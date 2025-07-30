@@ -1,25 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline, Box } from '@mui/material';
+import { theme } from './theme';
+import TopBar from './components/TopBar';
+import Home from './components/Home';
 
 function App() {
+  const [cartItems, setCartItems] = useState({
+    refrigerator: 0,
+    washingMachine: 0,
+    bulb: 0,
+    oven: 0,
+  });
+
+  const totalCartCount = Object.values(cartItems).reduce((sum, count) => sum + count, 0);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div className="App">
+        <TopBar cartCount={totalCartCount} />
+        <Box sx={{ paddingTop: '124px' }}> {/* Reduced padding to eliminate white space */}
+          <Home cartItems={cartItems} setCartItems={setCartItems} />
+        </Box>
+      </div>
+    </ThemeProvider>
   );
 }
 
