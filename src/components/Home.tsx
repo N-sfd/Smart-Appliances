@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -6,15 +6,29 @@ import {
   Button,
   Card,
   CardContent,
-  Modal,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  IconButton,
+  Divider,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import KitchenIcon from '@mui/icons-material/Kitchen';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import AcUnitIcon from '@mui/icons-material/AcUnit';
+import PlumbingIcon from '@mui/icons-material/Plumbing';
+import BoltIcon from '@mui/icons-material/Bolt';
+import DevicesIcon from '@mui/icons-material/Devices';
+import BuildIcon from '@mui/icons-material/Build';
+import StarIcon from '@mui/icons-material/Star';
+import FlashOnIcon from '@mui/icons-material/FlashOn';
+import EngineeringIcon from '@mui/icons-material/Engineering';
+import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { serviceCategories } from '../data/services';
 
 interface HomeProps {
   cartItems: {
@@ -23,166 +37,165 @@ interface HomeProps {
     bulb: number;
     oven: number;
   };
-  setCartItems: React.Dispatch<React.SetStateAction<{
-    refrigerator: number;
-    washingMachine: number;
-    bulb: number;
-    oven: number;
-  }>>;
+  setCartItems: React.Dispatch<
+    React.SetStateAction<{
+      refrigerator: number;
+      washingMachine: number;
+      bulb: number;
+      oven: number;
+    }>
+  >;
+  onOpenBooking: (priority: 'regular' | 'emergency', categoryId?: string, serviceTypeId?: string) => void;
 }
 
-const Home: React.FC<HomeProps> = ({ cartItems, setCartItems }) => {
+const sectionTags = ['All', 'Appliances', 'HVAC', 'Plumbing', 'Electrical', 'Smart Home', 'Maintenance'];
+
+const iconMap: Record<string, React.ReactNode> = {
+  Kitchen: <KitchenIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+  ShoppingCart: <ShoppingCartIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+  AcUnit: <AcUnitIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+  Plumbing: <PlumbingIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+  Bolt: <BoltIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+  Devices: <DevicesIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+  Build: <BuildIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+};
+
+const howItWorks = [
+  {
+    step: '1',
+    title: 'Choose a service',
+    description: 'Pick the right category and specific service type for your appliance or home system.',
+  },
+  {
+    step: '2',
+    title: 'Regular or emergency',
+    description: 'Schedule routine work at a convenient time or request urgent same-day emergency response.',
+  },
+  {
+    step: '3',
+    title: 'Tell us the problem',
+    description: 'Share the issue details, location, appliance brand, model, and any photos for faster service.',
+  },
+  {
+    step: '4',
+    title: 'Get contacted & booked',
+    description: 'Our team confirms service details, availability, and next steps with clear pricing notes.',
+  },
+];
+
+const trustItems = [
+  {
+    icon: <FlashOnIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
+    title: 'Fast Response',
+    description: 'Quick replies and clear scheduling for every request, including same-day emergency service.',
+  },
+  {
+    icon: <EngineeringIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
+    title: 'Experienced Technicians',
+    description: 'Licensed pros trained in appliance repair, HVAC, plumbing, electrical, and smart home setup.',
+  },
+  {
+    icon: <HomeRepairServiceIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
+    title: 'Full Home Coverage',
+    description: 'Complete coverage for repairs, installations, maintenance, and emergency jobs across all systems.',
+  },
+  {
+    icon: <VerifiedIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
+    title: 'Transparent Estimates',
+    description: 'Clear pricing notes and your consent before final diagnosis and any work begins.',
+  },
+];
+
+const companyStats = [
+  { value: '5,000+', label: 'Repairs Completed' },
+  { value: '4.9★', label: 'Average Rating' },
+  { value: '24/7', label: 'Emergency Support' },
+  { value: '100%', label: 'Licensed & Insured' },
+];
+
+const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentBrandIndex, setCurrentBrandIndex] = useState(0);
   const [currentRepairBrandIndex, setCurrentRepairBrandIndex] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [itemCounts, setItemCounts] = useState({
-    refrigerator: 0,
-    washingMachine: 0,
-    bulb: 0,
-    oven: 0,
-  });
-  
-  const images = [
-    '/1.png',
-    '/2.png', 
-    '/3.png'
-  ];
+  const [itemCounts, setItemCounts] = useState({ refrigerator: 0, washingMachine: 0, bulb: 0, oven: 0 });
+  const [serviceCategoryFilter, setServiceCategoryFilter] = useState('All');
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [contactSent, setContactSent] = useState(false);
 
-  const repairItems = [
-    'Refrigerator',
-    'Washing Machine',
-    'Dishwasher',
-    'Speaker',
-    'Microwave',
-    'Dryer',
-    'Air Conditioner',
-    'Water Heater',
-    'TV',
-    'Camera'
-  ];
+  const images = ['/1.png', '/2.png', '/3.png'];
 
   const brandLogos = [
-    { src: '/Samsung_Logo.svg.png', alt: 'Samsung Logo' },
-    { src: '/LG-Logo.png', alt: 'LG Logo' },
-    { src: '/Whirlpool-Logo.png', alt: 'Whirlpool Logo' },
-    { src: '/Bosch-Logo.png', alt: 'Bosch Logo' },
-    { src: '/General_Electric_logo.svg.png', alt: 'General Electric Logo' }
+    { src: '/Samsung_Logo.svg.png', alt: 'Samsung' },
+    { src: '/LG-Logo.png', alt: 'LG' },
+    { src: '/Whirlpool-Logo.png', alt: 'Whirlpool' },
+    { src: '/Bosch-Logo.png', alt: 'Bosch' },
+    { src: '/General_Electric_logo.svg.png', alt: 'GE' },
   ];
 
-  // Create infinite scroll by duplicating the brands
   const infiniteBrandLogos = [...brandLogos, ...brandLogos];
 
-  const carouselContent = [
-    {
-      title: "Our Premium Appliances",
-      description: "Discover our collection of cutting-edge smart appliances designed to make your life easier and more efficient. From smart refrigerators to intelligent washing machines.",
-      buttonText: "View Appliances",
-      buttonAction: "#appliances"
-    },
-    {
-      title: "We Can Fix What Is Broken!",
-      description: "Professional repair services for all types of appliances with quick response times and guaranteed work. Our expert technicians are here to help.",
-      buttonText: "Schedule Repair",
-      buttonAction: "#repair"
-    },
-    {
-      title: "Get In Touch With Us",
-      description: "Ready to upgrade your home with smart appliances or need professional repair services? Contact our team today for personalized solutions.",
-      buttonText: "Contact Us",
-      buttonAction: "#contact"
-    }
-  ];
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000); // Change image every 5 seconds
-
+      setCurrentBrandIndex((prev) => (prev + 1 >= brandLogos.length ? 0 : prev + 1));
+    }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [brandLogos.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentBrandIndex((prevIndex) => {
-        const nextIndex = prevIndex + 1;
-        // Reset to 0 when we reach the end of the first set
-        if (nextIndex >= brandLogos.length) {
-          return 0;
-        }
-        return nextIndex;
-      });
-    }, 3000); // Change brands every 3 seconds
-
+      setCurrentRepairBrandIndex((prev) => (prev + 1 >= brandLogos.length ? 0 : prev + 1));
+    }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [brandLogos.length]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentRepairBrandIndex((prevIndex) => {
-        const nextIndex = prevIndex + 1;
-        // Reset to 0 when we reach the end of the first set
-        if (nextIndex >= brandLogos.length) {
-          return 0;
-        }
-        return nextIndex;
-      });
-    }, 3000); // Change repair brands every 3 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleScheduleClick = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const filteredCategories = useMemo(
+    () =>
+      serviceCategoryFilter === 'All'
+        ? serviceCategories
+        : serviceCategories.filter((c) => c.tags.includes(serviceCategoryFilter)),
+    [serviceCategoryFilter],
+  );
 
   const increaseCount = (itemType: keyof typeof itemCounts) => {
-    setItemCounts(prev => ({
-      ...prev,
-      [itemType]: prev[itemType] + 1
-    }));
+    setItemCounts((prev) => ({ ...prev, [itemType]: prev[itemType] + 1 }));
   };
 
   const decreaseCount = (itemType: keyof typeof itemCounts) => {
-    setItemCounts(prev => ({
-      ...prev,
-      [itemType]: Math.max(0, prev[itemType] - 1)
-    }));
+    setItemCounts((prev) => ({ ...prev, [itemType]: Math.max(0, prev[itemType] - 1) }));
   };
 
   const addToCart = (itemType: keyof typeof itemCounts) => {
     if (itemCounts[itemType] > 0) {
-      setCartItems(prev => ({
-        ...prev,
-        [itemType]: prev[itemType] + itemCounts[itemType]
-      }));
-      setItemCounts(prev => ({
-        ...prev,
-        [itemType]: 0
-      }));
+      setCartItems((prev) => ({ ...prev, [itemType]: prev[itemType] + itemCounts[itemType] }));
+      setItemCounts((prev) => ({ ...prev, [itemType]: 0 }));
+    }
+  };
+
+  const handleContactSubmit = () => {
+    if (contactName && contactEmail && contactMessage) {
+      setContactSent(true);
     }
   };
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
-      {/* Hero Section - Image Carousel */}
+      {/* ── Hero ── */}
       <Box
         id="home"
-        sx={{
-          position: 'relative',
-          height: '50vh',
-          minHeight: '400px',
-          overflow: 'hidden',
-        }}
+        sx={{ position: 'relative', height: '58vh', minHeight: '440px', overflow: 'hidden' }}
       >
-        {/* Rotating Images */}
         {images.map((image, index) => (
           <Box
-            key={index}
+            key={image}
             sx={{
               position: 'absolute',
               top: 0,
@@ -198,8 +211,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems }) => {
             }}
           />
         ))}
-        
-        {/* Overlay with Text */}
+
         <Box
           sx={{
             position: 'absolute',
@@ -207,41 +219,25 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems }) => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(2, 47, 73, 0.6)',
+            backgroundColor: 'rgba(2, 47, 73, 0.68)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1,
           }}
         >
-          <Container maxWidth="lg" sx={{ 
-            textAlign: currentImageIndex === 0 ? 'left' : currentImageIndex === 1 ? 'center' : 'right', 
-            color: '#FFFFFF',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: currentImageIndex === 0 ? 'flex-start' : currentImageIndex === 1 ? 'center' : 'flex-end',
-            justifyContent: 'flex-end',
-            height: '100%',
-            paddingLeft: currentImageIndex === 0 ? '0' : 'inherit',
-            paddingRight: currentImageIndex === 2 ? '0' : 'inherit',
-            marginLeft: currentImageIndex === 0 ? '0' : 'inherit',
-            marginRight: currentImageIndex === 2 ? '0' : 'inherit',
-            transform: currentImageIndex === 0 ? 'translateX(-10%)' : currentImageIndex === 2 ? 'translateX(10%)' : 'none',
-            paddingBottom: '2%',
-          }}>
+          <Container maxWidth="lg" sx={{ color: '#FFFFFF', textAlign: 'center' }}>
             <Typography
               variant="h1"
               sx={{
                 fontFamily: 'Wasted Vindey, Arial, sans-serif',
                 fontWeight: 700,
-                fontSize: { xs: '2rem', md: '3rem' },
+                fontSize: { xs: '1.9rem', sm: '2.6rem', md: '3.4rem' },
                 marginBottom: 2,
-                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                opacity: 1,
-                transition: 'opacity 0.5s ease-in-out',
+                textShadow: '2px 2px 8px rgba(0,0,0,0.4)',
               }}
             >
-              {carouselContent[currentImageIndex].title}
+              Smart Home Service, Repairs & Installations
             </Typography>
             <Typography
               variant="h5"
@@ -249,78 +245,381 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems }) => {
                 fontFamily: 'DM Sans, Arial, sans-serif',
                 fontWeight: 400,
                 marginBottom: 3,
-                maxWidth: currentImageIndex === 1 ? '600px' : '400px',
-                margin: currentImageIndex === 0 ? '0 0 20px 0' : currentImageIndex === 1 ? '0 auto 20px auto' : '0 0 20px auto',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                opacity: 1,
-                transition: 'opacity 0.5s ease-in-out',
+                maxWidth: '760px',
+                margin: '0 auto 24px',
+                lineHeight: 1.7,
+                fontSize: { xs: '1rem', md: '1.2rem' },
+                textShadow: '1px 1px 6px rgba(0,0,0,0.3)',
               }}
             >
-              {carouselContent[currentImageIndex].description}
+              Book trusted technicians for appliances, HVAC, plumbing, electrical, smart home setup, or urgent
+              same-day service in your area.
             </Typography>
-            <Button
-              variant="contained"
-              size="large"
-              href={carouselContent[currentImageIndex].buttonAction}
-              sx={{
-                backgroundColor: '#22B1FB',
-                color: '#FFFFFF',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 600,
-                padding: '12px 32px',
-                fontSize: '1.1rem',
-                borderRadius: '12px',
-                '&:hover': {
-                  backgroundColor: '#022F49',
-                },
-                opacity: 1,
-                transition: 'opacity 0.5s ease-in-out',
-              }}
-            >
-              {carouselContent[currentImageIndex].buttonText}
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
+              <Button
+                variant="contained"
+                onClick={() => onOpenBooking('regular')}
+                sx={{
+                  backgroundColor: '#22B1FB',
+                  color: '#FFFFFF',
+                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontWeight: 700,
+                  padding: '14px 32px',
+                  borderRadius: '12px',
+                  fontSize: '1rem',
+                  '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
+                }}
+              >
+                Schedule Regular Service
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => onOpenBooking('emergency')}
+                sx={{
+                  backgroundColor: '#FF6B6B',
+                  color: '#FFFFFF',
+                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontWeight: 700,
+                  padding: '14px 32px',
+                  borderRadius: '12px',
+                  fontSize: '1rem',
+                  '&:hover': { backgroundColor: '#FFFFFF', color: '#FF6B6B' },
+                }}
+              >
+                Emergency Service
+              </Button>
+            </Box>
+            <Typography variant="body2" sx={{ color: '#D0EEFF', lineHeight: 1.7, fontSize: '0.9rem' }}>
+              Schedule a convenient appointment or request urgent same-day support with clear priority and fast response.
+            </Typography>
           </Container>
         </Box>
       </Box>
 
-      {/* Supported Brands Section */}
-      <Box sx={{ padding: '20px 0 50px 0', backgroundColor: '#F5F7F9' }}>
+      {/* ── Service Categories ── */}
+      <Box id="services" sx={{ padding: '72px 0', backgroundColor: '#FFFFFF' }}>
         <Container maxWidth="lg">
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', md: '1fr auto 1fr' }, 
-            gap: 3,
-            alignItems: 'center'
-          }}>
-            {/* Left Side - Brands We Sell */}
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              fontWeight: 600,
+              color: '#022F49',
+              textAlign: 'center',
+              marginBottom: 1.5,
+            }}
+          >
+            Our Service Categories
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontFamily: 'DM Sans, Arial, sans-serif',
+              color: '#555555',
+              textAlign: 'center',
+              marginBottom: 4,
+              maxWidth: '780px',
+              margin: '0 auto 32px',
+              lineHeight: 1.8,
+            }}
+          >
+            Home services that match the brands and systems you trust — from appliance repair to emergency support,
+            HVAC care, plumbing, electrical, and smart home setup.
+          </Typography>
+
+          {/* Filter tabs */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center', marginBottom: 4 }}>
+            {sectionTags.map((tag) => (
+              <Button
+                key={tag}
+                onClick={() => setServiceCategoryFilter(tag)}
+                variant={serviceCategoryFilter === tag ? 'contained' : 'outlined'}
+                sx={{
+                  textTransform: 'none',
+                  borderRadius: '999px',
+                  px: 3,
+                  py: 0.75,
+                  borderColor: '#22B1FB',
+                  color: serviceCategoryFilter === tag ? '#FFFFFF' : '#022F49',
+                  backgroundColor: serviceCategoryFilter === tag ? '#22B1FB' : '#F5F7F9',
+                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontWeight: serviceCategoryFilter === tag ? 700 : 500,
+                  '&:hover': { backgroundColor: serviceCategoryFilter === tag ? '#1A9FE0' : '#E8F4FD', borderColor: '#22B1FB' },
+                }}
+              >
+                {tag}
+              </Button>
+            ))}
+          </Box>
+
+          {/* Category cards */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' },
+              gap: 3,
+            }}
+          >
+            {filteredCategories.map((category) => (
+              <Card
+                key={category.id}
+                sx={{
+                  borderRadius: '20px',
+                  border: '1px solid #E5E5E5',
+                  minHeight: '340px',
+                  transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+                  '&:hover': { boxShadow: '0 8px 28px rgba(2,47,73,0.1)', transform: 'translateY(-2px)' },
+                }}
+              >
+                <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                    {iconMap[category.icon] ?? <StarIcon sx={{ fontSize: 36, color: '#22B1FB' }} />}
+                    <Typography
+                      variant="h5"
+                      sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49' }}
+                    >
+                      {category.title}
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: '#666666', lineHeight: 1.8, mb: 2 }}>
+                    {category.description}
+                  </Typography>
+
+                  {/* Top services list */}
+                  <Box sx={{ mb: 2, flexGrow: 1 }}>
+                    {category.services.slice(0, 4).map((service) => (
+                      <Box
+                        key={service.id}
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}
+                      >
+                        <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#22B1FB', flexShrink: 0 }} />
+                        <Typography
+                          variant="body2"
+                          sx={{ color: '#444444', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.82rem' }}
+                        >
+                          {service.label}
+                        </Typography>
+                      </Box>
+                    ))}
+                    {category.services.length > 4 && (
+                      <Typography
+                        variant="caption"
+                        sx={{ color: '#22B1FB', fontFamily: 'DM Sans, Arial, sans-serif', ml: 2.5 }}
+                      >
+                        +{category.services.length - 4} more services
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Box sx={{ display: 'grid', gap: 1 }}>
+                    <Button
+                      variant="contained"
+                      onClick={() => onOpenBooking('regular', category.id, category.services[0]?.id)}
+                      sx={{
+                        backgroundColor: '#22B1FB',
+                        color: '#FFFFFF',
+                        textTransform: 'none',
+                        borderRadius: '10px',
+                        fontFamily: 'DM Sans, Arial, sans-serif',
+                        fontWeight: 600,
+                        '&:hover': { backgroundColor: '#022F49' },
+                      }}
+                    >
+                      Book Service
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      onClick={() => onOpenBooking('emergency', category.id, category.services[0]?.id)}
+                      sx={{
+                        textTransform: 'none',
+                        borderRadius: '10px',
+                        borderColor: '#FF6B6B',
+                        color: '#FF6B6B',
+                        fontFamily: 'DM Sans, Arial, sans-serif',
+                        fontWeight: 600,
+                        '&:hover': { backgroundColor: '#FFF5F5', borderColor: '#CC2200', color: '#CC2200' },
+                      }}
+                    >
+                      Emergency Support
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── How It Works ── */}
+      <Box sx={{ padding: '64px 0', backgroundColor: '#F5F7F9' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              color: '#022F49',
+              textAlign: 'center',
+              marginBottom: 1,
+            }}
+          >
+            How It Works
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontFamily: 'DM Sans, Arial, sans-serif',
+              color: '#555555',
+              textAlign: 'center',
+              marginBottom: 4,
+            }}
+          >
+            Book a service in minutes, get expert help fast.
+          </Typography>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+              gap: 3,
+            }}
+          >
+            {howItWorks.map((item) => (
+              <Card
+                key={item.step}
+                sx={{ borderRadius: '18px', backgroundColor: '#FFFFFF', border: '1px solid #E5E5E5' }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: '50%',
+                      backgroundColor: '#22B1FB',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 2,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        color: '#FFFFFF',
+                        fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                        fontWeight: 700,
+                        fontSize: '1.1rem',
+                      }}
+                    >
+                      {item.step}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                      color: '#022F49',
+                      marginBottom: 1.5,
+                    }}
+                  >
+                    {item.title}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#555555', lineHeight: 1.8, fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                    {item.description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── Trust Section ── */}
+      <Box sx={{ padding: '72px 0', backgroundColor: '#FFFFFF' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              color: '#022F49',
+              textAlign: 'center',
+              marginBottom: 1,
+            }}
+          >
+            Why Choose Us
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontFamily: 'DM Sans, Arial, sans-serif',
+              color: '#555555',
+              textAlign: 'center',
+              marginBottom: 4,
+            }}
+          >
+            Trusted service with transparent pricing and professional technicians.
+          </Typography>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+              gap: 3,
+            }}
+          >
+            {trustItems.map((item) => (
+              <Card
+                key={item.title}
+                sx={{
+                  borderRadius: '18px',
+                  backgroundColor: '#F5F7F9',
+                  border: '1px solid #E8E8E8',
+                  transition: 'box-shadow 0.2s',
+                  '&:hover': { boxShadow: '0 6px 20px rgba(2,47,73,0.08)' },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ mb: 2 }}>{item.icon}</Box>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1.5 }}
+                  >
+                    {item.title}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#555555', lineHeight: 1.8, fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                    {item.description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── Brands ── */}
+      <Box sx={{ padding: '40px 0 56px', backgroundColor: '#F5F7F9' }}>
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr auto 1fr' },
+              gap: 3,
+              alignItems: 'center',
+            }}
+          >
             <Box>
               <Typography
                 variant="h3"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  marginBottom: 3,
-                  color: '#022F49',
-                }}
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', textAlign: 'center', mb: 3, color: '#022F49' }}
               >
                 Brands We Sell
               </Typography>
-              
-              <Box sx={{ 
-                position: 'relative',
-                overflow: 'hidden',
-                maxWidth: '500px', 
-                margin: '0 auto',
-                height: '80px'
-              }}>
-                <Box sx={{ 
-                  display: 'flex',
-                  transition: 'transform 0.5s ease-in-out',
-                  transform: `translateX(-${currentBrandIndex * (120 + 32)}px)`,
-                  gap: 4,
-                  alignItems: 'center'
-                }}>
+              <Box sx={{ position: 'relative', overflow: 'hidden', maxWidth: '500px', margin: '0 auto', height: '80px' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    transition: 'transform 0.5s ease-in-out',
+                    transform: `translateX(-${currentBrandIndex * 152}px)`,
+                    gap: 4,
+                    alignItems: 'center',
+                  }}
+                >
                   {infiniteBrandLogos.map((brand, index) => (
                     <Box
                       key={index}
@@ -328,23 +627,16 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems }) => {
                       src={brand.src}
                       alt={brand.alt}
                       sx={{
-                        width: (index % 5) === 4 ? '80px' : '120px', // GE logo is smaller
+                        width: index % 5 === 4 ? '80px' : '120px',
                         height: 'auto',
                         objectFit: 'contain',
-                        transition: 'all 0.3s ease',
                         flexShrink: 0,
-                        '&:hover': {
-                          transform: 'scale(1.1)',
-                          filter: 'drop-shadow(0 8px 25px rgba(0,0,0,0.2))',
-                        }
                       }}
                     />
                   ))}
                 </Box>
               </Box>
             </Box>
-
-            {/* Vertical Divider */}
             <Box
               sx={{
                 display: { xs: 'none', md: 'block' },
@@ -355,36 +647,23 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems }) => {
                 borderRadius: '1px',
               }}
             />
-
-            {/* Right Side - Brands We Repair */}
             <Box>
               <Typography
                 variant="h3"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  marginBottom: 3,
-                  color: '#022F49',
-                }}
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', textAlign: 'center', mb: 3, color: '#022F49' }}
               >
                 Brands We Repair
               </Typography>
-              
-              <Box sx={{ 
-                position: 'relative',
-                overflow: 'hidden',
-                maxWidth: '500px', 
-                margin: '0 auto',
-                height: '80px'
-              }}>
-                <Box sx={{ 
-                  display: 'flex',
-                  transition: 'transform 0.5s ease-in-out',
-                  transform: `translateX(-${currentRepairBrandIndex * (120 + 32)}px)`,
-                  gap: 4,
-                  alignItems: 'center'
-                }}>
+              <Box sx={{ position: 'relative', overflow: 'hidden', maxWidth: '500px', margin: '0 auto', height: '80px' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    transition: 'transform 0.5s ease-in-out',
+                    transform: `translateX(-${currentRepairBrandIndex * 152}px)`,
+                    gap: 4,
+                    alignItems: 'center',
+                  }}
+                >
                   {infiniteBrandLogos.map((brand, index) => (
                     <Box
                       key={`repair-${index}`}
@@ -392,15 +671,10 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems }) => {
                       src={brand.src}
                       alt={brand.alt}
                       sx={{
-                        width: (index % 5) === 4 ? '80px' : '120px', // GE logo is smaller
+                        width: index % 5 === 4 ? '80px' : '120px',
                         height: 'auto',
                         objectFit: 'contain',
-                        transition: 'all 0.3s ease',
                         flexShrink: 0,
-                        '&:hover': {
-                          transform: 'scale(1.1)',
-                          filter: 'drop-shadow(0 8px 25px rgba(0,0,0,0.2))',
-                        }
                       }}
                     />
                   ))}
@@ -411,2466 +685,830 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems }) => {
         </Container>
       </Box>
 
-      {/* Appliances Section */}
-      <Box id="appliances" sx={{ backgroundColor: '#E8F4FD' }}>
-        <Container maxWidth="lg" sx={{ padding: '40px 0 40px 0' }}>
-        <Typography
-          variant="h2"
-          sx={{
-            fontFamily: 'Wasted Vindey, Arial, sans-serif',
-            fontWeight: 600,
-            textAlign: 'center',
-            marginBottom: 4,
-            color: '#022F49',
-          }}
-        >
-          Buy Our Premium Appliances
-        </Typography>
-        
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 4 }}>
-          {/* Smart Refrigerator */}
-          <Card
-            sx={{
-              height: '100%',
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                backgroundColor: '#022F49',
-                borderColor: '#022F49',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-                '& .MuiTypography-root': {
-                  color: '#FFFFFF',
-                },
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 3 }}>
-              <Box
-                component="img"
-                src="/Item2.png"
-                alt="Smart Refrigerator"
-                sx={{
-                  width: '100%',
-                  height: '150px',
-                  objectFit: 'contain',
-                  borderRadius: '8px',
-                  marginBottom: 2,
-                }}
-              />
-              <Typography
-                variant="h5"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  marginBottom: 2,
-                  color: '#022F49',
-                }}
-              >
-                Smart Refrigerator
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#000000',
-                  lineHeight: 1.6,
-                  marginBottom: 3,
-                }}
-              >
-                Advanced temperature control, inventory tracking, and energy efficiency. Features include touch screen interface, 
-                camera monitoring, and smart notifications for food expiration dates.
-              </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 700,
-                    color: '#022F49',
-                  }}
-                >
-                  $1,299
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {/* Count Controls */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => decreaseCount('refrigerator')}
-                      disabled={itemCounts.refrigerator === 0}
-                      sx={{
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        padding: 0,
-                        border: '2px solid #22B1FB',
-                        color: itemCounts.refrigerator === 0 ? '#CCCCCC' : '#22B1FB',
-                        borderRadius: '8px',
-                        '&:hover': {
-                          backgroundColor: itemCounts.refrigerator === 0 ? 'transparent' : '#22B1FB',
-                          color: itemCounts.refrigerator === 0 ? '#CCCCCC' : '#FFFFFF',
-                        },
-                        '&:disabled': {
-                          borderColor: '#CCCCCC',
-                          color: '#CCCCCC',
-                        },
-                      }}
-                    >
-                      -
-                    </Button>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        color: '#022F49',
-                        minWidth: '20px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      {itemCounts.refrigerator}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      onClick={() => increaseCount('refrigerator')}
-                      sx={{
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        padding: 0,
-                        border: '2px solid #22B1FB',
-                        color: '#22B1FB',
-                        borderRadius: '8px',
-                        '&:hover': {
-                          backgroundColor: '#22B1FB',
-                          color: '#FFFFFF',
-                        },
-                      }}
-                    >
-                      +
-                    </Button>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    onClick={() => addToCart('refrigerator')}
-                    disabled={itemCounts.refrigerator === 0}
-                    sx={{
-                      backgroundColor: itemCounts.refrigerator === 0 ? '#CCCCCC' : '#22B1FB',
-                      color: '#FFFFFF',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 600,
-                      border: '2px solid #21B2FA',
-                      borderRadius: '12px',
-                      '&:hover': {
-                        backgroundColor: itemCounts.refrigerator === 0 ? '#CCCCCC' : '#022F49',
-                        border: '2px solid #21B2FA',
-                      },
-                      '&:disabled': {
-                        backgroundColor: '#CCCCCC',
-                        borderColor: '#CCCCCC',
-                      },
-                    }}
-                  >
-                    Add To Cart
-                  </Button>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-
-          {/* Smart Washing Machine */}
-          <Card
-            sx={{
-              height: '100%',
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                backgroundColor: '#022F49',
-                borderColor: '#022F49',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-                '& .MuiTypography-root': {
-                  color: '#FFFFFF',
-                },
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 3 }}>
-              <Box
-                component="img"
-                src="/Item4.png"
-                alt="Smart Washing Machine"
-                sx={{
-                  width: '100%',
-                  height: '150px',
-                  objectFit: 'contain',
-                  borderRadius: '8px',
-                  marginBottom: 2,
-                }}
-              />
-              <Typography
-                variant="h5"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  marginBottom: 2,
-                  color: '#022F49',
-                }}
-              >
-                Smart Washing Machine
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#000000',
-                  lineHeight: 1.6,
-                  marginBottom: 3,
-                }}
-              >
-                AI-powered fabric detection, optimal cycle selection, and remote control via smartphone app. 
-                Features include steam cleaning, allergen removal, and energy monitoring.
-              </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 700,
-                    color: '#022F49',
-                  }}
-                >
-                  $899
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {/* Count Controls */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => decreaseCount('washingMachine')}
-                      disabled={itemCounts.washingMachine === 0}
-                      sx={{
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        padding: 0,
-                        border: '2px solid #22B1FB',
-                        color: itemCounts.washingMachine === 0 ? '#CCCCCC' : '#22B1FB',
-                        borderRadius: '8px',
-                        '&:hover': {
-                          backgroundColor: itemCounts.washingMachine === 0 ? 'transparent' : '#22B1FB',
-                          color: itemCounts.washingMachine === 0 ? '#CCCCCC' : '#FFFFFF',
-                        },
-                        '&:disabled': {
-                          borderColor: '#CCCCCC',
-                          color: '#CCCCCC',
-                        },
-                      }}
-                    >
-                      -
-                    </Button>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        color: '#022F49',
-                        minWidth: '20px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      {itemCounts.washingMachine}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      onClick={() => increaseCount('washingMachine')}
-                      sx={{
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        padding: 0,
-                        border: '2px solid #22B1FB',
-                        color: '#22B1FB',
-                        borderRadius: '8px',
-                        '&:hover': {
-                          backgroundColor: '#22B1FB',
-                          color: '#FFFFFF',
-                        },
-                      }}
-                    >
-                      +
-                    </Button>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    onClick={() => addToCart('washingMachine')}
-                    disabled={itemCounts.washingMachine === 0}
-                    sx={{
-                      backgroundColor: itemCounts.washingMachine === 0 ? '#CCCCCC' : '#22B1FB',
-                      color: '#FFFFFF',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 600,
-                      border: '2px solid #21B2FA',
-                      borderRadius: '12px',
-                      '&:hover': {
-                        backgroundColor: itemCounts.washingMachine === 0 ? '#CCCCCC' : '#022F49',
-                        border: '2px solid #21B2FA',
-                      },
-                      '&:disabled': {
-                        backgroundColor: '#CCCCCC',
-                        borderColor: '#CCCCCC',
-                      },
-                    }}
-                  >
-                    Add To Cart
-                  </Button>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-
-          {/* Smart Dishwasher */}
-          <Card
-            sx={{
-              height: '100%',
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                backgroundColor: '#022F49',
-                borderColor: '#022F49',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-                '& .MuiTypography-root': {
-                  color: '#FFFFFF',
-                },
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 3 }}>
-              <Box
-                component="img"
-                src="/Item3.png"
-                alt="Smart Bulb"
-                sx={{
-                  width: '100%',
-                  height: '150px',
-                  objectFit: 'contain',
-                  borderRadius: '8px',
-                  marginBottom: 2,
-                }}
-              />
-              <Typography
-                variant="h5"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  marginBottom: 2,
-                  color: '#022F49',
-                }}
-              >
-                Smart Bulb
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#000000',
-                  lineHeight: 1.6,
-                  marginBottom: 3,
-                }}
-              >
-                Energy-efficient LED smart bulbs with customizable colors and brightness. Features include 
-                voice control, scheduling, and remote control via smartphone app for ultimate convenience.
-              </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 700,
-                    color: '#022F49',
-                  }}
-                >
-                  $49
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {/* Count Controls */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => decreaseCount('bulb')}
-                      disabled={itemCounts.bulb === 0}
-                      sx={{
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        padding: 0,
-                        border: '2px solid #22B1FB',
-                        color: itemCounts.bulb === 0 ? '#CCCCCC' : '#22B1FB',
-                        borderRadius: '8px',
-                        '&:hover': {
-                          backgroundColor: itemCounts.bulb === 0 ? 'transparent' : '#22B1FB',
-                          color: itemCounts.bulb === 0 ? '#CCCCCC' : '#FFFFFF',
-                        },
-                        '&:disabled': {
-                          borderColor: '#CCCCCC',
-                          color: '#CCCCCC',
-                        },
-                      }}
-                    >
-                      -
-                    </Button>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        color: '#022F49',
-                        minWidth: '20px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      {itemCounts.bulb}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      onClick={() => increaseCount('bulb')}
-                      sx={{
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        padding: 0,
-                        border: '2px solid #22B1FB',
-                        color: '#22B1FB',
-                        borderRadius: '8px',
-                        '&:hover': {
-                          backgroundColor: '#22B1FB',
-                          color: '#FFFFFF',
-                        },
-                      }}
-                    >
-                      +
-                    </Button>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    onClick={() => addToCart('bulb')}
-                    disabled={itemCounts.bulb === 0}
-                    sx={{
-                      backgroundColor: itemCounts.bulb === 0 ? '#CCCCCC' : '#22B1FB',
-                      color: '#FFFFFF',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 600,
-                      border: '2px solid #21B2FA',
-                      borderRadius: '12px',
-                      '&:hover': {
-                        backgroundColor: itemCounts.bulb === 0 ? '#CCCCCC' : '#022F49',
-                        border: '2px solid #21B2FA',
-                      },
-                      '&:disabled': {
-                        backgroundColor: '#CCCCCC',
-                        borderColor: '#CCCCCC',
-                      },
-                    }}
-                  >
-                    Add To Cart
-                  </Button>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-
-          {/* Smart Oven */}
-          <Card
-            sx={{
-              height: '100%',
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                backgroundColor: '#022F49',
-                borderColor: '#022F49',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-                '& .MuiTypography-root': {
-                  color: '#FFFFFF',
-                },
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 3 }}>
-              <Box
-                component="img"
-                src="/Item1.png"
-                alt="Smart Oven"
-                sx={{
-                  width: '100%',
-                  height: '150px',
-                  objectFit: 'contain',
-                  borderRadius: '8px',
-                  marginBottom: 2,
-                }}
-              />
-              <Typography
-                variant="h5"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  marginBottom: 2,
-                  color: '#022F49',
-                }}
-              >
-                Smart Oven
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#000000',
-                  lineHeight: 1.6,
-                  marginBottom: 3,
-                }}
-              >
-                Precision cooking with built-in cameras, recipe guidance, and temperature monitoring. 
-                Features include convection cooking, air frying, and voice control integration.
-              </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 700,
-                    color: '#022F49',
-                  }}
-                >
-                  $1,199
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {/* Count Controls */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => decreaseCount('oven')}
-                      disabled={itemCounts.oven === 0}
-                      sx={{
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        padding: 0,
-                        border: '2px solid #22B1FB',
-                        color: itemCounts.oven === 0 ? '#CCCCCC' : '#22B1FB',
-                        borderRadius: '8px',
-                        '&:hover': {
-                          backgroundColor: itemCounts.oven === 0 ? 'transparent' : '#22B1FB',
-                          color: itemCounts.oven === 0 ? '#CCCCCC' : '#FFFFFF',
-                        },
-                        '&:disabled': {
-                          borderColor: '#CCCCCC',
-                          color: '#CCCCCC',
-                        },
-                      }}
-                    >
-                      -
-                    </Button>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        color: '#022F49',
-                        minWidth: '20px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      {itemCounts.oven}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      onClick={() => increaseCount('oven')}
-                      sx={{
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        padding: 0,
-                        border: '2px solid #22B1FB',
-                        color: '#22B1FB',
-                        borderRadius: '8px',
-                        '&:hover': {
-                          backgroundColor: '#22B1FB',
-                          color: '#FFFFFF',
-                        },
-                      }}
-                    >
-                      +
-                    </Button>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    onClick={() => addToCart('oven')}
-                    disabled={itemCounts.oven === 0}
-                    sx={{
-                      backgroundColor: itemCounts.oven === 0 ? '#CCCCCC' : '#22B1FB',
-                      color: '#FFFFFF',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 600,
-                      border: '2px solid #21B2FA',
-                      borderRadius: '12px',
-                      '&:hover': {
-                        backgroundColor: itemCounts.oven === 0 ? '#CCCCCC' : '#022F49',
-                        border: '2px solid #21B2FA',
-                      },
-                      '&:disabled': {
-                        backgroundColor: '#CCCCCC',
-                        borderColor: '#CCCCCC',
-                      },
-                    }}
-                  >
-                    Add To Cart
-                  </Button>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Box>
-        
-        {/* View All Button */}
-        <Box sx={{ textAlign: 'center', marginTop: 4 }}>
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              borderColor: '#22B1FB',
-              color: '#22B1FB',
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              padding: '12px 32px',
-              borderRadius: '12px',
-              '&:hover': {
-                backgroundColor: '#22B1FB',
-                color: '#FFFFFF',
-                borderColor: '#22B1FB',
-              },
-            }}
-          >
-            View All
-          </Button>
-        </Box>
-        </Container>
-      </Box>
-
-              {/* Repairs Section */}
-        <Box id="repair" sx={{ backgroundColor: '#F5F7F9', padding: '40px 0' }}>
+      {/* ── Repair & Emergency Services ── */}
+      <Box id="repair" sx={{ padding: '72px 0', backgroundColor: '#022F49' }}>
         <Container maxWidth="lg">
-        <Typography
-          variant="h2"
-          sx={{
-            fontFamily: 'Wasted Vindey, Arial, sans-serif',
-            fontWeight: 600,
-            textAlign: 'center',
-            marginBottom: 4,
-            color: '#022F49',
-          }}
-        >
-          What We Fix
-        </Typography>
-        
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(5, 1fr)' }, gap: 3, maxWidth: '1200px', margin: '0 auto' }}>
-          {/* Refrigerator Repair */}
-          <Card
+          <Box
             sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/Refrigerator Icon.png"
-                  alt="Refrigerator Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Refrigerator
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Cooling issues, ice maker problems, temperature control
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Washing Machine Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/WashingMachine Icon.png"
-                  alt="Washing Machine Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Washing Machine
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Spin cycle issues, water leaks, drainage problems
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Dishwasher Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/Dishwasher Icon.png"
-                  alt="Dishwasher Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Dishwasher
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Water flow issues, cleaning problems, drainage repair
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Speaker Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/speaker.png"
-                  alt="Speaker Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Speaker
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Audio distortion, connectivity issues, power problems
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Microwave Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/Oven Icon.png"
-                  alt="Microwave Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Microwave
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Heating problems, door issues, control panel repair
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Dryer Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/dryer.png"
-                  alt="Dryer Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Dryer
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Heating issues, drum problems, belt replacement
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Air Conditioner Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/air-conditioner.png"
-                  alt="Air Conditioner Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Air Conditioner
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Cooling problems, refrigerant leaks, compressor repair
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Water Heater Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/water-heater.png"
-                  alt="Water Heater Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Water Heater
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Heating element issues, thermostat problems, tank leaks
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* TV Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/smart-tv.png"
-                  alt="TV Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                TV
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Screen issues, smart features, connectivity problems
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Camera Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/cctv-camera.png"
-                  alt="Camera Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Camera
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Lens problems, connectivity issues, recording repair
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Coffee Maker Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/coffe-maker-machine.png"
-                  alt="Coffee Maker Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Coffee Maker
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Brewing issues, water flow problems, heating element
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Cooker Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/Cooker.png"
-                  alt="Cooker Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Cooker
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Burner problems, ignition issues, temperature control
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Laptop / Computer Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/laptop-screen.png"
-                  alt="Laptop Computer Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Laptops
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Screen repair, battery replacement, hardware issues
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Vacuum Cleaner Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/bread.png"
-                  alt="Vacuum Cleaner Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Vacuum Cleaner
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Suction problems, brush roll issues, motor repair
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Gaming Console Repair */}
-          <Card
-            sx={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #D9D9D9',
-              borderRadius: '16px',
-              '&:hover': {
-                borderColor: '#22B1FB',
-                backgroundColor: '#21B2FA',
-                transform: 'translateY(-4px)',
-                transition: 'all 0.3s ease',
-              },
-            }}
-          >
-            <CardContent sx={{ padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-              <Box sx={{ marginBottom: 1, marginTop: 2 }}>
-                <Box
-                  component="img"
-                  src="/Console.png"
-                  alt="Gaming Console Icon"
-                  sx={{
-                    width: '48px',
-                    height: '48px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  color: '#022F49',
-                  marginBottom: 1,
-                }}
-              >
-                Gaming Console
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#666666',
-                  fontSize: '0.8rem',
-                  textAlign: 'center',
-                }}
-              >
-                Disc drive issues, overheating, controller repair
-              </Typography>
-            </CardContent>
-          </Card>
-        </Box>
-        
-        {/* Schedule Repairs Button */}
-        <Box sx={{ textAlign: 'center', marginTop: 4 }}>
-          <Button
-            variant="contained"
-            onClick={handleScheduleClick}
-            sx={{
-              backgroundColor: '#22B1FB',
-              color: '#FFFFFF',
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              textTransform: 'none',
-              padding: '12px 32px',
-              borderRadius: '12px',
-              minHeight: '48px',
-              '&:hover': {
-                backgroundColor: '#022F49',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(34, 177, 251, 0.3)',
-              },
-              transition: 'all 0.3s ease',
-            }}
-          >
-            Schedule Repairs
-          </Button>
-        </Box>
-        </Container>
-      </Box>
-
-
-
-      {/* About Us Section */}
-      <Box id="about" sx={{ padding: '60px 0', backgroundColor: '#E8F4FD' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', md: '0.8fr 1.2fr' }, 
-            gap: 6, 
-            alignItems: 'center' 
-          }}>
-            {/* Left Side - Image */}
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: { xs: 'center', md: 'flex-start' },
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              gap: 6,
               alignItems: 'center',
-              marginLeft: { md: '-120px' }
-            }}>
-              <Box
-                component="img"
-                src="/Humans About.png"
-                alt="About Us Image"
-                sx={{
-                  width: '100%',
-                  maxWidth: '1800px',
-                  height: 'auto',
-                  objectFit: 'contain',
-                  borderRadius: '16px',
-                }}
-              />
-            </Box>
-
-            {/* Right Side - Text Content */}
-            <Box sx={{ 
-              textAlign: { xs: 'center', md: 'left' }, 
-              paddingLeft: { md: 0 },
-              marginLeft: { md: '40px' }
-            }}>
+            }}
+          >
+            <Box>
               <Typography
                 variant="h2"
                 sx={{
                   fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  textAlign: { xs: 'center', md: 'left' },
-                  marginBottom: 4,
-                  color: '#022F49',
+                  color: '#FFFFFF',
+                  mb: 2,
                 }}
               >
-                About Us
+                Repair & Emergency Services
               </Typography>
-              
               <Typography
                 variant="body1"
                 sx={{
                   fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8,
-                  textAlign: { xs: 'center', md: 'left' },
-                  color: '#333333',
+                  color: '#A8D8F0',
+                  lineHeight: 1.9,
+                  mb: 3,
                 }}
               >
-                Smart Applications is a leading appliance repair and smart technology service company dedicated to providing exceptional repair solutions for all your household and electronic devices. With years of experience and a team of certified technicians, we specialize in repairing refrigerators, washing machines, dishwashers, smart TVs, and a wide range of electronic devices.
-                <br /><br />
-                Our commitment to quality service, competitive pricing, and customer satisfaction has made us the trusted choice for thousands of customers. We use only genuine parts and follow industry best practices to ensure your appliances are restored to optimal performance. Whether it's a simple repair or complex troubleshooting, our expert team is here to help you get your devices working perfectly again.
+                Our certified technicians handle repairs of all kinds — from appliance breakdowns and HVAC failures to
+                plumbing emergencies and electrical issues. We respond fast, diagnose accurately, and fix it right.
               </Typography>
-            </Box>
-          </Box>
-        </Container>
-      </Box>
-
-
-      {/* Contact Us Section */}
-      <Box id="contact" sx={{ padding: '60px 0', backgroundColor: '#F5F7F9' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
-            gap: 6, 
-            alignItems: 'flex-start' 
-          }}>
-            {/* Left Side - Contact Information */}
-            <Box sx={{ marginLeft: { md: '-80px' } }}>
-              <Typography
-                variant="h4"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  textAlign: { xs: 'center', md: 'left' },
-                  marginBottom: 4,
-                  color: '#022F49',
-                }}
-              >
-                Have Questions Or Need Assistance?
-              </Typography>
-              
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8,
-                  textAlign: { xs: 'center', md: 'left' },
-                  color: '#333333',
-                  marginBottom: 4,
-                }}
-              >
-                Feel free to fill out the form on the right for any queries or service requests. We're here to help you with all your appliance repair and smart technology needs.
-              </Typography>
-
-              {/* Contact Details */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* Phone */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box sx={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    backgroundColor: '#22B1FB', 
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#FFFFFF',
-                    fontSize: '20px'
-                  }}>
-                    📞
-                  </Box>
-                  <Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 4 }}>
+                {[
+                  'All major appliance brands serviced',
+                  'Licensed HVAC, plumbing & electrical techs',
+                  'Same-day emergency response available',
+                  'Transparent diagnosis before any repair',
+                  'Parts sourced and replaced on-site',
+                ].map((point) => (
+                  <Box key={point} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <CheckCircleOutlineIcon sx={{ color: '#22B1FB', fontSize: 20, flexShrink: 0 }} />
                     <Typography
-                      variant="h6"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        color: '#022F49',
-                        marginBottom: 0.5,
-                      }}
+                      variant="body2"
+                      sx={{ color: '#CCECFF', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.95rem' }}
                     >
-                      Phone
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        color: '#666666',
-                      }}
-                    >
-                      +1 (555) 123-4567
+                      {point}
                     </Typography>
                   </Box>
-                </Box>
-
-                {/* Email */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box sx={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    backgroundColor: '#22B1FB', 
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#FFFFFF',
-                    fontSize: '20px'
-                  }}>
-                    ✉️
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        color: '#022F49',
-                        marginBottom: 0.5,
-                      }}
-                    >
-                      Email
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        color: '#666666',
-                      }}
-                    >
-                      info@smartapplications.com
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Location */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box sx={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    backgroundColor: '#22B1FB', 
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#FFFFFF',
-                    fontSize: '20px'
-                  }}>
-                    📍
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        color: '#022F49',
-                        marginBottom: 0.5,
-                      }}
-                    >
-                      Location
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        color: '#666666',
-                      }}
-                    >
-                      123 Smart Street, Tech City, TC 12345
-                    </Typography>
-                  </Box>
-                </Box>
+                ))}
               </Box>
-            </Box>
-
-            {/* Right Side - Contact Form */}
-            <Box sx={{ 
-              backgroundColor: '#F5F7F9',
-              padding: 4,
-              borderRadius: '16px',
-              border: '2px solid #D9D9D9'
-            }}>
-              <Typography
-                variant="h4"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  marginBottom: 3,
-                  color: '#022F49',
-                }}
-              >
-                Contact Form
-              </Typography>
-
-              <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* Name Field */}
-                <Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 600,
-                      color: '#022F49',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Name *
-                  </Typography>
-                  <Box
-                    component="input"
-                    type="text"
-                    placeholder="Enter your full name"
-                    sx={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #D9D9D9',
-                      borderRadius: '8px',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontSize: '1rem',
-                      backgroundColor: '#FFFFFF',
-                      '&:focus': {
-                        outline: 'none',
-                        borderColor: '#22B1FB',
-                      },
-                    }}
-                  />
-                </Box>
-
-                {/* Email Field */}
-                <Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 600,
-                      color: '#022F49',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Email *
-                  </Typography>
-                  <Box
-                    component="input"
-                    type="email"
-                    placeholder="Enter your email address"
-                    sx={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #D9D9D9',
-                      borderRadius: '8px',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontSize: '1rem',
-                      backgroundColor: '#FFFFFF',
-                      '&:focus': {
-                        outline: 'none',
-                        borderColor: '#22B1FB',
-                      },
-                    }}
-                  />
-                </Box>
-
-                {/* Phone Field */}
-                <Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 600,
-                      color: '#022F49',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Phone Number
-                  </Typography>
-                  <Box
-                    component="input"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    sx={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #D9D9D9',
-                      borderRadius: '8px',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontSize: '1rem',
-                      backgroundColor: '#FFFFFF',
-                      '&:focus': {
-                        outline: 'none',
-                        borderColor: '#22B1FB',
-                      },
-                    }}
-                  />
-                </Box>
-
-                {/* Message Field */}
-                <Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 600,
-                      color: '#022F49',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Message *
-                  </Typography>
-                  <Box
-                    component="textarea"
-                    placeholder="Tell us about your inquiry or service request"
-                    rows={4}
-                    sx={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #D9D9D9',
-                      borderRadius: '8px',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontSize: '1rem',
-                      backgroundColor: '#FFFFFF',
-                      resize: 'vertical',
-                      minHeight: '120px',
-                      '&:focus': {
-                        outline: 'none',
-                        borderColor: '#22B1FB',
-                      },
-                    }}
-                  />
-                </Box>
-
-                {/* Submit Button */}
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   variant="contained"
+                  onClick={() => onOpenBooking('regular', 'appliance-repair')}
                   sx={{
                     backgroundColor: '#22B1FB',
                     color: '#FFFFFF',
                     fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 600,
-                    fontSize: '1rem',
+                    fontWeight: 700,
+                    px: 3,
+                    py: 1.25,
+                    borderRadius: '10px',
                     textTransform: 'none',
-                    padding: '12px 24px',
-                    borderRadius: '12px',
-                    marginTop: 2,
-                    '&:hover': {
-                      backgroundColor: '#022F49',
-                    },
+                    '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
                   }}
                 >
-                  Send Message
+                  Book Repair Service
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => onOpenBooking('emergency')}
+                  sx={{
+                    borderColor: '#FF6B6B',
+                    color: '#FF6B6B',
+                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontWeight: 700,
+                    px: 3,
+                    py: 1.25,
+                    borderRadius: '10px',
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999' },
+                  }}
+                >
+                  Emergency Help
                 </Button>
               </Box>
+            </Box>
+
+            {/* Stats */}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: 2,
+              }}
+            >
+              {companyStats.map((stat) => (
+                <Box
+                  key={stat.label}
+                  sx={{
+                    backgroundColor: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '16px',
+                    p: 3,
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                      color: '#22B1FB',
+                      fontSize: '2rem',
+                      fontWeight: 700,
+                      lineHeight: 1.2,
+                      mb: 0.5,
+                    }}
+                  >
+                    {stat.value}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: '#A8D8F0', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.85rem' }}
+                  >
+                    {stat.label}
+                  </Typography>
+                </Box>
+              ))}
             </Box>
           </Box>
         </Container>
       </Box>
 
-      {/* Footer Section */}
-      <Box sx={{ 
-        backgroundColor: '#022F49', 
-        color: '#FFFFFF',
-        padding: '30px 0 15px 0'
-      }}>
-        <Container maxWidth="lg">
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(4, 1fr)' }, 
-            gap: 4,
-            marginBottom: 2
-          }}>
-            {/* Company Info */}
-            <Box>
-              <Typography
-                variant="h6"
+      {/* ── Buy Appliances ── */}
+      <Box id="appliances" sx={{ backgroundColor: '#E8F4FD' }}>
+        <Container maxWidth="lg" sx={{ padding: '56px 0' }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              fontWeight: 600,
+              textAlign: 'center',
+              marginBottom: 4,
+              color: '#022F49',
+            }}
+          >
+            Buy Our Premium Appliances
+          </Typography>
+          <Box
+            sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 4 }}
+          >
+            {[
+              {
+                src: '/Item2.png',
+                alt: 'Smart Refrigerator',
+                title: 'Smart Refrigerator',
+                description: 'Advanced temperature control, inventory tracking, and energy efficiency for modern kitchens.',
+                price: '$1,299',
+                type: 'refrigerator' as const,
+              },
+              {
+                src: '/Item1.png',
+                alt: 'Smart Washer',
+                title: 'Smart Washer',
+                description: 'Efficient laundry solutions with remote monitoring and automatic cycle updates.',
+                price: '$799',
+                type: 'washingMachine' as const,
+              },
+            ].map((product) => (
+              <Card
+                key={product.type}
                 sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  marginBottom: 2,
-                  color: '#FFFFFF',
+                  height: '100%',
+                  backgroundColor: '#FFFFFF',
+                  border: '2px solid #D9D9D9',
+                  borderRadius: '16px',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: '#022F49',
+                    borderColor: '#022F49',
+                    transform: 'translateY(-4px)',
+                    '& .MuiTypography-root': { color: '#FFFFFF' },
+                  },
                 }}
               >
-                Smart Applications
+                <CardContent sx={{ p: 3 }}>
+                  <Box
+                    component="img"
+                    src={product.src}
+                    alt={product.alt}
+                    sx={{ width: '100%', height: '150px', objectFit: 'contain', borderRadius: '8px', mb: 2 }}
+                  />
+                  <Typography
+                    variant="h5"
+                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', fontWeight: 600, mb: 2, color: '#022F49' }}
+                  >
+                    {product.title}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#000000', lineHeight: 1.6, mb: 3 }}
+                  >
+                    {product.description}
+                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700, color: '#022F49' }}
+                    >
+                      {product.price}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => decreaseCount(product.type)}
+                        disabled={itemCounts[product.type] === 0}
+                        sx={{
+                          minWidth: '32px',
+                          width: '32px',
+                          height: '32px',
+                          p: 0,
+                          border: '2px solid #22B1FB',
+                          color: itemCounts[product.type] === 0 ? '#CCCCCC' : '#22B1FB',
+                          borderRadius: '8px',
+                          '&:hover': {
+                            backgroundColor: itemCounts[product.type] === 0 ? 'transparent' : '#22B1FB',
+                            color: itemCounts[product.type] === 0 ? '#CCCCCC' : '#FFFFFF',
+                          },
+                        }}
+                      >
+                        -
+                      </Button>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontWeight: 600,
+                          color: '#022F49',
+                          minWidth: '20px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {itemCounts[product.type]}
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        onClick={() => increaseCount(product.type)}
+                        sx={{
+                          minWidth: '32px',
+                          width: '32px',
+                          height: '32px',
+                          p: 0,
+                          border: '2px solid #22B1FB',
+                          color: '#22B1FB',
+                          borderRadius: '8px',
+                          '&:hover': { backgroundColor: '#22B1FB', color: '#FFFFFF' },
+                        }}
+                      >
+                        +
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => addToCart(product.type)}
+                        disabled={itemCounts[product.type] === 0}
+                        sx={{
+                          backgroundColor: '#22B1FB',
+                          color: '#FFFFFF',
+                          textTransform: 'none',
+                          borderRadius: '10px',
+                          '&:hover': { backgroundColor: '#022F49' },
+                        }}
+                      >
+                        Add
+                      </Button>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── About Us ── */}
+      <Box id="about" sx={{ padding: '80px 0', backgroundColor: '#FFFFFF' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 8, alignItems: 'center' }}>
+            <Box>
+              <Typography
+                variant="overline"
+                sx={{
+                  color: '#22B1FB',
+                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontWeight: 700,
+                  letterSpacing: 2,
+                  mb: 1,
+                  display: 'block',
+                }}
+              >
+                About Us
               </Typography>
+              <Typography
+                variant="h2"
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3 }}
+              >
+                Your Trusted Home Service Partner
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  color: '#555555',
+                  lineHeight: 2,
+                  mb: 2,
+                }}
+              >
+                Smart Appliances is a full-service home solutions company dedicated to keeping your appliances, HVAC
+                systems, plumbing, and electrical running smoothly. Our team of certified technicians brings years of
+                experience and a commitment to quality work every time.
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  color: '#555555',
+                  lineHeight: 2,
+                  mb: 3,
+                }}
+              >
+                Whether you need a routine maintenance visit or urgent emergency support, we respond quickly, diagnose
+                accurately, and provide transparent pricing before any work begins. We serve homeowners across the region
+                with same-day availability for emergency calls.
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Button
+                  variant="contained"
+                  onClick={() => onOpenBooking('regular')}
+                  sx={{
+                    backgroundColor: '#22B1FB',
+                    color: '#FFFFFF',
+                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontWeight: 700,
+                    px: 3,
+                    py: 1.25,
+                    borderRadius: '10px',
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: '#022F49' },
+                  }}
+                >
+                  Book a Service
+                </Button>
+                <Button
+                  variant="outlined"
+                  href="#contact"
+                  sx={{
+                    borderColor: '#022F49',
+                    color: '#022F49',
+                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1.25,
+                    borderRadius: '10px',
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: '#F5F7F9' },
+                  }}
+                >
+                  Contact Us
+                </Button>
+              </Box>
+            </Box>
+
+            {/* Values grid */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+              {[
+                { icon: <SupportAgentIcon sx={{ fontSize: 28, color: '#22B1FB' }} />, title: '24/7 Emergency', desc: 'Round-the-clock support for urgent home service needs.' },
+                { icon: <EngineeringIcon sx={{ fontSize: 28, color: '#22B1FB' }} />, title: 'Certified Techs', desc: 'All technicians are licensed, insured, and background-checked.' },
+                { icon: <VerifiedIcon sx={{ fontSize: 28, color: '#22B1FB' }} />, title: 'Quality Guarantee', desc: 'We stand behind every repair with our service quality guarantee.' },
+                { icon: <HomeRepairServiceIcon sx={{ fontSize: 28, color: '#22B1FB' }} />, title: 'Full Coverage', desc: 'Appliances, HVAC, plumbing, electrical — all in one call.' },
+              ].map((val) => (
+                <Box
+                  key={val.title}
+                  sx={{
+                    backgroundColor: '#F5F7F9',
+                    borderRadius: '16px',
+                    p: 2.5,
+                    border: '1px solid #E8E8E8',
+                  }}
+                >
+                  <Box sx={{ mb: 1 }}>{val.icon}</Box>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 0.5 }}
+                  >
+                    {val.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: '#666666', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: 1.7, fontSize: '0.82rem' }}
+                  >
+                    {val.desc}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── Contact Us ── */}
+      <Box id="contact" sx={{ padding: '80px 0', backgroundColor: '#F5F7F9' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              color: '#022F49',
+              textAlign: 'center',
+              mb: 1,
+            }}
+          >
+            Contact Us
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', textAlign: 'center', mb: 6 }}
+          >
+            Have a question or ready to book? Reach out — we respond quickly.
+          </Typography>
+
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 6 }}>
+            {/* Contact info */}
+            <Box>
+              <Typography
+                variant="h5"
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3 }}
+              >
+                Get In Touch
+              </Typography>
+              {[
+                { icon: <PhoneIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Phone', value: '+1 (555) 123-4567' },
+                { icon: <EmailIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Email', value: 'service@smartappliances.com' },
+                { icon: <LocationOnIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Address', value: '123 Main St, Anytown, USA 00000' },
+              ].map((item) => (
+                <Box key={item.label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 3 }}>
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: '10px',
+                      backgroundColor: '#E8F4FD',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {item.icon}
+                  </Box>
+                  <Box>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700 }}
+                    >
+                      {item.label}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', mt: 0.25 }}
+                    >
+                      {item.value}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+
+              {/* Hours */}
+              <Box
+                sx={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '14px',
+                  border: '1px solid #E5E5E5',
+                  p: 2.5,
+                  mt: 1,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                  <AccessTimeIcon sx={{ color: '#22B1FB', fontSize: 20 }} />
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', fontWeight: 700 }}
+                  >
+                    Service Hours
+                  </Typography>
+                </Box>
+                {[
+                  { day: 'Monday – Friday', hours: '8:00 AM – 6:00 PM' },
+                  { day: 'Saturday', hours: '9:00 AM – 4:00 PM' },
+                  { day: 'Sunday', hours: 'Closed (Emergency Only)' },
+                ].map((row) => (
+                  <Box
+                    key={row.day}
+                    sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', fontSize: '0.85rem' }}
+                    >
+                      {row.day}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 600, fontSize: '0.85rem' }}
+                    >
+                      {row.hours}
+                    </Typography>
+                  </Box>
+                ))}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1.5, pt: 1.5, borderTop: '1px solid #E5E5E5' }}>
+                  <WarningAmberIcon sx={{ color: '#FF6B6B', fontSize: 16 }} />
+                  <Typography
+                    variant="caption"
+                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#CC2200', fontWeight: 600 }}
+                  >
+                    Emergency service available 24/7 — call anytime
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Contact form */}
+            <Box>
+              <Typography
+                variant="h5"
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3 }}
+              >
+                Send Us a Message
+              </Typography>
+              {contactSent ? (
+                <Box
+                  sx={{
+                    backgroundColor: '#E8F5E9',
+                    border: '1px solid #A5D6A7',
+                    borderRadius: '14px',
+                    p: 4,
+                    textAlign: 'center',
+                  }}
+                >
+                  <CheckCircleOutlineIcon sx={{ color: '#2E7D32', fontSize: 48, mb: 2 }} />
+                  <Typography
+                    variant="h6"
+                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#2E7D32', mb: 1 }}
+                  >
+                    Message Sent!
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#388E3C' }}
+                  >
+                    Thank you for reaching out. We will get back to you as soon as possible.
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                  <TextField
+                    label="Your Name"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    fullWidth
+                    variant="outlined"
+                    sx={{ backgroundColor: '#FFFFFF', borderRadius: '8px' }}
+                  />
+                  <TextField
+                    label="Email Address"
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    fullWidth
+                    variant="outlined"
+                    sx={{ backgroundColor: '#FFFFFF', borderRadius: '8px' }}
+                  />
+                  <TextField
+                    label="Message"
+                    value={contactMessage}
+                    onChange={(e) => setContactMessage(e.target.value)}
+                    fullWidth
+                    multiline
+                    minRows={5}
+                    variant="outlined"
+                    sx={{ backgroundColor: '#FFFFFF', borderRadius: '8px' }}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={handleContactSubmit}
+                    disabled={!contactName || !contactEmail || !contactMessage}
+                    sx={{
+                      backgroundColor: '#22B1FB',
+                      color: '#FFFFFF',
+                      fontFamily: 'DM Sans, Arial, sans-serif',
+                      fontWeight: 700,
+                      py: 1.5,
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      fontSize: '1rem',
+                      '&:hover': { backgroundColor: '#022F49' },
+                    }}
+                  >
+                    Send Message
+                  </Button>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: '#888888', fontFamily: 'DM Sans, Arial, sans-serif', textAlign: 'center' }}
+                  >
+                    Or call us directly at{' '}
+                    <Box
+                      component="span"
+                      sx={{ color: '#22B1FB', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      +1 (555) 123-4567
+                    </Box>{' '}
+                    — we are here to help.
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── Footer ── */}
+      <Box component="footer" sx={{ backgroundColor: '#022F49', color: '#FFFFFF', pt: 7, pb: 4 }}>
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+              gap: 5,
+              mb: 5,
+            }}
+          >
+            {/* Brand column */}
+            <Box>
+              <Box
+                component="img"
+                src="/Logo.png"
+                alt="Smart Appliances"
+                sx={{ height: '48px', width: 'auto', objectFit: 'contain', mb: 2 }}
+              />
               <Typography
                 variant="body2"
                 sx={{
                   fontFamily: 'DM Sans, Arial, sans-serif',
-                  lineHeight: 1.6,
-                  color: '#CCCCCC',
+                  color: '#A8D8F0',
+                  lineHeight: 1.9,
+                  mb: 2.5,
                 }}
               >
-                Your trusted partner for appliance repair and smart technology services.
+                Your trusted partner for appliance repair, HVAC, plumbing, electrical, and smart home services — with
+                24/7 emergency support.
               </Typography>
+              <Box sx={{ display: 'flex', gap: 1.5 }}>
+                {['FB', 'TW', 'YT', 'IG'].map((s) => (
+                  <Box
+                    key={s}
+                    component="a"
+                    href="#"
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(255,255,255,0.08)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#A8D8F0',
+                      textDecoration: 'none',
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      transition: 'all 0.2s',
+                      '&:hover': { backgroundColor: '#22B1FB', color: '#FFFFFF' },
+                    }}
+                  >
+                    {s}
+                  </Box>
+                ))}
+              </Box>
             </Box>
 
-            {/* Quick Links */}
+            {/* Quick links */}
             <Box>
               <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  marginBottom: 2,
-                  color: '#FFFFFF',
-                }}
+                variant="subtitle1"
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', mb: 2.5, fontWeight: 700 }}
               >
                 Quick Links
               </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Home
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Appliances
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Repair Services
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  About Us
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Contact
-                </Typography>
-              </Box>
+              {[
+                { label: 'Home', href: '#home' },
+                { label: 'About Us', href: '#about' },
+                { label: 'Services', href: '#services' },
+                { label: 'Buy Appliances', href: '#appliances' },
+                { label: 'Repair Services', href: '#repair' },
+                { label: 'Contact Us', href: '#contact' },
+              ].map((link) => (
+                <Box key={link.label} component="a" href={link.href} sx={footerLinkStyle}>
+                  {link.label}
+                </Box>
+              ))}
             </Box>
 
             {/* Services */}
             <Box>
               <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  fontWeight: 600,
-                  marginBottom: 2,
-                  color: '#FFFFFF',
-                }}
+                variant="subtitle1"
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', mb: 2.5, fontWeight: 700 }}
               >
-                Services
+                Our Services
               </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Refrigerator Repair
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Washing Machine Repair
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Dishwasher Repair
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Smart TV Repair
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      color: '#22B1FB',
-                    },
-                  }}
-                >
-                  Electronic Device Repair
-                </Typography>
-              </Box>
+              {[
+                'Appliance Repair',
+                'Appliance Installation',
+                'HVAC Services',
+                'Plumbing Services',
+                'Electrical Services',
+                'Smart Home Setup',
+                'Home Maintenance',
+              ].map((s) => (
+                <Box key={s} component="span" sx={{ ...footerLinkStyle, display: 'block', cursor: 'default' }}>
+                  {s}
+                </Box>
+              ))}
             </Box>
 
-            {/* Contact Info */}
+            {/* Contact */}
             <Box>
               <Typography
-                variant="h6"
+                variant="subtitle1"
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', mb: 2.5, fontWeight: 700 }}
+              >
+                Contact
+              </Typography>
+              {[
+                { icon: <PhoneIcon sx={{ fontSize: 16 }} />, text: '+1 (555) 123-4567' },
+                { icon: <EmailIcon sx={{ fontSize: 16 }} />, text: 'service@smartappliances.com' },
+                { icon: <LocationOnIcon sx={{ fontSize: 16 }} />, text: '123 Main St, Anytown, USA' },
+                { icon: <AccessTimeIcon sx={{ fontSize: 16 }} />, text: 'Mon–Fri: 8AM–6PM' },
+              ].map((item) => (
+                <Box
+                  key={item.text}
+                  sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25, mb: 1.75 }}
+                >
+                  <Box sx={{ color: '#22B1FB', mt: '2px', flexShrink: 0 }}>{item.icon}</Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#A8D8F0', fontSize: '0.85rem', lineHeight: 1.5 }}
+                  >
+                    {item.text}
+                  </Typography>
+                </Box>
+              ))}
+              <Button
+                variant="outlined"
+                onClick={() => onOpenBooking('emergency')}
+                startIcon={<WarningAmberIcon sx={{ fontSize: 16 }} />}
                 sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                  borderColor: '#FF6B6B',
+                  color: '#FF9999',
+                  fontFamily: 'DM Sans, Arial, sans-serif',
                   fontWeight: 600,
-                  marginBottom: 2,
-                  color: '#FFFFFF',
+                  textTransform: 'none',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem',
+                  mt: 1,
+                  '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999' },
                 }}
               >
-                Contact Info
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                  }}
-                >
-                  📞 +1 (555) 123-4567
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                  }}
-                >
-                  ✉️ info@smartapplications.com
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: '#CCCCCC',
-                  }}
-                >
-                  📍 123 Smart Street, Tech City, TC 12345
-                </Typography>
-              </Box>
+                Emergency Service
+              </Button>
             </Box>
           </Box>
 
-          {/* Bottom Bar */}
-          <Box sx={{ 
-            borderTop: '1px solid #444444',
-            paddingTop: 2,
-            textAlign: 'center'
-          }}>
+          <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', mb: 3 }} />
+
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'center', md: 'space-between' },
+              flexWrap: 'wrap',
+              gap: 2,
+              textAlign: { xs: 'center', md: 'left' },
+            }}
+          >
             <Typography
               variant="body2"
-              sx={{
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                color: '#CCCCCC',
-                marginBottom: 2,
-              }}
+              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#7FBBDD', fontSize: '0.82rem' }}
             >
-              © 2025 Smart Applications. All rights reserved.
+              © {new Date().getFullYear()} Smart Appliances. All rights reserved.
             </Typography>
-            
-            {/* Social Media Icons */}
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
-              {/* Facebook */}
-              <Box component="a" href="#" sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: '#CCCCCC',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: '#22B1FB',
-                  color: '#FFFFFF',
-                  transform: 'scale(1.1)',
-                },
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-              </Box>
-              
-              {/* Twitter */}
-              <Box component="a" href="#" sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: '#CCCCCC',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: '#22B1FB',
-                  color: '#FFFFFF',
-                  transform: 'scale(1.1)',
-                },
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                </svg>
-              </Box>
-              
-              {/* Instagram */}
-              <Box component="a" href="#" sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: '#CCCCCC',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: '#22B1FB',
-                  color: '#FFFFFF',
-                  transform: 'scale(1.1)',
-                },
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-9.781c-.49 0-.927-.175-1.297-.49-.37-.315-.49-.807-.49-1.297s.12-.982.49-1.297c.37-.315.807-.49 1.297-.49s.927.175 1.297.49c.37.315.49.807.49 1.297s-.12.982-.49 1.297c-.37.315-.807.49-1.297.49z"/>
-                </svg>
-              </Box>
-              
-              {/* YouTube */}
-              <Box component="a" href="#" sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: '#CCCCCC',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: '#22B1FB',
-                  color: '#FFFFFF',
-                  transform: 'scale(1.1)',
-                },
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                </svg>
-              </Box>
-            </Box>
+            <Typography
+              variant="body2"
+              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#7FBBDD', fontSize: '0.82rem' }}
+            >
+              Licensed &amp; Insured · Serving homeowners across the region
+            </Typography>
           </Box>
         </Container>
       </Box>
-
-      {/* Schedule Appointment Modal */}
-      <Modal
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        aria-labelledby="schedule-modal-title"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 2,
-        }}
-      >
-        <Box
-          sx={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: 4,
-            maxWidth: '500px',
-            width: '100%',
-            maxHeight: '90vh',
-            overflow: 'auto',
-            position: 'relative',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-          }}
-        >
-          {/* Close Button */}
-          <IconButton
-            onClick={handleCloseModal}
-            sx={{
-              position: 'absolute',
-              right: 16,
-              top: 16,
-              color: '#666666',
-              '&:hover': {
-                color: '#FF0000',
-                backgroundColor: '#FFE6E6',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-
-          {/* Modal Content */}
-          <Typography
-            id="schedule-modal-title"
-            variant="h5"
-            sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              fontWeight: 600,
-              color: '#022F49',
-              marginBottom: 2,
-              paddingRight: 4,
-              marginTop: 0,
-            }}
-          >
-            Schedule Repair Appointment
-          </Typography>
-
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              color: '#666666',
-              marginBottom: 3,
-              lineHeight: 1.6,
-            }}
-          >
-            Need help with your appliance? Schedule a repair appointment with our expert technicians. 
-            We'll contact you to confirm the appointment time and provide a detailed quote.
-          </Typography>
-
-          {/* Contact Information */}
-          <Box sx={{ backgroundColor: '#F5F7F9', padding: 2, borderRadius: '8px', marginBottom: 3 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 600,
-                color: '#022F49',
-                marginBottom: 1,
-              }}
-            >
-              Contact Information
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                color: '#666666',
-                marginBottom: 0.5,
-              }}
-            >
-              📞 +1 (555) 123-4567
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                color: '#666666',
-              }}
-            >
-              ✉️ info@smartapplications.com
-            </Typography>
-          </Box>
-
-          {/* Form */}
-          <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {/* Name Field */}
-            <TextField
-              label="Full Name"
-              variant="outlined"
-              required
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                },
-              }}
-            />
-
-            {/* Email Field */}
-            <TextField
-              label="Email Address"
-              type="email"
-              variant="outlined"
-              required
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                },
-              }}
-            />
-
-            {/* Phone Field */}
-            <TextField
-              label="Phone Number"
-              type="tel"
-              variant="outlined"
-              required
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                },
-              }}
-            />
-
-            {/* Repair Item Dropdown */}
-            <FormControl variant="outlined" required>
-              <InputLabel sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
-                Select Item for Repair
-              </InputLabel>
-              <Select
-                label="Select Item for Repair"
-                sx={{
-                  borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                }}
-              >
-                {repairItems.map((item) => (
-                  <MenuItem key={item} value={item} sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
-                    {item}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            {/* Description Field */}
-            <TextField
-              label="Description of Issue"
-              variant="outlined"
-              multiline
-              rows={3}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                },
-              }}
-            />
-
-            {/* Schedule Button */}
-            <Button
-              variant="contained"
-              type="submit"
-              sx={{
-                backgroundColor: '#22B1FB',
-                color: '#FFFFFF',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 600,
-                fontSize: '1rem',
-                textTransform: 'none',
-                padding: '12px 24px',
-                borderRadius: '12px',
-                marginTop: 2,
-                '&:hover': {
-                  backgroundColor: '#022F49',
-                },
-              }}
-            >
-              Schedule Appointment
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
     </Box>
   );
 };
 
-export default Home; 
+const footerLinkStyle = {
+  display: 'block',
+  fontFamily: 'DM Sans, Arial, sans-serif',
+  color: '#A8D8F0',
+  textDecoration: 'none',
+  fontSize: '0.88rem',
+  lineHeight: 1.5,
+  mb: 1.25,
+  cursor: 'pointer',
+  transition: 'color 0.2s',
+  '&:hover': { color: '#22B1FB' },
+};
+
+export default Home;
