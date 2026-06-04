@@ -69,7 +69,15 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
       {/* Top info bar */}
       <AppBar
         position="fixed"
-        sx={{ backgroundColor: '#022F49', boxShadow: 'none', zIndex: 1002, top: 0 }}
+        sx={{
+          backgroundColor: 'rgba(2, 47, 73, 0.92)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: 'none',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          zIndex: 1002,
+          top: 0,
+        }}
       >
         <Toolbar sx={{ justifyContent: 'space-between', minHeight: '40px !important', padding: '0 24px' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -95,10 +103,13 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: 'rgba(2, 47, 73, 0.97)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          backgroundColor: 'rgba(2, 47, 73, 0.94)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
           zIndex: 1001,
-          top: '60px',
+          top: '40px',
         }}
       >
         <Toolbar sx={{ justifyContent: 'space-between', minHeight: '60px' }}>

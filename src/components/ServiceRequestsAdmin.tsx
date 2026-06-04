@@ -142,11 +142,11 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                     key={request.id}
                     sx={{
                       backgroundColor:
-                        request.servicePriority === 'emergency'
+                        request.emergencyBadge
                           ? '#FFF8F8'
                           : statusColors[request.status],
-                      borderLeft: request.servicePriority === 'emergency' ? '4px solid #FF6B6B' : '4px solid transparent',
-                      '&:hover': { backgroundColor: request.servicePriority === 'emergency' ? '#FFEFEF' : '#F0F7FF' },
+                      borderLeft: request.emergencyBadge ? '4px solid #FF6B6B' : '4px solid transparent',
+                      '&:hover': { backgroundColor: request.emergencyBadge ? '#FFEFEF' : '#F0F7FF' },
                     }}
                   >
                     <TableCell sx={{ minWidth: 160 }}>
@@ -166,10 +166,10 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={request.servicePriority === 'emergency' ? 'Emergency' : 'Regular'}
-                        color={request.servicePriority === 'emergency' ? 'error' : 'primary'}
+                        label={request.emergencyBadge ? 'Emergency' : 'Regular'}
+                        color={request.emergencyBadge ? 'error' : 'primary'}
                         size="small"
-                        icon={request.servicePriority === 'emergency' ? <WarningAmberIcon /> : undefined}
+                        icon={request.emergencyBadge ? <WarningAmberIcon /> : undefined}
                         sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700 }}
                       />
                     </TableCell>

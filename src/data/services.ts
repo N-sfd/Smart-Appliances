@@ -35,6 +35,7 @@ export interface ServiceRequest {
   applianceModel: string | null;
   imageUrl: string | null;
   notes: string | null;
+  emergencyBadge: boolean;
   status: 'new' | 'contacted' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
   createdAt: string;
   updatedAt: string;

@@ -166,6 +166,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
       applianceModel: applianceModel || null,
       imageUrl: imagePreviewUrl ?? null,
       notes: null,
+      emergencyBadge: servicePriority === 'emergency',
       status: 'new',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

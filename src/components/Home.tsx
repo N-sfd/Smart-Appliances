@@ -113,6 +113,27 @@ const companyStats = [
   { value: '100%', label: 'Licensed & Insured' },
 ];
 
+const testimonials = [
+  {
+    name: 'Sarah Johnson',
+    location: 'Austin, TX',
+    rating: 5,
+    text: 'Called for an emergency refrigerator repair at 10pm. A technician arrived within 2 hours and fixed it the same night. Absolutely incredible service!',
+  },
+  {
+    name: 'Michael Torres',
+    location: 'Houston, TX',
+    rating: 5,
+    text: 'Scheduled an AC maintenance visit — they showed up on time, explained everything clearly, and the price matched the quote exactly. Zero surprises.',
+  },
+  {
+    name: 'Emily Chen',
+    location: 'Dallas, TX',
+    rating: 5,
+    text: 'Smart home setup was flawless. The technician walked us through every device and made sure everything was fully integrated before leaving.',
+  },
+];
+
 const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentBrandIndex, setCurrentBrandIndex] = useState(0);
@@ -191,7 +212,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
       {/* ── Hero ── */}
       <Box
         id="home"
-        sx={{ position: 'relative', height: '58vh', minHeight: '440px', overflow: 'hidden' }}
+        sx={{ position: 'relative', height: '70vh', minHeight: '540px', overflow: 'hidden' }}
       >
         {images.map((image, index) => (
           <Box
@@ -224,9 +245,51 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1,
+            pb: '80px',
           }}
         >
           <Container maxWidth="lg" sx={{ color: '#FFFFFF', textAlign: 'center' }}>
+            {/* Trust badge */}
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1,
+                backgroundColor: 'rgba(34, 177, 251, 0.15)',
+                border: '1px solid rgba(34, 177, 251, 0.4)',
+                borderRadius: '999px',
+                px: 2.5,
+                py: 0.75,
+                mb: 2.5,
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  backgroundColor: '#22B1FB',
+                  '@keyframes heroPulse': {
+                    '0%': { boxShadow: '0 0 0 0 rgba(34,177,251,0.7)' },
+                    '70%': { boxShadow: '0 0 0 8px rgba(34,177,251,0)' },
+                    '100%': { boxShadow: '0 0 0 0 rgba(34,177,251,0)' },
+                  },
+                  animation: 'heroPulse 2s infinite',
+                }}
+              />
+              <Typography
+                sx={{
+                  color: '#D0EEFF',
+                  fontSize: '0.85rem',
+                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontWeight: 600,
+                  letterSpacing: 0.5,
+                }}
+              >
+                Trusted by 5,000+ homeowners
+              </Typography>
+            </Box>
             <Typography
               variant="h1"
               sx={{
@@ -294,6 +357,61 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
             </Typography>
           </Container>
         </Box>
+
+        {/* Hero stats bar */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 2,
+            backgroundColor: 'rgba(2, 47, 73, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderTop: '1px solid rgba(255,255,255,0.1)',
+            py: { xs: 2, md: 2.5 },
+          }}
+        >
+          <Container maxWidth="lg">
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: { xs: 'center', md: 'space-around' },
+                gap: { xs: 4, md: 2 },
+                flexWrap: 'wrap',
+              }}
+            >
+              {companyStats.map((stat) => (
+                <Box key={stat.label} sx={{ textAlign: 'center' }}>
+                  <Typography
+                    sx={{
+                      color: '#22B1FB',
+                      fontWeight: 800,
+                      fontSize: { xs: '1.4rem', md: '1.7rem' },
+                      fontFamily: 'DM Sans, Arial, sans-serif',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {stat.value}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: '#A8D8F0',
+                      fontSize: '0.7rem',
+                      fontFamily: 'DM Sans, Arial, sans-serif',
+                      textTransform: 'uppercase',
+                      letterSpacing: 1.2,
+                      mt: 0.5,
+                    }}
+                  >
+                    {stat.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Container>
+        </Box>
       </Box>
 
       {/* ── Service Categories ── */}
@@ -306,11 +424,12 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               fontWeight: 600,
               color: '#022F49',
               textAlign: 'center',
-              marginBottom: 1.5,
+              marginBottom: 1,
             }}
           >
             Our Service Categories
           </Typography>
+          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #22B1FB, #0077CC)', mx: 'auto', mt: 1.5, mb: 2 }} />
           <Typography
             variant="body1"
             sx={{
@@ -367,13 +486,27 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   borderRadius: '20px',
                   border: '1px solid #E5E5E5',
                   minHeight: '340px',
-                  transition: 'box-shadow 0.2s ease, transform 0.2s ease',
-                  '&:hover': { boxShadow: '0 8px 28px rgba(2,47,73,0.1)', transform: 'translateY(-2px)' },
+                  transition: 'all 0.25s ease',
+                  '&:hover': { boxShadow: '0 14px 40px rgba(34,177,251,0.18)', transform: 'translateY(-5px)', borderColor: 'rgba(34,177,251,0.4)' },
                 }}
               >
                 <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                    {iconMap[category.icon] ?? <StarIcon sx={{ fontSize: 36, color: '#22B1FB' }} />}
+                    <Box
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: '14px',
+                        background: 'linear-gradient(135deg, rgba(34,177,251,0.15) 0%, rgba(34,177,251,0.05) 100%)',
+                        border: '1px solid rgba(34,177,251,0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {iconMap[category.icon] ?? <StarIcon sx={{ fontSize: 32, color: '#22B1FB' }} />}
+                    </Box>
                     <Typography
                       variant="h5"
                       sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49' }}
@@ -464,6 +597,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
           >
             How It Works
           </Typography>
+          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #22B1FB, #0077CC)', mx: 'auto', mt: 1.5, mb: 2 }} />
           <Typography
             variant="body1"
             sx={{
@@ -490,10 +624,11 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 <CardContent sx={{ p: 3 }}>
                   <Box
                     sx={{
-                      width: 44,
-                      height: 44,
+                      width: 48,
+                      height: 48,
                       borderRadius: '50%',
-                      backgroundColor: '#22B1FB',
+                      background: 'linear-gradient(135deg, #22B1FB 0%, #0077CC 100%)',
+                      boxShadow: '0 4px 16px rgba(34,177,251,0.4)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -545,6 +680,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
           >
             Why Choose Us
           </Typography>
+          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #22B1FB, #0077CC)', mx: 'auto', mt: 1.5, mb: 2 }} />
           <Typography
             variant="body1"
             sx={{
@@ -570,12 +706,27 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   borderRadius: '18px',
                   backgroundColor: '#F5F7F9',
                   border: '1px solid #E8E8E8',
-                  transition: 'box-shadow 0.2s',
-                  '&:hover': { boxShadow: '0 6px 20px rgba(2,47,73,0.08)' },
+                  borderTop: '3px solid #22B1FB',
+                  transition: 'all 0.25s ease',
+                  '&:hover': { boxShadow: '0 10px 30px rgba(34,177,251,0.14)', transform: 'translateY(-3px)' },
                 }}
               >
                 <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ mb: 2 }}>{item.icon}</Box>
+                  <Box
+                    sx={{
+                      mb: 2.5,
+                      width: 56,
+                      height: 56,
+                      borderRadius: '14px',
+                      background: 'linear-gradient(135deg, rgba(34,177,251,0.15) 0%, rgba(34,177,251,0.05) 100%)',
+                      border: '1px solid rgba(34,177,251,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {item.icon}
+                  </Box>
                   <Typography
                     variant="h6"
                     sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1.5 }}
@@ -587,6 +738,84 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   </Typography>
                 </CardContent>
               </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── Testimonials ── */}
+      <Box sx={{ padding: '72px 0', backgroundColor: '#022F49' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', textAlign: 'center', mb: 1 }}
+          >
+            What Our Customers Say
+          </Typography>
+          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #22B1FB, #5DCAFF)', mx: 'auto', mt: 1.5, mb: 6 }} />
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+              gap: 3,
+            }}
+          >
+            {testimonials.map((t) => (
+              <Box
+                key={t.name}
+                sx={{
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '20px',
+                  p: 3.5,
+                  transition: 'all 0.25s ease',
+                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.09)', transform: 'translateY(-4px)', boxShadow: '0 12px 40px rgba(0,0,0,0.2)' },
+                }}
+              >
+                <Box sx={{ display: 'flex', gap: 0.5, mb: 2 }}>
+                  {[...Array(t.rating)].map((_, i) => (
+                    <StarIcon key={i} sx={{ color: '#FFB800', fontSize: 18 }} />
+                  ))}
+                </Box>
+                <Typography
+                  sx={{
+                    color: '#D0EEFF',
+                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    lineHeight: 1.85,
+                    mb: 3,
+                    fontSize: '0.95rem',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  "{t.text}"
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #22B1FB 0%, #0077CC 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Typography sx={{ color: '#FFFFFF', fontWeight: 700, fontSize: '1.1rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                      {t.name.charAt(0)}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography sx={{ color: '#FFFFFF', fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.9rem' }}>
+                      {t.name}
+                    </Typography>
+                    <Typography sx={{ color: '#7FBBDD', fontSize: '0.8rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                      {t.location}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             ))}
           </Box>
         </Container>
