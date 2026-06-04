@@ -35,10 +35,24 @@ export interface ServiceRequest {
   applianceModel: string | null;
   imageUrl: string | null;
   notes: string | null;
-  emergencyBadge: boolean;
-  status: 'new' | 'contacted' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  emergencyBadge?: boolean;
+  status: 'new' | 'in_review' | 'scheduled' | 'technician_assigned' | 'in_progress' | 'completed' | 'cancelled';
   createdAt: string;
   updatedAt: string;
+  // New extended fields
+  applianceType: string | null;
+  issueStartDate: string | null;
+  timeWindow: string | null;
+  priorityScore: 1 | 2 | 3 | 4;
+  possibleIssue: string | null;
+  recommendedTechnicianType: string | null;
+  estimatedDuration: string | null;
+  safetyNotes: string | null;
+  hasSafetyConcern: boolean;
+  applianceStillRunning: boolean | null;
+  callbackTime: string | null;
+  assignedTechnicianId: string | null;
+  technicianStatus: 'accepted' | 'on_the_way' | 'started' | 'completed' | null;
 }
 
 export const serviceCategories: ServiceCategory[] = [
@@ -165,9 +179,38 @@ export const issueSeverityOptions = ['High', 'Medium', 'Low'];
 
 export const statusOptions = [
   'new',
-  'contacted',
+  'in_review',
   'scheduled',
+  'technician_assigned',
   'in_progress',
   'completed',
   'cancelled',
 ] as const;
+
+export const statusLabels: Record<string, string> = {
+  new: 'New',
+  in_review: 'In Review',
+  scheduled: 'Scheduled',
+  technician_assigned: 'Tech Assigned',
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
+
+export const TIME_WINDOWS = [
+  'Morning (8AM–12PM)',
+  'Afternoon (12PM–4PM)',
+  'Evening (4PM–8PM)',
+];
+
+export const APPLIANCE_TYPES = [
+  'Refrigerator',
+  'Washer',
+  'Dryer',
+  'Dishwasher',
+  'Oven/Stove',
+  'Microwave',
+  'HVAC/AC',
+  'Water Heater',
+  'Other',
+];

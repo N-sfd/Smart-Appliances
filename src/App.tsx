@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { theme } from './theme';
 import TopBar from './components/TopBar';
 import Home from './components/Home';
-import RegularServiceModal from './components/RegularServiceModal';
-import EmergencyServiceModal from './components/EmergencyServiceModal';
-import ServiceRequestsAdmin from './components/ServiceRequestsAdmin';
-import { ServicePriority, ServiceRequest } from './data/services';
+import ServicesPage from './pages/ServicesPage';
+import RegularBookingPage from './pages/RegularBookingPage';
+import EmergencyBookingPage from './pages/EmergencyBookingPage';
+import ConfirmationPage from './pages/ConfirmationPage';
+import AdminDashboard from './pages/AdminDashboard';
+import TechnicianDashboard from './pages/TechnicianDashboard';
 
 const STORAGE_KEY = 'smart-appliances-service-requests';
 
@@ -19,104 +22,57 @@ function App() {
     oven: 0,
   });
 
-  const [isRegularOpen, setIsRegularOpen] = useState(false);
-  const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
-  const [modalCategoryId, setModalCategoryId] = useState<string>('appliance-repair');
-  const [modalServiceTypeId, setModalServiceTypeId] = useState<string>('refrigerator-repair');
-
-  const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>(() => {
+  // Keep service requests in state for the old admin component (legacy support)
+  const [_serviceRequests, setServiceRequests] = useState<unknown[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved) as ServiceRequest[];
+      if (saved) {
+        return JSON.parse(saved) as unknown[];
+      }
     } catch {
-      // ignore
+      // ignore parse errors
     }
     return [];
   });
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(serviceRequests));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(_serviceRequests));
     } catch {
-      // ignore
+      // ignore storage errors
     }
-  }, [serviceRequests]);
+  }, [_serviceRequests]);
 
-  const totalCartCount = Object.values(cartItems).reduce((sum, n) => sum + n, 0);
+  // Keep setServiceRequests available for potential use
+  void setServiceRequests;
 
-  // Single entry point used by Home.tsx — routes to the correct modal by priority
-  const handleOpenBooking = (
-    priority: ServicePriority,
-    categoryId?: string,
-    serviceTypeId?: string,
-  ) => {
-    if (categoryId) setModalCategoryId(categoryId);
-    if (serviceTypeId) setModalServiceTypeId(serviceTypeId);
-    if (priority === 'emergency') {
-      setIsEmergencyOpen(true);
-    } else {
-      setIsRegularOpen(true);
-    }
-  };
-
-  const handleSubmitRequest = (request: ServiceRequest) => {
-    setServiceRequests((prev) => [request, ...prev]);
-    // Modals close themselves after showing success state
-  };
-
-  const handleUpdateStatus = (id: string, status: ServiceRequest['status']) => {
-    setServiceRequests((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, status, updatedAt: new Date().toISOString() } : r,
-      ),
-    );
-  };
-
-  const handleUpdateNotes = (id: string, notes: string) => {
-    setServiceRequests((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, notes, updatedAt: new Date().toISOString() } : r,
-      ),
-    );
-  };
+  const totalCartCount = Object.values(cartItems).reduce((sum, count) => sum + count, 0);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="App">
-        <TopBar
-          cartCount={totalCartCount}
-          onScheduleClick={() => handleOpenBooking('regular')}
-        />
-        <Box sx={{ paddingTop: '124px' }}>
-          <Home
-            cartItems={cartItems}
-            setCartItems={setCartItems}
-            onOpenBooking={handleOpenBooking}
-          />
-          <ServiceRequestsAdmin
-            serviceRequests={serviceRequests}
-            onUpdateStatus={handleUpdateStatus}
-            onUpdateNotes={handleUpdateNotes}
-          />
+      <BrowserRouter>
+        <Box sx={{ paddingTop: '104px' }}>
+          <TopBar cartCount={totalCartCount} />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Home
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                />
+              }
+            />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/book/regular" element={<RegularBookingPage />} />
+            <Route path="/book/emergency" element={<EmergencyBookingPage />} />
+            <Route path="/confirmation/:requestId" element={<ConfirmationPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/technician" element={<TechnicianDashboard />} />
+          </Routes>
         </Box>
-
-        <RegularServiceModal
-          open={isRegularOpen}
-          onClose={() => setIsRegularOpen(false)}
-          initialCategoryId={modalCategoryId}
-          initialServiceTypeId={modalServiceTypeId}
-          onSubmitRequest={handleSubmitRequest}
-        />
-
-        <EmergencyServiceModal
-          open={isEmergencyOpen}
-          onClose={() => setIsEmergencyOpen(false)}
-          initialCategoryId={modalCategoryId}
-          initialServiceTypeId={modalServiceTypeId}
-          onSubmitRequest={handleSubmitRequest}
-        />
-      </div>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }

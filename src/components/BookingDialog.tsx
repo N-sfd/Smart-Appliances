@@ -170,6 +170,20 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
       status: 'new',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      // Extended fields
+      applianceType: null,
+      issueStartDate: null,
+      timeWindow: servicePriority === 'regular' ? preferredTime : null,
+      priorityScore: servicePriority === 'emergency' ? 4 : 2,
+      possibleIssue: null,
+      recommendedTechnicianType: null,
+      estimatedDuration: null,
+      safetyNotes: null,
+      hasSafetyConcern: false,
+      applianceStillRunning: null,
+      callbackTime: null,
+      assignedTechnicianId: null,
+      technicianStatus: null,
     };
 
     onSubmitRequest(newRequest);

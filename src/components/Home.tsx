@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -45,7 +46,7 @@ interface HomeProps {
       oven: number;
     }>
   >;
-  onOpenBooking: (priority: 'regular' | 'emergency', categoryId?: string, serviceTypeId?: string) => void;
+  onOpenBooking?: (priority: 'regular' | 'emergency', categoryId?: string, serviceTypeId?: string) => void;
 }
 
 const sectionTags = ['All', 'Appliances', 'HVAC', 'Plumbing', 'Electrical', 'Smart Home', 'Maintenance'];
@@ -135,6 +136,19 @@ const testimonials = [
 ];
 
 const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) => {
+  const navigate = useNavigate();
+  const openBooking = (priority: 'regular' | 'emergency', categoryId?: string, serviceTypeId?: string) => {
+    if (onOpenBooking) {
+      onOpenBooking(priority, categoryId, serviceTypeId);
+    } else {
+      const path = priority === 'emergency' ? '/book/emergency' : '/book/regular';
+      const params = new URLSearchParams();
+      if (categoryId) params.set('category', categoryId);
+      if (serviceTypeId) params.set('service', serviceTypeId);
+      const queryString = params.toString();
+      navigate(queryString ? `${path}?${queryString}` : path);
+    }
+  };
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentBrandIndex, setCurrentBrandIndex] = useState(0);
   const [currentRepairBrandIndex, setCurrentRepairBrandIndex] = useState(0);
@@ -321,7 +335,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
               <Button
                 variant="contained"
-                onClick={() => onOpenBooking('regular')}
+                onClick={() => openBooking('regular')}
                 sx={{
                   backgroundColor: '#22B1FB',
                   color: '#FFFFFF',
@@ -337,7 +351,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               </Button>
               <Button
                 variant="contained"
-                onClick={() => onOpenBooking('emergency')}
+                onClick={() => openBooking('emergency')}
                 sx={{
                   backgroundColor: '#FF6B6B',
                   color: '#FFFFFF',
@@ -547,7 +561,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   <Box sx={{ display: 'grid', gap: 1 }}>
                     <Button
                       variant="contained"
-                      onClick={() => onOpenBooking('regular', category.id, category.services[0]?.id)}
+                      onClick={() => openBooking('regular', category.id, category.services[0]?.id)}
                       sx={{
                         backgroundColor: '#22B1FB',
                         color: '#FFFFFF',
@@ -562,7 +576,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                     </Button>
                     <Button
                       variant="outlined"
-                      onClick={() => onOpenBooking('emergency', category.id, category.services[0]?.id)}
+                      onClick={() => openBooking('emergency', category.id, category.services[0]?.id)}
                       sx={{
                         textTransform: 'none',
                         borderRadius: '10px',
@@ -970,7 +984,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   variant="contained"
-                  onClick={() => onOpenBooking('regular', 'appliance-repair')}
+                  onClick={() => openBooking('regular', 'appliance-repair')}
                   sx={{
                     backgroundColor: '#22B1FB',
                     color: '#FFFFFF',
@@ -987,7 +1001,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 </Button>
                 <Button
                   variant="outlined"
-                  onClick={() => onOpenBooking('emergency')}
+                  onClick={() => openBooking('emergency')}
                   sx={{
                     borderColor: '#FF6B6B',
                     color: '#FF6B6B',
@@ -1252,7 +1266,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   variant="contained"
-                  onClick={() => onOpenBooking('regular')}
+                  onClick={() => openBooking('regular')}
                   sx={{
                     backgroundColor: '#22B1FB',
                     color: '#FFFFFF',
@@ -1677,7 +1691,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               ))}
               <Button
                 variant="outlined"
-                onClick={() => onOpenBooking('emergency')}
+                onClick={() => openBooking('emergency')}
                 startIcon={<WarningAmberIcon sx={{ fontSize: 16 }} />}
                 sx={{
                   borderColor: '#FF6B6B',

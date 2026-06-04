@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { ServiceRequest, statusOptions } from '../data/services';
+import { ServiceRequest, statusOptions, statusLabels } from '../data/services';
 
 interface ServiceRequestsAdminProps {
   serviceRequests: ServiceRequest[];
@@ -23,20 +23,12 @@ interface ServiceRequestsAdminProps {
   onUpdateNotes: (id: string, notes: string) => void;
 }
 
-const statusLabels: Record<ServiceRequest['status'], string> = {
-  new: 'New',
-  contacted: 'Contacted',
-  scheduled: 'Scheduled',
-  in_progress: 'In Progress',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-};
-
-const statusColors: Record<ServiceRequest['status'], string> = {
+const statusColors: Record<string, string> = {
   new: '#E3F2FD',
-  contacted: '#FFF8E1',
+  in_review: '#FFF8E1',
   scheduled: '#E8F5E9',
-  in_progress: '#F3E5F5',
+  technician_assigned: '#F3E5F5',
+  in_progress: '#FFF3E0',
   completed: '#E0F2F1',
   cancelled: '#FAFAFA',
 };
@@ -142,11 +134,11 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                     key={request.id}
                     sx={{
                       backgroundColor:
-                        request.emergencyBadge
+                        request.servicePriority === 'emergency'
                           ? '#FFF8F8'
-                          : statusColors[request.status],
-                      borderLeft: request.emergencyBadge ? '4px solid #FF6B6B' : '4px solid transparent',
-                      '&:hover': { backgroundColor: request.emergencyBadge ? '#FFEFEF' : '#F0F7FF' },
+                          : statusColors[request.status] ?? '#FFFFFF',
+                      borderLeft: request.servicePriority === 'emergency' ? '4px solid #FF6B6B' : '4px solid transparent',
+                      '&:hover': { backgroundColor: request.servicePriority === 'emergency' ? '#FFEFEF' : '#F0F7FF' },
                     }}
                   >
                     <TableCell sx={{ minWidth: 160 }}>
@@ -159,17 +151,17 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                       >
                         {statusOptions.map((opt) => (
                           <MenuItem key={opt} value={opt} sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
-                            {statusLabels[opt]}
+                            {statusLabels[opt] ?? opt}
                           </MenuItem>
                         ))}
                       </Select>
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={request.emergencyBadge ? 'Emergency' : 'Regular'}
-                        color={request.emergencyBadge ? 'error' : 'primary'}
+                        label={request.servicePriority === 'emergency' ? 'Emergency' : 'Regular'}
+                        color={request.servicePriority === 'emergency' ? 'error' : 'primary'}
                         size="small"
-                        icon={request.emergencyBadge ? <WarningAmberIcon /> : undefined}
+                        icon={request.servicePriority === 'emergency' ? <WarningAmberIcon /> : undefined}
                         sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700 }}
                       />
                     </TableCell>
