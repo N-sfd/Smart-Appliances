@@ -946,6 +946,8 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   fontFamily: 'Wasted Vindey, Arial, sans-serif',
                   color: '#FFFFFF',
                   mb: 2,
+                  fontSize: { xs: '1.4rem', sm: '1.6rem', md: '1.75rem' },
+                  whiteSpace: { md: 'nowrap' },
                 }}
               >
                 Repair & Emergency Services
@@ -1233,7 +1235,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               </Typography>
               <Typography
                 variant="h2"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3 }}
+                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3, fontSize: { xs: '1.6rem', sm: '2rem', md: '2.2rem' }, whiteSpace: { md: 'nowrap' } }}
               >
                 Your Trusted Home Service Partner
               </Typography>
