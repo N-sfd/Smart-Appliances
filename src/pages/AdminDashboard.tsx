@@ -1,266 +1,430 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
-  Alert,
   Box,
-  Button,
+  Typography,
+  Container,
   Card,
   CardContent,
   Chip,
-  Collapse,
-  Container,
-  FormControl,
-  InputAdornment,
-  MenuItem,
-  Paper,
   Select,
-  SelectChangeEvent,
-  Tab,
-  Tabs,
+  MenuItem,
   TextField,
-  Typography,
+  SelectChangeEvent,
 } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import SearchIcon from '@mui/icons-material/Search';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import { ServiceRequest, statusOptions, statusLabels } from '../data/services';
-import { updateServiceRequestStatus, updateServiceRequestNotes } from '../lib/firebase';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { ServiceRequest, statusOptions } from '../data/services';
 
 const STORAGE_KEY = 'smart-appliances-service-requests';
 
-function loadFromStorage(): ServiceRequest[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return [];
-    return JSON.parse(stored) as ServiceRequest[];
-  } catch {
-    return [];
-  }
-}
+const statusLabels: Record<ServiceRequest['status'], string> = {
+  new: 'New',
+  contacted: 'Contacted',
+  scheduled: 'Scheduled',
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
 
-function saveToStorage(requests: ServiceRequest[]): void {
+const statusColors: Record<ServiceRequest['status'], string> = {
+  new: '#E3F2FD',
+  contacted: '#FFF8E1',
+  scheduled: '#E8F5E9',
+  in_progress: '#F3E5F5',
+  completed: '#E0F2F1',
+  cancelled: '#FAFAFA',
+};
+
+const loadRequests = (): ServiceRequest[] => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved) as ServiceRequest[];
+  } catch {
+    // ignore
+  }
+  return [];
+};
+
+const saveRequests = (requests: ServiceRequest[]): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
   } catch {
     // ignore
   }
-}
-
-const priorityScoreColors: Record<number, string> = {
-  4: '#FF6B6B',
-  3: '#FF9800',
-  2: '#22B1FB',
-  1: '#757575',
 };
-
-const borderColors: Record<number, string> = {
-  4: '#FF6B6B',
-  3: '#FF9800',
-  2: '#22B1FB',
-  1: '#E0E0E0',
-};
-
-const tabs = ['All', 'New', 'Emergency', 'Scheduled', 'In Progress', 'Completed'];
 
 const AdminDashboard: React.FC = () => {
-  const [requests, setRequests] = useState<ServiceRequest[]>(loadFromStorage);
-  const [activeTab, setActiveTab] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [requests, setRequests] = useState<ServiceRequest[]>(loadRequests);
 
-  const handleUpdateStatus = (id: string, status: ServiceRequest['status']) => {
-    setRequests((curr) => {
-      const updated = curr.map((r) =>
+  const updateStatus = (id: string, status: ServiceRequest['status']) => {
+    setRequests((prev) => {
+      const updated = prev.map((r) =>
         r.id === id ? { ...r, status, updatedAt: new Date().toISOString() } : r,
       );
-      saveToStorage(updated);
+      saveRequests(updated);
       return updated;
     });
-    updateServiceRequestStatus(id, status).catch(() => {});
   };
 
-  const handleUpdateNotes = (id: string, notes: string) => {
-    setRequests((curr) => {
-      const updated = curr.map((r) =>
+  const updateNotes = (id: string, notes: string) => {
+    setRequests((prev) => {
+      const updated = prev.map((r) =>
         r.id === id ? { ...r, notes, updatedAt: new Date().toISOString() } : r,
       );
-      saveToStorage(updated);
+      saveRequests(updated);
       return updated;
     });
-    updateServiceRequestNotes(id, notes).catch(() => {});
   };
 
-  const stats = useMemo(
-    () => ({
-      total: requests.length,
-      emergency: requests.filter((r) => r.servicePriority === 'emergency').length,
-      pending: requests.filter((r) => r.status === 'in_review' || r.status === 'scheduled').length,
-      completed: requests.filter((r) => r.status === 'completed').length,
-    }),
-    [requests],
-  );
-
-  const filteredRequests = useMemo(() => {
-    let filtered = [...requests];
-
-    // Tab filter
-    if (activeTab === 1) filtered = filtered.filter((r) => r.status === 'new');
-    else if (activeTab === 2) filtered = filtered.filter((r) => r.servicePriority === 'emergency');
-    else if (activeTab === 3) filtered = filtered.filter((r) => r.status === 'scheduled');
-    else if (activeTab === 4) filtered = filtered.filter((r) => r.status === 'in_progress');
-    else if (activeTab === 5) filtered = filtered.filter((r) => r.status === 'completed');
-
-    // Search
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (r) =>
-          r.customerName.toLowerCase().includes(q) ||
-          r.serviceType.toLowerCase().includes(q) ||
-          r.serviceCategory.toLowerCase().includes(q) ||
-          r.email.toLowerCase().includes(q),
-      );
+  const sortedRequests = [...requests].sort((a, b) => {
+    if (a.servicePriority === b.servicePriority) {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
+    return a.servicePriority === 'emergency' ? -1 : 1;
+  });
 
-    // Sort: emergency first, then by date
-    filtered.sort((a, b) => {
-      if (a.servicePriority === b.servicePriority) {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-      return a.servicePriority === 'emergency' ? -1 : 1;
-    });
+  const totalCount = requests.length;
+  const emergencyCount = requests.filter((r) => r.servicePriority === 'emergency').length;
+  const pendingCount = requests.filter((r) => r.status === 'new' || r.status === 'contacted').length;
+  const completedCount = requests.filter((r) => r.status === 'completed').length;
+  const estRevenue = completedCount * 149;
 
-    return filtered;
-  }, [requests, activeTab, searchQuery]);
+  const statCards = [
+    { label: 'Total Requests', value: totalCount, color: '#022F49' },
+    { label: 'Emergency', value: emergencyCount, color: '#FF6B6B' },
+    { label: 'Pending', value: pendingCount, color: '#FF9800' },
+    { label: 'Completed', value: completedCount, color: '#2E7D32' },
+    {
+      label: 'Est. Revenue',
+      value: `$${estRevenue.toLocaleString()}`,
+      color: '#22B1FB',
+    },
+  ];
+
+  const getBorderColor = (request: ServiceRequest): string => {
+    if (request.servicePriority === 'emergency') return '#FF6B6B';
+    return '#22B1FB';
+  };
 
   return (
-    <Box sx={{ backgroundColor: '#F5F7F9', minHeight: '100vh', pb: 8 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #022F49 0%, #034a73 100%)',
-          py: { xs: 4, md: 6 },
-          px: 2,
-        }}
-      >
-        <Container maxWidth="xl">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <AssignmentIcon sx={{ color: '#22B1FB', fontSize: 40 }} />
-            <Box>
-              <Typography
-                variant="h4"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', fontWeight: 700 }}
-              >
-                Service Request Dashboard
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans, Arial, sans-serif' }}
-              >
-                Manage all service requests, update statuses, and track technician assignments
-              </Typography>
-            </Box>
-          </Box>
-        </Container>
-      </Box>
+    <Box sx={{ minHeight: '100vh', backgroundColor: '#F5F7F9', py: 6 }}>
+      <Container maxWidth="xl">
+        {/* Header */}
+        <Box sx={{ mb: 5 }}>
+          <Typography
+            variant="h3"
+            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1 }}
+          >
+            Admin Dashboard
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}
+          >
+            Manage all service requests, update statuses, and track customer submissions.
+          </Typography>
+        </Box>
 
-      <Container maxWidth="xl" sx={{ mt: 4 }}>
         {/* Stats row */}
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
+            gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(5, 1fr)' },
             gap: 2,
-            mb: 4,
+            mb: 5,
           }}
         >
-          <StatCard label="Total Requests" value={stats.total} color="#022F49" />
-          <StatCard label="Emergency" value={stats.emergency} color="#FF6B6B" />
-          <StatCard label="Pending" value={stats.pending} color="#FF9800" />
-          <StatCard label="Completed" value={stats.completed} color="#4CAF50" />
+          {statCards.map((stat) => (
+            <Card
+              key={stat.label}
+              sx={{
+                borderRadius: '16px',
+                border: '1px solid #E5E5E5',
+                boxShadow: 'none',
+                backgroundColor: '#FFFFFF',
+              }}
+            >
+              <CardContent sx={{ p: 2.5 }}>
+                <Typography
+                  sx={{
+                    fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                    color: stat.color,
+                    fontSize: '2rem',
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    mb: 0.5,
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', fontSize: '0.85rem' }}
+                >
+                  {stat.label}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
         </Box>
 
-        {/* Filter tabs + search */}
-        <Paper
-          elevation={0}
-          sx={{ borderRadius: '16px', border: '1px solid #E8EFF5', mb: 3, overflow: 'hidden' }}
-        >
-          <Tabs
-            value={activeTab}
-            onChange={(_e, newVal) => setActiveTab(newVal as number)}
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              borderBottom: '1px solid #E8EFF5',
-              '& .MuiTab-root': {
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                textTransform: 'none',
-                fontWeight: 500,
-              },
-              '& .Mui-selected': { fontWeight: 700, color: '#022F49 !important' },
-              '& .MuiTabs-indicator': { backgroundColor: '#22B1FB' },
-            }}
-          >
-            {tabs.map((tab, i) => (
-              <Tab key={tab} label={tab} value={i} />
-            ))}
-          </Tabs>
-
-          <Box sx={{ p: 2 }}>
-            <TextField
-              fullWidth
-              placeholder="Search by customer name, service type, or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: '#999999' }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': { borderRadius: '10px' },
-                '& input': { fontFamily: 'DM Sans, Arial, sans-serif' },
-              }}
-            />
-          </Box>
-        </Paper>
-
         {/* Request cards */}
-        {filteredRequests.length === 0 ? (
-          <Paper
-            elevation={0}
+        {sortedRequests.length === 0 ? (
+          <Box
             sx={{
-              borderRadius: '16px',
-              border: '2px dashed #D9D9D9',
-              p: 6,
               textAlign: 'center',
+              py: 12,
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              border: '2px dashed #D9D9D9',
             }}
           >
+            <CheckCircleIcon sx={{ fontSize: 64, color: '#D9D9D9', mb: 2 }} />
             <Typography
-              variant="body1"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666' }}
+              variant="h6"
+              sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#999999', mb: 1 }}
             >
-              {requests.length === 0
-                ? 'No service requests yet. Requests will appear here when customers submit forms.'
-                : 'No requests match your current filter.'}
+              No service requests yet
             </Typography>
-          </Paper>
+            <Typography
+              variant="body2"
+              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#AAAAAA' }}
+            >
+              Requests submitted through the booking form will appear here.
+            </Typography>
+          </Box>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {filteredRequests.map((request) => (
-              <RequestCard
+            {sortedRequests.map((request) => (
+              <Card
                 key={request.id}
-                request={request}
-                expanded={expandedId === request.id}
-                onToggleExpand={() =>
-                  setExpandedId((curr) => (curr === request.id ? null : request.id))
-                }
-                onUpdateStatus={handleUpdateStatus}
-                onUpdateNotes={handleUpdateNotes}
-              />
+                sx={{
+                  borderRadius: '16px',
+                  border: '1px solid #E5E5E5',
+                  borderLeft: `5px solid ${getBorderColor(request)}`,
+                  backgroundColor:
+                    request.servicePriority === 'emergency' ? '#FFF8F8' : statusColors[request.status],
+                  boxShadow: 'none',
+                  transition: 'box-shadow 0.2s',
+                  '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.06)' },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' },
+                      gap: 3,
+                    }}
+                  >
+                    {/* Column 1: Customer info */}
+                    <Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <Chip
+                          label={request.servicePriority === 'emergency' ? 'Emergency' : 'Regular'}
+                          size="small"
+                          icon={
+                            request.servicePriority === 'emergency' ? (
+                              <WarningAmberIcon sx={{ fontSize: '14px !important' }} />
+                            ) : undefined
+                          }
+                          sx={{
+                            backgroundColor:
+                              request.servicePriority === 'emergency' ? '#FF6B6B' : '#22B1FB',
+                            color: '#FFFFFF',
+                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            fontWeight: 700,
+                            fontSize: '0.75rem',
+                          }}
+                        />
+                      </Box>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 0.5 }}
+                      >
+                        {request.customerName}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', fontSize: '0.85rem' }}>
+                        {request.phone}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#22B1FB', fontSize: '0.85rem', wordBreak: 'break-all' }}
+                      >
+                        {request.email}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#888888', display: 'block', mt: 0.5 }}>
+                        {new Date(request.createdAt).toLocaleDateString()} {new Date(request.createdAt).toLocaleTimeString()}
+                      </Typography>
+                    </Box>
+
+                    {/* Column 2: Service info */}
+                    <Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          color: '#888888',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: 1,
+                          display: 'block',
+                          mb: 0.75,
+                        }}
+                      >
+                        Service
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 0.25 }}
+                      >
+                        {request.serviceCategory}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', mb: 0.25 }}>
+                        {request.serviceType}
+                      </Typography>
+                      {request.applianceBrand && (
+                        <Typography variant="caption" sx={{ color: '#888888', display: 'block' }}>
+                          {request.applianceBrand} {request.applianceModel}
+                        </Typography>
+                      )}
+                      {request.issueDescription && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            color: '#444444',
+                            mt: 1,
+                            fontSize: '0.82rem',
+                            lineHeight: 1.5,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {request.issueDescription}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    {/* Column 3: Status + Notes */}
+                    <Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          color: '#888888',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: 1,
+                          display: 'block',
+                          mb: 0.75,
+                        }}
+                      >
+                        Status
+                      </Typography>
+                      <Select
+                        value={request.status}
+                        onChange={(e: SelectChangeEvent<string>) =>
+                          updateStatus(request.id, e.target.value as ServiceRequest['status'])
+                        }
+                        fullWidth
+                        size="small"
+                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.85rem', mb: 2 }}
+                      >
+                        {statusOptions.map((opt) => (
+                          <MenuItem key={opt} value={opt} sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                            {statusLabels[opt]}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <TextField
+                        value={request.notes ?? ''}
+                        onChange={(e) => updateNotes(request.id, e.target.value)}
+                        fullWidth
+                        size="small"
+                        placeholder="Add internal notes"
+                        multiline
+                        maxRows={3}
+                        label="Notes"
+                        sx={{
+                          '& input, & textarea': {
+                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            fontSize: '0.85rem',
+                          },
+                        }}
+                      />
+                    </Box>
+
+                    {/* Column 4: Scheduling */}
+                    <Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          color: '#888888',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: 1,
+                          display: 'block',
+                          mb: 0.75,
+                        }}
+                      >
+                        Scheduling
+                      </Typography>
+                      {request.servicePriority === 'emergency' ? (
+                        <Box>
+                          <Chip
+                            label={request.urgencyLevel ?? 'ASAP'}
+                            size="small"
+                            sx={{
+                              backgroundColor: '#FFE0E0',
+                              color: '#CC2200',
+                              fontFamily: 'DM Sans, Arial, sans-serif',
+                              fontWeight: 600,
+                              mb: 1,
+                            }}
+                          />
+                        </Box>
+                      ) : (
+                        <Box>
+                          {request.preferredDate && (
+                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', mb: 0.25 }}>
+                              {request.preferredDate}
+                            </Typography>
+                          )}
+                          {request.preferredTime && (
+                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}>
+                              {request.preferredTime}
+                            </Typography>
+                          )}
+                          {request.requestedResponseTime && (
+                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}>
+                              {request.requestedResponseTime}
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
+
+                      {/* Address */}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          color: '#888888',
+                          display: 'block',
+                          mt: 2,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {request.address && `${request.address}, `}
+                        {request.city}{request.city && request.state ? ', ' : ''}{request.state} {request.zipCode}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
             ))}
           </Box>
         )}
@@ -268,239 +432,5 @@ const AdminDashboard: React.FC = () => {
     </Box>
   );
 };
-
-// --- StatCard ---
-const StatCard: React.FC<{ label: string; value: number; color: string }> = ({
-  label,
-  value,
-  color,
-}) => (
-  <Paper
-    elevation={0}
-    sx={{
-      borderRadius: '14px',
-      border: `2px solid ${color}22`,
-      p: { xs: 2, md: 3 },
-      textAlign: 'center',
-      backgroundColor: `${color}08`,
-    }}
-  >
-    <Typography
-      variant="h3"
-      sx={{
-        fontFamily: 'Wasted Vindey, Arial, sans-serif',
-        color,
-        fontWeight: 700,
-        fontSize: { xs: '2rem', md: '2.5rem' },
-      }}
-    >
-      {value}
-    </Typography>
-    <Typography
-      variant="body2"
-      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', fontWeight: 500 }}
-    >
-      {label}
-    </Typography>
-  </Paper>
-);
-
-// --- RequestCard ---
-interface RequestCardProps {
-  request: ServiceRequest;
-  expanded: boolean;
-  onToggleExpand: () => void;
-  onUpdateStatus: (id: string, status: ServiceRequest['status']) => void;
-  onUpdateNotes: (id: string, notes: string) => void;
-}
-
-const RequestCard: React.FC<RequestCardProps> = ({
-  request,
-  expanded,
-  onToggleExpand,
-  onUpdateStatus,
-  onUpdateNotes,
-}) => {
-  const isEmergency = request.servicePriority === 'emergency';
-  const score = request.priorityScore ?? (isEmergency ? 4 : 2);
-  const borderColor = borderColors[score] ?? '#E0E0E0';
-
-  return (
-    <Card
-      elevation={0}
-      sx={{
-        borderRadius: '14px',
-        border: `1.5px solid ${borderColor}`,
-        borderLeft: `5px solid ${borderColor}`,
-        backgroundColor: isEmergency ? '#FFF8F8' : '#FFFFFF',
-        overflow: 'visible',
-      }}
-    >
-      <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-          {/* Left: customer info */}
-          <Box sx={{ flex: 1, minWidth: 200 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <Chip
-                label={isEmergency ? 'Emergency' : (request.urgencyLevel ?? 'Normal')}
-                size="small"
-                icon={isEmergency ? <WarningAmberIcon /> : undefined}
-                sx={{
-                  backgroundColor: priorityScoreColors[score] ?? '#22B1FB',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  '& .MuiChip-icon': { color: '#FFFFFF' },
-                }}
-              />
-              <Chip
-                label={statusLabels[request.status] ?? request.status}
-                size="small"
-                variant="outlined"
-                sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 500 }}
-              />
-            </Box>
-            <Typography
-              variant="subtitle1"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700, color: '#022F49' }}
-            >
-              {request.customerName}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: '#555555', fontFamily: 'DM Sans, Arial, sans-serif' }}
-            >
-              {request.phone} &bull; {request.email}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: '#777777', fontFamily: 'DM Sans, Arial, sans-serif', mt: 0.5 }}
-            >
-              <strong>{request.serviceCategory}</strong> &rarr; {request.serviceType}
-              {request.applianceType ? ` (${request.applianceType})` : ''}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: '#888888', fontFamily: 'DM Sans, Arial, sans-serif', mt: 0.5 }}
-            >
-              {request.issueDescription.slice(0, 100)}
-              {request.issueDescription.length > 100 ? '...' : ''}
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{ color: '#AAAAAA', fontFamily: 'DM Sans, Arial, sans-serif', display: 'block', mt: 0.5 }}
-            >
-              Created: {new Date(request.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-            </Typography>
-          </Box>
-
-          {/* Right: status + actions */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, minWidth: 200 }}>
-            <FormControl fullWidth size="small">
-              <Select
-                value={request.status}
-                onChange={(e: SelectChangeEvent<string>) =>
-                  onUpdateStatus(request.id, e.target.value as ServiceRequest['status'])
-                }
-                sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.875rem', borderRadius: '8px' }}
-              >
-                {statusOptions.map((opt) => (
-                  <MenuItem key={opt} value={opt} sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
-                    {statusLabels[opt] ?? opt}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <TextField
-              value={request.notes ?? ''}
-              onChange={(e) => onUpdateNotes(request.id, e.target.value)}
-              placeholder="Internal notes..."
-              size="small"
-              multiline
-              maxRows={3}
-              sx={{
-                '& textarea, & input': { fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.85rem' },
-                '& .MuiOutlinedInput-root': { borderRadius: '8px' },
-              }}
-            />
-
-            <Button
-              size="small"
-              endIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              onClick={onToggleExpand}
-              sx={{
-                textTransform: 'none',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                color: '#22B1FB',
-                justifyContent: 'flex-start',
-              }}
-            >
-              {expanded ? 'Hide Details' : 'View Details'}
-            </Button>
-          </Box>
-        </Box>
-
-        {/* Expanded triage details */}
-        <Collapse in={expanded}>
-          <Box
-            sx={{
-              mt: 2,
-              pt: 2,
-              borderTop: '1px solid #E8EFF5',
-              display: 'grid',
-              gap: 1,
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-            }}
-          >
-            <DetailRow label="Urgency Level" value={request.urgencyLevel ?? '—'} />
-            <DetailRow label="Possible Issue" value={request.possibleIssue ?? '—'} />
-            <DetailRow label="Recommended Technician" value={request.recommendedTechnicianType ?? '—'} />
-            <DetailRow label="Estimated Duration" value={request.estimatedDuration ?? '—'} />
-            <DetailRow label="Appliance Brand" value={request.applianceBrand ?? '—'} />
-            <DetailRow label="Appliance Model" value={request.applianceModel ?? '—'} />
-            <DetailRow
-              label="Address"
-              value={`${request.address}, ${request.city}, ${request.state} ${request.zipCode}`}
-            />
-            {request.preferredDate && (
-              <DetailRow
-                label="Appointment"
-                value={`${request.preferredDate} — ${request.timeWindow ?? request.preferredTime ?? ''}`}
-              />
-            )}
-            {request.callbackTime && (
-              <DetailRow label="Callback Time" value={request.callbackTime} />
-            )}
-            {request.safetyNotes && (
-              <Box sx={{ gridColumn: '1 / -1' }}>
-                <Alert severity="warning" sx={{ borderRadius: '8px' }}>
-                  <strong>Safety Notes:</strong> {request.safetyNotes}
-                </Alert>
-              </Box>
-            )}
-          </Box>
-        </Collapse>
-      </CardContent>
-    </Card>
-  );
-};
-
-const DetailRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <Box>
-    <Typography
-      variant="caption"
-      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#999999', display: 'block' }}
-    >
-      {label}
-    </Typography>
-    <Typography
-      variant="body2"
-      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#333333' }}
-    >
-      {value}
-    </Typography>
-  </Box>
-);
 
 export default AdminDashboard;

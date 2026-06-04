@@ -15,22 +15,26 @@ import {
   Divider,
 } from '@mui/material';
 import { Phone, Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-const navItems = [
-  { label: 'Home', path: '/' },
-  { label: 'Services', path: '/services' },
-];
-
-interface TopBarProps {
-  cartCount: number;
+interface NavItem {
+  label: string;
+  path: string;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
+const navItems: NavItem[] = [
+  { label: 'Home', path: '/' },
+  { label: 'Services', path: '/services' },
+  { label: 'About', path: '/about' },
+  { label: 'Contact', path: '/contact' },
+];
+
+const TopBar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const isActive = (path: string) => {
+  const isActive = (path: string): boolean => {
     if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
   };
@@ -79,11 +83,9 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: 'rgba(2, 47, 73, 0.94)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          backgroundColor: 'rgba(2, 47, 73, 0.97)',
+          backdropFilter: 'blur(8px)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
           zIndex: 1001,
           top: '40px',
         }}
@@ -94,7 +96,7 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
             <Box
               component="img"
               src="/Logo.png"
-              alt="Smart Applications Logo"
+              alt="SmartAppliance Logo"
               sx={{
                 height: '50px',
                 width: 'auto',
@@ -131,8 +133,8 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
             </Box>
           </Box>
 
-          {/* Right side: phone, Book Service, Emergency, cart, hamburger */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 2 } }}>
+          {/* Right side: phone, book service, emergency, cart, hamburger */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 1.5 } }}>
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
               <Phone sx={{ color: '#22B1FB', fontSize: '1.1rem' }} />
               <Typography
@@ -145,21 +147,40 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
 
             <Button
               variant="contained"
-              onClick={() => handleNavClick('/book/regular')}
+              onClick={() => navigate('/book/regular')}
               sx={{
                 backgroundColor: '#22B1FB',
                 color: '#FFFFFF',
                 fontFamily: 'DM Sans, Arial, sans-serif',
                 fontWeight: 600,
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 textTransform: 'none',
-                padding: '6px 16px',
+                padding: '6px 14px',
                 borderRadius: '8px',
                 display: { xs: 'none', sm: 'flex' },
                 '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
               }}
             >
               Book Service
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/book/emergency')}
+              startIcon={<WarningAmberIcon sx={{ fontSize: '1rem !important' }} />}
+              sx={{
+                borderColor: '#FF6B6B',
+                color: '#FF6B6B',
+                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontWeight: 600,
+                fontSize: '0.82rem',
+                textTransform: 'none',
+                padding: '5px 12px',
+                borderRadius: '8px',
+                display: { xs: 'none', md: 'flex' },
+                '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999', color: '#FF9999' },
+              }}
+            >
+              Emergency
             </Button>
 
             <Button
@@ -211,29 +232,6 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
                   '&:hover': { transform: 'scale(1.1)' },
                 }}
               />
-              {cartCount > 0 && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: '-8px',
-                    right: '-8px',
-                    backgroundColor: '#FF4444',
-                    color: '#FFFFFF',
-                    borderRadius: '50%',
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    border: '2px solid #FFFFFF',
-                  }}
-                >
-                  {cartCount}
-                </Box>
-              )}
             </Box>
 
             {/* Hamburger for mobile/tablet */}
@@ -314,7 +312,7 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
           <Button
             variant="contained"
             fullWidth
-            onClick={() => handleNavClick('/book/regular')}
+            onClick={() => { navigate('/book/regular'); setDrawerOpen(false); }}
             sx={{
               backgroundColor: '#22B1FB',
               color: '#FFFFFF',
@@ -326,12 +324,13 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
               '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
             }}
           >
-            Book Service
+            Book Regular Service
           </Button>
           <Button
             variant="outlined"
             fullWidth
-            onClick={() => handleNavClick('/book/emergency')}
+            startIcon={<WarningAmberIcon />}
+            onClick={() => { navigate('/book/emergency'); setDrawerOpen(false); }}
             sx={{
               borderColor: '#FF6B6B',
               color: '#FF6B6B',
@@ -340,7 +339,7 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount }) => {
               textTransform: 'none',
               borderRadius: '10px',
               py: 1.25,
-              '&:hover': { backgroundColor: '#FF6B6B', color: '#FFFFFF' },
+              '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)' },
             }}
           >
             Emergency Service

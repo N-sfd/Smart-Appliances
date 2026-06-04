@@ -1,364 +1,353 @@
 import React, { useState } from 'react';
 import {
-  Alert,
-  Badge,
   Box,
-  Button,
+  Typography,
+  Container,
   Card,
   CardContent,
   Chip,
-  Container,
-  Typography,
+  Alert,
 } from '@mui/material';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { ServiceRequest } from '../data/services';
-import { updateTechnicianStatus } from '../lib/firebase';
 
 const STORAGE_KEY = 'smart-appliances-service-requests';
 
-function loadFromStorage(): ServiceRequest[] {
+const loadRequests = (): ServiceRequest[] => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return [];
-    return JSON.parse(stored) as ServiceRequest[];
-  } catch {
-    return [];
-  }
-}
-
-function saveToStorage(requests: ServiceRequest[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved) as ServiceRequest[];
   } catch {
     // ignore
   }
-}
-
-const priorityScoreColors: Record<number, string> = {
-  4: '#FF6B6B',
-  3: '#FF9800',
-  2: '#22B1FB',
-  1: '#757575',
+  return [];
 };
 
 const TechnicianDashboard: React.FC = () => {
-  const [requests, setRequests] = useState<ServiceRequest[]>(loadFromStorage);
+  const [requests] = useState<ServiceRequest[]>(loadRequests);
 
-  const activeJobs = requests.filter(
-    (r) => r.status === 'technician_assigned' || r.status === 'in_progress',
-  );
-
-  const handleTechnicianAction = (
-    id: string,
-    techStatus: ServiceRequest['technicianStatus'],
-    newJobStatus?: ServiceRequest['status'],
-  ) => {
-    setRequests((curr) => {
-      const updated = curr.map((r) =>
-        r.id === id
-          ? {
-              ...r,
-              technicianStatus: techStatus,
-              status: newJobStatus ?? r.status,
-              updatedAt: new Date().toISOString(),
-            }
-          : r,
-      );
-      saveToStorage(updated);
-      return updated;
+  // Show only scheduled and in-progress jobs
+  const activeJobs = requests
+    .filter((r) => r.status === 'scheduled' || r.status === 'in_progress' || r.status === 'new')
+    .sort((a, b) => {
+      if (a.servicePriority === b.servicePriority) {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      return a.servicePriority === 'emergency' ? -1 : 1;
     });
-    updateTechnicianStatus(id, techStatus).catch(() => {});
-  };
 
   return (
-    <Box sx={{ backgroundColor: '#F5F7F9', minHeight: '100vh', pb: 8 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #022F49 0%, #034a73 100%)',
-          py: { xs: 4, md: 6 },
-          px: 2,
-        }}
-      >
-        <Container maxWidth="lg">
+    <Box sx={{ minHeight: '100vh', backgroundColor: '#F5F7F9', py: 6 }}>
+      <Container maxWidth="lg">
+        {/* Header */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
           <Box
             sx={{
+              width: 56,
+              height: 56,
+              borderRadius: '14px',
+              backgroundColor: '#022F49',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 2,
+              justifyContent: 'center',
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <EngineeringIcon sx={{ color: '#22B1FB', fontSize: 40 }} />
-              <Box>
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                  }}
-                >
-                  Technician Dashboard
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans, Arial, sans-serif' }}
-                >
-                  All Jobs — Assigned & In Progress
-                </Typography>
-              </Box>
-            </Box>
-            <Badge badgeContent={activeJobs.length} color="error">
-              <Chip
-                label={`${activeJobs.length} Active Job${activeJobs.length !== 1 ? 's' : ''}`}
-                sx={{
-                  backgroundColor: '#22B1FB',
-                  color: '#FFFFFF',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 700,
-                  fontSize: '1rem',
-                  px: 1,
-                }}
-              />
-            </Badge>
+            <EngineeringIcon sx={{ fontSize: 30, color: '#22B1FB' }} />
           </Box>
-        </Container>
-      </Box>
-
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        {activeJobs.length === 0 ? (
-          <Card
-            elevation={0}
-            sx={{
-              borderRadius: '16px',
-              border: '2px dashed #D9D9D9',
-              p: 6,
-              textAlign: 'center',
-            }}
-          >
-            <EngineeringIcon sx={{ fontSize: 48, color: '#CCCCCC', mb: 2 }} />
+          <Box>
             <Typography
-              variant="h6"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#999999', mb: 1 }}
+              variant="h3"
+              sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', lineHeight: 1.2 }}
             >
-              No Active Jobs
+              Technician Dashboard
             </Typography>
             <Typography
               variant="body2"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#BBBBBB' }}
+              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666' }}
             >
-              Jobs with status "technician_assigned" or "in_progress" will appear here.
+              View and manage your assigned service jobs
             </Typography>
-          </Card>
+          </Box>
+        </Box>
+
+        {/* Summary */}
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 5 }}>
+          <Chip
+            label={`${activeJobs.length} Active Jobs`}
+            sx={{
+              backgroundColor: '#022F49',
+              color: '#FFFFFF',
+              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontWeight: 600,
+            }}
+          />
+          <Chip
+            label={`${activeJobs.filter((j) => j.servicePriority === 'emergency').length} Emergency`}
+            sx={{
+              backgroundColor: activeJobs.filter((j) => j.servicePriority === 'emergency').length > 0 ? '#FF6B6B' : '#E0E0E0',
+              color: activeJobs.filter((j) => j.servicePriority === 'emergency').length > 0 ? '#FFFFFF' : '#888888',
+              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontWeight: 600,
+            }}
+          />
+        </Box>
+
+        {/* Jobs */}
+        {activeJobs.length === 0 ? (
+          <Box
+            sx={{
+              textAlign: 'center',
+              py: 12,
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              border: '2px dashed #D9D9D9',
+            }}
+          >
+            <EngineeringIcon sx={{ fontSize: 64, color: '#D9D9D9', mb: 2 }} />
+            <Typography
+              variant="h6"
+              sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#999999', mb: 1 }}
+            >
+              No jobs assigned yet
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#AAAAAA' }}
+            >
+              New job assignments will appear here once the admin schedules them.
+            </Typography>
+          </Box>
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             {activeJobs.map((job) => (
-              <JobCard
+              <Card
                 key={job.id}
-                job={job}
-                onAction={handleTechnicianAction}
-              />
+                sx={{
+                  borderRadius: '16px',
+                  border: '1px solid #E5E5E5',
+                  borderLeft: `5px solid ${job.servicePriority === 'emergency' ? '#FF6B6B' : '#22B1FB'}`,
+                  backgroundColor: job.servicePriority === 'emergency' ? '#FFF8F8' : '#FFFFFF',
+                  boxShadow: 'none',
+                  transition: 'box-shadow 0.2s',
+                  '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.06)' },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  {/* Top row */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      mb: 2,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49' }}
+                      >
+                        {job.customerName}
+                      </Typography>
+                      <Chip
+                        label={job.servicePriority === 'emergency' ? 'Emergency' : 'Regular'}
+                        size="small"
+                        icon={
+                          job.servicePriority === 'emergency' ? (
+                            <WarningAmberIcon sx={{ fontSize: '14px !important' }} />
+                          ) : undefined
+                        }
+                        sx={{
+                          backgroundColor: job.servicePriority === 'emergency' ? '#FF6B6B' : '#22B1FB',
+                          color: '#FFFFFF',
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontWeight: 700,
+                          fontSize: '0.72rem',
+                        }}
+                      />
+                      <Chip
+                        label={job.status.replace('_', ' ')}
+                        size="small"
+                        sx={{
+                          backgroundColor: '#F5F7F9',
+                          color: '#022F49',
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontWeight: 600,
+                          fontSize: '0.72rem',
+                          textTransform: 'capitalize',
+                        }}
+                      />
+                    </Box>
+                    <Typography
+                      variant="caption"
+                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#888888' }}
+                    >
+                      {new Date(job.createdAt).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+
+                  {/* Details grid */}
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+                      gap: 3,
+                    }}
+                  >
+                    {/* Contact & Location */}
+                    <Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          color: '#888888',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: 1,
+                          display: 'block',
+                          mb: 0.75,
+                        }}
+                      >
+                        Contact & Location
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', mb: 0.25 }}>
+                        {job.phone}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#22B1FB', mb: 0.5, wordBreak: 'break-all', fontSize: '0.82rem' }}
+                      >
+                        {job.email}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', fontSize: '0.85rem' }}>
+                        {job.address && `${job.address}, `}
+                        {job.city}{job.city && job.state ? ', ' : ''}{job.state} {job.zipCode}
+                      </Typography>
+                    </Box>
+
+                    {/* Service info */}
+                    <Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          color: '#888888',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: 1,
+                          display: 'block',
+                          mb: 0.75,
+                        }}
+                      >
+                        Service Details
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 0.25 }}
+                      >
+                        {job.serviceCategory}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', mb: 0.25 }}>
+                        {job.serviceType}
+                      </Typography>
+                      {job.applianceBrand && (
+                        <Typography variant="caption" sx={{ color: '#888888', display: 'block', mb: 0.5 }}>
+                          {job.applianceBrand} {job.applianceModel}
+                        </Typography>
+                      )}
+                      {job.issueDescription && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            color: '#444444',
+                            fontSize: '0.82rem',
+                            lineHeight: 1.5,
+                            mt: 0.5,
+                          }}
+                        >
+                          {job.issueDescription}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    {/* Scheduling */}
+                    <Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          color: '#888888',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: 1,
+                          display: 'block',
+                          mb: 0.75,
+                        }}
+                      >
+                        Scheduling
+                      </Typography>
+                      {job.servicePriority === 'emergency' ? (
+                        <Chip
+                          label={job.urgencyLevel ?? 'ASAP'}
+                          size="small"
+                          sx={{
+                            backgroundColor: '#FFE0E0',
+                            color: '#CC2200',
+                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            fontWeight: 600,
+                          }}
+                        />
+                      ) : (
+                        <Box>
+                          {job.preferredDate && (
+                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', mb: 0.25 }}>
+                              {job.preferredDate}
+                            </Typography>
+                          )}
+                          {job.preferredTime && (
+                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}>
+                              {job.preferredTime}
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+
+                  {/* Safety notes */}
+                  {job.notes && job.notes.trim() !== '' && (
+                    <Alert
+                      severity="warning"
+                      icon={<WarningAmberIcon fontSize="inherit" />}
+                      sx={{
+                        mt: 2.5,
+                        borderRadius: '10px',
+                        backgroundColor: '#FFF3E0',
+                        border: '1px solid #FFCC80',
+                        '& .MuiAlert-message': {
+                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontSize: '0.88rem',
+                          color: '#E65100',
+                        },
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700, color: '#E65100', mb: 0.5 }}>
+                        Notes
+                      </Typography>
+                      {job.notes}
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
             ))}
           </Box>
         )}
       </Container>
     </Box>
-  );
-};
-
-// --- JobCard ---
-interface JobCardProps {
-  job: ServiceRequest;
-  onAction: (
-    id: string,
-    techStatus: ServiceRequest['technicianStatus'],
-    newJobStatus?: ServiceRequest['status'],
-  ) => void;
-}
-
-const JobCard: React.FC<JobCardProps> = ({ job, onAction }) => {
-  const isEmergency = job.servicePriority === 'emergency';
-  const score = job.priorityScore ?? (isEmergency ? 4 : 2);
-  const priorityColor = priorityScoreColors[score] ?? '#22B1FB';
-
-  const getNextAction = (): { label: string; techStatus: ServiceRequest['technicianStatus']; jobStatus?: ServiceRequest['status'] } | null => {
-    if (!job.technicianStatus) {
-      return { label: 'Accept Job', techStatus: 'accepted' };
-    }
-    if (job.technicianStatus === 'accepted') {
-      return { label: 'On the Way', techStatus: 'on_the_way', jobStatus: 'in_progress' };
-    }
-    if (job.technicianStatus === 'on_the_way') {
-      return { label: 'Started', techStatus: 'started' };
-    }
-    if (job.technicianStatus === 'started') {
-      return { label: 'Mark Completed', techStatus: 'completed', jobStatus: 'completed' };
-    }
-    return null;
-  };
-
-  const nextAction = getNextAction();
-
-  return (
-    <Card
-      elevation={0}
-      sx={{
-        borderRadius: '16px',
-        border: `1.5px solid ${priorityColor}44`,
-        borderLeft: `5px solid ${priorityColor}`,
-        backgroundColor: isEmergency ? '#FFF8F8' : '#FFFFFF',
-      }}
-    >
-      <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-        {/* Priority badge */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-          <Chip
-            label={isEmergency ? 'EMERGENCY' : (job.urgencyLevel ?? 'Normal')}
-            size="small"
-            icon={isEmergency ? <WarningAmberIcon /> : undefined}
-            sx={{
-              backgroundColor: priorityColor,
-              color: '#FFFFFF',
-              fontWeight: 700,
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              '& .MuiChip-icon': { color: '#FFFFFF' },
-            }}
-          />
-          {job.technicianStatus && (
-            <Chip
-              label={job.technicianStatus.replace('_', ' ').toUpperCase()}
-              size="small"
-              variant="outlined"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 600 }}
-            />
-          )}
-        </Box>
-
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 3,
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-            mb: 2,
-          }}
-        >
-          {/* Customer & location */}
-          <Box>
-            <Typography
-              variant="subtitle1"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700, color: '#022F49' }}
-            >
-              {job.customerName}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: '#555555', fontFamily: 'DM Sans, Arial, sans-serif' }}
-            >
-              {job.address}, {job.city}, {job.state} {job.zipCode}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: '#22B1FB', fontFamily: 'DM Sans, Arial, sans-serif', mt: 0.5 }}
-            >
-              {job.phone}
-            </Typography>
-          </Box>
-
-          {/* Service info */}
-          <Box>
-            <Typography
-              variant="body2"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 600, color: '#022F49' }}
-            >
-              {job.serviceCategory}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: '#555555', fontFamily: 'DM Sans, Arial, sans-serif' }}
-            >
-              {job.serviceType}
-              {job.applianceType ? ` — ${job.applianceType}` : ''}
-              {job.applianceBrand ? ` (${job.applianceBrand})` : ''}
-            </Typography>
-            {job.preferredDate && (
-              <Typography
-                variant="caption"
-                sx={{ color: '#888888', fontFamily: 'DM Sans, Arial, sans-serif', display: 'block', mt: 0.5 }}
-              >
-                Preferred: {job.preferredDate} | {job.timeWindow ?? job.preferredTime ?? ''}
-              </Typography>
-            )}
-          </Box>
-        </Box>
-
-        {/* Issue summary */}
-        <Typography
-          variant="body2"
-          sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', mb: 2 }}
-        >
-          {job.issueDescription.slice(0, 150)}
-          {job.issueDescription.length > 150 ? '...' : ''}
-        </Typography>
-
-        {/* Safety notes (prominent if present) */}
-        {job.safetyNotes && (
-          <Alert
-            severity="error"
-            icon={<WarningAmberIcon />}
-            sx={{ mb: 2, borderRadius: '10px', backgroundColor: '#FFF0F0', border: '1px solid #FF6B6B' }}
-          >
-            <strong>SAFETY:</strong> {job.safetyNotes}
-          </Alert>
-        )}
-
-        {/* Triage info */}
-        {job.recommendedTechnicianType && (
-          <Typography
-            variant="body2"
-            sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', mb: 1 }}
-          >
-            <strong>Technician Type:</strong> {job.recommendedTechnicianType} &bull;{' '}
-            <strong>Est. Duration:</strong> {job.estimatedDuration ?? '—'}
-          </Typography>
-        )}
-
-        {/* Action button */}
-        {nextAction ? (
-          <Button
-            variant="contained"
-            onClick={() => onAction(job.id, nextAction.techStatus, nextAction.jobStatus)}
-            sx={{
-              backgroundColor: priorityColor,
-              color: '#FFFFFF',
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              fontWeight: 700,
-              textTransform: 'none',
-              px: 4,
-              borderRadius: '10px',
-              mt: 1,
-              '&:hover': { backgroundColor: '#022F49' },
-            }}
-          >
-            {nextAction.label}
-          </Button>
-        ) : (
-          <Chip
-            label="Job Completed"
-            sx={{
-              backgroundColor: '#4CAF5020',
-              color: '#4CAF50',
-              fontWeight: 700,
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              mt: 1,
-            }}
-          />
-        )}
-      </CardContent>
-    </Card>
   );
 };
 
