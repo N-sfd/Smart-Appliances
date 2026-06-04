@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -8,6 +9,10 @@ import {
   CardContent,
   TextField,
   Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Chip,
 } from '@mui/material';
 import KitchenIcon from '@mui/icons-material/Kitchen';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -28,25 +33,9 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { serviceCategories } from '../data/services';
-
-interface HomeProps {
-  cartItems: {
-    refrigerator: number;
-    washingMachine: number;
-    bulb: number;
-    oven: number;
-  };
-  setCartItems: React.Dispatch<
-    React.SetStateAction<{
-      refrigerator: number;
-      washingMachine: number;
-      bulb: number;
-      oven: number;
-    }>
-  >;
-  onOpenBooking: (priority: 'regular' | 'emergency', categoryId?: string, serviceTypeId?: string) => void;
-}
 
 const sectionTags = ['All', 'Appliances', 'HVAC', 'Plumbing', 'Electrical', 'Smart Home', 'Maintenance'];
 
@@ -113,7 +102,56 @@ const companyStats = [
   { value: '100%', label: 'Licensed & Insured' },
 ];
 
-const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) => {
+const faqs = [
+  {
+    question: 'Do you offer emergency service?',
+    answer:
+      'Yes. We provide 24/7 emergency service for urgent issues including water leaks, burning smells, electrical hazards, and complete appliance failures. Emergency requests are prioritized and receive same-day response.',
+  },
+  {
+    question: 'What appliances do you repair?',
+    answer:
+      'We repair all major home appliances including refrigerators, washers, dryers, dishwashers, ovens, stoves, microwaves, and more. We also service HVAC systems, plumbing, electrical, and smart home equipment.',
+  },
+  {
+    question: 'Is there a diagnostic fee?',
+    answer:
+      'We charge a starting diagnostic fee of $49–$89 depending on the appliance type. This covers the technician visit and initial assessment. The diagnostic fee is applied toward the repair cost if you proceed.',
+  },
+  {
+    question: 'Can I upload a photo or video of the issue?',
+    answer:
+      'Yes. Our booking form includes an option to upload photos or short videos of the problem. This helps our technicians arrive better prepared and can speed up the repair.',
+  },
+  {
+    question: 'How soon can a technician come?',
+    answer:
+      'For regular service, we typically schedule within 1–3 business days based on your preferred time window. Emergency requests receive same-day response when possible.',
+  },
+  {
+    question: 'Do you service HVAC, plumbing, or electrical issues?',
+    answer:
+      'Yes. In addition to appliance repair, we offer HVAC support, plumbing services, and electrical services through our licensed technician network.',
+  },
+];
+
+const serviceAreas = [
+  'Downtown',
+  'North District',
+  'South Side',
+  'East End',
+  'West Hills',
+  'Midtown',
+  'Riverside',
+  'Lakewood',
+  'Greenfield',
+  'Parkview',
+  'Maplewood',
+  'Oakdale',
+];
+
+const Home: React.FC = () => {
+  const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentBrandIndex, setCurrentBrandIndex] = useState(0);
   const [currentRepairBrandIndex, setCurrentRepairBrandIndex] = useState(0);
@@ -173,13 +211,6 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
     setItemCounts((prev) => ({ ...prev, [itemType]: Math.max(0, prev[itemType] - 1) }));
   };
 
-  const addToCart = (itemType: keyof typeof itemCounts) => {
-    if (itemCounts[itemType] > 0) {
-      setCartItems((prev) => ({ ...prev, [itemType]: prev[itemType] + itemCounts[itemType] }));
-      setItemCounts((prev) => ({ ...prev, [itemType]: 0 }));
-    }
-  };
-
   const handleContactSubmit = () => {
     if (contactName && contactEmail && contactMessage) {
       setContactSent(true);
@@ -237,7 +268,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 textShadow: '2px 2px 8px rgba(0,0,0,0.4)',
               }}
             >
-              Smart Home Service, Repairs & Installations
+              Fast, Reliable Appliance Repair & Home Services
             </Typography>
             <Typography
               variant="h5"
@@ -252,13 +283,12 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 textShadow: '1px 1px 6px rgba(0,0,0,0.3)',
               }}
             >
-              Book trusted technicians for appliances, HVAC, plumbing, electrical, smart home setup, or urgent
-              same-day service in your area.
+              Book regular or emergency appliance repair with a simple guided service request process.
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
               <Button
                 variant="contained"
-                onClick={() => onOpenBooking('regular')}
+                onClick={() => navigate('/book/regular')}
                 sx={{
                   backgroundColor: '#22B1FB',
                   color: '#FFFFFF',
@@ -270,11 +300,11 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
                 }}
               >
-                Schedule Regular Service
+                Book Regular Service
               </Button>
               <Button
                 variant="contained"
-                onClick={() => onOpenBooking('emergency')}
+                onClick={() => navigate('/book/emergency')}
                 sx={{
                   backgroundColor: '#FF6B6B',
                   color: '#FFFFFF',
@@ -296,8 +326,187 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
         </Box>
       </Box>
 
+      {/* ── Service Choice Section ── */}
+      <Box sx={{ padding: '64px 0', backgroundColor: '#FFFFFF' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              fontWeight: 600,
+              color: '#022F49',
+              textAlign: 'center',
+              marginBottom: 1,
+            }}
+          >
+            How Would You Like to Book?
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontFamily: 'DM Sans, Arial, sans-serif',
+              color: '#555555',
+              textAlign: 'center',
+              marginBottom: 5,
+              maxWidth: '600px',
+              margin: '0 auto 40px',
+            }}
+          >
+            Choose the service type that fits your situation.
+          </Typography>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+              gap: 3,
+            }}
+          >
+            {/* Regular Service Card */}
+            <Card
+              sx={{
+                border: '2px solid #E5E5E5',
+                borderTop: '4px solid #22B1FB',
+                borderRadius: '20px',
+                boxShadow: 'none',
+                transition: 'box-shadow 0.2s',
+                '&:hover': { boxShadow: '0 8px 28px rgba(34,177,251,0.15)' },
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <CalendarMonthIcon sx={{ fontSize: 48, color: '#22B1FB', mb: 2 }} />
+                <Typography
+                  variant="h5"
+                  sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1 }}
+                >
+                  Regular Service Booking
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', mb: 2.5 }}
+                >
+                  For non-urgent appliance issues and scheduled maintenance
+                </Typography>
+                <Box sx={{ mb: 3 }}>
+                  {[
+                    'Refrigerator not cooling properly',
+                    'Washer not draining',
+                    'Dryer not heating',
+                    'Dishwasher not cleaning',
+                    'Oven not heating',
+                    'Appliance noise or maintenance issue',
+                  ].map((item) => (
+                    <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.75 }}>
+                      <CheckCircleOutlineIcon sx={{ fontSize: 16, color: '#22B1FB', flexShrink: 0 }} />
+                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#444444' }}>
+                        {item}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={() => navigate('/book/regular')}
+                  sx={{
+                    backgroundColor: '#22B1FB',
+                    color: '#FFFFFF',
+                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontWeight: 700,
+                    textTransform: 'none',
+                    borderRadius: '10px',
+                    py: 1.5,
+                    '&:hover': { backgroundColor: '#022F49' },
+                  }}
+                >
+                  Book Regular Service
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Emergency Service Card */}
+            <Card
+              sx={{
+                border: '2px solid #FFE5E5',
+                borderTop: '4px solid #FF6B6B',
+                borderRadius: '20px',
+                backgroundColor: '#FFF8F8',
+                boxShadow: 'none',
+                transition: 'box-shadow 0.2s',
+                '&:hover': { boxShadow: '0 8px 28px rgba(255,107,107,0.15)' },
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <WarningAmberIcon sx={{ fontSize: 48, color: '#FF6B6B', mb: 2 }} />
+                <Typography
+                  variant="h5"
+                  sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1 }}
+                >
+                  Emergency Service
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', mb: 2.5 }}
+                >
+                  For urgent issues that need immediate attention
+                </Typography>
+                <Box sx={{ mb: 2 }}>
+                  {[
+                    'Major water leak',
+                    'Burning smell or smoke',
+                    'Electrical issue',
+                    'Appliance overheating',
+                    'Refrigerator completely stopped',
+                    'No heating or cooling in extreme weather',
+                  ].map((item) => (
+                    <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.75 }}>
+                      <CheckCircleOutlineIcon sx={{ fontSize: 16, color: '#FF6B6B', flexShrink: 0 }} />
+                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#444444' }}>
+                        {item}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+                <Box
+                  sx={{
+                    backgroundColor: '#FFE5E5',
+                    borderRadius: '8px',
+                    p: 1.5,
+                    mb: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
+                  <WarningAmberIcon sx={{ fontSize: 16, color: '#CC2200', flexShrink: 0 }} />
+                  <Typography variant="caption" sx={{ color: '#CC2200', fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 600 }}>
+                    If you smell gas or see smoke, call 911 immediately.
+                  </Typography>
+                </Box>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={() => navigate('/book/emergency')}
+                  sx={{
+                    backgroundColor: '#FF6B6B',
+                    color: '#FFFFFF',
+                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontWeight: 700,
+                    textTransform: 'none',
+                    borderRadius: '10px',
+                    py: 1.5,
+                    '&:hover': { backgroundColor: '#CC2200' },
+                  }}
+                >
+                  Request Emergency Service
+                </Button>
+              </CardContent>
+            </Card>
+          </Box>
+        </Container>
+      </Box>
+
       {/* ── Service Categories ── */}
-      <Box id="services" sx={{ padding: '72px 0', backgroundColor: '#FFFFFF' }}>
+      <Box id="services" sx={{ padding: '72px 0', backgroundColor: '#F5F7F9' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
@@ -341,7 +550,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   py: 0.75,
                   borderColor: '#22B1FB',
                   color: serviceCategoryFilter === tag ? '#FFFFFF' : '#022F49',
-                  backgroundColor: serviceCategoryFilter === tag ? '#22B1FB' : '#F5F7F9',
+                  backgroundColor: serviceCategoryFilter === tag ? '#22B1FB' : '#FFFFFF',
                   fontFamily: 'DM Sans, Arial, sans-serif',
                   fontWeight: serviceCategoryFilter === tag ? 700 : 500,
                   '&:hover': { backgroundColor: serviceCategoryFilter === tag ? '#1A9FE0' : '#E8F4FD', borderColor: '#22B1FB' },
@@ -366,6 +575,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 sx={{
                   borderRadius: '20px',
                   border: '1px solid #E5E5E5',
+                  backgroundColor: '#FFFFFF',
                   minHeight: '340px',
                   transition: 'box-shadow 0.2s ease, transform 0.2s ease',
                   '&:hover': { boxShadow: '0 8px 28px rgba(2,47,73,0.1)', transform: 'translateY(-2px)' },
@@ -414,7 +624,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   <Box sx={{ display: 'grid', gap: 1 }}>
                     <Button
                       variant="contained"
-                      onClick={() => onOpenBooking('regular', category.id, category.services[0]?.id)}
+                      onClick={() => navigate('/book/regular')}
                       sx={{
                         backgroundColor: '#22B1FB',
                         color: '#FFFFFF',
@@ -429,7 +639,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                     </Button>
                     <Button
                       variant="outlined"
-                      onClick={() => onOpenBooking('emergency', category.id, category.services[0]?.id)}
+                      onClick={() => navigate('/book/emergency')}
                       sx={{
                         textTransform: 'none',
                         borderRadius: '10px',
@@ -451,7 +661,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
       </Box>
 
       {/* ── How It Works ── */}
-      <Box sx={{ padding: '64px 0', backgroundColor: '#F5F7F9' }}>
+      <Box sx={{ padding: '64px 0', backgroundColor: '#FFFFFF' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
@@ -485,7 +695,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
             {howItWorks.map((item) => (
               <Card
                 key={item.step}
-                sx={{ borderRadius: '18px', backgroundColor: '#FFFFFF', border: '1px solid #E5E5E5' }}
+                sx={{ borderRadius: '18px', backgroundColor: '#F5F7F9', border: '1px solid #E5E5E5' }}
               >
                 <CardContent sx={{ p: 3 }}>
                   <Box
@@ -532,7 +742,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
       </Box>
 
       {/* ── Trust Section ── */}
-      <Box sx={{ padding: '72px 0', backgroundColor: '#FFFFFF' }}>
+      <Box sx={{ padding: '72px 0', backgroundColor: '#F5F7F9' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
@@ -568,7 +778,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 key={item.title}
                 sx={{
                   borderRadius: '18px',
-                  backgroundColor: '#F5F7F9',
+                  backgroundColor: '#FFFFFF',
                   border: '1px solid #E8E8E8',
                   transition: 'box-shadow 0.2s',
                   '&:hover': { boxShadow: '0 6px 20px rgba(2,47,73,0.08)' },
@@ -593,7 +803,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
       </Box>
 
       {/* ── Brands ── */}
-      <Box sx={{ padding: '40px 0 56px', backgroundColor: '#F5F7F9' }}>
+      <Box sx={{ padding: '40px 0 56px', backgroundColor: '#FFFFFF' }}>
         <Container maxWidth="lg">
           <Box
             sx={{
@@ -741,7 +951,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   variant="contained"
-                  onClick={() => onOpenBooking('regular', 'appliance-repair')}
+                  onClick={() => navigate('/book/regular')}
                   sx={{
                     backgroundColor: '#22B1FB',
                     color: '#FFFFFF',
@@ -758,7 +968,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 </Button>
                 <Button
                   variant="outlined"
-                  onClick={() => onOpenBooking('emergency')}
+                  onClick={() => navigate('/book/emergency')}
                   sx={{
                     borderColor: '#FF6B6B',
                     color: '#FF6B6B',
@@ -949,7 +1159,6 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                       </Button>
                       <Button
                         variant="contained"
-                        onClick={() => addToCart(product.type)}
                         disabled={itemCounts[product.type] === 0}
                         sx={{
                           backgroundColor: '#22B1FB',
@@ -1003,7 +1212,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                   mb: 2,
                 }}
               >
-                Smart Appliances is a full-service home solutions company dedicated to keeping your appliances, HVAC
+                SmartAppliance is a full-service home solutions company dedicated to keeping your appliances, HVAC
                 systems, plumbing, and electrical running smoothly. Our team of certified technicians brings years of
                 experience and a commitment to quality work every time.
               </Typography>
@@ -1017,13 +1226,12 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 }}
               >
                 Whether you need a routine maintenance visit or urgent emergency support, we respond quickly, diagnose
-                accurately, and provide transparent pricing before any work begins. We serve homeowners across the region
-                with same-day availability for emergency calls.
+                accurately, and provide transparent pricing before any work begins.
               </Typography>
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   variant="contained"
-                  onClick={() => onOpenBooking('regular')}
+                  onClick={() => navigate('/book/regular')}
                   sx={{
                     backgroundColor: '#22B1FB',
                     color: '#FFFFFF',
@@ -1040,7 +1248,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 </Button>
                 <Button
                   variant="outlined"
-                  href="#contact"
+                  onClick={() => navigate('/contact')}
                   sx={{
                     borderColor: '#022F49',
                     color: '#022F49',
@@ -1127,7 +1335,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               </Typography>
               {[
                 { icon: <PhoneIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Phone', value: '+1 (555) 123-4567' },
-                { icon: <EmailIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Email', value: 'service@smartappliances.com' },
+                { icon: <EmailIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Email', value: 'service@smartappliance.com' },
                 { icon: <LocationOnIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Address', value: '123 Main St, Anytown, USA 00000' },
               ].map((item) => (
                 <Box key={item.label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 3 }}>
@@ -1315,6 +1523,146 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
         </Container>
       </Box>
 
+      {/* ── FAQ Section ── */}
+      <Box sx={{ padding: '80px 0', backgroundColor: '#FFFFFF' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              color: '#022F49',
+              textAlign: 'center',
+              mb: 1,
+            }}
+          >
+            Frequently Asked Questions
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5 }}>
+            <Box sx={{ width: 60, height: 4, backgroundColor: '#22B1FB', borderRadius: 2 }} />
+          </Box>
+          <Box sx={{ maxWidth: '800px', margin: '0 auto' }}>
+            {faqs.map((faq) => (
+              <Accordion
+                key={faq.question}
+                disableGutters
+                elevation={0}
+                sx={{
+                  border: '1px solid #E5E5E5',
+                  borderRadius: '12px !important',
+                  mb: 1.5,
+                  '&:before': { display: 'none' },
+                  '&.Mui-expanded': { boxShadow: '0 4px 16px rgba(2,47,73,0.08)' },
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: '#22B1FB' }} />}
+                  sx={{
+                    px: 3,
+                    py: 1,
+                    '& .MuiAccordionSummary-content': { my: 1.5 },
+                  }}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 600 }}
+                  >
+                    {faq.question}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ px: 3, pb: 2.5 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', lineHeight: 1.8 }}
+                  >
+                    {faq.answer}
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── Service Areas ── */}
+      <Box sx={{ padding: '72px 0', backgroundColor: '#F5F7F9' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              color: '#022F49',
+              textAlign: 'center',
+              mb: 1,
+            }}
+          >
+            Service Areas
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+            <Box sx={{ width: 60, height: 4, backgroundColor: '#22B1FB', borderRadius: 2 }} />
+          </Box>
+          <Typography
+            variant="body1"
+            sx={{
+              fontFamily: 'DM Sans, Arial, sans-serif',
+              color: '#555555',
+              textAlign: 'center',
+              maxWidth: '600px',
+              margin: '0 auto 40px',
+              lineHeight: 1.8,
+            }}
+          >
+            SmartAppliance serves homeowners across the greater metro area and surrounding regions. Contact us to
+            confirm service availability in your location.
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1.5,
+              justifyContent: 'center',
+              mb: 5,
+            }}
+          >
+            {serviceAreas.map((area) => (
+              <Chip
+                key={area}
+                label={area}
+                variant="outlined"
+                sx={{
+                  borderColor: '#022F49',
+                  color: '#022F49',
+                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontWeight: 500,
+                  fontSize: '0.9rem',
+                  px: 1,
+                  '&:hover': { backgroundColor: '#E8F4FD', borderColor: '#22B1FB', color: '#22B1FB' },
+                }}
+              />
+            ))}
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Button
+              variant="contained"
+              onClick={() => navigate('/contact')}
+              sx={{
+                backgroundColor: '#022F49',
+                color: '#FFFFFF',
+                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontWeight: 700,
+                px: 4,
+                py: 1.5,
+                borderRadius: '10px',
+                textTransform: 'none',
+                fontSize: '1rem',
+                '&:hover': { backgroundColor: '#22B1FB' },
+              }}
+            >
+              Check Your Area
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+
       {/* ── Footer ── */}
       <Box component="footer" sx={{ backgroundColor: '#022F49', color: '#FFFFFF', pt: 7, pb: 4 }}>
         <Container maxWidth="lg">
@@ -1331,7 +1679,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               <Box
                 component="img"
                 src="/Logo.png"
-                alt="Smart Appliances"
+                alt="SmartAppliance"
                 sx={{ height: '48px', width: 'auto', objectFit: 'contain', mb: 2 }}
               />
               <Typography
@@ -1383,14 +1731,16 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
                 Quick Links
               </Typography>
               {[
-                { label: 'Home', href: '#home' },
-                { label: 'About Us', href: '#about' },
-                { label: 'Services', href: '#services' },
-                { label: 'Buy Appliances', href: '#appliances' },
-                { label: 'Repair Services', href: '#repair' },
-                { label: 'Contact Us', href: '#contact' },
+                { label: 'Home', path: '/' },
+                { label: 'Services', path: '/services' },
+                { label: 'About', path: '/about' },
+                { label: 'Contact', path: '/contact' },
               ].map((link) => (
-                <Box key={link.label} component="a" href={link.href} sx={footerLinkStyle}>
+                <Box
+                  key={link.label}
+                  onClick={() => navigate(link.path)}
+                  sx={{ ...footerLinkStyle, cursor: 'pointer' }}
+                >
                   {link.label}
                 </Box>
               ))}
@@ -1429,7 +1779,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               </Typography>
               {[
                 { icon: <PhoneIcon sx={{ fontSize: 16 }} />, text: '+1 (555) 123-4567' },
-                { icon: <EmailIcon sx={{ fontSize: 16 }} />, text: 'service@smartappliances.com' },
+                { icon: <EmailIcon sx={{ fontSize: 16 }} />, text: 'service@smartappliance.com' },
                 { icon: <LocationOnIcon sx={{ fontSize: 16 }} />, text: '123 Main St, Anytown, USA' },
                 { icon: <AccessTimeIcon sx={{ fontSize: 16 }} />, text: 'Mon–Fri: 8AM–6PM' },
               ].map((item) => (
@@ -1448,7 +1798,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               ))}
               <Button
                 variant="outlined"
-                onClick={() => onOpenBooking('emergency')}
+                onClick={() => navigate('/book/emergency')}
                 startIcon={<WarningAmberIcon sx={{ fontSize: 16 }} />}
                 sx={{
                   borderColor: '#FF6B6B',
@@ -1483,7 +1833,7 @@ const Home: React.FC<HomeProps> = ({ cartItems, setCartItems, onOpenBooking }) =
               variant="body2"
               sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#7FBBDD', fontSize: '0.82rem' }}
             >
-              © {new Date().getFullYear()} Smart Appliances. All rights reserved.
+              © {new Date().getFullYear()} SmartAppliance. All rights reserved.
             </Typography>
             <Typography
               variant="body2"
@@ -1506,7 +1856,6 @@ const footerLinkStyle = {
   fontSize: '0.88rem',
   lineHeight: 1.5,
   mb: 1.25,
-  cursor: 'pointer',
   transition: 'color 0.2s',
   '&:hover': { color: '#22B1FB' },
 };

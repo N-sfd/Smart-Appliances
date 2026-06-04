@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -14,53 +15,32 @@ import {
   Divider,
 } from '@mui/material';
 import { Phone, Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-const navItems = [
-  { label: 'Home', href: '#home', id: 'home' },
-  { label: 'About Us', href: '#about', id: 'about' },
-  { label: 'Services', href: '#services', id: 'services' },
-  { label: 'Buy Appliances', href: '#appliances', id: 'appliances' },
-  { label: 'Repair Services', href: '#repair', id: 'repair' },
-  { label: 'Contact Us', href: '#contact', id: 'contact' },
-];
-
-interface TopBarProps {
-  cartCount: number;
-  onScheduleClick: () => void;
+interface NavItem {
+  label: string;
+  path: string;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
-  const [selectedItem, setSelectedItem] = useState('Home');
+const navItems: NavItem[] = [
+  { label: 'Home', path: '/' },
+  { label: 'Services', path: '/services' },
+  { label: 'About', path: '/about' },
+  { label: 'Contact', path: '/contact' },
+];
+
+const TopBar: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = navItems
-        .map((item) => document.getElementById(item.id))
-        .filter(Boolean) as HTMLElement[];
+  const isActive = (path: string): boolean => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
+  };
 
-      if (sections.length === 0) return;
-
-      const scrollPosition = window.scrollY + 220;
-
-      for (let i = sections.length - 1; i >= 0; i -= 1) {
-        const section = sections[i];
-        if (!section) continue;
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.offsetHeight;
-        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-          setSelectedItem(navItems[i].label);
-          break;
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleNavClick = (label: string) => {
-    setSelectedItem(label);
+  const handleNavClick = (path: string) => {
+    navigate(path);
     setDrawerOpen(false);
   };
 
@@ -96,9 +76,10 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
         position="fixed"
         sx={{
           backgroundColor: 'rgba(2, 47, 73, 0.97)',
+          backdropFilter: 'blur(8px)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
           zIndex: 1001,
-          top: '60px',
+          top: '40px',
         }}
       >
         <Toolbar sx={{ justifyContent: 'space-between', minHeight: '60px' }}>
@@ -107,7 +88,7 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
             <Box
               component="img"
               src="/Logo.png"
-              alt="Smart Applications Logo"
+              alt="SmartAppliance Logo"
               sx={{
                 height: '50px',
                 width: 'auto',
@@ -115,26 +96,22 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
                 cursor: 'pointer',
                 '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s ease' },
               }}
-              onClick={() => {
-                setSelectedItem('Home');
-                document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onClick={() => handleNavClick('/')}
             />
             <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 0.5 }}>
               {navItems.map((item) => (
                 <Button
                   key={item.label}
-                  href={item.href}
-                  onClick={() => handleNavClick(item.label)}
+                  onClick={() => handleNavClick(item.path)}
                   sx={{
-                    color: selectedItem === item.label ? '#22B1FB' : '#FFFFFF',
+                    color: isActive(item.path) ? '#22B1FB' : '#FFFFFF',
                     fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: selectedItem === item.label ? 700 : 500,
+                    fontWeight: isActive(item.path) ? 700 : 500,
                     fontSize: '0.85rem',
                     textTransform: 'none',
                     padding: '6px 10px',
                     borderRadius: '0px',
-                    borderBottom: selectedItem === item.label ? '3px solid #22B1FB' : '3px solid transparent',
+                    borderBottom: isActive(item.path) ? '3px solid #22B1FB' : '3px solid transparent',
                     '&:hover': {
                       backgroundColor: 'rgba(34, 177, 251, 0.12)',
                       color: '#22B1FB',
@@ -148,8 +125,8 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
             </Box>
           </Box>
 
-          {/* Right side: phone, schedule, cart, hamburger */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 2 } }}>
+          {/* Right side: phone, book service, emergency, cart, hamburger */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 1.5 } }}>
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
               <Phone sx={{ color: '#22B1FB', fontSize: '1.1rem' }} />
               <Typography
@@ -161,20 +138,40 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
             </Box>
             <Button
               variant="contained"
-              onClick={onScheduleClick}
+              onClick={() => navigate('/book/regular')}
               sx={{
                 backgroundColor: '#22B1FB',
                 color: '#FFFFFF',
                 fontFamily: 'DM Sans, Arial, sans-serif',
                 fontWeight: 600,
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 textTransform: 'none',
-                padding: '6px 16px',
+                padding: '6px 14px',
                 borderRadius: '8px',
+                display: { xs: 'none', sm: 'flex' },
                 '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
               }}
             >
-              Schedule
+              Book Service
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/book/emergency')}
+              startIcon={<WarningAmberIcon sx={{ fontSize: '1rem !important' }} />}
+              sx={{
+                borderColor: '#FF6B6B',
+                color: '#FF6B6B',
+                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontWeight: 600,
+                fontSize: '0.82rem',
+                textTransform: 'none',
+                padding: '5px 12px',
+                borderRadius: '8px',
+                display: { xs: 'none', md: 'flex' },
+                '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999', color: '#FF9999' },
+              }}
+            >
+              Emergency
             </Button>
             {/* Cart icon */}
             <Box sx={{ position: 'relative' }}>
@@ -191,29 +188,6 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
                   '&:hover': { transform: 'scale(1.1)' },
                 }}
               />
-              {cartCount > 0 && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: '-8px',
-                    right: '-8px',
-                    backgroundColor: '#FF4444',
-                    color: '#FFFFFF',
-                    borderRadius: '50%',
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    border: '2px solid #FFFFFF',
-                  }}
-                >
-                  {cartCount}
-                </Box>
-              )}
             </Box>
             {/* Hamburger for mobile/tablet */}
             <IconButton
@@ -250,13 +224,11 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
           {navItems.map((item) => (
             <ListItem key={item.label} disablePadding>
               <ListItemButton
-                component="a"
-                href={item.href}
-                onClick={() => handleNavClick(item.label)}
+                onClick={() => handleNavClick(item.path)}
                 sx={{
                   px: 3,
                   py: 1.5,
-                  borderLeft: selectedItem === item.label ? '4px solid #22B1FB' : '4px solid transparent',
+                  borderLeft: isActive(item.path) ? '4px solid #22B1FB' : '4px solid transparent',
                   '&:hover': { backgroundColor: 'rgba(34, 177, 251, 0.1)' },
                 }}
               >
@@ -264,8 +236,8 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
                   primary={item.label}
                   primaryTypographyProps={{
                     fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: selectedItem === item.label ? '#22B1FB' : '#FFFFFF',
-                    fontWeight: selectedItem === item.label ? 700 : 400,
+                    color: isActive(item.path) ? '#22B1FB' : '#FFFFFF',
+                    fontWeight: isActive(item.path) ? 700 : 400,
                     fontSize: '1rem',
                   }}
                 />
@@ -274,14 +246,11 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
           ))}
         </List>
         <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)', mt: 1 }} />
-        <Box sx={{ px: 3, py: 2.5 }}>
+        <Box sx={{ px: 3, py: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Button
             variant="contained"
             fullWidth
-            onClick={() => {
-              onScheduleClick();
-              setDrawerOpen(false);
-            }}
+            onClick={() => { navigate('/book/regular'); setDrawerOpen(false); }}
             sx={{
               backgroundColor: '#22B1FB',
               color: '#FFFFFF',
@@ -293,9 +262,27 @@ const TopBar: React.FC<TopBarProps> = ({ cartCount, onScheduleClick }) => {
               '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
             }}
           >
-            Schedule a Service
+            Book Regular Service
           </Button>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2, justifyContent: 'center' }}>
+          <Button
+            variant="outlined"
+            fullWidth
+            startIcon={<WarningAmberIcon />}
+            onClick={() => { navigate('/book/emergency'); setDrawerOpen(false); }}
+            sx={{
+              borderColor: '#FF6B6B',
+              color: '#FF6B6B',
+              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontWeight: 600,
+              textTransform: 'none',
+              borderRadius: '10px',
+              py: 1.25,
+              '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)' },
+            }}
+          >
+            Emergency Service
+          </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, justifyContent: 'center' }}>
             <Phone sx={{ color: '#22B1FB', fontSize: '1rem' }} />
             <Typography
               variant="body2"
