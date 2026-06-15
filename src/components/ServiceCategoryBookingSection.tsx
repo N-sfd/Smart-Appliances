@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { fonts } from '../theme';
 import { HubIconCard } from '../data/serviceHubConfigs';
 import { getServiceImage } from '../data/serviceImages';
+import { schedulerCategoryFromHubId } from '../data/schedulerPrefill';
 import { SERVICE_ISSUE_CHIPS } from '../data/serviceIssueChips';
 import { CATEGORY_SERVICE_DETAILS } from '../data/serviceCategoryDetails';
 import { getCategoryFallbackImage } from '../data/serviceCategoryFallbacks';
@@ -145,7 +146,14 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
       navigate('/emergency-service');
       return;
     }
-    const query = new URLSearchParams({ serviceType: 'R', productName: service.title });
+    const schedulerCategory = schedulerCategoryFromHubId(categoryId);
+    const query = new URLSearchParams({
+      serviceType: 'R',
+      productName: service.title,
+    });
+    if (schedulerCategory) {
+      query.set('serviceCategory', schedulerCategory);
+    }
     navigate(`/scheduler?${query.toString()}`);
   };
 

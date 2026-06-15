@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
@@ -39,20 +39,36 @@ import {
   getZipFieldHelperText,
   isZipFieldError,
 } from '../data/serviceAreas';
+import { saveServiceRequest } from '../lib/firebase';
+import {
+  parseSchedulerPrefill,
+  SchedulerServiceCategory,
+} from '../data/schedulerPrefill';
+import { insertBooking } from '../lib/supabaseBookings';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  addLocalDays,
+  formatLocalDateIso,
+  getTodayLocalDate,
+  sanitizePreferredDate,
+} from '../lib/localDate';
+import {
+  validateCityField,
+  validateEmailAddress,
+  validateFullName,
+  validatePreferredDateField,
+  validateStateField,
+  validateUsPhone,
+} from '../lib/schedulerContactValidation';
 
-// ── Storage ───────────────────────────────────────────────────────────────────
-const STORAGE_KEY = 'smart-appliances-service-requests';
-
-const saveRequest = (req: ServiceRequest): void => {
-  try {
-    const existing = localStorage.getItem(STORAGE_KEY);
-    const reqs: ServiceRequest[] = existing ? (JSON.parse(existing) as ServiceRequest[]) : [];
-    reqs.unshift(req);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reqs));
-  } catch {
-    // ignore
-  }
+const formatPhone = (raw: string): string => {
+  const digits = raw.replace(/\D/g, '').slice(0, 10);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
 };
+
+// ── Scheduler config ──────────────────────────────────────────────────────────
 
 // ── Step labels ───────────────────────────────────────────────────────────────
 const STEPS = ['Service Type', 'Service Details', 'Contact Info', 'Review & Submit'];
@@ -217,7 +233,7 @@ const buildSchedule = (days: number): DaySlot[] => {
   for (let i = 0; i < days; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() + i);
-    const iso = date.toISOString().slice(0, 10);
+    const iso = formatLocalDateIso(date);
     const isToday = i === 0;
     const isSun = date.getDay() === 0;
     const slots = TIME_SLOTS.map((slot) => {
@@ -286,48 +302,73 @@ const ChipGroup: React.FC<ChipGroupProps> = ({ label, options, value, onChange, 
   </Box>
 );
 
+const isUrgentSchedulerService = (
+  type: string,
+  urgency: string,
+): boolean =>
+  type === 'emergency' || urgency === 'Emergency' || urgency === 'Same-Day';
+
+const getInitialPreferredDate = (
+  urgent: boolean,
+  paramDate: string | null,
+): string => {
+  const today = getTodayLocalDate();
+  if (paramDate) {
+    const sanitized = sanitizePreferredDate(paramDate, today);
+    if (sanitized) return sanitized;
+  }
+  return urgent ? today : addLocalDays(1);
+};
+
 // ── Main component ────────────────────────────────────────────────────────────
 const SchedulerPage: React.FC = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const { user } = useAuth();
   const prefillZip = params.get('zipCode') ?? '';
+  const prefill = useMemo(() => parseSchedulerPrefill(params), [params]);
+  const paramPreferredDate = params.get('preferredDate');
+  const todayLocal = getTodayLocalDate();
 
   // Step
   const [step, setStep] = useState(0);
 
   // Step 0
-  const [serviceType, setServiceType] = useState('repair');
+  const [serviceType, setServiceType] = useState(prefill.serviceType);
 
   // Step 1 — category
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState<SchedulerServiceCategory | ''>(prefill.category);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(!prefill.skipCategoryPicker);
 
   // Appliance fields
-  const [appliance, setAppliance] = useState('');
+  const [appliance, setAppliance] = useState(prefill.fields.appliance ?? '');
+
+  // HVAC fields
+  const [hvacService, setHvacService] = useState(prefill.fields.hvacService ?? '');
   const [applianceIssue, setApplianceIssue] = useState('');
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
 
-  // HVAC fields
-  const [hvacService, setHvacService] = useState('');
+  // HVAC fields (hvacService initialized above)
   const [hvacIssue, setHvacIssue] = useState('');
   const [hvacSystemType, setHvacSystemType] = useState('');
   const [hvacUrgency, setHvacUrgency] = useState('');
 
   // Plumbing fields
-  const [plumbingIssue, setPlumbingIssue] = useState('');
+  const [plumbingIssue, setPlumbingIssue] = useState(prefill.fields.plumbingIssue ?? '');
   const [plumbingLocation, setPlumbingLocation] = useState('');
   const [waterLeaking, setWaterLeaking] = useState('');
 
   // Electrical fields
-  const [electricalIssue, setElectricalIssue] = useState('');
+  const [electricalIssue, setElectricalIssue] = useState(prefill.fields.electricalIssue ?? '');
   const [electricalSafety, setElectricalSafety] = useState('');
 
   // Smart Home fields
-  const [smartDevice, setSmartDevice] = useState('');
+  const [smartDevice, setSmartDevice] = useState(prefill.fields.smartDevice ?? '');
   const [smartHelp, setSmartHelp] = useState('');
 
   // Garage Door fields
-  const [garageDoorService, setGarageDoorService] = useState('');
+  const [garageDoorService, setGarageDoorService] = useState(prefill.fields.garageDoorService ?? '');
   const [garageDoorProblem, setGarageDoorProblem] = useState('');
 
   // Common
@@ -337,14 +378,71 @@ const SchedulerPage: React.FC = () => {
   const [zipCode, setZipCode] = useState(prefillZip);
   const [zipTouched, setZipTouched] = useState(false);
   const [address, setAddress] = useState('');
+  const [suiteApt, setSuiteApt] = useState('');
   const [city, setCity] = useState('');
+  const [stateField, setStateField] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [nameTouched, setNameTouched] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [cityTouched, setCityTouched] = useState(false);
+  const [stateTouched, setStateTouched] = useState(false);
+  const [preferredDate, setPreferredDate] = useState(() =>
+    getInitialPreferredDate(
+      isUrgentSchedulerService(prefill.serviceType, ''),
+      paramPreferredDate,
+    ),
+  );
+  const [preferredDateTouched, setPreferredDateTouched] = useState(false);
+  const [contactSubmitAttempted, setContactSubmitAttempted] = useState(false);
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [dateOffset, setDateOffset] = useState(0);
 
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const next = parseSchedulerPrefill(params);
+    if (next.serviceTypeFromUrl) setServiceType(next.serviceType);
+    if (next.category) {
+      setCategory(next.category);
+      setShowCategoryPicker(!next.skipCategoryPicker);
+    }
+    if (next.fields.appliance) setAppliance(next.fields.appliance);
+    if (next.fields.hvacService) setHvacService(next.fields.hvacService);
+    if (next.fields.plumbingIssue) setPlumbingIssue(next.fields.plumbingIssue);
+    if (next.fields.electricalIssue) setElectricalIssue(next.fields.electricalIssue);
+    if (next.fields.smartDevice) setSmartDevice(next.fields.smartDevice);
+    if (next.fields.garageDoorService) setGarageDoorService(next.fields.garageDoorService);
+  }, [params]);
+
+  useEffect(() => {
+    if (preferredDateTouched) return;
+    setPreferredDate(
+      getInitialPreferredDate(
+        isUrgentSchedulerService(serviceType, hvacUrgency),
+        paramPreferredDate,
+      ),
+    );
+  }, [serviceType, hvacUrgency, paramPreferredDate, preferredDateTouched]);
+
+  useEffect(() => {
+    if (step !== 2) setContactSubmitAttempted(false);
+  }, [step]);
+
+  const showContactError = (touched: boolean, message: string | null): boolean =>
+    Boolean(message) && (touched || contactSubmitAttempted);
+
+  const nameError = validateFullName(name);
+  const emailError = validateEmailAddress(email);
+  const phoneError = validateUsPhone(phone);
+  const cityError = validateCityField(city);
+  const stateError = validateStateField(stateField);
+  const preferredDateError = validatePreferredDateField(preferredDate);
+  const zipValidation = validateZipCode(zipCode);
 
   const schedule = useMemo(() => buildSchedule(14), []);
   const visibleDays = schedule.slice(dateOffset, dateOffset + VISIBLE_DAYS);
@@ -449,19 +547,43 @@ const SchedulerPage: React.FC = () => {
     }
     if (step === 2) {
       return (
-        validateZipCode(zipCode).isValid &&
-        Boolean(name.trim()) &&
-        /\S+@\S+\.\S+/.test(email) &&
-        phone.replace(/\D/g, '').length >= 10
+        zipValidation.isValid &&
+        !nameError &&
+        !emailError &&
+        !phoneError &&
+        !cityError &&
+        !stateError &&
+        !preferredDateError
       );
     }
     return true;
-  }, [step, serviceType, category, appliance, hvacService, plumbingIssue, electricalIssue, smartDevice, garageDoorService, zipCode, name, email, phone]);
+  }, [
+    step,
+    serviceType,
+    category,
+    appliance,
+    hvacService,
+    plumbingIssue,
+    electricalIssue,
+    smartDevice,
+    garageDoorService,
+    zipValidation.isValid,
+    nameError,
+    emailError,
+    phoneError,
+    cityError,
+    stateError,
+    preferredDateError,
+  ]);
 
   const handleNext = () => {
     if (serviceType === 'emergency' && step === 0) {
       navigate('/emergency-service');
       return;
+    }
+    if (step === 2) {
+      setContactSubmitAttempted(true);
+      if (!canContinue) return;
     }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
@@ -478,6 +600,20 @@ const SchedulerPage: React.FC = () => {
     setIssueDescription('');
   };
 
+  const handleChangeCategory = () => {
+    setShowCategoryPicker(true);
+    resetCategoryFields();
+    setCategory('');
+  };
+
+  const handleSelectCategory = (catId: SchedulerServiceCategory) => {
+    if (category !== catId) resetCategoryFields();
+    setCategory(catId);
+    setShowCategoryPicker(false);
+  };
+
+  const categorySummaryVisible = Boolean(category) && !showCategoryPicker;
+
   const toggleSlot = (iso: string, slotId: string, available: boolean) => {
     if (!available) return;
     const key = slotKey(iso, slotId);
@@ -488,10 +624,14 @@ const SchedulerPage: React.FC = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+
     const isEmergency = serviceType === 'emergency' || hvacUrgency === 'Emergency';
     const priority: ServicePriority = isEmergency ? 'emergency' : 'regular';
     const [firstDate] = selectedSlots[0]?.split('|') ?? [''];
+    const resolvedPreferredDate = preferredDate || firstDate || null;
 
     const noteParts: string[] = [];
     if (appliance) noteParts.push(`Appliance: ${appliance}`);
@@ -519,7 +659,7 @@ const SchedulerPage: React.FC = () => {
       phone,
       address,
       city,
-      state: '',
+      state: stateField,
       zipCode,
       serviceCategory: category || (SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? ''),
       serviceType: serviceTitle,
@@ -537,7 +677,7 @@ const SchedulerPage: React.FC = () => {
       ),
       applianceStillRunning: null,
       issueStartDate: null,
-      preferredDate: firstDate || null,
+      preferredDate: resolvedPreferredDate,
       preferredTime: slotLabels.join('; ') || null,
       timeWindow: slotLabels.join('; ') || null,
       requestedResponseTime: slotLabels.join('; ') || null,
@@ -554,8 +694,39 @@ const SchedulerPage: React.FC = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    saveRequest(req);
-    setSubmitted(true);
+
+    try {
+      await saveServiceRequest(req);
+
+      // Also persist to Supabase
+      await insertBooking({
+        user_id: user?.id ?? null,
+        customer_name: name,
+        email,
+        phone,
+        address,
+        suite_apt: suiteApt || null,
+        city,
+        state: stateField,
+        zip_code: zipCode,
+        service_type: serviceTitle,
+        service_category: category || (SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? ''),
+        appliance_brand: brand || null,
+        appliance_model: model || null,
+        issue_description: noteParts.join('\n') || issueDescription,
+        urgency: hvacUrgency || (isEmergency ? 'Emergency' : null),
+        preferred_date: resolvedPreferredDate,
+        preferred_time: slotLabels.join('; ') || null,
+        status: 'New',
+      });
+
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Scheduler booking error:', error);
+      setSubmitError('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ── Shared nav button bar ─────────────────────────────────────────────────
@@ -580,32 +751,38 @@ const SchedulerPage: React.FC = () => {
       </Button>
 
       {isSubmitStep ? (
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          sx={{
-            backgroundColor: colors.primaryBlue,
-            color: '#fff',
-            fontFamily: fonts.body,
-            fontWeight: 700,
-            px: 4,
-            py: 1.4,
-            borderRadius: '10px',
-            textTransform: 'none',
-            boxShadow: 'none',
-            '&:hover': { backgroundColor: colors.navy },
-          }}
-        >
-          Submit Request
-        </Button>
+        <>
+          {submitError ? (
+            <Typography sx={{ color: colors.emergency, fontSize: '14px', alignSelf: 'center' }}>
+              {submitError}
+            </Typography>
+          ) : null}
+          <Button
+            variant="contained"
+            disabled={isSubmitting}
+            onClick={handleSubmit}
+            sx={{
+              backgroundColor: colors.primaryBlue,
+              color: '#fff',
+              fontFamily: fonts.body,
+              fontWeight: 700,
+              px: 4,
+              py: 1.4,
+              borderRadius: '10px',
+              textTransform: 'none',
+              boxShadow: 'none',
+              '&:hover': { backgroundColor: colors.navy },
+            }}
+          >
+            {isSubmitting ? 'Submitting…' : 'Submit Request'}
+          </Button>
+        </>
       ) : (
         <Button
           variant="contained"
-          disabled={!canContinue}
+          disabled={step !== 2 && !canContinue}
           onClick={handleNext}
           sx={{
-            backgroundColor:
-              serviceType === 'emergency' && step === 0 ? colors.emergency : colors.primaryBlue,
             color: '#fff',
             fontFamily: fonts.body,
             fontWeight: 700,
@@ -614,11 +791,23 @@ const SchedulerPage: React.FC = () => {
             borderRadius: '10px',
             textTransform: 'none',
             boxShadow: 'none',
-            '&:hover': {
-              backgroundColor:
-                serviceType === 'emergency' && step === 0 ? colors.emergencyHover : colors.navy,
-            },
-            '&.Mui-disabled': { backgroundColor: '#CBD5E1', color: '#fff' },
+            ...(step === 2 && !canContinue
+              ? {
+                  backgroundColor: '#CBD5E1',
+                  '&:hover': { backgroundColor: '#CBD5E1' },
+                }
+              : {
+                  backgroundColor:
+                    serviceType === 'emergency' && step === 0
+                      ? colors.emergency
+                      : colors.primaryBlue,
+                  '&:hover': {
+                    backgroundColor:
+                      serviceType === 'emergency' && step === 0
+                        ? colors.emergencyHover
+                        : colors.navy,
+                  },
+                }),
           }}
         >
           {serviceType === 'emergency' && step === 0 ? 'Get Emergency Help' : 'Continue'}
@@ -1090,9 +1279,70 @@ const SchedulerPage: React.FC = () => {
                       fontSize: '0.88rem',
                     }}
                   >
-                    Select a category, then answer a few quick questions.
+                    {categorySummaryVisible
+                      ? `Tell us more about your ${category} service.`
+                      : 'Select a category, then answer a few quick questions.'}
                   </Typography>
 
+                  {categorySummaryVisible && (
+                    <Box
+                      sx={{
+                        mb: 3,
+                        p: 2,
+                        borderRadius: '14px',
+                        border: `1px solid ${colors.border}`,
+                        backgroundColor: colors.lightBlueBg,
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'center' },
+                        justifyContent: 'space-between',
+                        gap: 1.5,
+                      }}
+                    >
+                      <Box>
+                        <Typography
+                          sx={{
+                            fontFamily: fonts.body,
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            color: colors.mutedText,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.04em',
+                            mb: 0.35,
+                          }}
+                        >
+                          Selected Service Category
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontFamily: fonts.heading,
+                            fontWeight: 700,
+                            color: colors.navy,
+                            fontSize: '1.05rem',
+                          }}
+                        >
+                          {category}
+                        </Typography>
+                      </Box>
+                      <Button
+                        variant="text"
+                        onClick={handleChangeCategory}
+                        sx={{
+                          textTransform: 'none',
+                          fontFamily: fonts.body,
+                          fontWeight: 600,
+                          color: colors.primaryBlue,
+                          px: 1,
+                          minWidth: 'auto',
+                        }}
+                      >
+                        Change Category
+                      </Button>
+                    </Box>
+                  )}
+
+                  {showCategoryPicker && (
+                    <>
                   {/* Category grid */}
                   <Typography
                     sx={{
@@ -1121,10 +1371,7 @@ const SchedulerPage: React.FC = () => {
                       return (
                         <Box
                           key={cat.id}
-                          onClick={() => {
-                            if (category !== cat.id) resetCategoryFields();
-                            setCategory(cat.id);
-                          }}
+                          onClick={() => handleSelectCategory(cat.id as SchedulerServiceCategory)}
                           sx={{
                             cursor: 'pointer',
                             p: { xs: 1.5, sm: 2 },
@@ -1165,6 +1412,8 @@ const SchedulerPage: React.FC = () => {
                       );
                     })}
                   </Box>
+                    </>
+                  )}
 
                   {/* ── Appliance ── */}
                   {category === 'Appliance' && (
@@ -1433,13 +1682,16 @@ const SchedulerPage: React.FC = () => {
                       onChange={(e) => setZipCode(normalizeZipInput(e.target.value))}
                       onBlur={() => setZipTouched(true)}
                       inputProps={{ inputMode: 'numeric', maxLength: 5 }}
-                      error={isZipFieldError(zipCode, zipTouched || zipCode.length === 5)}
-                      helperText={getZipFieldHelperText(zipCode, zipTouched || zipCode.length === 5)}
+                      error={isZipFieldError(zipCode, zipTouched || contactSubmitAttempted)}
+                      helperText={getZipFieldHelperText(
+                        zipCode,
+                        zipTouched || contactSubmitAttempted,
+                      )}
                       fullWidth
                       size="small"
                     />
 
-                    {validateZipCode(zipCode).isValid && (
+                    {zipValidation.isValid && (
                       <Box
                         sx={{
                           display: 'flex',
@@ -1458,8 +1710,8 @@ const SchedulerPage: React.FC = () => {
                       </Box>
                     )}
 
-                    {validateZipCode(zipCode).isValidFormat &&
-                      !validateZipCode(zipCode).isInServiceArea &&
+                    {zipValidation.isValidFormat &&
+                      !zipValidation.isInServiceArea &&
                       zipCode.length === 5 && (
                         <Box
                           sx={{
@@ -1499,12 +1751,35 @@ const SchedulerPage: React.FC = () => {
                       size="small"
                     />
                     <TextField
-                      label="City"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
+                      label="Suite / Apt (optional)"
+                      value={suiteApt}
+                      onChange={(e) => setSuiteApt(e.target.value)}
                       fullWidth
                       size="small"
                     />
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                      <TextField
+                        label="City"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        onBlur={() => setCityTouched(true)}
+                        error={showContactError(cityTouched, cityError)}
+                        helperText={showContactError(cityTouched, cityError) ? cityError : ''}
+                        fullWidth
+                        size="small"
+                      />
+                      <TextField
+                        label="State"
+                        value={stateField}
+                        onChange={(e) => setStateField(e.target.value.toUpperCase().slice(0, 2))}
+                        onBlur={() => setStateTouched(true)}
+                        error={showContactError(stateTouched, stateError)}
+                        helperText={showContactError(stateTouched, stateError) ? stateError : ''}
+                        size="small"
+                        sx={{ width: 100, flexShrink: 0 }}
+                        inputProps={{ maxLength: 2 }}
+                      />
+                    </Box>
 
                     <Divider />
 
@@ -1512,6 +1787,9 @@ const SchedulerPage: React.FC = () => {
                       label="Full name *"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      onBlur={() => setNameTouched(true)}
+                      error={showContactError(nameTouched, nameError)}
+                      helperText={showContactError(nameTouched, nameError) ? nameError : ''}
                       fullWidth
                       size="small"
                       required
@@ -1521,6 +1799,9 @@ const SchedulerPage: React.FC = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      onBlur={() => setEmailTouched(true)}
+                      error={showContactError(emailTouched, emailError)}
+                      helperText={showContactError(emailTouched, emailError) ? emailError : ''}
                       fullWidth
                       size="small"
                       required
@@ -1528,7 +1809,33 @@ const SchedulerPage: React.FC = () => {
                     <TextField
                       label="Phone number *"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => setPhone(formatPhone(e.target.value))}
+                      onBlur={() => setPhoneTouched(true)}
+                      error={showContactError(phoneTouched, phoneError)}
+                      helperText={showContactError(phoneTouched, phoneError) ? phoneError : ''}
+                      inputProps={{ inputMode: 'tel' }}
+                      fullWidth
+                      size="small"
+                      required
+                    />
+
+                    <TextField
+                      label="Preferred Date *"
+                      type="date"
+                      value={preferredDate}
+                      onChange={(e) => {
+                        setPreferredDateTouched(true);
+                        setPreferredDate(e.target.value);
+                      }}
+                      onBlur={() => setPreferredDateTouched(true)}
+                      error={showContactError(preferredDateTouched, preferredDateError)}
+                      helperText={
+                        showContactError(preferredDateTouched, preferredDateError)
+                          ? preferredDateError
+                          : ''
+                      }
+                      inputProps={{ min: todayLocal }}
+                      InputLabelProps={{ shrink: true }}
                       fullWidth
                       size="small"
                       required
@@ -1773,9 +2080,12 @@ const SchedulerPage: React.FC = () => {
                       ...(electricalSafety ? [['Safety Concern', electricalSafety]] : []),
                       ...(smartHelp ? [['Help Needed', smartHelp]] : []),
                       ['ZIP Code', zipCode],
+                      ...(address ? [['Address', [address, suiteApt].filter(Boolean).join(', ')]] : []),
+                      ...([city, stateField].filter(Boolean).length > 0 ? [['City / State', [city, stateField].filter(Boolean).join(', ')]] : []),
                       ['Name', name],
                       ['Email', email],
                       ['Phone', phone],
+                      ['Preferred Date', preferredDate || '—'],
                       [
                         'Availability',
                         slotLabels.length ? slotLabels.join('; ') : 'Will confirm by phone',

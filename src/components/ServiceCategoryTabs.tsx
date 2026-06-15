@@ -1,13 +1,11 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import {
-  Refrigerator,
-  Snowflake,
-  Droplets,
-  Zap,
-  Home,
-  LucideIcon,
-} from 'lucide-react';
+import KitchenIcon from '@mui/icons-material/Kitchen';
+import AcUnitIcon from '@mui/icons-material/AcUnit';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import BoltIcon from '@mui/icons-material/Bolt';
+import HomeIcon from '@mui/icons-material/Home';
+import type { SvgIconComponent } from '@mui/icons-material';
 
 export const SERVICE_CATEGORY_TABS = [
   'Appliances',
@@ -19,12 +17,12 @@ export const SERVICE_CATEGORY_TABS = [
 
 export type ServiceCategoryTab = (typeof SERVICE_CATEGORY_TABS)[number];
 
-const TAB_ICONS: Record<ServiceCategoryTab, LucideIcon> = {
-  Appliances: Refrigerator,
-  HVAC: Snowflake,
-  Plumbing: Droplets,
-  Electrical: Zap,
-  'Smart Home': Home,
+const TAB_ICONS: Record<ServiceCategoryTab, SvgIconComponent> = {
+  Appliances: KitchenIcon,
+  HVAC: AcUnitIcon,
+  Plumbing: WaterDropIcon,
+  Electrical: BoltIcon,
+  'Smart Home': HomeIcon,
 };
 
 interface ServiceCategoryTabsProps {
@@ -46,7 +44,11 @@ const ServiceCategoryTabs: React.FC<ServiceCategoryTabsProps> = ({
     }}
   >
     <Box className="service-segment-scroll">
-      <Box className="service-segment-track" role="tablist" aria-label="Service categories">
+      <Box
+        className="service-segment-track"
+        role="group"
+        aria-label="Service categories"
+      >
         {SERVICE_CATEGORY_TABS.map((tab) => {
           const Icon = TAB_ICONS[tab];
           const isActive = activeCategory === tab;
@@ -55,9 +57,7 @@ const ServiceCategoryTabs: React.FC<ServiceCategoryTabsProps> = ({
             <button
               key={tab}
               type="button"
-              role="tab"
-              aria-selected={isActive}
-              tabIndex={isActive ? 0 : -1}
+              {...(isActive ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
               className={`service-segment-tab${isActive ? ' is-active' : ''}`}
               onClick={() => onChange(tab)}
             >

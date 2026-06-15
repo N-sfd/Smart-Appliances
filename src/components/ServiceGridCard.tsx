@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Card, Typography } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { colors } from '../theme';
+import { SERVICE_CARD_IMAGE_WIDTH, SERVICE_CARD_IMAGE_HEIGHT } from '../constants/imageDimensions';
 
 interface ServiceGridCardProps {
   title: string;
@@ -47,7 +48,10 @@ const ServiceGridCard: React.FC<ServiceGridCardProps> = ({ title, subtitle, imag
         component="img"
         src={image}
         alt={title}
+        width={SERVICE_CARD_IMAGE_WIDTH}
+        height={SERVICE_CARD_IMAGE_HEIGHT}
         loading="lazy"
+        decoding="async"
         sx={{
           width: '100%',
           height: '100%',

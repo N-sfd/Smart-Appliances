@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
@@ -18,8 +18,10 @@ import { getServiceImage } from '../data/serviceImages';
 import { EMERGENCY_SERVICE_IDS } from '../data/serviceCategoryHubs';
 import { HOME_APPLIANCE_SERVICE_IDS, ELECTRICAL_SERVICE_IDS } from '../data/serviceNavItems';
 import ServiceCategoryPage from './ServiceCategoryPage';
-import GarageDoorRepairPage from './GarageDoorRepairPage';
 import { SERVICE_CATEGORY_PAGE_MAP } from '../data/serviceCategoryPages';
+import { inferCategoryFromProductName } from '../data/schedulerPrefill';
+
+const GarageDoorRepairPage = lazy(() => import('./GarageDoorRepairPage'));
 
 const font = "'Inter', 'DM Sans', Arial, sans-serif";
 const heading = "'Plus Jakarta Sans', 'Inter', sans-serif";
@@ -70,7 +72,11 @@ const ServiceDetailPage: React.FC = () => {
   }
 
   if (serviceId === 'garage-door-repair') {
-    return <GarageDoorRepairPage />;
+    return (
+      <Suspense fallback={<Box sx={{ minHeight: '50vh' }} />}>
+        <GarageDoorRepairPage />
+      </Suspense>
+    );
   }
 
   const service = popularServices.find((s) => s.id === serviceId || s.serviceId === serviceId);
@@ -109,6 +115,10 @@ const ServiceDetailPage: React.FC = () => {
                 variant="contained"
                 onClick={() => {
                   const query = new URLSearchParams({ serviceType: 'R', productName: title });
+                  const schedulerCategory = inferCategoryFromProductName(title);
+                  if (schedulerCategory) {
+                    query.set('serviceCategory', schedulerCategory);
+                  }
                   navigate(`/scheduler?${query.toString()}`);
                 }}
                 sx={{

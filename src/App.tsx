@@ -4,8 +4,11 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, CircularProgress } from '@mui/material';
 import { theme } from './theme';
 import TopBar from './components/TopBar';
-import Home from './components/Home';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 
+const Home = lazy(() => import('./components/Home'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
@@ -22,9 +25,63 @@ const TermsOfServicePage = lazy(() => import('./pages/LegalPage').then(m => ({ d
 const AccessibilityPage = lazy(() => import('./pages/LegalPage').then(m => ({ default: m.AccessibilityPage })));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 
+// Auth pages
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SignupPage = lazy(() => import('./pages/SignupPage'));
+const MyBookingsPage = lazy(() => import('./pages/MyBookingsPage'));
+
+// Admin pages
+const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
+const AdminBookingsPage = lazy(() => import('./pages/admin/AdminBookingsPage'));
+const AdminCustomersPage = lazy(() => import('./pages/admin/AdminCustomersPage'));
+
 const PageFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
     <CircularProgress />
+  </Box>
+);
+
+/** Minimal shell for admin pages — no top nav, full-height sidebar layout */
+const AdminShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
+    {/* Sidebar */}
+    <Box
+      sx={{
+        width: 220, flexShrink: 0, backgroundColor: '#0B3D91',
+        display: { xs: 'none', md: 'flex' }, flexDirection: 'column', pt: 4, px: 2, gap: 0.5,
+      }}
+    >
+      <Box sx={{ px: 1, mb: 3 }}>
+        <Box sx={{ color: '#fff', fontWeight: 800, fontSize: '1rem', fontFamily: 'Inter, sans-serif', letterSpacing: '-0.02em' }}>
+          Smart Appliances
+        </Box>
+        <Box sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', fontFamily: 'Inter, sans-serif' }}>
+          Admin Portal
+        </Box>
+      </Box>
+      {[
+        { label: 'Dashboard', to: '/admin/dashboard' },
+        { label: 'Bookings', to: '/admin/bookings' },
+        { label: 'Customers', to: '/admin/customers' },
+        { label: '← Site', to: '/' },
+      ].map(({ label, to }) => (
+        <Box
+          key={to}
+          component="a"
+          href={to}
+          sx={{
+            display: 'block', px: 1.5, py: 1, borderRadius: '8px', color: 'rgba(255,255,255,0.8)',
+            fontFamily: 'Inter, sans-serif', fontSize: '0.88rem', textDecoration: 'none',
+            '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)', color: '#fff' },
+          }}
+        >
+          {label}
+        </Box>
+      ))}
+    </Box>
+    {/* Main */}
+    <Box sx={{ flex: 1, overflow: 'auto' }}>{children}</Box>
   </Box>
 );
 
@@ -32,9 +89,10 @@ function AppRoutes() {
   return (
     <>
       <TopBar />
-      <Box sx={{ paddingTop: { xs: '112px', md: '128px' } }}>
+      <Box component="main" sx={{ paddingTop: { xs: '112px', md: '128px' } }}>
         <Suspense fallback={<PageFallback />}>
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/home-appliances" element={<ServiceCategoryPage slug="home-appliances" />} />
@@ -55,8 +113,66 @@ function AppRoutes() {
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/accessibility" element={<AccessibilityPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/technician" element={<TechnicianDashboard />} />
+
+            {/* Auth pages */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+
+            {/* Protected user pages */}
+            <Route
+              path="/my-bookings"
+              element={
+                <ProtectedRoute>
+                  <MyBookingsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin login (no AdminRoute guard — it's the entry point) */}
+            <Route
+              path="/admin/login"
+              element={
+                <AdminShell>
+                  <AdminLoginPage />
+                </AdminShell>
+              }
+            />
+
+            {/* Protected admin routes */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <AdminRoute>
+                  <AdminShell>
+                    <AdminDashboardPage />
+                  </AdminShell>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/bookings"
+              element={
+                <AdminRoute>
+                  <AdminShell>
+                    <AdminBookingsPage />
+                  </AdminShell>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/customers"
+              element={
+                <AdminRoute>
+                  <AdminShell>
+                    <AdminCustomersPage />
+                  </AdminShell>
+                </AdminRoute>
+              }
+            />
+
+            {/* Legacy admin route */}
+            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </Suspense>
       </Box>
@@ -69,9 +185,11 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <div className="App">
-          <AppRoutes />
-        </div>
+        <AuthProvider>
+          <div className="App">
+            <AppRoutes />
+          </div>
+        </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
   );

@@ -120,6 +120,7 @@ const PricingPage: React.FC = () => {
       serviceType: 'R',
       zipCode: estimate.zipCode,
       productName: estimate.applianceLabel,
+      serviceCategory: 'Appliance',
     });
     navigate(`/scheduler?${params.toString()}`, {
       state: {

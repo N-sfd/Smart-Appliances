@@ -23,6 +23,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { issueSeverityOptions, serviceCategories, ServicePriority, ServiceRequest, urgencyOptions } from '../data/services';
 import { validateZipCode, normalizeZipInput } from '../data/serviceAreas';
+import { saveServiceRequest } from '../lib/firebase';
 
 interface BookingDialogProps {
   open: boolean;
@@ -62,6 +63,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedCategory = useMemo(
     () => serviceCategories.find((c) => c.id === serviceCategoryId) ?? serviceCategories[0],
@@ -120,7 +122,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setErrorMessage('');
     if (!customerName || !email || !phone || !address || !city || !stateValue || !zipCode || !issueDescription) {
       setErrorMessage('Please complete all required contact and request fields.');
@@ -192,13 +194,21 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
       technicianStatus: null,
     };
 
-    onSubmitRequest(newRequest);
-
-    setConfirmationMessage(
-      servicePriority === 'emergency'
-        ? 'Emergency request received. Our team will contact you as soon as possible.'
-        : 'Your service request has been submitted. We will confirm your appointment soon.',
-    );
+    setIsSubmitting(true);
+    try {
+      await saveServiceRequest(newRequest);
+      onSubmitRequest(newRequest);
+      setConfirmationMessage(
+        servicePriority === 'emergency'
+          ? 'Emergency request received. Our team will contact you as soon as possible.'
+          : 'Your service request has been submitted. We will confirm your appointment soon.',
+      );
+    } catch (error) {
+      console.error('Booking error:', error);
+      setErrorMessage('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const serviceTypeOptions = useMemo(() => selectedCategory.services, [selectedCategory.services]);
@@ -549,6 +559,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
         </Button>
         <Button
           variant="contained"
+          disabled={isSubmitting}
           onClick={handleSubmit}
           sx={{
             backgroundColor: isEmergency ? '#EF4444' : '#1A73E8',
@@ -561,7 +572,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
             '&:hover': { backgroundColor: isEmergency ? '#EA580C' : '#0B3D91' },
           }}
         >
-          {isEmergency ? 'Submit Emergency Request' : 'Submit Request'}
+          {isSubmitting ? 'Submitting…' : isEmergency ? 'Submit Emergency Request' : 'Submit Request'}
         </Button>
       </DialogActions>
     </Dialog>

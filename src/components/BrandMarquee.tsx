@@ -2,6 +2,8 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { ApplianceBrand, homeApplianceBrands } from '../data/applianceBrands';
 import { fonts } from '../theme';
+import { BRAND_LOGO_SLOT_WIDTH, BRAND_LOGO_SLOT_HEIGHT } from '../constants/imageDimensions';
+import StableImage from './StableImage';
 
 interface BrandMarqueeProps {
   brands?: ApplianceBrand[];
@@ -92,20 +94,16 @@ const BrandMarquee: React.FC<BrandMarqueeProps> = ({
               px: { xs: 1, md: 1.5 },
             }}
           >
-            <Box
-              component="img"
-              src={brand.logo}
-              alt={brand.displayName}
-              loading="lazy"
-              sx={{
-                height: { xs: 32, md: 38 },
-                width: 'auto',
-                maxWidth: { xs: 72, md: 96 },
-                objectFit: 'contain',
-                display: brand.logo ? 'block' : 'none',
-                flexShrink: 0,
-              }}
-            />
+            {brand.logo ? (
+              <StableImage
+                src={brand.logo}
+                alt={brand.displayName}
+                intrinsicWidth={BRAND_LOGO_SLOT_WIDTH}
+                intrinsicHeight={BRAND_LOGO_SLOT_HEIGHT}
+                displayWidth={{ xs: 72, md: 96 }}
+                displayHeight={{ xs: 32, md: 38 }}
+              />
+            ) : null}
           </Box>
         ))}
       </Box>

@@ -11,6 +11,7 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { ServiceRequest } from '../data/services';
+import { persistServiceRequest } from './serviceRequests';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY || '',
@@ -45,6 +46,8 @@ if (isConfigured) {
 const COLLECTION = 'serviceRequests';
 
 export async function saveServiceRequest(request: ServiceRequest): Promise<void> {
+  await persistServiceRequest(request);
+
   if (db) {
     try {
       await addDoc(collection(db, COLLECTION), request);

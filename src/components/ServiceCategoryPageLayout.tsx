@@ -15,6 +15,7 @@ import { colors, fonts } from '../theme';
 import ServiceCategoryBookingSection from './ServiceCategoryBookingSection';
 import CategoryBrandSection from './CategoryBrandSection';
 import type { ServiceCategoryPageConfig } from '../data/serviceCategoryPages';
+import { SERVICE_SLUG_TO_SCHEDULER } from '../data/schedulerPrefill';
 
 interface ServiceCategoryPageLayoutProps {
   config: ServiceCategoryPageConfig;
@@ -54,8 +55,10 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
       scrollToBooking();
       return;
     }
-    if (config.slug === 'home-appliances') {
-      navigate('/scheduler');
+    const schedulerCategory = SERVICE_SLUG_TO_SCHEDULER[config.slug];
+    if (schedulerCategory) {
+      const query = new URLSearchParams({ serviceCategory: schedulerCategory });
+      navigate(`/scheduler?${query.toString()}`);
       return;
     }
     scrollToBooking();
@@ -609,6 +612,7 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
               disableGutters
               elevation={0}
               defaultExpanded={index === 0}
+              TransitionProps={{ unmountOnExit: true, mountOnEnter: true }}
               sx={{
                 border: '1px solid #E4E7EB',
                 borderRadius: index === 0 ? '12px 12px 0 0' : index === config.faqs.length - 1 ? '0 0 12px 12px' : 0,

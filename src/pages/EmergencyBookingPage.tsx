@@ -25,19 +25,7 @@ import {
   getZipFieldHelperText,
   isZipFieldError,
 } from '../data/serviceAreas';
-
-const STORAGE_KEY = 'smart-appliances-service-requests';
-
-const saveRequest = (request: ServiceRequest): void => {
-  try {
-    const existing = localStorage.getItem(STORAGE_KEY);
-    const requests: ServiceRequest[] = existing ? (JSON.parse(existing) as ServiceRequest[]) : [];
-    requests.unshift(request);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
-  } catch {
-    // ignore
-  }
-};
+import { saveServiceRequest } from '../lib/firebase';
 
 interface EmergencyBookingState {
   serviceCategory?: string;
@@ -67,6 +55,8 @@ const EmergencyBookingPage: React.FC = () => {
   const [zipCode, setZipCode] = useState('');
   const [zipTouched, setZipTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedCategory = serviceCategories.find((c) => c.id === categoryId) ?? serviceCategories[0];
   const zipValidation = validateZipCode(zipCode);
@@ -77,7 +67,10 @@ const EmergencyBookingPage: React.FC = () => {
     setServiceTypeId(cat.services[0].id);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+
     const request: ServiceRequest = {
       id: `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       customerName: name,
@@ -117,8 +110,16 @@ const EmergencyBookingPage: React.FC = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    saveRequest(request);
-    setSubmitted(true);
+
+    try {
+      await saveServiceRequest(request);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Emergency booking error:', error);
+      setSubmitError('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -341,13 +342,16 @@ const EmergencyBookingPage: React.FC = () => {
                     />
                   </Box>
                 </Box>
+                {submitError ? (
+                  <Alert severity="error" sx={{ mt: 2 }}>{submitError}</Alert>
+                ) : null}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
                   <Button onClick={() => setStep(1)} variant="outlined" sx={{ borderColor: '#0B3D91', color: '#0B3D91', textTransform: 'none', borderRadius: '10px', px: 3, py: 1.25 }}>
                     Back
                   </Button>
                   <Button
                     variant="contained"
-                    disabled={!name || !phone || !email || !address || !zipValidation.isValid}
+                    disabled={!name || !phone || !email || !address || !zipValidation.isValid || isSubmitting}
                     onClick={handleSubmit}
                     sx={{
                       backgroundColor: '#EF4444',
@@ -361,7 +365,7 @@ const EmergencyBookingPage: React.FC = () => {
                       '&:hover': { backgroundColor: '#EA580C' },
                     }}
                   >
-                    Submit Emergency Request
+                    {isSubmitting ? 'Submitting…' : 'Submit Emergency Request'}
                   </Button>
                 </Box>
               </Box>

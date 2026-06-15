@@ -257,6 +257,9 @@ export const theme = createTheme({
       },
     },
     MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+      },
       styleOverrides: {
         root: inputSx,
       },

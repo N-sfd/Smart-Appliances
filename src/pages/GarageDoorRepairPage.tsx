@@ -185,7 +185,11 @@ const GarageDoorRepairPage: React.FC = () => {
     const label = issueLabel ?? (selectedIssue
       ? ISSUE_CARDS.find((c) => c.id === selectedIssue)?.label
       : undefined);
-    const query = new URLSearchParams({ serviceType: 'R', productName: 'Garage Door Repair' });
+    const query = new URLSearchParams({
+      serviceType: 'R',
+      productName: 'Garage Door Repair',
+      serviceCategory: 'Garage Door',
+    });
     if (label) query.set('issue', label);
     navigate(`/scheduler?${query.toString()}`);
   };
@@ -754,6 +758,7 @@ const GarageDoorRepairPage: React.FC = () => {
               disableGutters
               elevation={0}
               defaultExpanded={index === 0}
+              TransitionProps={{ unmountOnExit: true, mountOnEnter: true }}
               sx={{
                 border: '1px solid #E4E7EB',
                 borderRadius:

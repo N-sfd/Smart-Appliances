@@ -55,7 +55,15 @@ const TopBar: React.FC = () => {
   const isServicesSection = location.pathname.startsWith('/services');
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 8);
+        ticking = false;
+      });
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -386,9 +394,9 @@ const TopBar: React.FC = () => {
                               }}
                             >
                               <Icon
-                                size={20}
-                                strokeWidth={1.75}
-                                color={itemActive ? colors.primaryBlue : '#64748B'}
+                                className="services-nav-dropdown-icon"
+                                aria-hidden="true"
+                                sx={{ color: itemActive ? colors.primaryBlue : '#64748B' }}
                               />
                               <ListItemText
                                 primary={item.label}

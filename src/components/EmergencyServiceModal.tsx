@@ -197,13 +197,14 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
 
     try {
       await saveServiceRequest(request);
-    } catch {
-      // Firestore unavailable — data still saved to localStorage via App.tsx
+      onSubmitRequest(request);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Emergency booking error:', error);
+      setErrors({ submit: 'Something went wrong. Please try again.' });
+    } finally {
+      setIsLoading(false);
     }
-
-    onSubmitRequest(request);
-    setIsLoading(false);
-    setSubmitted(true);
   };
 
   const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
@@ -528,6 +529,11 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
             {errors.consent && (
               <Typography variant="caption" sx={{ color: '#D32F2F', ml: 1.5 }}>
                 {errors.consent}
+              </Typography>
+            )}
+            {errors.submit && (
+              <Typography variant="body2" sx={{ color: '#D32F2F', mt: 1.5 }}>
+                {errors.submit}
               </Typography>
             )}
 

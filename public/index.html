@@ -16,17 +16,45 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!-- Preconnect to Google Fonts CDN to eliminate DNS/TCP latency -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" />
-    <!-- Preload LCP hero image so the browser fetches it before JS executes -->
-    <link rel="preload" as="image" href="%PUBLIC_URL%/images/services/hero-appliance-technician.webp" type="image/webp" />
+    <!-- LCP: fetch hero before JS bundle; high priority on preload + img -->
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/images/services/hero-appliance-technician.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <style>
+      /* Static LCP poster — discoverable in HTML, hidden once React mounts */
+      #lcp-hero {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 54% 38%;
+        z-index: 0;
+        pointer-events: none;
+        background-color: #0b2d6b;
+      }
+      body:has(#root:not(:empty)) #lcp-hero {
+        display: none;
+      }
+    </style>
     <title>Smart Appliances — Appliance Repair & Home Services</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <img
+      id="lcp-hero"
+      src="%PUBLIC_URL%/images/services/hero-appliance-technician.webp"
+      alt="Certified appliance repair technician"
+      width="1200"
+      height="900"
+      fetchpriority="high"
+      decoding="sync"
+    />
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

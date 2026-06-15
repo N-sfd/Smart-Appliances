@@ -25,25 +25,13 @@ import {
   isZipFieldError,
   SERVICE_AREA_ZIP_HINT,
 } from '../data/serviceAreas';
-
-const STORAGE_KEY = 'smart-appliances-service-requests';
+import { saveServiceRequest } from '../lib/firebase';
 
 const STEPS = [
   { num: 1, label: 'Service Details' },
   { num: 2, label: 'Contact Info' },
   { num: 3, label: 'Review & Submit' },
 ] as const;
-
-const saveRequest = (request: ServiceRequest): void => {
-  try {
-    const existing = localStorage.getItem(STORAGE_KEY);
-    const requests: ServiceRequest[] = existing ? (JSON.parse(existing) as ServiceRequest[]) : [];
-    requests.unshift(request);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
-  } catch {
-    // ignore
-  }
-};
 
 interface BookingState {
   serviceCategory?: string;
@@ -169,7 +157,13 @@ const RegularBookingPage: React.FC = () => {
     setServiceTypeId(cat.services[0].id);
   };
 
-  const handleSubmit = () => {
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+
     const request: ServiceRequest = {
       id: `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       customerName: name,
@@ -209,8 +203,16 @@ const RegularBookingPage: React.FC = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    saveRequest(request);
-    setSubmitted(true);
+
+    try {
+      await saveServiceRequest(request);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Booking error:', error);
+      setSubmitError('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const ActionRow = ({
@@ -731,10 +733,15 @@ const RegularBookingPage: React.FC = () => {
                   </Box>
                 </Box>
 
+                {submitError ? (
+                  <Typography sx={{ color: colors.emergency, fontSize: '14px', mt: 2 }}>{submitError}</Typography>
+                ) : null}
+
                 <ActionRow
                   onBack={() => setStep(2)}
                   onContinue={handleSubmit}
-                  continueLabel="Submit Booking"
+                  continueLabel={isSubmitting ? 'Submitting…' : 'Submit Booking'}
+                  continueDisabled={isSubmitting}
                 />
               </Box>
             )}

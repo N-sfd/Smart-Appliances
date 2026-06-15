@@ -2,6 +2,8 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { fonts } from '../theme';
 import type { LogoBrand } from '../data/logoBrandTypes';
+import { BRAND_LOGO_SLOT_WIDTH, BRAND_LOGO_SLOT_HEIGHT } from '../constants/imageDimensions';
+import StableImage from './StableImage';
 
 interface LogoBrandMarqueeProps {
   brands: LogoBrand[];
@@ -57,24 +59,16 @@ const LogoBrandMarquee: React.FC<LogoBrandMarqueeProps> = ({ brands, logoHeight 
                 }),
           }}
         >
-          {brand.logo && (
-            <Box
-              component="img"
+          {brand.logo ? (
+            <StableImage
               src={brand.logo}
               alt={brand.displayName}
-              loading="lazy"
-              sx={{
-                height: logoHeight,
-                width: 'auto',
-                minWidth: 72,
-                maxWidth: 120,
-                objectFit: 'contain',
-                display: 'block',
-                flexShrink: 0,
-              }}
+              intrinsicWidth={BRAND_LOGO_SLOT_WIDTH}
+              intrinsicHeight={BRAND_LOGO_SLOT_HEIGHT}
+              displayWidth={{ xs: 72, md: 120 }}
+              displayHeight={{ xs: logoHeight, md: logoHeight }}
             />
-          )}
-          {!brand.logo && (
+          ) : (
             <Typography
               sx={{
                 fontFamily: fonts.heading,

@@ -1,6 +1,12 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import logoBrand from '../assets/logo-brand.webp';
+import {
+  LOGO_BRAND_WIDTH,
+  LOGO_BRAND_HEIGHT,
+  LOGO_HEADER_HEIGHT,
+  LOGO_HEADER_WIDTH,
+} from '../constants/imageDimensions';
 
 interface BrandLogoProps {
   size?: number;
@@ -45,30 +51,42 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       }
     : { 'aria-label': 'Smart Appliances' };
 
+  const displayWidth = isHeader
+    ? LOGO_HEADER_WIDTH
+    : { xs: Math.round(mobileSize * (LOGO_BRAND_WIDTH / LOGO_BRAND_HEIGHT)), md: Math.round(size * (LOGO_BRAND_WIDTH / LOGO_BRAND_HEIGHT)) };
+
+  const displayHeight = isHeader
+    ? LOGO_HEADER_HEIGHT
+    : { xs: mobileSize, md: size };
+
   return (
     <Box sx={wrapperSx} {...interactiveProps}>
       <Box
-        component="img"
-        src={logoBrand}
-        alt="Smart Appliances — Repair, Install, Maintain"
         sx={{
-          display: 'block',
-          objectFit: 'contain',
-          objectPosition: 'left center',
+          width: displayWidth,
+          height: displayHeight,
+          maxWidth: isHeader ? { xs: 260, sm: 300, md: 340, lg: 360 } : undefined,
           flexShrink: 0,
-          // No filters or opacity — show the PNG exactly as designed
-          ...(isHeader
-            ? {
-                height: { xs: 88, sm: 96, md: 108, lg: 116 },
-                width: 'auto',
-                maxWidth: { xs: 260, sm: 300, md: 340, lg: 360 },
-              }
-            : {
-                height: { xs: mobileSize, md: size },
-                width: 'auto',
-              }),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
         }}
-      />
+      >
+        <Box
+          component="img"
+          src={logoBrand}
+          alt="Smart Appliances — Repair, Install, Maintain"
+          width={LOGO_BRAND_WIDTH}
+          height={LOGO_BRAND_HEIGHT}
+          sx={{
+            display: 'block',
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            objectPosition: 'left center',
+          }}
+        />
+      </Box>
     </Box>
   );
 };
