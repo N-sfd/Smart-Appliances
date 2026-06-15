@@ -3,14 +3,18 @@ import {
   Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
   Chip, IconButton, CircularProgress, Collapse, Button, InputAdornment,
+  Divider,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
+import SendIcon from '@mui/icons-material/Send';
 import {
   fetchAllBookings, updateBookingStatus, BookingRow, BOOKING_STATUSES,
+  fetchBookingNotes, insertBookingNote, BookingNote,
 } from '../../lib/supabaseBookings';
+import { useAuth } from '../../contexts/AuthContext';
 import { colors, fonts } from '../../theme';
 
 const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
@@ -21,30 +25,118 @@ const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
   Cancelled: { bg: '#FAFAFA', text: '#616161' },
 };
 
+const SERVICE_CATEGORIES = ['Appliance', 'HVAC', 'Plumbing', 'Electrical', 'Smart Home', 'Garage Door'];
+const SERVICE_TYPES = ['Repair', 'Installation', 'Maintenance', 'Emergency'];
+
 const fmt = (iso?: string) => {
   if (!iso) return '—';
   try {
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch {
-    return iso;
-  }
+  } catch { return iso; }
 };
+
+// ── Booking notes panel ───────────────────────────────────────────────────────
+
+const NotesPanel: React.FC<{ bookingId: string }> = ({ bookingId }) => {
+  const { user } = useAuth();
+  const [notes, setNotes] = useState<BookingNote[]>([]);
+  const [newNote, setNewNote] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchBookingNotes(bookingId).then((n) => { setNotes(n); setLoading(false); });
+  }, [bookingId]);
+
+  const handleAdd = async () => {
+    if (!newNote.trim()) return;
+    setSaving(true);
+    await insertBookingNote(bookingId, newNote.trim(), user?.id);
+    const updated = await fetchBookingNotes(bookingId);
+    setNotes(updated);
+    setNewNote('');
+    setSaving(false);
+  };
+
+  return (
+    <Box sx={{ mt: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5 }}>
+        <NoteAddOutlinedIcon sx={{ fontSize: 16, color: colors.primaryBlue }} />
+        <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.82rem', color: colors.navy }}>
+          Internal Notes
+        </Typography>
+      </Box>
+
+      {loading ? (
+        <CircularProgress size={16} />
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1.5 }}>
+          {notes.length === 0 && (
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.8rem', color: colors.mutedText }}>
+              No notes yet.
+            </Typography>
+          )}
+          {notes.map((n) => (
+            <Box
+              key={n.id}
+              sx={{
+                backgroundColor: '#FFFBEB', borderRadius: '8px', px: 1.5, py: 1,
+                border: '1px solid #FDE68A',
+              }}
+            >
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: '#92400E', lineHeight: 1.5 }}>
+                {n.note}
+              </Typography>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mt: 0.25 }}>
+                {fmt(n.created_at)}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      )}
+
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <TextField
+          value={newNote}
+          onChange={(e) => setNewNote(e.target.value)}
+          placeholder="Add a note…"
+          size="small"
+          fullWidth
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAdd(); } }}
+          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '0.82rem', fontFamily: fonts.body } }}
+        />
+        <Button
+          onClick={() => void handleAdd()}
+          disabled={saving || !newNote.trim()}
+          variant="contained"
+          sx={{
+            backgroundColor: colors.primaryBlue, color: '#fff', minWidth: 40, px: 1.5,
+            borderRadius: '8px', '&:hover': { backgroundColor: colors.navy },
+          }}
+        >
+          {saving ? <CircularProgress size={14} sx={{ color: '#fff' }} /> : <SendIcon sx={{ fontSize: 16 }} />}
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
+// ── Expanded row detail ───────────────────────────────────────────────────────
 
 interface RowDetailProps {
   row: BookingRow;
-  onUpdate: (id: string, status: string, notes: string) => Promise<void>;
+  onStatusChange: (id: string, status: string) => Promise<void>;
 }
 
-const RowDetail: React.FC<RowDetailProps> = ({ row, onUpdate }) => {
+const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange }) => {
   const [status, setStatus] = useState(row.status);
-  const [notes, setNotes] = useState(row.admin_notes ?? '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const handleSave = async () => {
     if (!row.id) return;
     setSaving(true);
-    await onUpdate(row.id, status, notes);
+    await onStatusChange(row.id, status);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -53,34 +145,67 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onUpdate }) => {
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, backgroundColor: '#F8FAFC', borderTop: `1px solid ${colors.border}` }}>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 2 }}>
+        {/* Customer */}
         <Box>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, mb: 0.25 }}>Customer</Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, color: colors.darkText }}>{row.customer_name}</Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText }}>{row.email}</Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText }}>{row.phone}</Typography>
-        </Box>
-        <Box>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, mb: 0.25 }}>Address</Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.darkText }}>
-            {[row.address, row.suite_apt].filter(Boolean).join(', ')}
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Customer
           </Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.darkText }}>
+          <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, color: colors.darkText }}>{row.customer_name}</Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText }}>{row.email}</Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText }}>{row.phone}</Typography>
+        </Box>
+        {/* Address */}
+        <Box>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Address
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>
+            {[row.street_address, row.suite_apt].filter(Boolean).join(', ') || '—'}
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>
             {[row.city, row.state, row.zip_code].filter(Boolean).join(', ')}
           </Typography>
         </Box>
+        {/* Service details */}
         <Box>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, mb: 0.25 }}>Issue</Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.darkText }}>{row.issue_description || '—'}</Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Service Details
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>
+            {[row.product_name, row.problem_type, row.system_type].filter(Boolean).join(' · ') || row.service_type}
+          </Typography>
+          {row.brand && (
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText }}>
+              {row.brand}{row.model_number ? ` · ${row.model_number}` : ''}
+            </Typography>
+          )}
         </Box>
+        {/* Timing */}
         <Box>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, mb: 0.25 }}>Urgency / Preferred Time</Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.darkText }}>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Scheduling
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>
             {[row.urgency, row.preferred_date, row.preferred_time].filter(Boolean).join(' · ') || '—'}
           </Typography>
         </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+      {row.issue_description && (
+        <Box sx={{ mb: 2, p: 1.5, backgroundColor: '#fff', borderRadius: '8px', border: `1px solid ${colors.border}` }}>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Issue Description
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText, lineHeight: 1.6 }}>
+            {row.issue_description}
+          </Typography>
+        </Box>
+      )}
+
+      <Divider sx={{ mb: 2 }} />
+
+      {/* Status update */}
+      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center', mb: 2 }}>
         <FormControl size="small" sx={{ minWidth: 160 }}>
           <InputLabel sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>Status</InputLabel>
           <Select
@@ -94,60 +219,82 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onUpdate }) => {
             ))}
           </Select>
         </FormControl>
-
-        <TextField
-          label="Admin notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          size="small"
-          multiline
-          minRows={1}
-          maxRows={3}
-          sx={{
-            flex: 1, minWidth: 200,
-            '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.85rem' },
-          }}
-        />
-
         <Button
-          onClick={handleSave}
-          disabled={saving}
+          onClick={() => void handleSave()}
+          disabled={saving || status === row.status}
           variant="contained"
-          startIcon={saving ? <CircularProgress size={14} sx={{ color: '#fff' }} /> : <SaveOutlinedIcon />}
           sx={{
             backgroundColor: saved ? colors.success : colors.primaryBlue, color: '#fff',
             fontFamily: fonts.body, fontWeight: 700, textTransform: 'none',
             borderRadius: '10px', fontSize: '0.85rem', height: 40,
             '&:hover': { backgroundColor: colors.navy },
+            '&.Mui-disabled': { backgroundColor: '#CBD5E1', color: '#fff' },
           }}
         >
-          {saved ? 'Saved!' : 'Save'}
+          {saving ? <CircularProgress size={14} sx={{ color: '#fff' }} /> : saved ? 'Saved!' : 'Update Status'}
         </Button>
       </Box>
+
+      {/* Notes */}
+      {row.id && <NotesPanel bookingId={row.id} />}
     </Box>
   );
 };
 
+// ── Main page ─────────────────────────────────────────────────────────────────
+
 const AdminBookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Filters
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [zipFilter, setZipFilter] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
-    const rows = await fetchAllBookings({ status: statusFilter, search });
+    const rows = await fetchAllBookings({
+      status: statusFilter,
+      search,
+      category: categoryFilter,
+      service_type: typeFilter,
+      zip_code: zipFilter,
+      date_from: dateFrom,
+      date_to: dateTo,
+    });
     setBookings(rows);
     setLoading(false);
-  }, [statusFilter, search]);
+  }, [statusFilter, search, categoryFilter, typeFilter, zipFilter, dateFrom, dateTo]);
 
   useEffect(() => { void load(); }, [load]);
 
-  const handleUpdate = async (id: string, status: string, notes: string) => {
-    await updateBookingStatus(id, status, notes);
-    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status, admin_notes: notes } : b));
+  const handleStatusChange = async (id: string, status: string) => {
+    await updateBookingStatus(id, status);
+    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
   };
+
+  const filterSelect = (label: string, value: string, onChange: (v: string) => void, options: string[]) => (
+    <FormControl size="small" sx={{ minWidth: 140 }}>
+      <InputLabel sx={{ fontFamily: fonts.body, fontSize: '0.82rem' }}>{label}</InputLabel>
+      <Select
+        value={value}
+        label={label}
+        onChange={(e) => onChange(e.target.value)}
+        sx={{ borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.82rem' }}
+      >
+        <MenuItem value="all" sx={{ fontFamily: fonts.body, fontSize: '0.82rem' }}>All</MenuItem>
+        {options.map((o) => (
+          <MenuItem key={o} value={o} sx={{ fontFamily: fonts.body, fontSize: '0.82rem' }}>{o}</MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
@@ -158,39 +305,63 @@ const AdminBookingsPage: React.FC = () => {
         {bookings.length} result{bookings.length !== 1 ? 's' : ''}
       </Typography>
 
-      {/* Filters */}
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }}>
+      {/* Filter row */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 3 }}>
         <TextField
-          placeholder="Search name, email, phone, ZIP, service…"
+          placeholder="Search name, email, phone, ZIP…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           size="small"
           sx={{
-            flex: 1, minWidth: 240,
-            '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body },
+            flex: 1, minWidth: 200,
+            '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.82rem' },
           }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon sx={{ fontSize: 18, color: colors.mutedText }} />
+                <SearchIcon sx={{ fontSize: 16, color: colors.mutedText }} />
               </InputAdornment>
             ),
           }}
         />
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>Status</InputLabel>
-          <Select
-            value={statusFilter}
-            label="Status"
-            onChange={(e) => setStatusFilter(e.target.value)}
-            sx={{ borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.85rem' }}
-          >
-            <MenuItem value="all" sx={{ fontFamily: fonts.body }}>All statuses</MenuItem>
-            {BOOKING_STATUSES.map((s) => (
-              <MenuItem key={s} value={s} sx={{ fontFamily: fonts.body }}>{s}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        {filterSelect('Status', statusFilter, setStatusFilter, BOOKING_STATUSES)}
+        {filterSelect('Category', categoryFilter, setCategoryFilter, SERVICE_CATEGORIES)}
+        {filterSelect('Type', typeFilter, setTypeFilter, SERVICE_TYPES)}
+        <TextField
+          placeholder="ZIP"
+          value={zipFilter}
+          onChange={(e) => setZipFilter(e.target.value.replace(/\D/g, '').slice(0, 5))}
+          size="small"
+          inputProps={{ maxLength: 5, inputMode: 'numeric' }}
+          sx={{
+            width: 90,
+            '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.82rem' },
+          }}
+        />
+        <TextField
+          label="From"
+          type="date"
+          value={dateFrom}
+          onChange={(e) => setDateFrom(e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+          sx={{
+            width: 150,
+            '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.82rem' },
+          }}
+        />
+        <TextField
+          label="To"
+          type="date"
+          value={dateTo}
+          onChange={(e) => setDateTo(e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+          sx={{
+            width: 150,
+            '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.82rem' },
+          }}
+        />
       </Box>
 
       {loading ? (
@@ -199,15 +370,15 @@ const AdminBookingsPage: React.FC = () => {
         </Box>
       ) : bookings.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText }}>No bookings found.</Typography>
+          <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText }}>No bookings match your filters.</Typography>
         </Box>
       ) : (
         <TableContainer component={Paper} elevation={0} sx={{ border: `1px solid ${colors.border}`, borderRadius: '16px', overflow: 'hidden' }}>
           <Table size="small">
             <TableHead>
               <TableRow sx={{ backgroundColor: '#F8FAFC' }}>
-                {['Date', 'Name', 'Service', 'Location', 'Status', ''].map((h) => (
-                  <TableCell key={h} sx={{ fontFamily: fonts.body, fontWeight: 700, color: colors.navy, fontSize: '0.78rem', py: 1.5 }}>
+                {['Date', 'Customer', 'Service', 'ZIP', 'Urgency', 'Status', ''].map((h) => (
+                  <TableCell key={h} sx={{ fontFamily: fonts.body, fontWeight: 700, color: colors.navy, fontSize: '0.75rem', py: 1.5 }}>
                     {h}
                   </TableCell>
                 ))}
@@ -220,32 +391,48 @@ const AdminBookingsPage: React.FC = () => {
                 return (
                   <React.Fragment key={b.id}>
                     <TableRow
+                      onClick={() => setExpandedId(isExpanded ? null : (b.id ?? null))}
                       sx={{
-                        '&:hover': { backgroundColor: '#F8FAFC' },
                         cursor: 'pointer',
                         backgroundColor: isExpanded ? '#F0F7FF' : 'inherit',
+                        '&:hover': { backgroundColor: '#F8FAFC' },
                       }}
-                      onClick={() => setExpandedId(isExpanded ? null : (b.id ?? null))}
                     >
-                      <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText, whiteSpace: 'nowrap', py: 1.5 }}>
+                      <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, whiteSpace: 'nowrap', py: 1.5 }}>
                         {fmt(b.created_at)}
                       </TableCell>
-                      <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.darkText, py: 1.5 }}>
-                        <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, fontSize: '0.85rem' }}>{b.customer_name}</Typography>
+                      <TableCell sx={{ py: 1.5 }}>
+                        <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, fontSize: '0.85rem', color: colors.darkText }}>
+                          {b.customer_name}
+                        </Typography>
                         <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText }}>{b.email}</Typography>
+                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText }}>{b.phone}</Typography>
                       </TableCell>
-                      <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.darkText, py: 1.5 }}>
-                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>{b.service_type}</Typography>
-                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText }}>{b.service_category}</Typography>
+                      <TableCell sx={{ py: 1.5 }}>
+                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>{b.product_name || b.service_type}</Typography>
+                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText }}>{b.service_category} · {b.service_type}</Typography>
                       </TableCell>
                       <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText, py: 1.5 }}>
-                        {[b.city, b.zip_code].filter(Boolean).join(', ')}
+                        {b.zip_code}
+                      </TableCell>
+                      <TableCell sx={{ py: 1.5 }}>
+                        {b.urgency ? (
+                          <Chip
+                            label={b.urgency}
+                            size="small"
+                            sx={{
+                              backgroundColor: b.urgency === 'Emergency' ? '#FEF2F2' : colors.lightBlueBg,
+                              color: b.urgency === 'Emergency' ? '#DC2626' : colors.primaryBlue,
+                              fontFamily: fonts.body, fontWeight: 700, fontSize: '0.72rem',
+                            }}
+                          />
+                        ) : <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText }}>—</Typography>}
                       </TableCell>
                       <TableCell sx={{ py: 1.5 }}>
                         <Chip
                           label={b.status}
                           size="small"
-                          sx={{ backgroundColor: statusStyle.bg, color: statusStyle.text, fontFamily: fonts.body, fontWeight: 700, fontSize: '0.75rem' }}
+                          sx={{ backgroundColor: statusStyle.bg, color: statusStyle.text, fontFamily: fonts.body, fontWeight: 700, fontSize: '0.72rem' }}
                         />
                       </TableCell>
                       <TableCell sx={{ py: 1.5 }}>
@@ -255,9 +442,9 @@ const AdminBookingsPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={6} sx={{ p: 0, border: 0 }}>
+                      <TableCell colSpan={7} sx={{ p: 0, border: 0 }}>
                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                          <RowDetail row={b} onUpdate={handleUpdate} />
+                          <RowDetail row={b} onStatusChange={handleStatusChange} />
                         </Collapse>
                       </TableCell>
                     </TableRow>

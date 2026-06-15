@@ -29,12 +29,14 @@ const PricingPage = lazy(() => import('./pages/PricingPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
 const MyBookingsPage = lazy(() => import('./pages/MyBookingsPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 
 // Admin pages
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
 const AdminBookingsPage = lazy(() => import('./pages/admin/AdminBookingsPage'));
 const AdminCustomersPage = lazy(() => import('./pages/admin/AdminCustomersPage'));
+const AdminServicesPage = lazy(() => import('./pages/admin/AdminServicesPage'));
 
 const PageFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
@@ -64,6 +66,7 @@ const AdminShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
         { label: 'Dashboard', to: '/admin/dashboard' },
         { label: 'Bookings', to: '/admin/bookings' },
         { label: 'Customers', to: '/admin/customers' },
+        { label: 'Services', to: '/admin/services' },
         { label: '← Site', to: '/' },
       ].map(({ label, to }) => (
         <Box
@@ -128,6 +131,14 @@ function AppRoutes() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Admin login (no AdminRoute guard — it's the entry point) */}
             <Route
@@ -166,6 +177,17 @@ function AppRoutes() {
                 <AdminRoute>
                   <AdminShell>
                     <AdminCustomersPage />
+                  </AdminShell>
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/services"
+              element={
+                <AdminRoute>
+                  <AdminShell>
+                    <AdminServicesPage />
                   </AdminShell>
                 </AdminRoute>
               }

@@ -88,12 +88,24 @@ const MyBookingsPage: React.FC = () => {
               New Booking
             </Button>
             <Button
-              onClick={handleSignOut}
+              component={RouterLink}
+              to="/profile"
               variant="outlined"
               sx={{
                 borderColor: colors.border, color: colors.darkText, fontFamily: fonts.body,
                 fontWeight: 600, textTransform: 'none', borderRadius: '10px',
                 '&:hover': { borderColor: colors.navy },
+              }}
+            >
+              Profile
+            </Button>
+            <Button
+              onClick={handleSignOut}
+              variant="outlined"
+              sx={{
+                borderColor: colors.border, color: colors.darkText, fontFamily: fonts.body,
+                fontWeight: 600, textTransform: 'none', borderRadius: '10px',
+                '&:hover': { borderColor: '#EF4444', color: '#EF4444' },
               }}
             >
               Sign out
