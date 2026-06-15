@@ -19,8 +19,9 @@ const STORAGE_KEY = 'smart-appliances-service-requests';
 
 const statusLabels: Record<ServiceRequest['status'], string> = {
   new: 'New',
-  contacted: 'Contacted',
+  in_review: 'In Review',
   scheduled: 'Scheduled',
+  technician_assigned: 'Tech Assigned',
   in_progress: 'In Progress',
   completed: 'Completed',
   cancelled: 'Cancelled',
@@ -28,9 +29,10 @@ const statusLabels: Record<ServiceRequest['status'], string> = {
 
 const statusColors: Record<ServiceRequest['status'], string> = {
   new: '#E3F2FD',
-  contacted: '#FFF8E1',
+  in_review: '#FFF8E1',
   scheduled: '#E8F5E9',
-  in_progress: '#F3E5F5',
+  technician_assigned: '#F3E5F5',
+  in_progress: '#FFF3E0',
   completed: '#E0F2F1',
   cancelled: '#FAFAFA',
 };
@@ -85,25 +87,25 @@ const AdminDashboard: React.FC = () => {
 
   const totalCount = requests.length;
   const emergencyCount = requests.filter((r) => r.servicePriority === 'emergency').length;
-  const pendingCount = requests.filter((r) => r.status === 'new' || r.status === 'contacted').length;
+  const pendingCount = requests.filter((r) => r.status === 'new' || r.status === 'in_review').length;
   const completedCount = requests.filter((r) => r.status === 'completed').length;
   const estRevenue = completedCount * 149;
 
   const statCards = [
-    { label: 'Total Requests', value: totalCount, color: '#022F49' },
-    { label: 'Emergency', value: emergencyCount, color: '#FF6B6B' },
+    { label: 'Total Requests', value: totalCount, color: '#0B3D91' },
+    { label: 'Emergency', value: emergencyCount, color: '#EF4444' },
     { label: 'Pending', value: pendingCount, color: '#FF9800' },
     { label: 'Completed', value: completedCount, color: '#2E7D32' },
     {
       label: 'Est. Revenue',
       value: `$${estRevenue.toLocaleString()}`,
-      color: '#22B1FB',
+      color: '#1A73E8',
     },
   ];
 
   const getBorderColor = (request: ServiceRequest): string => {
-    if (request.servicePriority === 'emergency') return '#FF6B6B';
-    return '#22B1FB';
+    if (request.servicePriority === 'emergency') return '#EF4444';
+    return '#1A73E8';
   };
 
   return (
@@ -113,13 +115,13 @@ const AdminDashboard: React.FC = () => {
         <Box sx={{ mb: 5 }}>
           <Typography
             variant="h3"
-            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1 }}
+            sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 1 }}
           >
             Admin Dashboard
           </Typography>
           <Typography
             variant="body1"
-            sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}
+            sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A' }}
           >
             Manage all service requests, update statuses, and track customer submissions.
           </Typography>
@@ -139,7 +141,7 @@ const AdminDashboard: React.FC = () => {
               key={stat.label}
               sx={{
                 borderRadius: '16px',
-                border: '1px solid #E5E5E5',
+                border: '1px solid #E4E7EB',
                 boxShadow: 'none',
                 backgroundColor: '#FFFFFF',
               }}
@@ -147,7 +149,7 @@ const AdminDashboard: React.FC = () => {
               <CardContent sx={{ p: 2.5 }}>
                 <Typography
                   sx={{
-                    fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                    fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                     color: stat.color,
                     fontSize: '2rem',
                     fontWeight: 700,
@@ -159,7 +161,7 @@ const AdminDashboard: React.FC = () => {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', fontSize: '0.85rem' }}
+                  sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#666666', fontSize: '0.85rem' }}
                 >
                   {stat.label}
                 </Typography>
@@ -182,13 +184,13 @@ const AdminDashboard: React.FC = () => {
             <CheckCircleIcon sx={{ fontSize: 64, color: '#D9D9D9', mb: 2 }} />
             <Typography
               variant="h6"
-              sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#999999', mb: 1 }}
+              sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#999999', mb: 1 }}
             >
               No service requests yet
             </Typography>
             <Typography
               variant="body2"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#AAAAAA' }}
+              sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#AAAAAA' }}
             >
               Requests submitted through the booking form will appear here.
             </Typography>
@@ -200,7 +202,7 @@ const AdminDashboard: React.FC = () => {
                 key={request.id}
                 sx={{
                   borderRadius: '16px',
-                  border: '1px solid #E5E5E5',
+                  border: '1px solid #E4E7EB',
                   borderLeft: `5px solid ${getBorderColor(request)}`,
                   backgroundColor:
                     request.servicePriority === 'emergency' ? '#FFF8F8' : statusColors[request.status],
@@ -230,9 +232,9 @@ const AdminDashboard: React.FC = () => {
                           }
                           sx={{
                             backgroundColor:
-                              request.servicePriority === 'emergency' ? '#FF6B6B' : '#22B1FB',
+                              request.servicePriority === 'emergency' ? '#EF4444' : '#1A73E8',
                             color: '#FFFFFF',
-                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                             fontWeight: 700,
                             fontSize: '0.75rem',
                           }}
@@ -240,16 +242,16 @@ const AdminDashboard: React.FC = () => {
                       </Box>
                       <Typography
                         variant="subtitle1"
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 0.5 }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 700, mb: 0.5 }}
                       >
                         {request.customerName}
                       </Typography>
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', fontSize: '0.85rem' }}>
+                      <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', fontSize: '0.85rem' }}>
                         {request.phone}
                       </Typography>
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#22B1FB', fontSize: '0.85rem', wordBreak: 'break-all' }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A73E8', fontSize: '0.85rem', wordBreak: 'break-all' }}
                       >
                         {request.email}
                       </Typography>
@@ -263,7 +265,7 @@ const AdminDashboard: React.FC = () => {
                       <Typography
                         variant="caption"
                         sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           color: '#888888',
                           fontWeight: 700,
                           textTransform: 'uppercase',
@@ -276,11 +278,11 @@ const AdminDashboard: React.FC = () => {
                       </Typography>
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 0.25 }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 700, mb: 0.25 }}
                       >
                         {request.serviceCategory}
                       </Typography>
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', mb: 0.25 }}>
+                      <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', mb: 0.25 }}>
                         {request.serviceType}
                       </Typography>
                       {request.applianceBrand && (
@@ -292,7 +294,7 @@ const AdminDashboard: React.FC = () => {
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                             color: '#444444',
                             mt: 1,
                             fontSize: '0.82rem',
@@ -313,7 +315,7 @@ const AdminDashboard: React.FC = () => {
                       <Typography
                         variant="caption"
                         sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           color: '#888888',
                           fontWeight: 700,
                           textTransform: 'uppercase',
@@ -331,10 +333,10 @@ const AdminDashboard: React.FC = () => {
                         }
                         fullWidth
                         size="small"
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.85rem', mb: 2 }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem', mb: 2 }}
                       >
                         {statusOptions.map((opt) => (
-                          <MenuItem key={opt} value={opt} sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                          <MenuItem key={opt} value={opt} sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
                             {statusLabels[opt]}
                           </MenuItem>
                         ))}
@@ -350,7 +352,7 @@ const AdminDashboard: React.FC = () => {
                         label="Notes"
                         sx={{
                           '& input, & textarea': {
-                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                             fontSize: '0.85rem',
                           },
                         }}
@@ -362,7 +364,7 @@ const AdminDashboard: React.FC = () => {
                       <Typography
                         variant="caption"
                         sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           color: '#888888',
                           fontWeight: 700,
                           textTransform: 'uppercase',
@@ -380,8 +382,8 @@ const AdminDashboard: React.FC = () => {
                             size="small"
                             sx={{
                               backgroundColor: '#FFE0E0',
-                              color: '#CC2200',
-                              fontFamily: 'DM Sans, Arial, sans-serif',
+                              color: '#EA580C',
+                              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                               fontWeight: 600,
                               mb: 1,
                             }}
@@ -390,17 +392,17 @@ const AdminDashboard: React.FC = () => {
                       ) : (
                         <Box>
                           {request.preferredDate && (
-                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', mb: 0.25 }}>
+                            <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', mb: 0.25 }}>
                               {request.preferredDate}
                             </Typography>
                           )}
                           {request.preferredTime && (
-                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}>
+                            <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A' }}>
                               {request.preferredTime}
                             </Typography>
                           )}
                           {request.requestedResponseTime && (
-                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}>
+                            <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A' }}>
                               {request.requestedResponseTime}
                             </Typography>
                           )}
@@ -411,7 +413,7 @@ const AdminDashboard: React.FC = () => {
                       <Typography
                         variant="caption"
                         sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           color: '#888888',
                           display: 'block',
                           mt: 2,

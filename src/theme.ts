@@ -1,59 +1,247 @@
 import { createTheme } from '@mui/material/styles';
 
+// ─────────────────────────────────────────────
+// Cobalt/Navy design tokens
+// ─────────────────────────────────────────────
+export const tokens = {
+  primary: {
+    50: '#E8F1FF',
+    100: '#D0E3FF',
+    300: '#5EA3F5',
+    500: '#1A73E8',
+    700: '#0B3D91',
+  },
+  accent: {
+    100: '#DFF6FF',
+    300: '#7FD9FF',
+    500: '#4FC3F7',
+  },
+  neutral: {
+    50: '#FFFFFF',
+    100: '#F5F7FA',
+    200: '#E4E7EB',
+    400: '#9AA5B1',
+    700: '#1A1A1A',
+  },
+  success: { 500: '#22C55E' },
+  warning: { 500: '#F59E0B' },
+  error: { 500: '#EF4444' },
+} as const;
+
+/** Backward-compatible flat color map used across components */
+export const colors = {
+  navy: tokens.primary[700],
+  darkText: tokens.neutral[700],
+  primaryBlue: tokens.primary[500],
+  primaryBlueHover: tokens.primary[700],
+  skyBlue: tokens.accent[500],
+  brightBlue: tokens.accent[300],
+  serviceBlue: tokens.primary[500],
+  lightBlueBg: tokens.primary[50],
+  veryLightBg: tokens.neutral[100],
+  background: tokens.neutral[100],
+  surface: tokens.neutral[50],
+  border: tokens.neutral[200],
+  mutedText: tokens.neutral[400],
+  emergency: tokens.error[500],
+  emergencyHover: '#DC2626',
+  emergencyLight: '#FEF2F2',
+  warningOrange: tokens.warning[500],
+  success: tokens.success[500],
+  white: tokens.neutral[50],
+  cardShadow: '0 18px 40px rgba(10, 37, 64, 0.12)',
+  brandGradient: 'linear-gradient(135deg, #0B3D91 0%, #1A73E8 40%, #4FC3F7 100%)',
+};
+
+export const fonts = {
+  heading: "'Inter', 'Plus Jakarta Sans', Arial, sans-serif",
+  body: "'Inter', 'DM Sans', Arial, sans-serif",
+};
+
+export const radii = {
+  xl: '0.875rem',
+  '2xl': '1rem',
+};
+
+// ─────────────────────────────────────────────
+// Reusable button styles (MUI sx tokens)
+// ─────────────────────────────────────────────
+export const primaryButtonSx = {
+  background: colors.primaryBlue,
+  color: colors.white,
+  fontFamily: fonts.heading,
+  fontWeight: 600,
+  fontSize: '0.95rem',
+  textTransform: 'none' as const,
+  borderRadius: radii.xl,
+  boxShadow: '0 12px 30px rgba(10, 37, 64, 0.18)',
+  transition: 'transform 150ms ease, box-shadow 150ms ease, background 150ms ease',
+  '&:hover': {
+    background: colors.primaryBlueHover,
+    transform: 'translateY(-1px)',
+    boxShadow: '0 18px 40px rgba(10, 37, 64, 0.22)',
+  },
+  '&.Mui-disabled': { background: tokens.neutral[200], color: tokens.neutral[400], boxShadow: 'none' },
+};
+
+export const secondaryButtonSx = {
+  background: colors.white,
+  color: colors.primaryBlue,
+  fontFamily: fonts.heading,
+  fontWeight: 600,
+  fontSize: '0.95rem',
+  textTransform: 'none' as const,
+  border: `1px solid ${colors.primaryBlue}`,
+  borderRadius: radii.xl,
+  boxShadow: 'none',
+  transition: 'background 150ms ease, color 150ms ease',
+  '&:hover': { background: colors.lightBlueBg },
+};
+
+export const emergencyButtonSx = {
+  background: colors.white,
+  color: colors.emergency,
+  fontFamily: fonts.heading,
+  fontWeight: 600,
+  fontSize: '0.95rem',
+  textTransform: 'none' as const,
+  border: `1px solid ${colors.emergency}`,
+  borderRadius: radii.xl,
+  boxShadow: 'none',
+  transition: 'background 150ms ease, transform 150ms ease',
+  '&:hover': {
+    background: colors.emergencyLight,
+    transform: 'translateY(-1px)',
+  },
+};
+
+/** Equal-size hero/header CTA pair — Book Service + Emergency Service */
+export const heroCtaButtonSx = {
+  width: { xs: '100%', sm: '180px' },
+  height: '56px',
+  minHeight: '56px',
+  maxHeight: '56px',
+  borderRadius: '16px',
+  fontFamily: fonts.heading,
+  fontWeight: 600,
+  fontSize: '0.95rem',
+  lineHeight: 1,
+  textTransform: 'none' as const,
+  padding: 0,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+};
+
+export const heroCtaInnerSx = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+  whiteSpace: 'nowrap',
+};
+
+export const cardSx = {
+  backgroundColor: colors.surface,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii['2xl'],
+  boxShadow: colors.cardShadow,
+};
+
+export const badgeSx = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 0.75,
+  backgroundColor: colors.surface,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.xl,
+  px: 1.5,
+  py: 0.75,
+  fontFamily: fonts.body,
+  fontSize: '0.82rem',
+  fontWeight: 500,
+  color: colors.darkText,
+};
+
+export const inputSx = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: radii.xl,
+    fontFamily: fonts.body,
+    height: 52,
+    '& fieldset': { borderColor: colors.border },
+    '&:hover fieldset': { borderColor: colors.primaryBlue },
+    '&.Mui-focused': {
+      boxShadow: `0 0 0 4px ${colors.lightBlueBg}`,
+      '& fieldset': { borderColor: colors.primaryBlue },
+    },
+  },
+};
+
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#022F49',
-      light: '#22B1FB',
-      dark: '#011824',
+      main: colors.primaryBlue,
+      light: tokens.primary[300],
+      dark: colors.primaryBlueHover,
+      contrastText: colors.white,
     },
     secondary: {
-      main: '#22B1FB',
-      light: '#5DCAFF',
-      dark: '#0088CC',
+      main: tokens.accent[500],
+      light: tokens.accent[300],
+      dark: tokens.primary[700],
     },
+    error: {
+      main: colors.emergency,
+      dark: colors.emergencyHover,
+      light: colors.emergencyLight,
+    },
+    success: { main: colors.success },
+    warning: { main: colors.warningOrange },
     background: {
-      default: '#FFFFFF',
-      paper: '#FFFFFF',
+      default: colors.background,
+      paper: colors.surface,
     },
     text: {
-      primary: '#022F49',
-      secondary: '#555555',
+      primary: colors.darkText,
+      secondary: colors.mutedText,
     },
+    divider: colors.border,
   },
-  shape: {
-    borderRadius: 12,
-  },
+  shape: { borderRadius: 14 },
   typography: {
-    fontFamily: 'DM Sans, Arial, sans-serif',
-    h1: { fontFamily: 'Wasted Vindey, Arial, sans-serif', fontWeight: 700 },
-    h2: { fontFamily: 'Wasted Vindey, Arial, sans-serif', fontWeight: 600 },
-    h3: { fontFamily: 'Wasted Vindey, Arial, sans-serif', fontWeight: 600 },
-    h4: { fontFamily: 'Wasted Vindey, Arial, sans-serif', fontWeight: 600 },
-    h5: { fontFamily: 'Wasted Vindey, Arial, sans-serif', fontWeight: 600 },
-    h6: { fontFamily: 'Wasted Vindey, Arial, sans-serif', fontWeight: 600 },
+    fontFamily: fonts.body,
+    h1: { fontFamily: fonts.heading, fontWeight: 700 },
+    h2: { fontFamily: fonts.heading, fontWeight: 700 },
+    h3: { fontFamily: fonts.heading, fontWeight: 700 },
+    h4: { fontFamily: fonts.heading, fontWeight: 700 },
+    h5: { fontFamily: fonts.heading, fontWeight: 700 },
+    h6: { fontFamily: fonts.heading, fontWeight: 700 },
   },
   components: {
     MuiAppBar: {
       styleOverrides: {
-        root: { backgroundColor: '#022F49' },
+        root: {
+          backgroundColor: colors.white,
+          color: colors.navy,
+        },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          transition: 'all 0.25s ease',
-          fontFamily: 'DM Sans, Arial, sans-serif',
+          transition: 'all 0.15s ease',
+          fontFamily: fonts.body,
           fontWeight: 600,
-          letterSpacing: 0.3,
+          letterSpacing: 0,
+          textTransform: 'none',
         },
         containedPrimary: {
-          background: 'linear-gradient(135deg, #22B1FB 0%, #0088CC 100%)',
-          boxShadow: '0 4px 14px rgba(34,177,251,0.3)',
+          backgroundColor: colors.primaryBlue,
+          boxShadow: '0 12px 30px rgba(10, 37, 64, 0.18)',
           '&:hover': {
-            background: 'linear-gradient(135deg, #5DCAFF 0%, #22B1FB 100%)',
-            boxShadow: '0 6px 20px rgba(34,177,251,0.45)',
-            transform: 'translateY(-1px)',
+            backgroundColor: colors.primaryBlueHover,
+            boxShadow: '0 18px 40px rgba(10, 37, 64, 0.22)',
           },
         },
       },
@@ -61,50 +249,29 @@ export const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0 2px 12px rgba(2,47,73,0.06)',
-          transition: 'all 0.25s ease',
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        rounded: {
-          boxShadow: '0 4px 24px rgba(2,47,73,0.08)',
+          borderRadius: 16,
+          border: `1px solid ${colors.border}`,
+          boxShadow: colors.cardShadow,
+          transition: 'all 0.22s ease',
         },
       },
     },
     MuiTextField: {
       styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '10px',
-            transition: 'box-shadow 0.2s ease',
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#22B1FB',
-            },
-            '&.Mui-focused': {
-              boxShadow: '0 0 0 3px rgba(34,177,251,0.12)',
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#22B1FB',
-              },
-            },
-          },
-        },
+        root: inputSx,
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          fontFamily: 'DM Sans, Arial, sans-serif',
+          fontFamily: fonts.body,
           fontWeight: 600,
         },
       },
     },
     MuiSelect: {
       styleOverrides: {
-        root: {
-          fontFamily: 'DM Sans, Arial, sans-serif',
-        },
+        root: { fontFamily: fonts.body },
       },
     },
   },

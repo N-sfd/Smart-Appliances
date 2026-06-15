@@ -20,16 +20,16 @@ import { ServiceRequest } from '../data/services';
 const STORAGE_KEY = 'smart-appliances-service-requests';
 
 const priorityColors: Record<string, string> = {
-  Emergency: '#FF6B6B',
+  Emergency: '#EF4444',
   High: '#FF9800',
-  Normal: '#22B1FB',
+  Normal: '#1A73E8',
   Low: '#757575',
 };
 
 const priorityScoreColors: Record<number, string> = {
-  4: '#FF6B6B',
+  4: '#EF4444',
   3: '#FF9800',
-  2: '#22B1FB',
+  2: '#1A73E8',
   1: '#757575',
 };
 
@@ -71,13 +71,13 @@ const ConfirmationPage: React.FC = () => {
         <Container maxWidth="sm" sx={{ textAlign: 'center' }}>
           <Typography
             variant="h5"
-            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 2 }}
+            sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 2 }}
           >
             Request Not Found
           </Typography>
           <Typography
             variant="body1"
-            sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', mb: 3 }}
+            sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#666666', mb: 3 }}
           >
             We couldn't find the service request you're looking for. It may have been cleared.
           </Typography>
@@ -86,10 +86,10 @@ const ConfirmationPage: React.FC = () => {
             onClick={() => navigate('/')}
             startIcon={<HomeIcon />}
             sx={{
-              backgroundColor: '#22B1FB',
+              backgroundColor: '#1A73E8',
               color: '#FFFFFF',
               textTransform: 'none',
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               borderRadius: '10px',
               px: 4,
             }}
@@ -104,8 +104,8 @@ const ConfirmationPage: React.FC = () => {
   const isEmergency = request.servicePriority === 'emergency';
   const urgencyLevel = request.urgencyLevel ?? 'Normal';
   const priorityColor = isEmergency
-    ? '#FF6B6B'
-    : priorityColors[urgencyLevel] ?? priorityScoreColors[request.priorityScore] ?? '#22B1FB';
+    ? '#EF4444'
+    : priorityColors[urgencyLevel] ?? priorityScoreColors[request.priorityScore] ?? '#1A73E8';
 
   return (
     <Box sx={{ backgroundColor: '#F5F7F9', minHeight: '100vh', pb: 8 }}>
@@ -113,8 +113,8 @@ const ConfirmationPage: React.FC = () => {
       <Box
         sx={{
           background: isEmergency
-            ? 'linear-gradient(135deg, #7a1a1a 0%, #CC2200 100%)'
-            : 'linear-gradient(135deg, #022F49 0%, #034a73 100%)',
+            ? 'linear-gradient(135deg, #7a1a1a 0%, #EA580C 100%)'
+            : 'linear-gradient(135deg, #0B3D91 0%, #034a73 100%)',
           py: { xs: 5, md: 8 },
           px: 2,
           textAlign: 'center',
@@ -125,7 +125,7 @@ const ConfirmationPage: React.FC = () => {
             width: 80,
             height: 80,
             borderRadius: '50%',
-            backgroundColor: isEmergency ? '#FF6B6B' : '#4CAF50',
+            backgroundColor: isEmergency ? '#EF4444' : '#4CAF50',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -139,7 +139,7 @@ const ConfirmationPage: React.FC = () => {
         <Typography
           variant="h4"
           sx={{
-            fontFamily: 'Wasted Vindey, Arial, sans-serif',
+            fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
             color: '#FFFFFF',
             fontWeight: 700,
             mb: 1,
@@ -149,7 +149,7 @@ const ConfirmationPage: React.FC = () => {
         </Typography>
         <Typography
           variant="body1"
-          sx={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'DM Sans, Arial, sans-serif' }}
+          sx={{ color: 'rgba(255,255,255,0.8)', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}
         >
           {isEmergency
             ? 'Our emergency dispatch team will contact you as soon as possible.'
@@ -163,7 +163,7 @@ const ConfirmationPage: React.FC = () => {
           <Alert
             severity="error"
             icon={<WarningAmberIcon />}
-            sx={{ mb: 3, borderRadius: '12px', border: '2px solid #FF6B6B' }}
+            sx={{ mb: 3, borderRadius: '12px', border: '2px solid #EF4444' }}
           >
             <strong>Safety Reminder:</strong> If there is any immediate danger (gas, smoke, fire, flooding) — evacuate immediately and call 911. Do not wait for a technician.
           </Alert>
@@ -192,15 +192,15 @@ const ConfirmationPage: React.FC = () => {
             <Box>
               <Typography
                 variant="overline"
-                sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#999999' }}
+                sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#999999' }}
               >
                 Request ID
               </Typography>
               <Typography
                 variant="h6"
                 sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#022F49',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                  color: '#0B3D91',
                   fontWeight: 700,
                   wordBreak: 'break-all',
                 }}
@@ -214,8 +214,8 @@ const ConfirmationPage: React.FC = () => {
               onClick={handleCopyId}
               sx={{
                 textTransform: 'none',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                color: copied ? '#4CAF50' : '#22B1FB',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                color: copied ? '#4CAF50' : '#1A73E8',
               }}
             >
               {copied ? 'Copied!' : 'Copy ID'}
@@ -227,7 +227,7 @@ const ConfirmationPage: React.FC = () => {
           {/* Summary table */}
           <Typography
             variant="subtitle1"
-            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 2 }}
+            sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', fontWeight: 700, mb: 2 }}
           >
             Request Summary
           </Typography>
@@ -244,7 +244,7 @@ const ConfirmationPage: React.FC = () => {
                     backgroundColor: priorityColor,
                     color: '#FFFFFF',
                     fontWeight: 700,
-                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                   }}
                 />
               }
@@ -271,7 +271,7 @@ const ConfirmationPage: React.FC = () => {
           {/* Triage result */}
           <Typography
             variant="subtitle1"
-            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 2 }}
+            sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', fontWeight: 700, mb: 2 }}
           >
             Triage Assessment
           </Typography>
@@ -307,7 +307,7 @@ const ConfirmationPage: React.FC = () => {
         >
           <Typography
             variant="subtitle1"
-            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 2 }}
+            sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', fontWeight: 700, mb: 2 }}
           >
             What Happens Next
           </Typography>
@@ -323,14 +323,14 @@ const ConfirmationPage: React.FC = () => {
                     minWidth: 28,
                     height: 28,
                     borderRadius: '50%',
-                    backgroundColor: isEmergency ? '#FF6B6B' : '#22B1FB',
+                    backgroundColor: isEmergency ? '#EF4444' : '#1A73E8',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#FFFFFF',
                     fontWeight: 700,
                     fontSize: '0.8rem',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                     flexShrink: 0,
                   }}
                 >
@@ -338,7 +338,7 @@ const ConfirmationPage: React.FC = () => {
                 </Box>
                 <Typography
                   variant="body2"
-                  sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', pt: 0.25 }}
+                  sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', pt: 0.25 }}
                 >
                   {step}
                 </Typography>
@@ -354,14 +354,14 @@ const ConfirmationPage: React.FC = () => {
             startIcon={<AddIcon />}
             onClick={() => navigate('/book/regular')}
             sx={{
-              backgroundColor: '#22B1FB',
+              backgroundColor: '#1A73E8',
               color: '#FFFFFF',
               textTransform: 'none',
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               fontWeight: 700,
               px: 4,
               borderRadius: '10px',
-              '&:hover': { backgroundColor: '#022F49' },
+              '&:hover': { backgroundColor: '#0B3D91' },
             }}
           >
             Book Another Service
@@ -371,14 +371,14 @@ const ConfirmationPage: React.FC = () => {
             startIcon={<HomeIcon />}
             onClick={() => navigate('/')}
             sx={{
-              borderColor: '#022F49',
-              color: '#022F49',
+              borderColor: '#0B3D91',
+              color: '#0B3D91',
               textTransform: 'none',
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               fontWeight: 700,
               px: 4,
               borderRadius: '10px',
-              '&:hover': { backgroundColor: '#022F49', color: '#FFFFFF' },
+              '&:hover': { backgroundColor: '#0B3D91', color: '#FFFFFF' },
             }}
           >
             Go to Home
@@ -398,14 +398,14 @@ const SummaryRow: React.FC<SummaryRowProps> = ({ label, value }) => (
   <Box>
     <Typography
       variant="caption"
-      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#999999', display: 'block', mb: 0.25 }}
+      sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#999999', display: 'block', mb: 0.25 }}
     >
       {label}
     </Typography>
     {typeof value === 'string' ? (
       <Typography
         variant="body2"
-        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#333333', fontWeight: 500 }}
+        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#333333', fontWeight: 500 }}
       >
         {value}
       </Typography>

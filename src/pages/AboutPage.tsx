@@ -33,33 +33,33 @@ interface TrustItem {
 
 const offerItems: OfferItem[] = [
   {
-    icon: <BuildIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+    icon: <BuildIcon sx={{ fontSize: 36, color: '#1A73E8' }} />,
     title: 'Appliance Repair',
     description:
       'Expert repair for all major appliances including refrigerators, washers, dryers, ovens, and more.',
   },
   {
-    icon: <AcUnitIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+    icon: <AcUnitIcon sx={{ fontSize: 36, color: '#1A73E8' }} />,
     title: 'HVAC Services',
     description: 'Heating and cooling repair, maintenance, and emergency HVAC support.',
   },
   {
-    icon: <PlumbingIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+    icon: <PlumbingIcon sx={{ fontSize: 36, color: '#1A73E8' }} />,
     title: 'Plumbing Support',
     description: 'Leak repair, drain cleaning, water heater service, and emergency plumbing.',
   },
   {
-    icon: <BoltIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+    icon: <BoltIcon sx={{ fontSize: 36, color: '#1A73E8' }} />,
     title: 'Electrical Services',
     description: 'Outlet repair, panel inspection, fixture installation, and electrical emergencies.',
   },
   {
-    icon: <DevicesIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+    icon: <DevicesIcon sx={{ fontSize: 36, color: '#1A73E8' }} />,
     title: 'Smart Home Setup',
     description: 'Smart thermostat, security cameras, doorbells, and Wi-Fi device setup.',
   },
   {
-    icon: <WarningAmberIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+    icon: <WarningAmberIcon sx={{ fontSize: 36, color: '#1A73E8' }} />,
     title: 'Emergency Service',
     description: 'Same-day emergency response available 24/7 for urgent home service needs.',
   },
@@ -67,32 +67,32 @@ const offerItems: OfferItem[] = [
 
 const trustItems: TrustItem[] = [
   {
-    icon: <VerifiedIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
+    icon: <VerifiedIcon sx={{ fontSize: 32, color: '#1A73E8' }} />,
     title: 'Transparent Pricing',
     description: 'Clear diagnostic fees and repair estimates before any work begins.',
   },
   {
-    icon: <SupportAgentIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
+    icon: <SupportAgentIcon sx={{ fontSize: 32, color: '#1A73E8' }} />,
     title: '24/7 Emergency Support',
     description: 'Round-the-clock availability for urgent home service emergencies.',
   },
   {
-    icon: <EngineeringIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
+    icon: <EngineeringIcon sx={{ fontSize: 32, color: '#1A73E8' }} />,
     title: 'Licensed Technicians',
     description: 'All technicians are licensed, insured, and background-checked professionals.',
   },
   {
-    icon: <HomeRepairServiceIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
+    icon: <HomeRepairServiceIcon sx={{ fontSize: 32, color: '#1A73E8' }} />,
     title: 'Full Home Coverage',
     description: 'Appliances, HVAC, plumbing, electrical, and smart home — all covered.',
   },
 ];
 
 const statCards = [
-  { value: '5,000+', label: 'Repairs Completed' },
-  { value: '4.9★', label: 'Average Rating' },
-  { value: '24/7', label: 'Emergency Support' },
-  { value: '100%', label: 'Licensed & Insured' },
+  { value: 'Local', label: 'Trusted local service' },
+  { value: 'Licensed', label: 'Licensed & insured technicians' },
+  { value: 'Same-Day', label: 'Appointments available' },
+  { value: 'Upfront', label: 'Estimate after diagnosis' },
 ];
 
 const AboutPage: React.FC = () => {
@@ -103,7 +103,7 @@ const AboutPage: React.FC = () => {
       {/* ── Hero Banner ── */}
       <Box
         sx={{
-          backgroundColor: '#022F49',
+          backgroundColor: '#0B3D91',
           py: { xs: 8, md: 12 },
           textAlign: 'center',
           px: 2,
@@ -113,8 +113,8 @@ const AboutPage: React.FC = () => {
           <Typography
             variant="overline"
             sx={{
-              color: '#22B1FB',
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              color: '#1A73E8',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               fontWeight: 700,
               letterSpacing: 3,
               display: 'block',
@@ -127,7 +127,7 @@ const AboutPage: React.FC = () => {
           <Typography
             variant="h1"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
               fontWeight: 700,
               color: '#FFFFFF',
               fontSize: { xs: '2rem', sm: '2.8rem', md: '3.4rem' },
@@ -140,7 +140,7 @@ const AboutPage: React.FC = () => {
           <Typography
             variant="body1"
             sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               color: '#A8D8F0',
               fontSize: { xs: '1rem', md: '1.15rem' },
               lineHeight: 1.8,
@@ -170,8 +170,8 @@ const AboutPage: React.FC = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  color: '#022F49',
+                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                  color: '#0B3D91',
                   mb: 3,
                   fontSize: { xs: '2rem', md: '2.6rem' },
                 }}
@@ -180,7 +180,7 @@ const AboutPage: React.FC = () => {
               </Typography>
               <Typography
                 variant="body1"
-                sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', lineHeight: 1.9, mb: 2 }}
+                sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', lineHeight: 1.9, mb: 2 }}
               >
                 We make it easy for homeowners to get professional appliance repair and home service support without
                 the hassle. Our platform collects the right information upfront so technicians arrive prepared,
@@ -188,7 +188,7 @@ const AboutPage: React.FC = () => {
               </Typography>
               <Typography
                 variant="body1"
-                sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', lineHeight: 1.9 }}
+                sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', lineHeight: 1.9 }}
               >
                 Whether it's a refrigerator repair, HVAC emergency, plumbing issue, or smart home setup,
                 SmartAppliance connects you with the right professional for the job.
@@ -216,10 +216,10 @@ const AboutPage: React.FC = () => {
                 >
                   <Typography
                     sx={{
-                      fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                      color: '#022F49',
-                      fontSize: '2.2rem',
-                      fontWeight: 700,
+                      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                      color: '#1A73E8',
+                      fontSize: '1.5rem',
+                      fontWeight: 800,
                       lineHeight: 1.2,
                       mb: 0.5,
                     }}
@@ -228,7 +228,7 @@ const AboutPage: React.FC = () => {
                   </Typography>
                   <Typography
                     variant="body2"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', fontSize: '0.88rem' }}
+                    sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#666666', fontSize: '0.88rem' }}
                   >
                     {stat.label}
                   </Typography>
@@ -245,8 +245,8 @@ const AboutPage: React.FC = () => {
           <Typography
             variant="h2"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              color: '#022F49',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              color: '#0B3D91',
               textAlign: 'center',
               mb: 1,
             }}
@@ -254,7 +254,7 @@ const AboutPage: React.FC = () => {
             What We Offer
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
-            <Box sx={{ width: 60, height: 4, backgroundColor: '#22B1FB', borderRadius: 2 }} />
+            <Box sx={{ width: 60, height: 4, backgroundColor: '#1A73E8', borderRadius: 2 }} />
           </Box>
           <Box
             sx={{
@@ -268,12 +268,12 @@ const AboutPage: React.FC = () => {
                 key={item.title}
                 sx={{
                   borderRadius: '20px',
-                  border: '1px solid #E5E5E5',
+                  border: '1px solid #E4E7EB',
                   backgroundColor: '#FFFFFF',
                   boxShadow: 'none',
                   transition: 'box-shadow 0.2s, transform 0.2s',
                   '&:hover': {
-                    boxShadow: '0 8px 24px rgba(2,47,73,0.1)',
+                    boxShadow: '0 8px 24px rgba(11,37,69,0.1)',
                     transform: 'translateY(-3px)',
                   },
                 }}
@@ -282,13 +282,13 @@ const AboutPage: React.FC = () => {
                   <Box sx={{ mb: 2 }}>{item.icon}</Box>
                   <Typography
                     variant="h6"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1.5 }}
+                    sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 1.5 }}
                   >
                     {item.title}
                   </Typography>
                   <Typography
                     variant="body2"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', lineHeight: 1.8 }}
+                    sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', lineHeight: 1.8 }}
                   >
                     {item.description}
                   </Typography>
@@ -305,8 +305,8 @@ const AboutPage: React.FC = () => {
           <Typography
             variant="h2"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              color: '#022F49',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              color: '#0B3D91',
               textAlign: 'center',
               mb: 1,
             }}
@@ -314,7 +314,7 @@ const AboutPage: React.FC = () => {
             Why Customers Trust Us
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
-            <Box sx={{ width: 60, height: 4, backgroundColor: '#22B1FB', borderRadius: 2 }} />
+            <Box sx={{ width: 60, height: 4, backgroundColor: '#1A73E8', borderRadius: 2 }} />
           </Box>
           <Box
             sx={{
@@ -332,7 +332,7 @@ const AboutPage: React.FC = () => {
                   borderRadius: '16px',
                   border: '1px solid #E8E8E8',
                   transition: 'box-shadow 0.2s',
-                  '&:hover': { boxShadow: '0 6px 20px rgba(2,47,73,0.08)' },
+                  '&:hover': { boxShadow: '0 6px 20px rgba(11,37,69,0.08)' },
                 }}
               >
                 <Box
@@ -340,7 +340,7 @@ const AboutPage: React.FC = () => {
                     width: 64,
                     height: 64,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #E8F4FD 0%, #D0EEFF 100%)',
+                    background: 'linear-gradient(135deg, #E8F1FF 0%, #D0EEFF 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -351,13 +351,13 @@ const AboutPage: React.FC = () => {
                 </Box>
                 <Typography
                   variant="h6"
-                  sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1 }}
+                  sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 1 }}
                 >
                   {item.title}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', lineHeight: 1.7 }}
+                  sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#666666', lineHeight: 1.7 }}
                 >
                   {item.description}
                 </Typography>
@@ -368,12 +368,12 @@ const AboutPage: React.FC = () => {
       </Box>
 
       {/* ── CTA Banner ── */}
-      <Box sx={{ backgroundColor: '#022F49', py: { xs: 8, md: 10 }, textAlign: 'center', px: 2 }}>
+      <Box sx={{ backgroundColor: '#0B3D91', py: { xs: 8, md: 10 }, textAlign: 'center', px: 2 }}>
         <Container maxWidth="md">
           <Typography
             variant="h2"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
               color: '#FFFFFF',
               mb: 4,
               fontSize: { xs: '2rem', md: '2.6rem' },
@@ -386,34 +386,34 @@ const AboutPage: React.FC = () => {
               variant="contained"
               onClick={() => navigate('/book/regular')}
               sx={{
-                backgroundColor: '#22B1FB',
+                backgroundColor: '#1A73E8',
                 color: '#FFFFFF',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 700,
                 px: 4,
                 py: 1.75,
                 borderRadius: '12px',
                 textTransform: 'none',
                 fontSize: '1rem',
-                '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
+                '&:hover': { backgroundColor: '#FFFFFF', color: '#0B3D91' },
               }}
             >
               Book Regular Service
             </Button>
             <Button
               variant="outlined"
-              onClick={() => navigate('/book/emergency')}
+              onClick={() => navigate('/emergency-service')}
               sx={{
-                borderColor: '#FF6B6B',
-                color: '#FF6B6B',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                borderColor: '#EF4444',
+                color: '#EF4444',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 700,
                 px: 4,
                 py: 1.75,
                 borderRadius: '12px',
                 textTransform: 'none',
                 fontSize: '1rem',
-                '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999', color: '#FF9999' },
+                '&:hover': { backgroundColor: 'rgba(249,115,22,0.1)', borderColor: '#FB923C', color: '#FB923C' },
               }}
             >
               Request Emergency Service

@@ -1,141 +1,163 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Container, Button } from '@mui/material';
 import {
-  Box,
-  Typography,
-  Container,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-} from '@mui/material';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+  Refrigerator,
+  Snowflake,
+  Droplets,
+  Zap,
+  HouseWifi,
+  AlertTriangle,
+  LucideIcon,
+} from 'lucide-react';
+import { SERVICE_TYPE_IMAGE_MAP, DEFAULT_SERVICE_IMAGE } from '../data/serviceImages';
+import { fonts } from '../theme';
 
-interface ServiceCard {
+const SERVICES_HERO_IMAGE = '/images/services/appliances/technician-default.webp';
+
+type ServiceTab =
+  | 'hvac'
+  | 'plumbing'
+  | 'electrical'
+  | 'smart-home'
+  | 'emergency';
+
+interface ServiceCardData {
   id: string;
   title: string;
   description: string;
-  commonIssues: string[];
-  diagnosticFee: string;
-  availability: 'Regular & Emergency' | 'Regular Only' | 'Emergency Only';
+  image: string;
+  issues: string[];
 }
 
-const services: ServiceCard[] = [
+interface TabConfig {
+  id: ServiceTab;
+  label: string;
+  Icon: LucideIcon;
+  heading: string;
+  subtitle: string;
+  services: ServiceCardData[];
+}
+
+function svc(id: string, title: string, issues: string[]): ServiceCardData {
+  const info = SERVICE_TYPE_IMAGE_MAP[id] ?? DEFAULT_SERVICE_IMAGE;
+  return { id, title, description: info.desc, image: info.image, issues };
+}
+
+const TABS: TabConfig[] = [
   {
-    id: 'refrigerator-repair',
-    title: 'Refrigerator Repair',
-    description: 'Expert repair for all refrigerator makes and models. We diagnose and fix cooling, ice maker, and compressor issues.',
-    commonIssues: ['Not cooling properly', 'Ice maker not working', 'Leaking water', 'Unusual noise'],
-    diagnosticFee: '$79',
-    availability: 'Regular & Emergency',
+    id: 'hvac',
+    label: 'HVAC',
+    Icon: Snowflake,
+    heading: 'HVAC Services',
+    subtitle:
+      'Heating, ventilation, and air conditioning repair and maintenance by certified HVAC technicians.',
+    services: [
+      svc('ac-repair', 'AC Repair', ['No cooling', 'Warm air blowing', 'Refrigerant leak', 'Loud noise']),
+      svc('heating-furnace-repair', 'Heating & Furnace Repair', ['No heat', 'Burner not igniting', 'Short cycling', 'Unusual smell']),
+      svc('thermostat-installation', 'Thermostat Installation', ['Not responding', 'Incorrect temperature', 'New smart thermostat', 'C-wire upgrade']),
+      svc('hvac-maintenance', 'HVAC Maintenance', ['Annual tune-up', 'Filter replacement', 'Coil cleaning', 'Efficiency check']),
+      svc('duct-cleaning', 'Duct Cleaning', ['Dust and debris', 'Allergens in air', 'Poor airflow', 'Post-renovation cleaning']),
+    ],
   },
   {
-    id: 'washer-repair',
-    title: 'Washer Repair',
-    description: 'Front-load and top-load washer repair for all brands. We fix drainage, spin cycle, and error code issues.',
-    commonIssues: ['Not draining', 'Not spinning', 'Leaking', 'Won\'t start'],
-    diagnosticFee: '$69',
-    availability: 'Regular & Emergency',
+    id: 'plumbing',
+    label: 'Plumbing',
+    Icon: Droplets,
+    heading: 'Plumbing Services',
+    subtitle:
+      'Expert plumbing repair and installation for leaks, drains, fixtures, and water heaters.',
+    services: [
+      svc('leak-repair', 'Leak Repair', ['Pipe leak', 'Under-sink leak', 'Water stains', 'High water bill']),
+      svc('drain-cleaning', 'Drain Cleaning', ['Slow drain', 'Complete blockage', 'Bad odor', 'Multiple drains']),
+      svc('faucet-repair', 'Faucet Repair & Replacement', ['Dripping faucet', 'Low pressure', 'Leak at base', 'Handle issue']),
+      svc('toilet-repair', 'Toilet Repair', ['Running toilet', "Won't flush", 'Leaking at base', 'Clogged']),
+      svc('water-heater-service', 'Water Heater Service', ['No hot water', 'Insufficient hot water', 'Leak at tank', 'Strange sounds']),
+    ],
   },
   {
-    id: 'dryer-repair',
-    title: 'Dryer Repair',
-    description: 'Gas and electric dryer repair. We address heating failures, tumbler issues, and airflow problems.',
-    commonIssues: ['Not heating', 'Takes too long to dry', 'Tumbler not turning', 'Loud noise'],
-    diagnosticFee: '$69',
-    availability: 'Regular Only',
+    id: 'electrical',
+    label: 'Electrical',
+    Icon: Zap,
+    heading: 'Electrical Services',
+    subtitle:
+      'Licensed electricians for outlets, fixtures, panels, and appliance electrical connections.',
+    services: [
+      svc('outlet-switch-repair', 'Outlet & Switch Repair', ['Dead outlet', 'Switch not working', 'Warm outlet', 'GFCI tripping']),
+      svc('light-fixture-installation', 'Light Fixture Installation', ['New fixture', 'Flickering light', 'Buzzing sound', 'Dimmer upgrade']),
+      svc('ceiling-fan-installation', 'Ceiling Fan Installation', ['New fan install', 'Wobbling fan', 'Remote issue', 'Light kit']),
+      svc('breaker-panel-inspection', 'Breaker / Panel Inspection', ['Breaker tripping', 'Panel overheating', 'Safety inspection', 'Capacity upgrade']),
+      svc('appliance-electrical-connection', 'Appliance Electrical Connection', ['Dryer circuit', 'Range outlet', 'Dedicated circuit', 'Amperage upgrade']),
+    ],
   },
   {
-    id: 'dishwasher-repair',
-    title: 'Dishwasher Repair',
-    description: 'Full dishwasher diagnostics and repair. We fix cleaning performance, draining, and door latch issues.',
-    commonIssues: ['Not cleaning dishes', 'Not draining', 'Door latch broken', 'Leaking'],
-    diagnosticFee: '$79',
-    availability: 'Regular Only',
+    id: 'smart-home',
+    label: 'Smart Home',
+    Icon: HouseWifi,
+    heading: 'Smart Home Setup',
+    subtitle:
+      'Professional installation and configuration of smart home devices, locks, cameras, and thermostats.',
+    services: [
+      svc('smart-thermostat-setup', 'Smart Thermostat Setup', ['Nest / Ecobee', 'C-wire install', 'App pairing', 'Schedule config']),
+      svc('doorbell-installation', 'Video Doorbell Installation', ['Ring setup', 'Existing wiring', 'App setup', 'Motion zones']),
+      svc('camera-installation', 'Security Camera Installation', ['Indoor mount', 'Outdoor setup', 'Night vision', 'Cloud storage']),
+      svc('smart-lock-installation', 'Smart Lock Installation', ['Lock fitting', 'App pairing', 'Access codes', 'Keypad programming']),
+      svc('wifi-setup', 'Wi-Fi Device Setup', ['Device connection', 'Troubleshooting', 'Mesh network', 'Range extension']),
+      svc('tv-mounting', 'TV Mounting', ['Wall mount', 'Cable management', 'Stud finding', 'Tilt bracket']),
+    ],
   },
   {
-    id: 'oven-stove-repair',
-    title: 'Oven & Stove Repair',
-    description: 'Gas and electric oven and stove repair. We handle heating elements, igniters, and temperature issues.',
-    commonIssues: ['Not heating', 'Burner not igniting', 'Inaccurate temperature', 'Door not sealing'],
-    diagnosticFee: '$79',
-    availability: 'Regular Only',
-  },
-  {
-    id: 'microwave-repair',
-    title: 'Microwave Repair',
-    description: 'Countertop and over-the-range microwave repair. We fix heating failures, door switches, and turntable issues.',
-    commonIssues: ['Not heating', 'Sparking', 'Turntable not rotating', 'Display not working'],
-    diagnosticFee: '$59',
-    availability: 'Regular Only',
-  },
-  {
-    id: 'hvac-support',
-    title: 'HVAC Support',
-    description: 'AC and heating repair, thermostat service, and seasonal maintenance for all HVAC systems.',
-    commonIssues: ['No cooling or heating', 'Strange noises', 'High energy bills', 'Thermostat not responding'],
-    diagnosticFee: '$89',
-    availability: 'Regular & Emergency',
-  },
-  {
-    id: 'plumbing-support',
-    title: 'Plumbing Support',
-    description: 'Leak repair, drain cleaning, water heater service, and emergency plumbing for all home systems.',
-    commonIssues: ['Water leak', 'Clogged drain', 'Water heater issues', 'Running toilet'],
-    diagnosticFee: '$89',
-    availability: 'Regular & Emergency',
-  },
-  {
-    id: 'electrical-support',
-    title: 'Electrical Support',
-    description: 'Outlet repair, panel inspection, fixture installation, and emergency electrical service.',
-    commonIssues: ['Outlet not working', 'Circuit breaker tripping', 'Flickering lights', 'Burning smell'],
-    diagnosticFee: '$89',
-    availability: 'Regular & Emergency',
-  },
-  {
-    id: 'emergency-repair',
-    title: 'Emergency Repair',
-    description: 'Same-day emergency response for urgent home appliance and system failures that cannot wait.',
-    commonIssues: ['Major water leak', 'Burning smell or smoke', 'Complete appliance failure', 'No heat in extreme weather'],
-    diagnosticFee: 'ASAP',
-    availability: 'Emergency Only',
+    id: 'emergency',
+    label: 'Emergency',
+    Icon: AlertTriangle,
+    heading: 'Emergency Services',
+    subtitle:
+      'Urgent same-day response for critical appliance and home system failures. For gas, smoke, or fire — call 911 first.',
+    services: [
+      svc('emergency-hvac-service', 'Emergency HVAC Service', ['Total system failure', 'No heat in winter', 'No AC in extreme heat', 'Gas smell']),
+      svc('emergency-plumbing', 'Emergency Plumbing', ['Burst pipe', 'Major water leak', 'Sewage backup', 'Flooding']),
+      svc('emergency-electrical-service', 'Emergency Electrical Service', ['Power outage', 'Sparking outlet', 'Burning smell', 'Circuit failure']),
+    ],
   },
 ];
 
-const availabilityColor: Record<ServiceCard['availability'], string> = {
-  'Regular & Emergency': '#E8F5E9',
-  'Regular Only': '#E3F2FD',
-  'Emergency Only': '#FFEBEE',
-};
-
-const availabilityTextColor: Record<ServiceCard['availability'], string> = {
-  'Regular & Emergency': '#2E7D32',
-  'Regular Only': '#1565C0',
-  'Emergency Only': '#C62828',
-};
-
 const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<ServiceTab>('hvac');
+
+  const tab = TABS.find((t) => t.id === activeTab)!;
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
+    <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
       {/* ── Hero ── */}
       <Box
         sx={{
-          backgroundColor: '#022F49',
+          position: 'relative',
           py: { xs: 8, md: 10 },
           textAlign: 'center',
           px: 2,
+          overflow: 'hidden',
+          backgroundImage: `url(${SERVICES_HERO_IMAGE})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
         }}
       >
-        <Container maxWidth="md">
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(135deg, rgba(7,27,65,0.88) 0%, rgba(11,61,145,0.78) 45%, rgba(11,61,145,0.72) 100%)',
+            zIndex: 0,
+          }}
+        />
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
           <Typography
             variant="overline"
             sx={{
-              color: '#22B1FB',
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              color: '#4FC3F7',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               fontWeight: 700,
               letterSpacing: 3,
               display: 'block',
@@ -147,248 +169,357 @@ const ServicesPage: React.FC = () => {
           <Typography
             variant="h1"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              fontWeight: 700,
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              fontWeight: 800,
               color: '#FFFFFF',
               fontSize: { xs: '2rem', sm: '2.6rem', md: '3rem' },
               mb: 2,
+              letterSpacing: '-0.4px',
+              lineHeight: 1.15,
             }}
           >
-            Professional Home Repair & Service
+            Professional Appliance Repair & Service
           </Typography>
           <Typography
-            variant="body1"
             sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               color: '#A8D8F0',
-              fontSize: { xs: '1rem', md: '1.1rem' },
+              fontSize: { xs: '1rem', md: '1.15rem' },
               lineHeight: 1.8,
-              maxWidth: '600px',
-              margin: '0 auto',
+              maxWidth: '560px',
+              mx: 'auto',
             }}
           >
-            From routine appliance repair to emergency home service, SmartAppliance has you covered.
+            Choose a service category, view common issues, and schedule trusted technicians in minutes.
           </Typography>
         </Container>
       </Box>
 
-      {/* ── Service Cards ── */}
-      <Box sx={{ py: { xs: 6, md: 10 }, backgroundColor: '#F5F7F9' }}>
-        <Container maxWidth="lg">
+      {/* ── Category Tabs + Services ── */}
+      <Box sx={{ py: { xs: 5, md: 8 }, backgroundColor: '#F8FAFC' }}>
+        <Container maxWidth={false} sx={{ maxWidth: '1180px', mx: 'auto', px: { xs: 2, sm: 3 } }}>
+
+          {/* Segmented tab bar */}
+          <Box
+            sx={{
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              '&::-webkit-scrollbar': { display: 'none' },
+              mb: 5,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'inline-flex',
+                minWidth: 'max-content',
+                backgroundColor: '#EEF2F7',
+                borderRadius: '16px',
+                p: '5px',
+                gap: '4px',
+              }}
+            >
+              {/* Home Appliances — dedicated page */}
+              <Box
+                component="button"
+                type="button"
+                onClick={() => navigate('/services/home-appliances')}
+                sx={{
+                  display: 'inline-flex', alignItems: 'center', gap: '7px',
+                  px: { xs: '14px', md: '18px' }, py: '10px',
+                  borderRadius: '12px', border: 'none', cursor: 'pointer',
+                  fontFamily: fonts.body,
+                  fontWeight: 500,
+                  fontSize: { xs: '0.85rem', md: '0.9rem' },
+                  color: '#64748B',
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.18s ease',
+                  '&:hover': { color: '#0B3D91', backgroundColor: 'rgba(255,255,255,0.65)' },
+                }}
+              >
+                <Refrigerator size={16} strokeWidth={1.8} color="currentColor" />
+                <span>Home Appliances</span>
+              </Box>
+
+              {TABS.map(({ id, label, Icon }) => {
+                const isActive = activeTab === id;
+                const isEmergency = id === 'emergency';
+                return (
+                  <Box
+                    key={id}
+                    component="button"
+                    type="button"
+                    onClick={() => setActiveTab(id)}
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '7px',
+                      px: { xs: '14px', md: '18px' },
+                      py: '10px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontFamily: fonts.body,
+                      fontWeight: isActive ? 700 : 500,
+                      fontSize: { xs: '0.85rem', md: '0.9rem' },
+                      color: isActive
+                        ? isEmergency ? '#DC2626' : '#1A73E8'
+                        : '#64748B',
+                      backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+                      boxShadow: isActive ? '0 2px 10px rgba(0,0,0,0.10)' : 'none',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.18s ease',
+                      '&:hover': {
+                        color: isActive
+                          ? isEmergency ? '#DC2626' : '#1A73E8'
+                          : '#0B3D91',
+                        backgroundColor: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                      },
+                    }}
+                  >
+                    <Icon size={16} strokeWidth={isActive ? 2.2 : 1.8} color="currentColor" />
+                    <span>{label}</span>
+                  </Box>
+                );
+              })}
+            </Box>
+          </Box>
+
+          {/* Category heading */}
+          <Box sx={{ mb: { xs: 4, md: 5 } }}>
+            <Typography
+              variant="h2"
+              sx={{
+                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                fontWeight: 800,
+                color: '#0B3D91',
+                fontSize: { xs: '1.65rem', md: '2rem' },
+                mb: 1,
+                letterSpacing: '-0.3px',
+              }}
+            >
+              {tab.heading}
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                color: '#64748B',
+                fontSize: { xs: '0.95rem', md: '1rem' },
+                lineHeight: 1.7,
+                maxWidth: 680,
+              }}
+            >
+              {tab.subtitle}
+            </Typography>
+          </Box>
+
+          {/* Service cards grid */}
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
-              gap: 3,
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)',
+              },
+              gap: '28px',
             }}
           >
-            {services.map((service) => (
-              <Card
+            {tab.services.map((service) => (
+              <Box
                 key={service.id}
                 sx={{
-                  borderRadius: '20px',
-                  border: '1px solid #E5E5E5',
                   backgroundColor: '#FFFFFF',
-                  boxShadow: 'none',
+                  border: '1px solid #E4E7EB',
+                  borderRadius: '22px',
+                  overflow: 'hidden',
+                  boxShadow: '0 12px 30px rgba(10,37,64,0.08)',
                   display: 'flex',
                   flexDirection: 'column',
-                  transition: 'box-shadow 0.2s, transform 0.2s',
+                  transition: 'transform 0.22s ease, box-shadow 0.22s ease',
                   '&:hover': {
-                    boxShadow: '0 8px 24px rgba(2,47,73,0.1)',
-                    transform: 'translateY(-3px)',
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 18px 40px rgba(10,37,64,0.12)',
                   },
                 }}
               >
-                <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                  {/* Title row with diagnostic fee */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                    <Typography
-                      variant="h6"
-                      sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', flexGrow: 1, mr: 1 }}
-                    >
-                      {service.title}
-                    </Typography>
-                    <Box
-                      sx={{
-                        backgroundColor: service.availability === 'Emergency Only' ? '#FFEBEE' : '#E8F4FD',
-                        borderRadius: '8px',
-                        px: 1.25,
-                        py: 0.5,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
-                          fontWeight: 700,
-                          color: service.availability === 'Emergency Only' ? '#C62828' : '#022F49',
-                          fontSize: '0.8rem',
-                        }}
-                      >
-                        {service.diagnosticFee === 'ASAP' ? 'ASAP' : `from ${service.diagnosticFee}`}
-                      </Typography>
-                    </Box>
-                  </Box>
+                {/* Image */}
+                <Box sx={{ height: '190px', overflow: 'hidden', flexShrink: 0 }}>
+                  <Box
+                    component="img"
+                    src={service.image}
+                    alt={service.title}
+                    loading="lazy"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                      transition: 'transform 0.3s ease',
+                      '&:hover': { transform: 'scale(1.04)' },
+                    }}
+                  />
+                </Box>
 
-                  {/* Availability badge */}
-                  <Box sx={{ mb: 2 }}>
-                    <Chip
-                      label={service.availability}
-                      size="small"
-                      sx={{
-                        backgroundColor: availabilityColor[service.availability],
-                        color: availabilityTextColor[service.availability],
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                      }}
-                    />
-                  </Box>
-
+                {/* Body */}
+                <Box sx={{ p: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                   <Typography
-                    variant="body2"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', lineHeight: 1.7, mb: 2 }}
+                    sx={{
+                      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                      fontWeight: 700,
+                      fontSize: '1.05rem',
+                      color: '#0B3D91',
+                      mb: 0.75,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {service.title}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                      fontSize: '0.875rem',
+                      color: '#64748B',
+                      lineHeight: 1.55,
+                      mb: 1.75,
+                    }}
                   >
                     {service.description}
                   </Typography>
 
-                  {/* Common issues list */}
-                  <Box sx={{ mb: 3, flexGrow: 1 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        color: '#888888',
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: 1,
-                        display: 'block',
-                        mb: 1,
-                      }}
-                    >
-                      Common Issues
-                    </Typography>
-                    {service.commonIssues.map((issue) => (
-                      <Box key={issue} sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
-                        <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#22B1FB', flexShrink: 0 }} />
-                        <Typography
-                          variant="body2"
-                          sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#444444', fontSize: '0.82rem' }}
-                        >
-                          {issue}
-                        </Typography>
+                  {/* Issue chips */}
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '6px', mb: 2.5 }}>
+                    {service.issues.map((issue) => (
+                      <Box
+                        key={issue}
+                        component="span"
+                        sx={{
+                          display: 'inline-block',
+                          backgroundColor: '#E8F1FF',
+                          color: '#0B3D91',
+                          borderRadius: '999px',
+                          px: '10px',
+                          py: '4px',
+                          fontSize: '0.75rem',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                          fontWeight: 600,
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {issue}
                       </Box>
                     ))}
                   </Box>
 
-                  {/* CTA buttons */}
-                  <Box sx={{ display: 'grid', gap: 1 }}>
-                    {service.availability !== 'Emergency Only' && (
-                      <Button
-                        variant="contained"
-                        onClick={() => navigate('/book/regular')}
-                        sx={{
-                          backgroundColor: '#22B1FB',
-                          color: '#FFFFFF',
-                          textTransform: 'none',
-                          borderRadius: '10px',
-                          fontFamily: 'DM Sans, Arial, sans-serif',
-                          fontWeight: 600,
-                          '&:hover': { backgroundColor: '#022F49' },
-                        }}
-                      >
-                        Book Service
-                      </Button>
-                    )}
-                    {service.availability !== 'Regular Only' && (
-                      <Button
-                        variant={service.availability === 'Emergency Only' ? 'contained' : 'outlined'}
-                        onClick={() => navigate('/book/emergency')}
-                        startIcon={<WarningAmberIcon />}
-                        sx={
-                          service.availability === 'Emergency Only'
-                            ? {
-                                backgroundColor: '#FF6B6B',
-                                color: '#FFFFFF',
-                                textTransform: 'none',
-                                borderRadius: '10px',
-                                fontFamily: 'DM Sans, Arial, sans-serif',
-                                fontWeight: 600,
-                                '&:hover': { backgroundColor: '#CC2200' },
-                              }
-                            : {
-                                textTransform: 'none',
-                                borderRadius: '10px',
-                                borderColor: '#FF6B6B',
-                                color: '#FF6B6B',
-                                fontFamily: 'DM Sans, Arial, sans-serif',
-                                fontWeight: 600,
-                                '&:hover': { backgroundColor: '#FFF5F5', borderColor: '#CC2200', color: '#CC2200' },
-                              }
-                        }
-                      >
-                        Emergency Support
-                      </Button>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
+                  {/* Schedule button */}
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() =>
+                      navigate('/book/regular', { state: { serviceType: service.id } })
+                    }
+                    sx={{
+                      mt: 'auto',
+                      height: '44px',
+                      backgroundColor: '#1A73E8',
+                      color: '#FFFFFF',
+                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                      fontWeight: 700,
+                      fontSize: '0.9rem',
+                      textTransform: 'none',
+                      borderRadius: '12px',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        backgroundColor: '#0B3D91',
+                        boxShadow: '0 6px 20px rgba(11,61,145,0.22)',
+                      },
+                    }}
+                  >
+                    Schedule Service
+                  </Button>
+                </Box>
+              </Box>
             ))}
           </Box>
         </Container>
       </Box>
 
       {/* ── Bottom CTA ── */}
-      <Box sx={{ backgroundColor: '#022F49', py: { xs: 8, md: 10 }, textAlign: 'center', px: 2 }}>
+      <Box
+        sx={{
+          backgroundColor: '#0B3D91',
+          py: { xs: 8, md: 10 },
+          textAlign: 'center',
+          px: 2,
+        }}
+      >
         <Container maxWidth="md">
           <Typography
             variant="h3"
-            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', mb: 2 }}
+            sx={{
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              fontWeight: 800,
+              color: '#FFFFFF',
+              mb: 2,
+              fontSize: { xs: '1.6rem', md: '2rem' },
+              letterSpacing: '-0.3px',
+            }}
           >
             Not Sure Which Service You Need?
           </Typography>
           <Typography
-            variant="body1"
-            sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#A8D8F0', mb: 4, lineHeight: 1.8 }}
+            sx={{
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+              color: '#A8D8F0',
+              mb: 4,
+              lineHeight: 1.8,
+              maxWidth: 560,
+              mx: 'auto',
+              fontSize: { xs: '0.95rem', md: '1rem' },
+            }}
           >
-            Our team is ready to help diagnose the issue and recommend the right service. Contact us and we'll guide you through the process.
+            Our team is ready to help diagnose the issue and recommend the right service.
+            Contact us and we&apos;ll guide you through the process.
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Button
               variant="contained"
               onClick={() => navigate('/contact')}
               sx={{
-                backgroundColor: '#22B1FB',
+                backgroundColor: '#1A73E8',
                 color: '#FFFFFF',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 700,
                 px: 4,
                 py: 1.5,
                 borderRadius: '10px',
                 textTransform: 'none',
-                '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
+                '&:hover': { backgroundColor: '#FFFFFF', color: '#0B3D91' },
               }}
             >
               Contact Us
             </Button>
             <Button
               variant="outlined"
-              onClick={() => navigate('/book/emergency')}
-              startIcon={<WarningAmberIcon />}
+              onClick={() => navigate('/scheduler')}
               sx={{
-                borderColor: '#FF6B6B',
-                color: '#FF6B6B',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                borderColor: 'rgba(255,255,255,0.4)',
+                color: '#FFFFFF',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 700,
                 px: 4,
                 py: 1.5,
                 borderRadius: '10px',
                 textTransform: 'none',
-                '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999', color: '#FF9999' },
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  borderColor: '#FFFFFF',
+                },
               }}
             >
-              Emergency Service
+              Book Online
             </Button>
           </Box>
         </Container>

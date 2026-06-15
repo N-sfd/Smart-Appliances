@@ -48,17 +48,17 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
   const emergencyCount = serviceRequests.filter((r) => r.servicePriority === 'emergency').length;
 
   return (
-    <Box id="admin" sx={{ backgroundColor: '#F8FBFF', padding: '60px 0' }}>
+    <Box id="admin" sx={{ backgroundColor: '#F5F7FA', padding: '60px 0' }}>
       <Paper elevation={0} sx={{ maxWidth: '1300px', margin: '0 auto', padding: { xs: 2, md: 4 }, borderRadius: '24px' }}>
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2, mb: 2 }}>
           <Box>
             <Typography
               variant="h3"
-              sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1 }}
+              sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 1 }}
             >
               Service Request Dashboard
             </Typography>
-            <Typography variant="body1" sx={{ color: '#555555' }}>
+            <Typography variant="body1" sx={{ color: '#1A1A1A' }}>
               Emergency requests are pinned to the top. Update status, add notes, and track all customer requests.
             </Typography>
           </Box>
@@ -75,10 +75,10 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                 py: 1,
               }}
             >
-              <WarningAmberIcon sx={{ color: '#FF6B6B', fontSize: 20 }} />
+              <WarningAmberIcon sx={{ color: '#EF4444', fontSize: 20 }} />
               <Typography
                 variant="body2"
-                sx={{ color: '#CC2200', fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif' }}
+                sx={{ color: '#EA580C', fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}
               >
                 {emergencyCount} emergency {emergencyCount === 1 ? 'request' : 'requests'} pending
               </Typography>
@@ -96,7 +96,7 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
               border: '2px dashed #D9D9D9',
             }}
           >
-            <Typography variant="body1" sx={{ color: '#666666', fontFamily: 'DM Sans, Arial, sans-serif' }}>
+            <Typography variant="body1" sx={{ color: '#666666', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
               No service requests yet. Use the booking form to create a request.
             </Typography>
           </Box>
@@ -105,25 +105,25 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ backgroundColor: '#F5F7F9' }}>
-                  <TableCell sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49' }}>
+                  <TableCell sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91' }}>
                     Status
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49' }}>
+                  <TableCell sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91' }}>
                     Priority
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49' }}>
+                  <TableCell sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91' }}>
                     Customer
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49' }}>
+                  <TableCell sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91' }}>
                     Contact
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49' }}>
+                  <TableCell sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91' }}>
                     Service
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49' }}>
+                  <TableCell sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91' }}>
                     Requested
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49' }}>
+                  <TableCell sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91' }}>
                     Notes
                   </TableCell>
                 </TableRow>
@@ -137,7 +137,7 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                         request.servicePriority === 'emergency'
                           ? '#FFF8F8'
                           : statusColors[request.status] ?? '#FFFFFF',
-                      borderLeft: request.servicePriority === 'emergency' ? '4px solid #FF6B6B' : '4px solid transparent',
+                      borderLeft: request.servicePriority === 'emergency' ? '4px solid #EF4444' : '4px solid transparent',
                       '&:hover': { backgroundColor: request.servicePriority === 'emergency' ? '#FFEFEF' : '#F0F7FF' },
                     }}
                   >
@@ -147,10 +147,10 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                         onChange={(e) => onUpdateStatus(request.id, e.target.value as ServiceRequest['status'])}
                         fullWidth
                         size="small"
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.85rem' }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem' }}
                       >
                         {statusOptions.map((opt) => (
-                          <MenuItem key={opt} value={opt} sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                          <MenuItem key={opt} value={opt} sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
                             {statusLabels[opt] ?? opt}
                           </MenuItem>
                         ))}
@@ -162,11 +162,11 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                         color={request.servicePriority === 'emergency' ? 'error' : 'primary'}
                         size="small"
                         icon={request.servicePriority === 'emergency' ? <WarningAmberIcon /> : undefined}
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700 }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontWeight: 700 }}
                       />
                     </TableCell>
                     <TableCell>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
                         {request.customerName}
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#666666', display: 'block' }}>
@@ -177,12 +177,12 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                      <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
                         {request.phone}
                       </Typography>
                       <Typography
                         variant="body2"
-                        sx={{ color: '#22B1FB', fontFamily: 'DM Sans, Arial, sans-serif', wordBreak: 'break-all' }}
+                        sx={{ color: '#1A73E8', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", wordBreak: 'break-all' }}
                       >
                         {request.email}
                       </Typography>
@@ -190,11 +190,11 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                     <TableCell>
                       <Typography
                         variant="body2"
-                        sx={{ fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49' }}
+                        sx={{ fontWeight: 700, fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91' }}
                       >
                         {request.serviceCategory}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#666666', fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                      <Typography variant="body2" sx={{ color: '#666666', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
                         {request.serviceType}
                       </Typography>
                       {request.applianceBrand && (
@@ -211,15 +211,15 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                             size="small"
                             sx={{
                               backgroundColor: '#FFE0E0',
-                              color: '#CC2200',
-                              fontFamily: 'DM Sans, Arial, sans-serif',
+                              color: '#EA580C',
+                              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                               fontSize: '0.75rem',
                               fontWeight: 600,
                             }}
                           />
                         </Box>
                       ) : (
-                        <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                        <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
                           {request.requestedResponseTime || '—'}
                         </Typography>
                       )}
@@ -233,7 +233,7 @@ const ServiceRequestsAdmin: React.FC<ServiceRequestsAdminProps> = ({
                         placeholder="Add internal notes"
                         multiline
                         maxRows={3}
-                        sx={{ '& input, & textarea': { fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.85rem' } }}
+                        sx={{ '& input, & textarea': { fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem' } }}
                       />
                     </TableCell>
                   </TableRow>

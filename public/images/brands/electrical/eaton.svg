@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40" role="img" aria-label="Eaton">
+  <path d="M8 12h14l4 8 4-8h14v16H34V20l-4 8h-6l-4-8v8H8V12z" fill="#005EB8"/>
+  <text x="46" y="27" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#005EB8">Eaton</text>
+</svg>

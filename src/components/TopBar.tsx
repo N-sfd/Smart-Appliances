@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
-  Typography,
   Box,
   Button,
   Drawer,
@@ -13,19 +12,33 @@ import {
   ListItemButton,
   ListItemText,
   Divider,
+  Collapse,
 } from '@mui/material';
-import { Phone, Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import { colors, fonts, primaryButtonSx } from '../theme';
+import { BrandLogo } from './Logo';
+import {
+  serviceNavItems,
+  serviceNavPath,
+  isServiceNavItemActive,
+  ServiceNavItem,
+} from '../data/serviceNavItems';
 
-interface NavItem {
+interface NavLink {
   label: string;
   path: string;
+  hash?: string;
+  cat?: string;
 }
 
-const navItems: NavItem[] = [
-  { label: 'Home', path: '/' },
+const navLinks: NavLink[] = [
   { label: 'Services', path: '/services' },
-  { label: 'About', path: '/about' },
+  { label: 'Pricing', path: '/pricing' },
+  { label: 'Brands We Service', path: '/', hash: 'brands' },
+  { label: 'Why Choose Us', path: '/', hash: 'why-choose-us' },
+  { label: 'Service Areas', path: '/', hash: 'service-areas' },
+  { label: 'About Us', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ];
 
@@ -33,211 +46,264 @@ const TopBar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
+  const [servicesDrawerOpen, setServicesDrawerOpen] = useState(false);
+  const servicesMenuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const servicesMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const isActive = (path: string): boolean => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
+  const isServicesSection = location.pathname.startsWith('/services');
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    setServicesMenuOpen(false);
+    if (isServicesSection) setServicesDrawerOpen(true);
+  }, [location.pathname, isServicesSection]);
+
+  useEffect(() => {
+    if (!servicesMenuOpen) return undefined;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (servicesMenuRef.current && !servicesMenuRef.current.contains(event.target as Node)) {
+        setServicesMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setServicesMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [servicesMenuOpen]);
+
+  const openServicesMenu = () => {
+    if (servicesMenuCloseTimer.current) clearTimeout(servicesMenuCloseTimer.current);
+    setServicesMenuOpen(true);
   };
 
-  const handleNavClick = (path: string) => {
-    navigate(path);
+  const closeServicesMenu = () => {
+    servicesMenuCloseTimer.current = setTimeout(() => setServicesMenuOpen(false), 120);
+  };
+
+  const isActive = (link: NavLink): boolean => {
+    if (link.label === 'Services') return isServicesSection;
+    if (link.hash) return false;
+    if (link.path === '/') return location.pathname === '/';
+    if (!location.pathname.startsWith(link.path)) return false;
+    if (link.cat) return new URLSearchParams(location.search).get('cat') === link.cat;
+    return true;
+  };
+
+  const scrollToSection = (id: string) => {
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 400);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleNavClick = (link: NavLink) => {
+    if (link.label === 'Services') {
+      navigate('/services');
+      setDrawerOpen(false);
+      return;
+    }
+    if (link.hash) scrollToSection(link.hash);
+    else navigate(link.cat ? `${link.path}?cat=${link.cat}` : link.path);
     setDrawerOpen(false);
   };
 
+  const goToService = (item: ServiceNavItem) => {
+    navigate(serviceNavPath(item));
+    setServicesMenuOpen(false);
+    setDrawerOpen(false);
+  };
+
+  const toggleServicesMenu = () => {
+    setServicesMenuOpen((open) => !open);
+  };
+
+  const navButtonSx = (active: boolean) => ({
+    color: active ? colors.primaryBlue : colors.darkText,
+    fontFamily: fonts.heading,
+    fontWeight: active ? 700 : 600,
+    fontSize: '0.88rem',
+    textTransform: 'none' as const,
+    px: 0.9,
+    py: 0.85,
+    minWidth: 'auto',
+    whiteSpace: 'nowrap' as const,
+    borderRadius: 0,
+    borderBottom: '2px solid',
+    borderBottomColor: active ? colors.primaryBlue : 'transparent',
+    transition: 'color 0.2s ease, border-color 0.2s ease',
+    '&:hover': {
+      backgroundColor: 'transparent',
+      color: colors.primaryBlue,
+    },
+  });
+
   return (
     <>
-      {/* Top info bar */}
       <AppBar
         position="fixed"
+        elevation={0}
         sx={{
-          backgroundColor: 'rgba(2, 47, 73, 0.92)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          boxShadow: 'none',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          zIndex: 1002,
-          top: 0,
+          backgroundColor: colors.surface,
+          borderBottom: `1px solid ${colors.border}`,
+          boxShadow: scrolled ? '0 4px 20px rgba(10, 37, 64, 0.08)' : 'none',
+          transition: 'box-shadow 0.25s ease',
+          zIndex: 1100,
+          overflow: 'visible',
         }}
       >
-        <Toolbar sx={{ justifyContent: 'space-between', minHeight: '40px !important', padding: '0 24px' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Phone sx={{ color: '#22B1FB', fontSize: '1rem' }} />
-            <Typography
-              variant="body2"
-              sx={{ color: '#FFFFFF', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.85rem' }}
-            >
-              +1 (555) 123-4567
-            </Typography>
+        <Toolbar
+          sx={{
+            justifyContent: 'space-between',
+            minHeight: { xs: '112px !important', md: '128px !important' },
+            py: { xs: 1, md: 1.25 },
+            pl: { xs: 1.5, sm: 2, md: 2.5, lg: 3 },
+            pr: { xs: 2, lg: 3 },
+            gap: 0.5,
+            overflow: 'visible',
+          }}
+        >
+          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: { xs: 2, md: 3.5, lg: 4.5 } }}>
+            <BrandLogo variant="header" onClick={() => { navigate('/'); setDrawerOpen(false); }} />
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {['FB', 'TW', 'YT', 'IG'].map((social) => (
-              <Box key={social} component="a" href="#" sx={linkStyle}>
-                {social}
-              </Box>
-            ))}
-          </Box>
-        </Toolbar>
-      </AppBar>
 
-      {/* Main nav bar */}
-      <AppBar
-        position="fixed"
-        sx={{
-          backgroundColor: 'rgba(2, 47, 73, 0.97)',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          zIndex: 1001,
-          top: '40px',
-        }}
-      >
-        <Toolbar sx={{ justifyContent: 'space-between', minHeight: '64px' }}>
-          {/* Logo + desktop nav */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              component="img"
-              src="/Logo.png"
-              alt="SmartAppliance Logo"
-              sx={{
-                height: '50px',
-                width: 'auto',
-                objectFit: 'contain',
-                cursor: 'pointer',
-                '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s ease' },
-              }}
-              onClick={() => handleNavClick('/')}
-            />
-            <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 0.5 }}>
-              {navItems.map((item) => (
+          <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 0.25, alignItems: 'center', flexGrow: 1, justifyContent: 'flex-start', ml: { lg: 2.5, xl: 3.5 } }}>
+            {navLinks.map((link) => {
+              const active = isActive(link);
+
+              if (link.label === 'Services') {
+                return (
+                  <Box
+                    key={link.label}
+                    ref={servicesMenuRef}
+                    sx={{ position: 'relative' }}
+                    onMouseEnter={openServicesMenu}
+                    onMouseLeave={closeServicesMenu}
+                  >
+                    <Button
+                      onClick={toggleServicesMenu}
+                      disableRipple
+                      aria-expanded={servicesMenuOpen}
+                      aria-haspopup="menu"
+                      endIcon={
+                        <KeyboardArrowDown
+                          sx={{
+                            fontSize: '1.1rem !important',
+                            transform: servicesMenuOpen ? 'rotate(180deg)' : 'none',
+                            transition: 'transform 0.2s ease',
+                          }}
+                        />
+                      }
+                      sx={navButtonSx(active)}
+                    >
+                      {link.label}
+                    </Button>
+
+                    {servicesMenuOpen && (
+                      <Box
+                        onMouseEnter={openServicesMenu}
+                        onMouseLeave={closeServicesMenu}
+                        sx={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          pt: 0.75,
+                          zIndex: 1200,
+                        }}
+                      >
+                        <Box
+                          className="services-nav-dropdown"
+                          role="menu"
+                          aria-label="Services menu"
+                        >
+                          {serviceNavItems.map((item, index) => {
+                            const itemActive = isServiceNavItemActive(
+                              item,
+                              location.pathname,
+                              location.search,
+                            );
+                            const Icon = item.icon;
+                            const isLast = index === serviceNavItems.length - 1;
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                role="menuitem"
+                                className={[
+                                  'services-nav-dropdown-item',
+                                  itemActive ? 'is-active' : '',
+                                  isLast ? 'is-last' : '',
+                                ].filter(Boolean).join(' ')}
+                                onClick={() => goToService(item)}
+                              >
+                                <Icon className="services-nav-dropdown-icon" aria-hidden="true" />
+                                <span>{item.label}</span>
+                              </button>
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                );
+              }
+
+              return (
                 <Button
-                  key={item.label}
-                  onClick={() => handleNavClick(item.path)}
-                  sx={{
-                    color: isActive(item.path) ? '#22B1FB' : '#FFFFFF',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: isActive(item.path) ? 700 : 500,
-                    fontSize: '0.85rem',
-                    textTransform: 'none',
-                    padding: '6px 10px',
-                    borderRadius: '0px',
-                    borderBottom: isActive(item.path) ? '3px solid #22B1FB' : '3px solid transparent',
-                    '&:hover': {
-                      backgroundColor: 'rgba(34, 177, 251, 0.12)',
-                      color: '#22B1FB',
-                      borderRadius: '8px',
-                    },
-                  }}
+                  key={link.label}
+                  onClick={() => handleNavClick(link)}
+                  disableRipple
+                  sx={navButtonSx(active)}
                 >
-                  {item.label}
+                  {link.label}
                 </Button>
-              ))}
-            </Box>
+              );
+            })}
           </Box>
 
-          {/* Right side: phone, book service, emergency, cart, hamburger */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 1.5 } }}>
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
-              <Phone sx={{ color: '#22B1FB', fontSize: '1.1rem' }} />
-              <Typography
-                variant="body2"
-                sx={{ color: '#FFFFFF', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.9rem' }}
-              >
-                +1 (555) 123-4567
-              </Typography>
-            </Box>
-
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexShrink: 0 }}>
             <Button
-              variant="contained"
-              onClick={() => navigate('/book/regular')}
+              component="a"
+              href="tel:+18885550199"
+              startIcon={<Phone sx={{ fontSize: '1rem !important' }} />}
               sx={{
-                backgroundColor: '#22B1FB',
-                color: '#FFFFFF',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 600,
+                display: { xs: 'none', sm: 'inline-flex' },
+                color: colors.navy,
+                fontFamily: fonts.body,
+                fontWeight: 700,
                 fontSize: '0.82rem',
                 textTransform: 'none',
-                padding: '6px 14px',
-                borderRadius: '8px',
-                display: { xs: 'none', sm: 'flex' },
-                '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
+                border: `1.5px solid ${colors.border}`,
+                borderRadius: '10px',
+                px: 1.5,
+                py: 0.55,
+                whiteSpace: 'nowrap',
+                '&:hover': { backgroundColor: colors.lightBlueBg, borderColor: colors.primaryBlue, color: colors.primaryBlue },
               }}
             >
-              Book Service
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/book/emergency')}
-              startIcon={<WarningAmberIcon sx={{ fontSize: '1rem !important' }} />}
-              sx={{
-                borderColor: '#FF6B6B',
-                color: '#FF6B6B',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 600,
-                fontSize: '0.82rem',
-                textTransform: 'none',
-                padding: '5px 12px',
-                borderRadius: '8px',
-                display: { xs: 'none', md: 'flex' },
-                '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999', color: '#FF9999' },
-              }}
-            >
-              Emergency
+              (888) 555-0199
             </Button>
 
-            <Button
-              variant="outlined"
-              onClick={() => handleNavClick('/book/emergency')}
-              sx={{
-                borderColor: '#FF6B6B',
-                color: '#FF6B6B',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                textTransform: 'none',
-                padding: '5px 12px',
-                borderRadius: '8px',
-                display: { xs: 'none', md: 'flex' },
-                '&:hover': { backgroundColor: '#FF6B6B', color: '#FFFFFF', borderColor: '#FF6B6B' },
-              }}
-            >
-              Emergency
-            </Button>
-
-            {/* Admin link */}
-            <Button
-              onClick={() => handleNavClick('/admin')}
-              sx={{
-                color: 'rgba(255,255,255,0.4)',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontSize: '0.7rem',
-                textTransform: 'none',
-                display: { xs: 'none', lg: 'flex' },
-                '&:hover': { color: 'rgba(255,255,255,0.8)' },
-              }}
-            >
-              Admin
-            </Button>
-
-            {/* Cart icon */}
-            <Box sx={{ position: 'relative' }}>
-              <Box
-                component="img"
-                src="/cart.png"
-                alt="Shopping Cart"
-                sx={{
-                  width: '24px',
-                  height: '24px',
-                  cursor: 'pointer',
-                  filter: 'brightness(0) invert(1)',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { transform: 'scale(1.1)' },
-                }}
-              />
-            </Box>
-
-            {/* Hamburger for mobile/tablet */}
             <IconButton
               onClick={() => setDrawerOpen(true)}
-              sx={{ display: { xs: 'flex', lg: 'none' }, color: '#FFFFFF', ml: 0.5 }}
+              sx={{ display: { xs: 'flex', lg: 'none' }, color: colors.navy }}
               aria-label="Open navigation menu"
             >
               <MenuIcon />
@@ -246,138 +312,152 @@ const TopBar: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Mobile/tablet drawer */}
       <Drawer
         anchor="right"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        PaperProps={{ sx: { width: 300, backgroundColor: '#022F49' } }}
+        PaperProps={{ sx: { width: 300, backgroundColor: colors.surface } }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2.5, py: 2 }}>
-          <Box
-            component="img"
-            src="/Logo.png"
-            alt="Logo"
-            sx={{ height: '40px', width: 'auto', objectFit: 'contain' }}
-          />
-          <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: '#FFFFFF' }}>
+          <BrandLogo variant="header" onClick={() => { navigate('/'); setDrawerOpen(false); }} />
+          <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: colors.navy }}>
             <CloseIcon />
           </IconButton>
         </Box>
-        <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)' }} />
+        <Divider sx={{ borderColor: colors.border }} />
         <List sx={{ py: 1 }}>
-          {navItems.map((item) => (
-            <ListItem key={item.label} disablePadding>
-              <ListItemButton
-                onClick={() => handleNavClick(item.path)}
-                sx={{
-                  px: 3,
-                  py: 1.5,
-                  borderLeft: isActive(item.path) ? '4px solid #22B1FB' : '4px solid transparent',
-                  '&:hover': { backgroundColor: 'rgba(34, 177, 251, 0.1)' },
-                }}
-              >
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    color: isActive(item.path) ? '#22B1FB' : '#FFFFFF',
-                    fontWeight: isActive(item.path) ? 700 : 400,
-                    fontSize: '1rem',
+          {navLinks.map((link) => {
+            const active = isActive(link);
+
+            if (link.label === 'Services') {
+              return (
+                <React.Fragment key={link.label}>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      onClick={() => setServicesDrawerOpen((open) => !open)}
+                      sx={{
+                        px: 3,
+                        py: 1.4,
+                        backgroundColor: active ? colors.lightBlueBg : 'transparent',
+                        '&:hover': { backgroundColor: colors.lightBlueBg },
+                      }}
+                    >
+                      <ListItemText
+                        primary={link.label}
+                        primaryTypographyProps={{
+                          fontFamily: fonts.body,
+                          color: active ? colors.primaryBlue : colors.darkText,
+                          fontWeight: active ? 700 : 600,
+                          fontSize: '0.95rem',
+                        }}
+                      />
+                      {servicesDrawerOpen ? (
+                        <KeyboardArrowUp sx={{ color: colors.primaryBlue, fontSize: '1.2rem' }} />
+                      ) : (
+                        <KeyboardArrowDown sx={{ color: colors.mutedText, fontSize: '1.2rem' }} />
+                      )}
+                    </ListItemButton>
+                  </ListItem>
+                  <Collapse in={servicesDrawerOpen} timeout="auto" unmountOnExit>
+                    <List disablePadding sx={{ pb: 1 }}>
+                      {serviceNavItems.map((item, index) => {
+                        const itemActive = isServiceNavItemActive(
+                          item,
+                          location.pathname,
+                          location.search,
+                        );
+                        const Icon = item.icon;
+                        const isLast = index === serviceNavItems.length - 1;
+                        return (
+                          <ListItem key={item.id} disablePadding sx={{ px: 1.5 }}>
+                            <ListItemButton
+                              onClick={() => goToService(item)}
+                              sx={{
+                                minHeight: 56,
+                                px: 2,
+                                py: 1.25,
+                                borderRadius: 0,
+                                gap: 2,
+                                borderBottom: isLast ? 'none' : '1px solid #E4E7EB',
+                                backgroundColor: itemActive ? colors.lightBlueBg : 'transparent',
+                                '&:hover': {
+                                  backgroundColor: colors.lightBlueBg,
+                                },
+                              }}
+                            >
+                              <Icon
+                                size={20}
+                                strokeWidth={1.75}
+                                color={itemActive ? colors.primaryBlue : '#64748B'}
+                              />
+                              <ListItemText
+                                primary={item.label}
+                                primaryTypographyProps={{
+                                  fontFamily: fonts.body,
+                                  color: itemActive ? colors.primaryBlue : colors.darkText,
+                                  fontWeight: 600,
+                                  fontSize: '0.95rem',
+                                }}
+                              />
+                            </ListItemButton>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Collapse>
+                </React.Fragment>
+              );
+            }
+
+            return (
+              <ListItem key={link.label} disablePadding>
+                <ListItemButton
+                  onClick={() => handleNavClick(link)}
+                  sx={{
+                    px: 3,
+                    py: 1.4,
+                    backgroundColor: active ? colors.lightBlueBg : 'transparent',
+                    '&:hover': { backgroundColor: colors.lightBlueBg },
                   }}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-          {/* Admin link in drawer */}
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => handleNavClick('/admin')}
-              sx={{ px: 3, py: 1.5, '&:hover': { backgroundColor: 'rgba(34, 177, 251, 0.1)' } }}
-            >
-              <ListItemText
-                primary="Admin"
-                primaryTypographyProps={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: 'rgba(255,255,255,0.4)',
-                  fontWeight: 400,
-                  fontSize: '0.85rem',
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
+                >
+                  <ListItemText
+                    primary={link.label}
+                    primaryTypographyProps={{
+                      fontFamily: fonts.body,
+                      color: active ? colors.primaryBlue : colors.darkText,
+                      fontWeight: active ? 700 : 600,
+                      fontSize: '0.95rem',
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
-        <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)', mt: 1 }} />
+        <Divider sx={{ borderColor: colors.border }} />
         <Box sx={{ px: 3, py: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Button
-            variant="contained"
             fullWidth
-            onClick={() => { navigate('/book/regular'); setDrawerOpen(false); }}
-            sx={{
-              backgroundColor: '#22B1FB',
-              color: '#FFFFFF',
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              fontWeight: 600,
-              textTransform: 'none',
-              borderRadius: '10px',
-              py: 1.25,
-              '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
-            }}
+            onClick={() => { navigate('/scheduler'); setDrawerOpen(false); }}
+            startIcon={<EventAvailableIcon />}
+            sx={{ ...primaryButtonSx, py: 1.25 }}
           >
-            Book Regular Service
+            Schedule Service
           </Button>
-          <Button
-            variant="outlined"
-            fullWidth
-            startIcon={<WarningAmberIcon />}
-            onClick={() => { navigate('/book/emergency'); setDrawerOpen(false); }}
-            sx={{
-              borderColor: '#FF6B6B',
-              color: '#FF6B6B',
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              fontWeight: 600,
-              textTransform: 'none',
-              borderRadius: '10px',
-              py: 1.25,
-              '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)' },
-            }}
+          <Box
+            component="a"
+            href="tel:+18885550199"
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center', mt: 0.5, textDecoration: 'none' }}
           >
-            Emergency Service
-          </Button>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, justifyContent: 'center' }}>
-            <Phone sx={{ color: '#22B1FB', fontSize: '1rem' }} />
-            <Typography
-              variant="body2"
-              sx={{ color: '#FFFFFF', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.9rem' }}
-            >
-              +1 (555) 123-4567
-            </Typography>
+            <Phone sx={{ color: colors.primaryBlue, fontSize: '1rem' }} />
+            <Box component="span" sx={{ color: colors.navy, fontFamily: fonts.body, fontSize: '0.9rem', fontWeight: 700 }}>
+              (888) 555-0199
+            </Box>
           </Box>
         </Box>
       </Drawer>
     </>
   );
-};
-
-const linkStyle = {
-  color: '#FFFFFF',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '26px',
-  height: '26px',
-  borderRadius: '50%',
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  transition: 'all 0.3s ease',
-  textDecoration: 'none',
-  fontSize: '0.65rem',
-  fontWeight: 700,
-  '&:hover': {
-    color: '#22B1FB',
-    backgroundColor: 'rgba(34, 177, 251, 0.2)',
-    transform: 'scale(1.1)',
-  },
 };
 
 export default TopBar;

@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" role="img" aria-label="TP-Link">
+  <path d="M8 28V12h8l6 10 6-10h8v16h-6V20l-6 10h-4l-6-10v8H8z" fill="#00A0DF"/>
+  <text x="42" y="27" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#00A0DF">TP-Link</text>
+</svg>

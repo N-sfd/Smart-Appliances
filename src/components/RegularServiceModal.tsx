@@ -26,6 +26,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { serviceCategories, ServiceRequest } from '../data/services';
+import { validateZipCode, normalizeZipInput } from '../data/serviceAreas';
 import { saveServiceRequest } from '../lib/firebase';
 
 interface RegularServiceModalProps {
@@ -45,15 +46,15 @@ const SectionLabel: React.FC<{ icon: React.ReactNode; title: string; first?: boo
 }) => (
   <Box sx={{ mt: first ? 0 : 3, mb: 2 }}>
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.75 }}>
-      <Box sx={{ color: '#22B1FB', display: 'flex' }}>{icon}</Box>
+      <Box sx={{ color: '#1A73E8', display: 'flex' }}>{icon}</Box>
       <Typography
         sx={{
-          fontFamily: 'DM Sans, Arial, sans-serif',
+          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
           fontWeight: 700,
           fontSize: '0.72rem',
           letterSpacing: 1.5,
           textTransform: 'uppercase',
-          color: '#022F49',
+          color: '#0B3D91',
         }}
       >
         {title}
@@ -141,6 +142,10 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
     if (!city.trim()) e.city = 'City is required.';
     if (!state.trim()) e.state = 'State is required.';
     if (!zip.trim()) e.zip = 'ZIP code is required.';
+    else {
+      const zipResult = validateZipCode(zip);
+      if (!zipResult.isValid) e.zip = zipResult.message ?? 'Enter a valid 5-digit ZIP code.';
+    }
     if (!preferredDate) e.preferredDate = 'Please choose a preferred date.';
     if (!preferredTime) e.preferredTime = 'Please choose a preferred time.';
     if (!description.trim()) e.description = 'Please describe the issue.';
@@ -227,21 +232,21 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
           maxWidth: '720px',
           width: '100%',
           borderRadius: '16px',
-          borderTop: '4px solid #22B1FB',
+          borderTop: '4px solid #1A73E8',
         },
       }}
     >
       <DialogTitle sx={{ px: 3, pt: 2.5, pb: 1.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <CalendarMonthIcon sx={{ color: '#22B1FB', fontSize: 26 }} />
+            <CalendarMonthIcon sx={{ color: '#1A73E8', fontSize: 26 }} />
             <Box>
               <Typography
                 sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                   fontWeight: 700,
                   fontSize: '1.3rem',
-                  color: '#022F49',
+                  color: '#0B3D91',
                   lineHeight: 1.2,
                 }}
               >
@@ -249,7 +254,7 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ color: '#666666', fontFamily: 'DM Sans, Arial, sans-serif', mt: 0.25 }}
+                sx={{ color: '#666666', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", mt: 0.25 }}
               >
                 Book an appointment at your preferred date and time.
               </Typography>
@@ -266,12 +271,12 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
       <DialogContent sx={{ px: 3, py: 2.5 }}>
         {submitted ? (
           <Box sx={{ textAlign: 'center', py: 6 }}>
-            <CheckCircleIcon sx={{ fontSize: 56, color: '#22B1FB', mb: 2 }} />
+            <CheckCircleIcon sx={{ fontSize: 56, color: '#1A73E8', mb: 2 }} />
             <Typography
               sx={{
-                fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                 fontSize: '1.4rem',
-                color: '#022F49',
+                color: '#0B3D91',
                 mb: 1,
               }}
             >
@@ -279,7 +284,7 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
             </Typography>
             <Typography
               variant="body1"
-              sx={{ color: '#555555', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: 1.8 }}
+              sx={{ color: '#1A1A1A', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", lineHeight: 1.8 }}
             >
               Your regular service request has been submitted. We will contact you to confirm your
               appointment.
@@ -289,14 +294,14 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
               variant="contained"
               sx={{
                 mt: 4,
-                backgroundColor: '#22B1FB',
+                backgroundColor: '#1A73E8',
                 color: '#FFFFFF',
                 textTransform: 'none',
                 borderRadius: '10px',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 700,
                 px: 5,
-                '&:hover': { backgroundColor: '#022F49' },
+                '&:hover': { backgroundColor: '#0B3D91' },
               }}
             >
               Close
@@ -414,7 +419,7 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
               <TextField
                 label="ZIP Code *"
                 value={zip}
-                onChange={(e) => setZip(e.target.value)}
+                onChange={(e) => setZip(normalizeZipInput(e.target.value))}
                 size="small"
                 fullWidth
                 error={Boolean(errors.zip)}
@@ -472,18 +477,39 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
                 sx={fieldSx}
               />
             </Box>
-            <TextField
-              label="Describe the problem *"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              size="small"
-              fullWidth
-              multiline
-              minRows={4}
-              error={Boolean(errors.description)}
-              helperText={errors.description}
-              sx={{ ...fieldSx, mb: 2 }}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+              <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: '#1A1A1A' }}>
+                Describe the problem *
+              </Typography>
+              <Box
+                component="textarea"
+                value={description}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+                placeholder="Tell us what is happening with the appliance or service issue."
+                sx={{
+                  width: '100%',
+                  minHeight: '120px',
+                  padding: '16px',
+                  border: errors.description ? '1px solid #EF4444' : '1px solid #E4E7EB',
+                  borderRadius: '16px',
+                  fontSize: '16px',
+                  lineHeight: 1.5,
+                  color: '#1A1A1A',
+                  backgroundColor: '#FFFFFF',
+                  resize: 'vertical',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  '&:focus': { borderColor: '#1A73E8', boxShadow: '0 0 0 4px rgba(26,115,232,0.12)' },
+                  '&::placeholder': { color: '#9AA5B1' },
+                }}
+              />
+              {errors.description && (
+                <Typography sx={{ fontSize: '0.75rem', color: '#EF4444', mt: 0.25 }}>
+                  {errors.description}
+                </Typography>
+              )}
+            </Box>
             <Box>
               <Button
                 component="label"
@@ -494,8 +520,8 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
                   textTransform: 'none',
                   borderColor: '#D0D0D0',
                   color: '#444444',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  '&:hover': { borderColor: '#22B1FB', color: '#22B1FB' },
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                  '&:hover': { borderColor: '#1A73E8', color: '#1A73E8' },
                 }}
               >
                 Attach an image (optional)
@@ -507,7 +533,7 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
                     component="img"
                     src={imagePreviewUrl}
                     alt="Preview"
-                    sx={{ width: '100%', maxWidth: '200px', borderRadius: '8px', border: '1px solid #E5E5E5' }}
+                    sx={{ width: '100%', maxWidth: '200px', borderRadius: '8px', border: '1px solid #E4E7EB' }}
                   />
                 </Box>
               )}
@@ -526,7 +552,7 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
               label={
                 <Typography
                   variant="body2"
-                  sx={{ color: errors.consent ? '#D32F2F' : '#555555', fontFamily: 'DM Sans, Arial, sans-serif' }}
+                  sx={{ color: errors.consent ? '#D32F2F' : '#1A1A1A', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}
                 >
                   I understand that final pricing may depend on diagnosis and service availability.
                 </Typography>
@@ -545,10 +571,10 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
                 variant="outlined"
                 sx={{
                   borderColor: '#D0D0D0',
-                  color: '#555555',
+                  color: '#1A1A1A',
                   textTransform: 'none',
                   borderRadius: '10px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                   py: 1.25,
                 }}
               >
@@ -560,15 +586,15 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
                 variant="contained"
                 disabled={isLoading}
                 sx={{
-                  backgroundColor: '#22B1FB',
+                  backgroundColor: '#1A73E8',
                   color: '#FFFFFF',
                   textTransform: 'none',
                   borderRadius: '10px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                   fontWeight: 700,
                   py: 1.25,
                   fontSize: '0.95rem',
-                  '&:hover': { backgroundColor: '#022F49' },
+                  '&:hover': { backgroundColor: '#0B3D91' },
                   '&.Mui-disabled': { backgroundColor: '#BBDDEE' },
                 }}
               >

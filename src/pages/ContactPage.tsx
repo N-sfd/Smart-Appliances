@@ -15,7 +15,6 @@ import {
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { serviceCategories } from '../data/services';
@@ -30,32 +29,25 @@ interface ContactInfo {
 
 const contactInfoItems: ContactInfo[] = [
   {
-    icon: <PhoneIcon sx={{ color: '#22B1FB', fontSize: 22 }} />,
+    icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 22 }} />,
     label: '+1 (555) 123-4567',
     sublabel: 'Mon–Fri 8AM–6PM, Sat 9AM–4PM',
-    iconBg: '#E8F4FD',
+    iconBg: '#E8F1FF',
     value: 'phone',
   },
   {
-    icon: <EmailIcon sx={{ color: '#22B1FB', fontSize: 22 }} />,
+    icon: <EmailIcon sx={{ color: '#1A73E8', fontSize: 22 }} />,
     label: 'service@smartappliance.com',
     sublabel: 'We respond within 2 hours',
-    iconBg: '#E8F4FD',
+    iconBg: '#E8F1FF',
     value: 'email',
   },
   {
-    icon: <LocationOnIcon sx={{ color: '#22B1FB', fontSize: 22 }} />,
+    icon: <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 22 }} />,
     label: 'Serving Your Local Area',
     sublabel: 'We cover the greater metro area and surrounding regions',
-    iconBg: '#E8F4FD',
+    iconBg: '#E8F1FF',
     value: 'location',
-  },
-  {
-    icon: <WarningAmberIcon sx={{ color: '#FF6B6B', fontSize: 22 }} />,
-    label: 'Emergency Line',
-    sublabel: '+1 (555) 911-HELP — Available 24/7',
-    iconBg: '#FFF0F0',
-    value: 'emergency',
   },
 ];
 
@@ -129,7 +121,7 @@ const ContactPage: React.FC = () => {
       {/* ── Page Hero ── */}
       <Box
         sx={{
-          backgroundColor: '#022F49',
+          backgroundColor: '#0B3D91',
           py: { xs: 8, md: 10 },
           textAlign: 'center',
           px: 2,
@@ -139,7 +131,7 @@ const ContactPage: React.FC = () => {
           <Typography
             variant="h1"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
               fontWeight: 700,
               color: '#FFFFFF',
               fontSize: { xs: '2rem', sm: '2.6rem', md: '3rem' },
@@ -151,7 +143,7 @@ const ContactPage: React.FC = () => {
           <Typography
             variant="body1"
             sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               color: '#A8D8F0',
               fontSize: { xs: '1rem', md: '1.1rem' },
               lineHeight: 1.8,
@@ -176,7 +168,7 @@ const ContactPage: React.FC = () => {
             <Box>
               <Typography
                 variant="h4"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 4 }}
+                sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 4 }}
               >
                 Get In Touch
               </Typography>
@@ -203,13 +195,13 @@ const ContactPage: React.FC = () => {
                   <Box>
                     <Typography
                       variant="subtitle1"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700, lineHeight: 1.3 }}
+                      sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 700, lineHeight: 1.3 }}
                     >
                       {item.label}
                     </Typography>
                     <Typography
                       variant="body2"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', mt: 0.25, lineHeight: 1.5 }}
+                      sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#666666', mt: 0.25, lineHeight: 1.5 }}
                     >
                       {item.sublabel}
                     </Typography>
@@ -222,16 +214,16 @@ const ContactPage: React.FC = () => {
                 sx={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '16px',
-                  border: '1px solid #E5E5E5',
+                  border: '1px solid #E4E7EB',
                   p: 3,
                   mt: 2,
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
-                  <AccessTimeIcon sx={{ color: '#22B1FB', fontSize: 22 }} />
+                  <AccessTimeIcon sx={{ color: '#1A73E8', fontSize: 22 }} />
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', fontWeight: 700 }}
+                    sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', fontWeight: 700 }}
                   >
                     Business Hours
                   </Typography>
@@ -243,36 +235,18 @@ const ContactPage: React.FC = () => {
                   >
                     <Typography
                       variant="body2"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', fontSize: '0.88rem' }}
+                      sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', fontSize: '0.88rem' }}
                     >
                       {row.day}
                     </Typography>
                     <Typography
                       variant="body2"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 600, fontSize: '0.88rem' }}
+                      sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 600, fontSize: '0.88rem' }}
                     >
                       {row.hours}
                     </Typography>
                   </Box>
                 ))}
-                <Box
-                  sx={{
-                    mt: 2,
-                    pt: 2,
-                    borderTop: '1px solid #E5E5E5',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                  }}
-                >
-                  <WarningAmberIcon sx={{ color: '#FF6B6B', fontSize: 16, flexShrink: 0 }} />
-                  <Typography
-                    variant="caption"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#CC2200', fontWeight: 600 }}
-                  >
-                    Emergency service available 24/7 — call anytime
-                  </Typography>
-                </Box>
               </Box>
             </Box>
 
@@ -281,22 +255,22 @@ const ContactPage: React.FC = () => {
               sx={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '20px',
-                border: '1px solid #E5E5E5',
+                border: '1px solid #E4E7EB',
                 p: { xs: 3, md: 4 },
               }}
             >
               {submitted ? (
                 <Box sx={{ textAlign: 'center', py: 6 }}>
-                  <CheckCircleIcon sx={{ fontSize: 64, color: '#22B1FB', mb: 2 }} />
+                  <CheckCircleIcon sx={{ fontSize: 64, color: '#1A73E8', mb: 2 }} />
                   <Typography
                     variant="h5"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1.5 }}
+                    sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 1.5 }}
                   >
                     Message Sent!
                   </Typography>
                   <Typography
                     variant="body1"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}
+                    sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A' }}
                   >
                     We'll be in touch within 2 hours.
                   </Typography>
@@ -305,7 +279,7 @@ const ContactPage: React.FC = () => {
                 <>
                   <Typography
                     variant="h5"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3 }}
+                    sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 3 }}
                   >
                     Send Us a Message
                   </Typography>
@@ -349,7 +323,7 @@ const ContactPage: React.FC = () => {
                         value={form.serviceCategory}
                         onChange={handleSelectChange}
                         label="Service Category"
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}
                       >
                         <MenuItem value="">
                           <em>Select a category</em>
@@ -376,15 +350,15 @@ const ContactPage: React.FC = () => {
                       variant="contained"
                       onClick={handleSubmit}
                       sx={{
-                        backgroundColor: '#22B1FB',
+                        backgroundColor: '#1A73E8',
                         color: '#FFFFFF',
-                        fontFamily: 'DM Sans, Arial, sans-serif',
+                        fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                         fontWeight: 700,
                         py: 1.75,
                         borderRadius: '10px',
                         textTransform: 'none',
                         fontSize: '1rem',
-                        '&:hover': { backgroundColor: '#022F49' },
+                        '&:hover': { backgroundColor: '#0B3D91' },
                       }}
                     >
                       Send Message
@@ -411,7 +385,7 @@ const ContactPage: React.FC = () => {
           >
             <Typography
               variant="h6"
-              sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mr: { sm: 2 } }}
+              sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mr: { sm: 2 } }}
             >
               Need service now?
             </Typography>
@@ -419,36 +393,18 @@ const ContactPage: React.FC = () => {
               variant="contained"
               onClick={() => navigate('/book/regular')}
               sx={{
-                backgroundColor: '#22B1FB',
+                backgroundColor: '#1A73E8',
                 color: '#FFFFFF',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 700,
                 px: 4,
                 py: 1.5,
                 borderRadius: '10px',
                 textTransform: 'none',
-                '&:hover': { backgroundColor: '#022F49' },
+                '&:hover': { backgroundColor: '#0B3D91' },
               }}
             >
               Book Regular Service
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/book/emergency')}
-              startIcon={<WarningAmberIcon />}
-              sx={{
-                borderColor: '#FF6B6B',
-                color: '#FF6B6B',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 700,
-                px: 4,
-                py: 1.5,
-                borderRadius: '10px',
-                textTransform: 'none',
-                '&:hover': { backgroundColor: 'rgba(255,107,107,0.08)', borderColor: '#CC2200', color: '#CC2200' },
-              }}
-            >
-              Emergency Service
             </Button>
           </Box>
         </Container>

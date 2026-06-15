@@ -22,6 +22,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { issueSeverityOptions, serviceCategories, ServicePriority, ServiceRequest, urgencyOptions } from '../data/services';
+import { validateZipCode, normalizeZipInput } from '../data/serviceAreas';
 
 interface BookingDialogProps {
   open: boolean;
@@ -125,6 +126,11 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
       setErrorMessage('Please complete all required contact and request fields.');
       return;
     }
+    const zipResult = validateZipCode(zipCode);
+    if (!zipResult.isValid) {
+      setErrorMessage(zipResult.message ?? 'Enter a valid 5-digit ZIP code.');
+      return;
+    }
     if (servicePriority === 'regular' && (!preferredDate || !preferredTime)) {
       setErrorMessage('Please choose a preferred date and time for regular service.');
       return;
@@ -206,22 +212,22 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          backgroundColor: isEmergency ? '#FFF8F8' : '#F8FBFF',
-          borderBottom: `3px solid ${isEmergency ? '#FF6B6B' : '#22B1FB'}`,
+          backgroundColor: isEmergency ? '#FFF8F8' : '#F5F7FA',
+          borderBottom: `3px solid ${isEmergency ? '#EF4444' : '#1A73E8'}`,
           pb: 2,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           {isEmergency ? (
-            <WarningAmberIcon sx={{ color: '#FF6B6B', fontSize: 28 }} />
+            <WarningAmberIcon sx={{ color: '#EF4444', fontSize: 28 }} />
           ) : (
-            <CalendarTodayIcon sx={{ color: '#22B1FB', fontSize: 26 }} />
+            <CalendarTodayIcon sx={{ color: '#1A73E8', fontSize: 26 }} />
           )}
           <Typography
             variant="h5"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              color: isEmergency ? '#CC2200' : '#022F49',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              color: isEmergency ? '#EA580C' : '#0B3D91',
               fontWeight: 700,
             }}
           >
@@ -231,7 +237,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
         <Button
           onClick={onClose}
           startIcon={<CloseIcon />}
-          sx={{ color: '#555555', textTransform: 'none', fontFamily: 'DM Sans, Arial, sans-serif' }}
+          sx={{ color: '#1A1A1A', textTransform: 'none', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}
         >
           Close
         </Button>
@@ -243,25 +249,25 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
           <Box
             onClick={() => setServicePriority('regular')}
             sx={{
-              border: `2px solid ${servicePriority === 'regular' ? '#22B1FB' : '#E5E5E5'}`,
+              border: `2px solid ${servicePriority === 'regular' ? '#1A73E8' : '#E4E7EB'}`,
               borderRadius: '14px',
               p: 2,
               cursor: 'pointer',
               backgroundColor: servicePriority === 'regular' ? '#EBF8FF' : '#FAFAFA',
               transition: 'all 0.2s ease',
-              '&:hover': { borderColor: '#22B1FB', backgroundColor: '#EBF8FF' },
+              '&:hover': { borderColor: '#1A73E8', backgroundColor: '#EBF8FF' },
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <CalendarTodayIcon sx={{ color: '#22B1FB', fontSize: 20 }} />
+              <CalendarTodayIcon sx={{ color: '#1A73E8', fontSize: 20 }} />
               <Typography
                 variant="subtitle1"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', fontWeight: 700 }}
+                sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', fontWeight: 700 }}
               >
                 Regular Service
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ color: '#555555', fontFamily: 'DM Sans, Arial, sans-serif' }}>
+            <Typography variant="body2" sx={{ color: '#1A1A1A', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
               Schedule a convenient appointment at your preferred date and time.
             </Typography>
           </Box>
@@ -269,25 +275,25 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
           <Box
             onClick={() => setServicePriority('emergency')}
             sx={{
-              border: `2px solid ${servicePriority === 'emergency' ? '#FF6B6B' : '#E5E5E5'}`,
+              border: `2px solid ${servicePriority === 'emergency' ? '#EF4444' : '#E4E7EB'}`,
               borderRadius: '14px',
               p: 2,
               cursor: 'pointer',
               backgroundColor: servicePriority === 'emergency' ? '#FFF5F5' : '#FAFAFA',
               transition: 'all 0.2s ease',
-              '&:hover': { borderColor: '#FF6B6B', backgroundColor: '#FFF5F5' },
+              '&:hover': { borderColor: '#EF4444', backgroundColor: '#FFF5F5' },
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <WarningAmberIcon sx={{ color: '#FF6B6B', fontSize: 20 }} />
+              <WarningAmberIcon sx={{ color: '#EF4444', fontSize: 20 }} />
               <Typography
                 variant="subtitle1"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#CC2200', fontWeight: 700 }}
+                sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#EA580C', fontWeight: 700 }}
               >
                 Emergency Service
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ color: '#555555', fontFamily: 'DM Sans, Arial, sans-serif' }}>
+            <Typography variant="body2" sx={{ color: '#1A1A1A', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
               Need urgent help? Request ASAP or same-day emergency response.
             </Typography>
           </Box>
@@ -298,7 +304,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
           <Alert
             severity="warning"
             icon={<WarningAmberIcon />}
-            sx={{ mb: 3, borderRadius: '10px', fontFamily: 'DM Sans, Arial, sans-serif' }}
+            sx={{ mb: 3, borderRadius: '10px', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}
           >
             <strong>Emergency service note:</strong> Availability and pricing for emergency requests may vary based on
             location and demand. Our dispatch team will contact you as soon as possible to confirm service.
@@ -360,7 +366,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             fullWidth
-            sx={isEmergency ? { '& .MuiOutlinedInput-root': { borderColor: '#FF6B6B' } } : {}}
+            sx={isEmergency ? { '& .MuiOutlinedInput-root': { borderColor: '#EF4444' } } : {}}
           />
           <TextField
             label="Address *"
@@ -383,7 +389,8 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
           <TextField
             label="ZIP Code *"
             value={zipCode}
-            onChange={(e) => setZipCode(e.target.value)}
+            onChange={(e) => setZipCode(normalizeZipInput(e.target.value))}
+            inputProps={{ inputMode: 'numeric', maxLength: 5 }}
             fullWidth
           />
         </Box>
@@ -405,15 +412,34 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
         </Box>
 
         {/* Issue description */}
-        <TextField
-          label="Describe the problem *"
-          value={issueDescription}
-          onChange={(e) => setIssueDescription(e.target.value)}
-          fullWidth
-          multiline
-          minRows={4}
-          sx={{ mt: 3 }}
-        />
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 3 }}>
+          <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: '#1A1A1A' }}>
+            Describe the problem *
+          </Typography>
+          <Box
+            component="textarea"
+            value={issueDescription}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setIssueDescription(e.target.value)}
+            placeholder="Tell us what is happening with the appliance or service issue."
+            sx={{
+              width: '100%',
+              minHeight: '120px',
+              padding: '16px',
+              border: '1px solid #E4E7EB',
+              borderRadius: '16px',
+              fontSize: '16px',
+              lineHeight: 1.5,
+              color: '#1A1A1A',
+              backgroundColor: '#FFFFFF',
+              resize: 'vertical',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+              outline: 'none',
+              boxSizing: 'border-box',
+              '&:focus': { borderColor: '#1A73E8', boxShadow: '0 0 0 4px rgba(26,115,232,0.12)' },
+              '&::placeholder': { color: '#9AA5B1' },
+            }}
+          />
+        </Box>
 
         {/* Date/time or urgency */}
         {servicePriority === 'regular' ? (
@@ -472,13 +498,13 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
 
         {/* Image upload */}
         <Box sx={{ mt: 3 }}>
-          <Button component="label" variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none', fontFamily: 'DM Sans, Arial, sans-serif' }}>
+          <Button component="label" variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
             Upload an image (optional)
             <input type="file" hidden accept="image/*" onChange={handleImageChange} />
           </Button>
           {imagePreviewUrl && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant="body2" sx={{ color: '#555555', mb: 1 }}>
+              <Typography variant="body2" sx={{ color: '#1A1A1A', mb: 1 }}>
                 Image preview
               </Typography>
               <Box
@@ -517,7 +543,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
       <DialogActions sx={{ px: 3, py: 2.5, gap: 1 }}>
         <Button
           onClick={onClose}
-          sx={{ textTransform: 'none', fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}
+          sx={{ textTransform: 'none', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A' }}
         >
           Cancel
         </Button>
@@ -525,14 +551,14 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
           variant="contained"
           onClick={handleSubmit}
           sx={{
-            backgroundColor: isEmergency ? '#FF6B6B' : '#22B1FB',
+            backgroundColor: isEmergency ? '#EF4444' : '#1A73E8',
             color: '#FFFFFF',
             textTransform: 'none',
-            fontFamily: 'DM Sans, Arial, sans-serif',
+            fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
             fontWeight: 700,
             px: 4,
             borderRadius: '10px',
-            '&:hover': { backgroundColor: isEmergency ? '#CC2200' : '#022F49' },
+            '&:hover': { backgroundColor: isEmergency ? '#EA580C' : '#0B3D91' },
           }}
         >
           {isEmergency ? 'Submit Emergency Request' : 'Submit Request'}

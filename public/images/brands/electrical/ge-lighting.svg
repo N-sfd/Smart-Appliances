@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 40" role="img" aria-label="GE Lighting">
+  <circle cx="18" cy="20" r="12" fill="#005EB8"/>
+  <text x="36" y="20" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#005EB8">GE</text>
+  <text x="36" y="33" font-family="Arial,sans-serif" font-size="10" font-weight="600" fill="#005EB8">Lighting</text>
+</svg>

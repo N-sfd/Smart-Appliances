@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -6,27 +6,21 @@ import {
   Container,
   Button,
   Card,
-  CardContent,
   TextField,
-  Divider,
+  InputAdornment,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Chip,
+  Select,
+  MenuItem,
+  FormControl,
+  OutlinedInput,
+  SelectChangeEvent,
 } from '@mui/material';
-import KitchenIcon from '@mui/icons-material/Kitchen';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import AcUnitIcon from '@mui/icons-material/AcUnit';
-import PlumbingIcon from '@mui/icons-material/Plumbing';
-import BoltIcon from '@mui/icons-material/Bolt';
-import DevicesIcon from '@mui/icons-material/Devices';
-import BuildIcon from '@mui/icons-material/Build';
-import StarIcon from '@mui/icons-material/Star';
-import FlashOnIcon from '@mui/icons-material/FlashOn';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import VerifiedIcon from '@mui/icons-material/Verified';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -34,468 +28,1015 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FlashOnIcon from '@mui/icons-material/FlashOn';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import GppGoodIcon from '@mui/icons-material/GppGood';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import HandshakeIcon from '@mui/icons-material/Handshake';
 import { serviceCategories } from '../data/services';
+import { popularServices } from '../data/popularServices';
+import { SERVICE_TYPE_IMAGE_MAP, CATEGORY_IMAGE_MAP, DEFAULT_SERVICE_IMAGE } from '../data/serviceImages';
+import { colors, fonts, heroCtaButtonSx } from '../theme';
+import SiteFooter from './SiteFooter';
+import ServiceCategoryTabs, { ServiceCategoryTab } from './ServiceCategoryTabs';
+import ServiceGridCard from './ServiceGridCard';
+import ServiceAreaMap from './ServiceAreaMap';
+import {
+  normalizeZipInput,
+  validateZipCode,
+  getZipFieldHelperText,
+  isZipFieldError,
+  serviceAreaNeighborhoods,
+  SERVICE_AREA_REGION_LABEL,
+} from '../data/serviceAreas';
 
-const sectionTags = ['All', 'Appliances', 'HVAC', 'Plumbing', 'Electrical', 'Smart Home', 'Maintenance'];
+// ─────────────────────────────────────────────
+// Data
+// ─────────────────────────────────────────────
 
-const iconMap: Record<string, React.ReactNode> = {
-  Kitchen: <KitchenIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
-  ShoppingCart: <ShoppingCartIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
-  AcUnit: <AcUnitIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
-  Plumbing: <PlumbingIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
-  Bolt: <BoltIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
-  Devices: <DevicesIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
-  Build: <BuildIcon sx={{ fontSize: 36, color: '#22B1FB' }} />,
+const allServiceOptions = serviceCategories.flatMap((cat) =>
+  cat.services.map((s) => ({ id: s.id, label: s.label, categoryId: cat.id })),
+);
+
+const tabCategoryMap: Record<string, string[]> = {
+  HVAC: ['hvac-services'],
+  Plumbing: ['plumbing-services'],
+  Electrical: ['electrical-services'],
+  'Smart Home': ['smart-home-setup'],
+};
+
+const SERVICE_DETAIL_EXT: Record<string, { issues?: string[]; hasEmergency: boolean }> = {
+  // Appliances — issues come from popularServices chips
+  'refrigerator-repair':             { issues: ['Not cooling', 'Ice maker issue', 'New install setup', 'Water line hookup'], hasEmergency: true },
+  'washer-dryer':                    { issues: ["Won't spin", 'Not heating', 'Hose connection', 'Level and test'], hasEmergency: false },
+  'washer-repair':                   { hasEmergency: false },
+  'dishwasher-repair':               { issues: ['Not cleaning', "Won't drain", 'Drain connection', 'Water line hookup'], hasEmergency: false },
+  'oven-stove-repair':               { issues: ['Not heating', 'Burner issue', 'Gas line hookup', 'Electrical hookup'], hasEmergency: true },
+  'microwave-repair':                { issues: ['Not heating', 'No power', 'OTR mounting', 'Countertop setup'], hasEmergency: false },
+  'smart-appliance-setup':           { hasEmergency: false },
+  'garbage-disposal-repair':         { issues: ['Humming but not working', 'Leaking under sink', 'Jammed blades', "Won't turn on"], hasEmergency: false },
+  'ice-maker-repair':                { issues: ['Not making ice', 'Ice tastes off', 'Water supply issue', 'Dispenser stuck'], hasEmergency: false },
+  'refrigerator-installation':       { hasEmergency: false },
+  'dishwasher-installation':         { hasEmergency: false },
+  'washer-dryer-installation':       { hasEmergency: false },
+  'microwave-installation':          { hasEmergency: false },
+  'range-oven-installation':         { hasEmergency: false },
+  // Appliances (legacy)
+  'dryer-repair':                    { hasEmergency: false },
+  // HVAC
+  'ac-repair':                       { issues: ['No cooling', 'Warm air blowing', 'Refrigerant leak', 'Loud noise'], hasEmergency: true },
+  'heating-furnace-repair':          { issues: ['No heat', 'Burner not igniting', 'Short cycling', 'Unusual smell'], hasEmergency: true },
+  'thermostat-installation':         { issues: ['Thermostat not responding', 'Incorrect temperature', 'New smart thermostat', 'C-wire upgrade'], hasEmergency: false },
+  'hvac-maintenance':                { issues: ['Annual tune-up', 'Filter replacement', 'Coil cleaning', 'Efficiency check'], hasEmergency: false },
+  'duct-cleaning':                   { issues: ['Dust and debris', 'Allergens in air', 'Poor airflow', 'Post-renovation cleaning'], hasEmergency: false },
+  'emergency-hvac-service':          { issues: ['Total system failure', 'No heat in winter', 'No AC in extreme heat', 'Gas smell'], hasEmergency: true },
+  // Plumbing
+  'leak-repair':                     { issues: ['Pipe leak', 'Under-sink leak', 'Water stains on walls', 'High water bill'], hasEmergency: true },
+  'drain-cleaning':                  { issues: ['Slow drain', 'Complete blockage', 'Bad odor', 'Multiple drains affected'], hasEmergency: false },
+  'faucet-repair':                   { issues: ['Dripping faucet', 'Low pressure', 'Leak at base', 'Handle issue'], hasEmergency: false },
+  'toilet-repair':                   { issues: ['Running toilet', "Won't flush properly", 'Leaking at base', 'Clogged'], hasEmergency: false },
+  'water-heater-service':            { issues: ['No hot water', 'Insufficient hot water', 'Leak at tank', 'Strange sounds'], hasEmergency: true },
+  'emergency-plumbing':              { issues: ['Burst pipe', 'Major water leak', 'Sewage backup', 'Flooding'], hasEmergency: true },
+  // Electrical
+  'outlet-switch-repair':            { issues: ['Dead outlet', 'Switch not working', 'Warm or buzzing outlet', 'GFCI tripping'], hasEmergency: true },
+  'light-fixture-installation':      { issues: ['New fixture install', 'Flickering light', 'Buzzing sound', 'Dimmer upgrade'], hasEmergency: false },
+  'ceiling-fan-installation':        { issues: ['New fan install', 'Wobbling fan', 'Remote not working', 'Light kit issue'], hasEmergency: false },
+  'breaker-panel-inspection':        { issues: ['Breaker tripping', 'Panel overheating', 'Safety inspection', 'Capacity upgrade'], hasEmergency: true },
+  'appliance-electrical-connection': { issues: ['Dryer circuit setup', 'Range outlet install', 'Dedicated circuit', 'Amperage upgrade'], hasEmergency: false },
+  'emergency-electrical-service':    { issues: ['Power outage', 'Sparking outlet', 'Burning smell', 'Circuit failure'], hasEmergency: true },
+  // Smart Home
+  'smart-thermostat-setup':          { issues: ['Nest / Ecobee setup', 'C-wire installation', 'App pairing', 'Schedule configuration'], hasEmergency: false },
+  'doorbell-installation':           { issues: ['Ring doorbell setup', 'Existing wiring use', 'App setup', 'Motion zone config'], hasEmergency: false },
+  'camera-installation':             { issues: ['Indoor camera mount', 'Outdoor camera setup', 'Night vision config', 'Cloud storage setup'], hasEmergency: false },
+  'smart-lock-installation':         { issues: ['Smart lock fitting', 'App pairing', 'Access code setup', 'Keypad programming'], hasEmergency: false },
+  'wifi-setup':                      { issues: ['Device connection', 'Wi-Fi troubleshooting', 'Mesh network setup', 'Range extension'], hasEmergency: false },
+  'tv-mounting':                     { issues: ['Wall mount install', 'Cable management', 'Stud finding', 'Tilt / swivel bracket'], hasEmergency: false },
+  // Home Maintenance
+  'preventive-maintenance':          { issues: ['Annual appliance check', 'Filter replacement', 'Seal inspection', 'Efficiency tune-up'], hasEmergency: false },
+  'dryer-vent-cleaning':             { issues: ['Lint buildup', 'Long dry times', 'Overheating dryer', 'Fire risk reduction'], hasEmergency: false },
+  'air-duct-cleaning':               { issues: ['Dust in vents', 'Allergy symptoms', 'Pet dander buildup', 'Post-reno debris'], hasEmergency: false },
+  'seasonal-hvac-tune-up':           { issues: ['Pre-season check', 'Filter change', 'Coil cleaning', 'Refrigerant check'], hasEmergency: false },
+  'garage-door-repair':              { issues: ["Won't open or close", 'Broken spring or cable', 'Noisy or off-track door', 'Opener not responding'], hasEmergency: false },
+  'general-handyman':                { issues: ['Minor repairs', 'Small installations', 'Home maintenance fixes', 'Seasonal tasks'], hasEmergency: false },
 };
 
 const howItWorks = [
-  {
-    step: '1',
-    title: 'Choose a service',
-    description: 'Pick the right category and specific service type for your appliance or home system.',
-  },
-  {
-    step: '2',
-    title: 'Regular or emergency',
-    description: 'Schedule routine work at a convenient time or request urgent same-day emergency response.',
-  },
-  {
-    step: '3',
-    title: 'Tell us the problem',
-    description: 'Share the issue details, location, appliance brand, model, and any photos for faster service.',
-  },
-  {
-    step: '4',
-    title: 'Get contacted & booked',
-    description: 'Our team confirms service details, availability, and next steps with clear pricing notes.',
-  },
+  { step: '1', title: 'Choose a service', description: 'Pick the category and specific service for your appliance or home system.' },
+  { step: '2', title: 'Regular or emergency', description: 'Schedule at a convenient time or request same-day emergency response.' },
+  { step: '3', title: 'Tell us the problem', description: 'Share the issue, appliance brand, model, and any photos for faster service.' },
+  { step: '4', title: 'Get contacted & booked', description: 'We confirm availability, service details, and next steps with clear pricing.' },
 ];
 
 const trustItems = [
-  {
-    icon: <FlashOnIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
-    title: 'Fast Response',
-    description: 'Quick replies and clear scheduling for every request, including same-day emergency service.',
-  },
-  {
-    icon: <EngineeringIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
-    title: 'Experienced Technicians',
-    description: 'Licensed pros trained in appliance repair, HVAC, plumbing, electrical, and smart home setup.',
-  },
-  {
-    icon: <HomeRepairServiceIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
-    title: 'Full Home Coverage',
-    description: 'Complete coverage for repairs, installations, maintenance, and emergency jobs across all systems.',
-  },
-  {
-    icon: <VerifiedIcon sx={{ fontSize: 32, color: '#22B1FB' }} />,
-    title: 'Transparent Estimates',
-    description: 'Clear pricing notes and your consent before final diagnosis and any work begins.',
-  },
-];
-
-const companyStats = [
-  { value: '5,000+', label: 'Repairs Completed' },
-  { value: '4.9★', label: 'Average Rating' },
-  { value: '24/7', label: 'Emergency Support' },
-  { value: '100%', label: 'Licensed & Insured' },
+  { icon: <GppGoodIcon sx={{ fontSize: 28, color: colors.primaryBlue }} />, title: 'Licensed & Insured', description: 'All technicians are licensed, insured, and background-checked for your peace of mind.' },
+  { icon: <ScheduleIcon sx={{ fontSize: 28, color: colors.primaryBlue }} />, title: 'Same-Day Availability', description: 'Priority scheduling for urgent but non-emergency issues when availability allows.' },
+  { icon: <AssignmentTurnedInIcon sx={{ fontSize: 28, color: colors.primaryBlue }} />, title: 'Transparent Pricing', description: 'Technician explains the issue and estimated cost before any repair begins.' },
+  { icon: <HomeRepairServiceIcon sx={{ fontSize: 28, color: colors.primaryBlue }} />, title: 'Service Warranty', description: 'Work is backed by a service quality commitment — we stand behind every repair.' },
+  { icon: <EngineeringIcon sx={{ fontSize: 28, color: colors.primaryBlue }} />, title: 'Certified Technicians', description: 'Every technician passes a thorough background check before working in your home.' },
+  { icon: <HandshakeIcon sx={{ fontSize: 28, color: colors.primaryBlue }} />, title: 'Satisfaction-Focused', description: 'We do not consider a job done until you are satisfied with the work and service.' },
 ];
 
 const faqs = [
-  {
-    question: 'Do you offer emergency service?',
-    answer:
-      'Yes. We provide 24/7 emergency service for urgent issues including water leaks, burning smells, electrical hazards, and complete appliance failures. Emergency requests are prioritized and receive same-day response.',
-  },
-  {
-    question: 'What appliances do you repair?',
-    answer:
-      'We repair all major home appliances including refrigerators, washers, dryers, dishwashers, ovens, stoves, microwaves, and more. We also service HVAC systems, plumbing, electrical, and smart home equipment.',
-  },
-  {
-    question: 'Is there a diagnostic fee?',
-    answer:
-      'We charge a starting diagnostic fee of $49–$89 depending on the appliance type. This covers the technician visit and initial assessment. The diagnostic fee is applied toward the repair cost if you proceed.',
-  },
-  {
-    question: 'Can I upload a photo or video of the issue?',
-    answer:
-      'Yes. Our booking form includes an option to upload photos or short videos of the problem. This helps our technicians arrive better prepared and can speed up the repair.',
-  },
-  {
-    question: 'How soon can a technician come?',
-    answer:
-      'For regular service, we typically schedule within 1–3 business days based on your preferred time window. Emergency requests receive same-day response when possible.',
-  },
-  {
-    question: 'Do you service HVAC, plumbing, or electrical issues?',
-    answer:
-      'Yes. In addition to appliance repair, we offer HVAC support, plumbing services, and electrical services through our licensed technician network.',
-  },
+  { question: 'Do you offer emergency service?', answer: 'Yes. We provide 24/7 emergency service for urgent issues including water leaks, burning smells, electrical hazards, and complete appliance failures. Emergency requests are prioritized and receive same-day response.' },
+  { question: 'What appliances do you repair?', answer: 'We repair all major home appliances including refrigerators, washers, dryers, dishwashers, ovens, stoves, microwaves, and more. We also service HVAC systems, plumbing, electrical, and smart home equipment.' },
+  { question: 'Is there a diagnostic fee?', answer: 'A diagnostic fee may apply depending on the appliance type and service needed. This covers the technician visit and initial assessment. The technician will explain the full cost before any repair work begins.' },
+  { question: 'How soon can a technician come?', answer: 'For regular service, we typically schedule within 1–3 business days based on your preferred time window. Same-day requests depend on availability. Emergency requests receive priority response.' },
+  { question: 'Do you service HVAC, plumbing, or electrical issues?', answer: 'Yes. In addition to appliance repair, we offer HVAC support, plumbing services, and electrical services through our licensed technician network.' },
+  { question: 'Can I track my service request?', answer: 'Yes. Use the Track Request section on our homepage or contact us directly by phone or email. We will provide status updates as your request moves from scheduling through completion.' },
 ];
 
-const serviceAreas = [
-  'Downtown',
-  'North District',
-  'South Side',
-  'East End',
-  'West Hills',
-  'Midtown',
-  'Riverside',
-  'Lakewood',
-  'Greenfield',
-  'Parkview',
-  'Maplewood',
-  'Oakdale',
+const serviceCoverageItems = [
+  'Appliance repair',
+  'Appliance installation',
+  'HVAC service',
+  'Plumbing service',
+  'Emergency priority',
 ];
+
+const majorBrands: { name: string; logo: string }[] = [
+  { name: 'Samsung', logo: '/Samsung_Logo.svg.png' },
+  { name: 'LG', logo: '/LG-Logo.png' },
+  { name: 'Whirlpool', logo: '/Whirlpool-Logo.png' },
+  { name: 'Bosch', logo: '/Bosch-Logo.png' },
+  { name: 'GE', logo: '/General_Electric_logo.svg.png' },
+  { name: 'Maytag', logo: '/images/brands/maytag.svg' },
+  { name: 'Frigidaire', logo: '/images/brands/frigidaire.svg' },
+  { name: 'KitchenAid', logo: '/images/brands/kitchenaid.svg' },
+  { name: 'Electrolux', logo: '/images/brands/electrolux.svg' },
+  { name: 'Amana', logo: '/images/brands/amana.svg' },
+  { name: 'Speed Queen', logo: '/images/brands/speed-queen.svg' },
+  { name: 'Hotpoint', logo: '/images/brands/hotpoint.svg' },
+];
+
+// ─────────────────────────────────────────────
+// Component
+// ─────────────────────────────────────────────
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [currentBrandIndex, setCurrentBrandIndex] = useState(0);
-  const [currentRepairBrandIndex, setCurrentRepairBrandIndex] = useState(0);
-  const [itemCounts, setItemCounts] = useState({ refrigerator: 0, washingMachine: 0, bulb: 0, oven: 0 });
-  const [serviceCategoryFilter, setServiceCategoryFilter] = useState('All');
+
+  // Scheduler state
+  const [schedulerService, setSchedulerService] = useState('');
+  const [schedulerZip, setSchedulerZip] = useState('');
+  const [schedulerZipTouched, setSchedulerZipTouched] = useState(false);
+  const [schedulerUrgency, setSchedulerUrgency] = useState<'regular' | 'sameday' | 'emergency'>('regular');
+
+  // Service cards state
+  const [activeCategory, setActiveCategory] = useState<ServiceCategoryTab>('Appliances');
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+
+  // Contact form state
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactMessage, setContactMessage] = useState('');
   const [contactSent, setContactSent] = useState(false);
 
-  const images = ['/1.png', '/2.png', '/3.png'];
+  // Service areas ZIP checker
+  const [areaZip, setAreaZip] = useState('');
+  const [areaZipTouched, setAreaZipTouched] = useState(false);
 
-  const brandLogos = [
-    { src: '/Samsung_Logo.svg.png', alt: 'Samsung' },
-    { src: '/LG-Logo.png', alt: 'LG' },
-    { src: '/Whirlpool-Logo.png', alt: 'Whirlpool' },
-    { src: '/Bosch-Logo.png', alt: 'Bosch' },
-    { src: '/General_Electric_logo.svg.png', alt: 'GE' },
-  ];
-
-  const infiniteBrandLogos = [...brandLogos, ...brandLogos];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [images.length]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBrandIndex((prev) => (prev + 1 >= brandLogos.length ? 0 : prev + 1));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [brandLogos.length]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentRepairBrandIndex((prev) => (prev + 1 >= brandLogos.length ? 0 : prev + 1));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [brandLogos.length]);
-
-  const filteredCategories = useMemo(
-    () =>
-      serviceCategoryFilter === 'All'
-        ? serviceCategories
-        : serviceCategories.filter((c) => c.tags.includes(serviceCategoryFilter)),
-    [serviceCategoryFilter],
-  );
-
-  const increaseCount = (itemType: keyof typeof itemCounts) => {
-    setItemCounts((prev) => ({ ...prev, [itemType]: prev[itemType] + 1 }));
+  const handleServiceSelect = (id: string) => {
+    setSelectedServiceId(id);
+    setTimeout(() => document.getElementById('service-detail-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
   };
 
-  const decreaseCount = (itemType: keyof typeof itemCounts) => {
-    setItemCounts((prev) => ({ ...prev, [itemType]: Math.max(0, prev[itemType] - 1) }));
+  const handleCategoryChange = (cat: ServiceCategoryTab) => {
+    setActiveCategory(cat);
+    setSelectedServiceId(null);
   };
 
-  const handleContactSubmit = () => {
-    if (contactName && contactEmail && contactMessage) {
-      setContactSent(true);
+  const nonPopularCategories = useMemo(() => {
+    const catIds = tabCategoryMap[activeCategory] ?? [];
+    return serviceCategories.filter((c) => catIds.includes(c.id));
+  }, [activeCategory]);
+
+  const selectedDetail = useMemo(() => {
+    if (!selectedServiceId) return null;
+    const popular = popularServices.find((s) => s.id === selectedServiceId);
+    const imgInfo = SERVICE_TYPE_IMAGE_MAP[selectedServiceId] ?? DEFAULT_SERVICE_IMAGE;
+    const ext = SERVICE_DETAIL_EXT[selectedServiceId];
+    if (popular) {
+      return {
+        title: popular.label,
+        description: popular.description,
+        image: popular.image,
+        issues: popular.chips,
+        hasEmergency: ext?.hasEmergency ?? false,
+      };
+    }
+    if (imgInfo && ext) {
+      return {
+        title: imgInfo.title,
+        description: imgInfo.desc,
+        image: imgInfo.image,
+        issues: ext.issues ?? [],
+        hasEmergency: ext.hasEmergency,
+      };
+    }
+    return null;
+  }, [selectedServiceId]);
+
+  const schedulerZipValidation = validateZipCode(schedulerZip);
+  const schedulerCanContinue = Boolean(schedulerService) && schedulerZipValidation.isValid;
+  const areaZipValidation = validateZipCode(areaZip);
+  const areaZipInCoverage = areaZipValidation.isInServiceArea;
+
+  const handleAreaZipCheck = () => {
+    setAreaZipTouched(true);
+    if (!areaZipValidation.isValid) return;
+    navigate(`/scheduler?${new URLSearchParams({ zipCode: areaZip }).toString()}`);
+  };
+
+  const schedulerContinue = () => {
+    setSchedulerZipTouched(true);
+    if (!schedulerCanContinue) return;
+
+    const found = allServiceOptions.find((o) => o.id === schedulerService);
+    const state = {
+      serviceCategory: found?.categoryId ?? '',
+      serviceType: schedulerService,
+      sameDayRequested: schedulerUrgency === 'sameday',
+      zipCode: schedulerZip,
+    };
+    if (schedulerUrgency === 'emergency') {
+      navigate('/emergency-service', { state });
+    } else {
+      navigate('/book/regular', { state });
     }
   };
 
-  return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
-      {/* ── Hero ── */}
-      <Box
-        id="home"
-        sx={{ position: 'relative', height: '70vh', minHeight: '540px', overflow: 'hidden' }}
-      >
-        {images.map((image, index) => (
-          <Box
-            key={image}
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              opacity: index === currentImageIndex ? 1 : 0,
-              transition: 'opacity 1s ease-in-out',
-              backgroundImage: `url(${image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-            }}
-          />
-        ))}
+  const handleContactSubmit = () => {
+    if (contactName && contactEmail && contactMessage) setContactSent(true);
+  };
 
-        <Box
+  const heroImageSrc = '/images/services/hero-appliance-technician.webp';
+
+  const heroFieldLabelSx = {
+    fontFamily: fonts.body,
+    fontWeight: 600,
+    fontSize: '0.8rem',
+    color: colors.darkText,
+    mb: 0.75,
+    display: 'block',
+  };
+
+  const heroBookingCard = (
+    <Box className="hero-booking-card">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.75 }}>
+          <Box
+            sx={{
+              width: 36,
+              height: 36,
+              borderRadius: '10px',
+              backgroundColor: colors.lightBlueBg,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <CalendarMonthIcon sx={{ color: colors.primaryBlue, fontSize: 20 }} />
+          </Box>
+          <Box>
+            <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.05rem', color: colors.navy, lineHeight: 1.2 }}>
+              Book Your Service
+            </Typography>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, mt: 0.15 }}>
+              It only takes a minute
+            </Typography>
+          </Box>
+        </Box>
+
+        <Typography component="label" sx={heroFieldLabelSx}>What do you need help with?</Typography>
+        <FormControl fullWidth size="small" className="hero-form-input" sx={{ mb: 1.25 }}>
+          <Select
+            value={schedulerService}
+            displayEmpty
+            onChange={(e: SelectChangeEvent<string>) => setSchedulerService(e.target.value)}
+            renderValue={(v) => v ? allServiceOptions.find((o) => o.id === v)?.label ?? v : 'Select a service'}
+            MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
+            input={
+              <OutlinedInput
+                startAdornment={
+                  <InputAdornment position="start">
+                    <CalendarMonthIcon sx={{ fontSize: 20, color: colors.mutedText }} />
+                  </InputAdornment>
+                }
+              />
+            }
+          >
+            {serviceCategories.map((cat) => [
+              <MenuItem key={`cat-${cat.id}`} disabled value="" sx={{ fontFamily: fonts.body, fontWeight: 700, color: colors.navy, fontSize: '0.8rem', opacity: '1 !important' }}>
+                — {cat.title}
+              </MenuItem>,
+              ...cat.services.map((s) => (
+                <MenuItem key={s.id} value={s.id} sx={{ fontFamily: fonts.body, pl: 3 }}>
+                  {s.label}
+                </MenuItem>
+              )),
+            ])}
+          </Select>
+        </FormControl>
+
+        <Typography component="label" sx={heroFieldLabelSx}>ZIP Code</Typography>
+        <TextField
+          fullWidth
+          size="small"
+          className="hero-form-input"
+          placeholder="Enter your ZIP code"
+          value={schedulerZip}
+          onChange={(e) => setSchedulerZip(normalizeZipInput(e.target.value))}
+          onBlur={() => setSchedulerZipTouched(true)}
+          inputProps={{ inputMode: 'numeric', maxLength: 5, pattern: '[0-9]{5}' }}
+          error={isZipFieldError(schedulerZip, schedulerZipTouched)}
+          helperText={getZipFieldHelperText(schedulerZip, schedulerZipTouched) || ' '}
+          FormHelperTextProps={{ sx: { mx: 0, fontFamily: fonts.body, fontSize: '0.75rem', minHeight: '1.25em' } }}
+          sx={{ mb: 1.25 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <LocationOnIcon sx={{ fontSize: 20, color: colors.mutedText }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <Typography component="label" sx={heroFieldLabelSx}>How soon do you need service?</Typography>
+        <FormControl fullWidth size="small" className="hero-form-input" sx={{ mb: 1.75 }}>
+          <Select
+            value={schedulerUrgency}
+            onChange={(e) => setSchedulerUrgency(e.target.value as typeof schedulerUrgency)}
+            input={
+              <OutlinedInput
+                startAdornment={
+                  <InputAdornment position="start">
+                    <AccessTimeIcon sx={{ fontSize: 20, color: colors.mutedText }} />
+                  </InputAdornment>
+                }
+              />
+            }
+          >
+            <MenuItem value="regular" sx={{ fontFamily: fonts.body }}>Schedule at a convenient time</MenuItem>
+            <MenuItem value="sameday" sx={{ fontFamily: fonts.body }}>Same-day service</MenuItem>
+            <MenuItem value="emergency" sx={{ fontFamily: fonts.body }}>Emergency — right away</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Button
+          fullWidth
+          variant="contained"
+          endIcon={<ArrowForwardIcon />}
+          disabled={!schedulerCanContinue}
+          onClick={schedulerContinue}
           sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(2, 47, 73, 0.68)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1,
-            pb: '80px',
+            backgroundColor: colors.primaryBlue,
+            color: colors.white,
+            fontFamily: fonts.heading,
+            fontWeight: 600,
+            fontSize: '1rem',
+            textTransform: 'none',
+            borderRadius: '14px',
+            height: 48,
+            boxShadow: '0 12px 30px rgba(10, 37, 64, 0.18)',
+            '&:hover': { backgroundColor: colors.primaryBlueHover },
+            '&.Mui-disabled': { backgroundColor: colors.border, color: colors.mutedText, boxShadow: 'none' },
           }}
         >
-          <Container maxWidth="lg" sx={{ color: '#FFFFFF', textAlign: 'center' }}>
-            {/* Trust badge */}
+          Continue
+        </Button>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 1.5, justifyContent: 'center' }}>
+          <LockOutlinedIcon sx={{ fontSize: 14, color: colors.mutedText }} />
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.71rem', color: colors.mutedText }}>
+            Your information is secure and private
+          </Typography>
+        </Box>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ minHeight: '100vh', backgroundColor: colors.background }}>
+      {/* ── Hero — unified banner: navy text left, image blends across, card floats right ── */}
+      <Box
+        id="home"
+        sx={{
+          position: 'relative',
+          background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
+          pt: { xs: 5, md: 6 },
+          pb: { xs: 4, md: 5, lg: 5 },
+          minHeight: { md: 560, lg: 600 },
+          overflow: 'hidden',
+        }}
+      >
+        {/* Desktop: full-width ambient image — one continuous banner, no boxed panel */}
+        <Box
+          aria-hidden
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+          }}
+        >
+          {/* Soft peripheral glow — never covers the technician center */}
+          <Box
+            component="img"
+            src={heroImageSrc}
+            alt=""
+            sx={{
+              position: 'absolute',
+              inset: '-48px',
+              width: 'calc(100% + 96px)',
+              height: 'calc(100% + 96px)',
+              objectFit: 'cover',
+              objectPosition: '54% 38%',
+              filter: 'blur(42px) brightness(1.12) saturate(1.08)',
+              opacity: 0.32,
+              WebkitMaskImage: 'radial-gradient(ellipse 68% 88% at 52% 40%, transparent 30%, rgba(0,0,0,0.35) 58%, black 100%)',
+              maskImage: 'radial-gradient(ellipse 68% 88% at 52% 40%, transparent 30%, rgba(0,0,0,0.35) 58%, black 100%)',
+            }}
+          />
+          {/* Sharp technician — clear subject, feathered edges only */}
+          <Box
+            component="img"
+            src={heroImageSrc}
+            alt=""
+            loading="eager"
+            fetchPriority="high"
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: '54% 38%',
+              WebkitMaskImage: `
+                linear-gradient(to right,
+                  transparent 0%,
+                  rgba(0,0,0,0.12) 10%,
+                  rgba(0,0,0,0.45) 20%,
+                  black 30%,
+                  black 72%,
+                  rgba(0,0,0,0.08) 82%,
+                  transparent 90%
+                )
+              `,
+              maskImage: `
+                linear-gradient(to right,
+                  transparent 0%,
+                  rgba(0,0,0,0.12) 10%,
+                  rgba(0,0,0,0.45) 20%,
+                  black 30%,
+                  black 72%,
+                  rgba(0,0,0,0.08) 82%,
+                  transparent 90%
+                )
+              `,
+            }}
+          />
+          {/* Smooth left-to-right fade — no solid block, image shows through */}
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              background: `linear-gradient(
+                90deg,
+                rgba(11, 61, 145, 0.92) 0%,
+                rgba(11, 61, 145, 0.74) 24%,
+                rgba(11, 61, 145, 0.28) 42%,
+                rgba(11, 61, 145, 0.06) 56%,
+                rgba(11, 61, 145, 0.00) 66%
+              )`,
+            }}
+          />
+        </Box>
+
+        <Container
+          maxWidth="xl"
+          sx={{
+            maxWidth: '1280px !important',
+            px: { xs: 2, sm: 3 },
+            pl: { md: 1, lg: 1.5 },
+            pr: { md: 2, lg: 2.5 },
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
+          <Box
+            sx={{
+              position: 'relative',
+              minHeight: { md: 400, lg: 440 },
+            }}
+          >
+            {/* Left: headline + CTAs — stays readable, does not overlap image subject */}
+            <Box sx={{ maxWidth: { md: '42%', lg: '38%' }, pb: { xs: 1, lg: 1.5 }, pt: 0, position: 'relative', zIndex: 2, ml: { md: -2.5, lg: -3.5 } }}>
+              {/* Trust badge */}
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  backgroundColor: 'rgba(79,195,247,0.14)',
+                  border: '1px solid rgba(79,195,247,0.28)',
+                  borderRadius: '20px',
+                  px: 1.5,
+                  py: 0.45,
+                  mb: 2,
+                }}
+              >
+                <VerifiedIcon sx={{ color: '#4FC3F7', fontSize: 14 }} />
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.76rem', fontWeight: 600, color: '#BDE8FF' }}>
+                  Trusted Local Appliance Service
+                </Typography>
+              </Box>
+
+              {/* Heading */}
+              <Typography
+                variant="h1"
+                sx={{
+                  fontFamily: fonts.heading,
+                  fontWeight: 800,
+                  fontSize: { xs: '1.85rem', md: '2.2rem', lg: '2.5rem' },
+                  color: '#FFFFFF',
+                  lineHeight: 1.1,
+                  mb: 1.5,
+                  letterSpacing: '-0.4px',
+                }}
+              >
+                Professional Appliance Repair{' '}
+                <Box component="span" sx={{ color: '#4FC3F7' }}>Made Easy</Box>
+              </Typography>
+
+              {/* Subtext */}
+              <Typography
+                sx={{
+                  fontFamily: fonts.body,
+                  fontSize: { xs: '0.92rem', md: '0.98rem' },
+                  color: 'rgba(255,255,255,0.75)',
+                  lineHeight: 1.6,
+                  mb: 2.5,
+                  maxWidth: '440px',
+                }}
+              >
+                Book trusted technicians for appliance repair, installation, HVAC, plumbing, and urgent service needs.
+              </Typography>
+
+              {/* CTAs */}
+              <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'flex-start' }, mb: 2.5 }}>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/scheduler')}
+                  sx={{
+                    ...heroCtaButtonSx,
+                    backgroundColor: colors.primaryBlue,
+                    color: colors.white,
+                    boxShadow: '0 12px 30px rgba(10, 37, 64, 0.18)',
+                    '&:hover': {
+                      backgroundColor: colors.primaryBlueHover,
+                      boxShadow: '0 18px 40px rgba(10, 37, 64, 0.22)',
+                    },
+                  }}
+                >
+                  Book Service
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/emergency-service')}
+                  sx={{
+                    ...heroCtaButtonSx,
+                    backgroundColor: colors.white,
+                    color: colors.primaryBlue,
+                    border: `1px solid ${colors.primaryBlue}`,
+                    boxShadow: '0 12px 30px rgba(10, 37, 64, 0.12)',
+                    '&:hover': {
+                      backgroundColor: colors.lightBlueBg,
+                      boxShadow: '0 16px 36px rgba(10, 37, 64, 0.16)',
+                    },
+                  }}
+                >
+                  Emergency Service
+                </Button>
+              </Box>
+
+              {/* Trust row */}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.5, md: 2.5 }, alignItems: 'center' }}>
+                {['Licensed & Insured', 'Same-Day Available', 'Estimate After Diagnosis'].map((item) => (
+                  <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                    <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#4FC3F7' }} />
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.82)' }}>
+                      {item}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Mobile: image visible above, card below — does not overlap subject */}
+          <Box sx={{ display: { xs: 'block', md: 'none' }, pb: 3 }}>
             <Box
               sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 1,
-                backgroundColor: 'rgba(34, 177, 251, 0.15)',
-                border: '1px solid rgba(34, 177, 251, 0.4)',
-                borderRadius: '999px',
-                px: 2.5,
-                py: 0.75,
-                mb: 2.5,
-                backdropFilter: 'blur(8px)',
+                position: 'relative',
+                height: 260,
+                mx: -1,
+                mb: 0,
+                overflow: 'hidden',
+                borderRadius: '16px',
+              }}
+            >
+              <Box
+                component="img"
+                src={heroImageSrc}
+                alt=""
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  inset: '-28px',
+                  width: 'calc(100% + 56px)',
+                  height: 'calc(100% + 56px)',
+                  objectFit: 'cover',
+                  objectPosition: '54% 38%',
+                  filter: 'blur(32px) brightness(1.08)',
+                  opacity: 0.35,
+                }}
+              />
+              <Box
+                component="img"
+                src={heroImageSrc}
+                alt="Certified appliance repair technician giving thumbs up"
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: '54% 38%',
+                  WebkitMaskImage: 'linear-gradient(to bottom, black 62%, rgba(0,0,0,0.4) 85%, transparent 100%)',
+                  maskImage: 'linear-gradient(to bottom, black 62%, rgba(0,0,0,0.4) 85%, transparent 100%)',
+                }}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: `
+                    linear-gradient(180deg, rgba(11,61,145,0.12) 0%, transparent 40%, transparent 100%),
+                    linear-gradient(90deg, rgba(11,61,145,0.28) 0%, rgba(11,61,145,0.04) 45%, transparent 72%)
+                  `,
+                }}
+              />
+            </Box>
+            <Box sx={{ position: 'relative', zIndex: 2, mt: 3 }}>
+              {heroBookingCard}
+            </Box>
+          </Box>
+        </Container>
+
+        {/* Desktop booking card — tucked to far right, below face/thumbs-up */}
+        <Box
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            position: 'absolute',
+            right: { md: '16px', lg: '24px' },
+            top: { md: 96, lg: 104 },
+            width: '100%',
+            maxWidth: { md: '300px', lg: '320px' },
+            zIndex: 4,
+            pointerEvents: 'auto',
+          }}
+        >
+          {heroBookingCard}
+        </Box>
+      </Box>
+
+      {/* ── What Needs Service? ── */}
+      <Box id="services" sx={{ py: { xs: 7, md: 10 }, backgroundColor: colors.surface }}>
+        <Container
+          maxWidth={false}
+          sx={{
+            maxWidth: '1180px',
+            mx: 'auto',
+            px: { xs: 2, sm: 3 },
+          }}
+        >
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: fonts.heading,
+              fontWeight: 800,
+              color: colors.navy,
+              textAlign: 'center',
+              fontSize: { xs: '1.875rem', md: '2.625rem' },
+              mb: 1.5,
+            }}
+          >
+            What Needs Service?
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: fonts.body,
+              color: '#64748B',
+              textAlign: 'center',
+              mb: { xs: 3, md: 3.5 },
+              fontSize: '1rem',
+              lineHeight: 1.65,
+              maxWidth: 680,
+              mx: 'auto',
+            }}
+          >
+            Choose a service to see repair details, common issues, and booking options.
+          </Typography>
+
+          <ServiceCategoryTabs
+            activeCategory={activeCategory}
+            onChange={handleCategoryChange}
+          />
+
+          {/* Appliances tab: image-based cards */}
+          {activeCategory === 'Appliances' && (
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+                gap: '28px',
+              }}
+            >
+              {popularServices.map((service) => (
+                <Card
+                  key={service.id}
+                  onClick={() => handleServiceSelect(service.id)}
+                  sx={{
+                    borderRadius: '18px',
+                    border: `1px solid ${colors.border}`,
+                    boxShadow: colors.cardShadow,
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    transition: 'all 0.22s ease',
+                    '&:hover': {
+                      boxShadow: '0 22px 48px rgba(10, 37, 64, 0.16)',
+                      transform: 'translateY(-4px)',
+                      borderColor: colors.primaryBlue,
+                    },
+                  }}
+                >
+                  {/* Image area */}
+                  <Box
+                    sx={{
+                      backgroundColor: service.imageBg,
+                      height: '180px',
+                      position: 'relative',
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={service.image}
+                      alt={service.label}
+                      loading="lazy"
+                      sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </Box>
+                  {/* Text area */}
+                  <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box>
+                      <Typography
+                        sx={{
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                          fontWeight: 700,
+                          fontSize: '0.95rem',
+                          color: '#0B3D91',
+                          mb: 0.25,
+                        }}
+                      >
+                        {service.label}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                          fontSize: '0.78rem',
+                          color: '#1A1A1A',
+                        }}
+                      >
+                        {service.subtitle}
+                      </Typography>
+                    </Box>
+                    <ArrowForwardIcon sx={{ color: '#AAAAAA', fontSize: 20, flexShrink: 0, ml: 1 }} />
+                  </Box>
+                </Card>
+              ))}
+            </Box>
+          )}
+
+          {/* Other tabs: image-top service cards */}
+          {activeCategory !== 'Appliances' && (
+            <Box
+              sx={{
+                maxWidth: ['HVAC', 'Plumbing', 'Electrical'].includes(activeCategory) ? 992 : 1100,
+                mx: 'auto',
+                width: '100%',
               }}
             >
               <Box
                 sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: '#22B1FB',
-                  '@keyframes heroPulse': {
-                    '0%': { boxShadow: '0 0 0 0 rgba(34,177,251,0.7)' },
-                    '70%': { boxShadow: '0 0 0 8px rgba(34,177,251,0)' },
-                    '100%': { boxShadow: '0 0 0 0 rgba(34,177,251,0)' },
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    sm: 'repeat(2, minmax(0, 1fr))',
+                    md: 'repeat(3, minmax(0, 1fr))',
                   },
-                  animation: 'heroPulse 2s infinite',
-                }}
-              />
-              <Typography
-                sx={{
-                  color: '#D0EEFF',
-                  fontSize: '0.85rem',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  letterSpacing: 0.5,
+                  gap: { xs: 2, sm: 2.25, md: 2.5 },
                 }}
               >
-                Trusted by 5,000+ homeowners
-              </Typography>
+                {nonPopularCategories.flatMap((cat) =>
+                  cat.services.slice(0, 6).map((s) => {
+                    const imgInfo = SERVICE_TYPE_IMAGE_MAP[s.id] ?? CATEGORY_IMAGE_MAP[cat.id] ?? DEFAULT_SERVICE_IMAGE;
+                    return (
+                      <ServiceGridCard
+                        key={s.id}
+                        title={imgInfo.title}
+                        subtitle={s.cardSubtitle ?? cat.title}
+                        image={imgInfo.image}
+                        onClick={() => handleServiceSelect(s.id)}
+                      />
+                    );
+                  }),
+                )}
+              </Box>
             </Box>
-            <Typography
-              variant="h1"
-              sx={{
-                fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                fontWeight: 700,
-                fontSize: { xs: '1.9rem', sm: '2.6rem', md: '3.4rem' },
-                marginBottom: 2,
-                textShadow: '2px 2px 8px rgba(0,0,0,0.4)',
-              }}
-            >
-              Fast, Reliable Appliance Repair & Home Services
-            </Typography>
-            <Typography
-              variant="h5"
-              sx={{
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 400,
-                marginBottom: 3,
-                maxWidth: '760px',
-                margin: '0 auto 24px',
-                lineHeight: 1.7,
-                fontSize: { xs: '1rem', md: '1.2rem' },
-                textShadow: '1px 1px 6px rgba(0,0,0,0.3)',
-              }}
-            >
-              Book regular or emergency appliance repair with a simple guided service request process.
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-              <Button
-                variant="contained"
-                onClick={() => navigate('/book/regular')}
-                sx={{
-                  backgroundColor: '#22B1FB',
-                  color: '#FFFFFF',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 700,
-                  padding: '14px 32px',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
-                }}
-              >
-                Book Regular Service
-              </Button>
-              <Button
-                variant="contained"
-                onClick={() => navigate('/book/emergency')}
-                sx={{
-                  backgroundColor: '#FF6B6B',
-                  color: '#FFFFFF',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 700,
-                  padding: '14px 32px',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  '&:hover': { backgroundColor: '#FFFFFF', color: '#FF6B6B' },
-                }}
-              >
-                Emergency Service
-              </Button>
-            </Box>
-            <Typography variant="body2" sx={{ color: '#D0EEFF', lineHeight: 1.7, fontSize: '0.9rem' }}>
-              Schedule a convenient appointment or request urgent same-day support with clear priority and fast response.
-            </Typography>
-          </Container>
-        </Box>
+          )}
 
-        {/* Hero stats bar */}
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 2,
-            backgroundColor: 'rgba(2, 47, 73, 0.85)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            borderTop: '1px solid rgba(255,255,255,0.1)',
-            py: { xs: 2, md: 2.5 },
-          }}
-        >
-          <Container maxWidth="lg">
+          {/* Selected service detail panel */}
+          {selectedDetail && (
             <Box
+              id="service-detail-panel"
               sx={{
-                display: 'flex',
-                justifyContent: { xs: 'center', md: 'space-around' },
-                gap: { xs: 4, md: 2 },
-                flexWrap: 'wrap',
+                mt: 4,
+                borderRadius: '24px',
+                border: '1px solid #D0E3FF',
+                overflow: 'hidden',
+                boxShadow: '0 20px 60px rgba(10,37,64,0.10)',
+                backgroundColor: '#FFFFFF',
               }}
             >
-              {companyStats.map((stat) => (
-                <Box key={stat.label} sx={{ textAlign: 'center' }}>
-                  <Typography
-                    sx={{
-                      color: '#22B1FB',
-                      fontWeight: 800,
-                      fontSize: { xs: '1.4rem', md: '1.7rem' },
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      lineHeight: 1.1,
-                    }}
-                  >
-                    {stat.value}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: '#A8D8F0',
-                      fontSize: '0.7rem',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      textTransform: 'uppercase',
-                      letterSpacing: 1.2,
-                      mt: 0.5,
-                    }}
-                  >
-                    {stat.label}
-                  </Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '380px 1fr' }, minHeight: 280 }}>
+                {/* Image */}
+                <Box sx={{ height: { xs: 220, md: '100%' }, minHeight: { md: 280 }, overflow: 'hidden' }}>
+                  <Box
+                    component="img"
+                    src={selectedDetail.image}
+                    alt={selectedDetail.title}
+                    sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
                 </Box>
-              ))}
+                {/* Info */}
+                <Box sx={{ p: { xs: 3, md: 4.5 }, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '1.35rem', md: '1.65rem' }, color: '#0B3D91', mb: 1.5, lineHeight: 1.2 }}>
+                    {selectedDetail.title}
+                  </Typography>
+                  <Typography sx={{ fontFamily: fonts.body, color: '#475569', lineHeight: 1.8, fontSize: '0.95rem', mb: 2.5 }}>
+                    {selectedDetail.description}
+                  </Typography>
+                  {selectedDetail.issues.length > 0 && (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2.5 }}>
+                      {selectedDetail.issues.map((issue) => (
+                        <Chip
+                          key={issue}
+                          label={issue}
+                          size="small"
+                          sx={{
+                            backgroundColor: '#F0F4FF',
+                            color: '#1A73E8',
+                            border: '1px solid #D0E3FF',
+                            fontFamily: fonts.body,
+                            fontWeight: 600,
+                            fontSize: '0.8rem',
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  )}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 3 }}>
+                    <VerifiedIcon sx={{ fontSize: 15, color: '#1A73E8' }} />
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: '#64748B', fontWeight: 600 }}>
+                      Transparent quote before work begins
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Button
+                      variant="contained"
+                      onClick={() => navigate('/book/regular', { state: { serviceType: selectedServiceId } })}
+                      sx={{
+                        backgroundColor: '#1A73E8',
+                        color: '#FFFFFF',
+                        fontFamily: fonts.body,
+                        fontWeight: 700,
+                        textTransform: 'none',
+                        borderRadius: '10px',
+                        px: 3.5,
+                        py: 1.3,
+                        '&:hover': { backgroundColor: '#0B3D91' },
+                      }}
+                    >
+                      Schedule Service
+                    </Button>
+                    {selectedDetail.hasEmergency && (
+                      <Button
+                        variant="outlined"
+                        startIcon={<WarningAmberIcon />}
+                        onClick={() => navigate('/emergency-service')}
+                        sx={{
+                          borderColor: '#EF4444',
+                          color: '#EF4444',
+                          fontFamily: fonts.body,
+                          fontWeight: 700,
+                          textTransform: 'none',
+                          borderRadius: '10px',
+                          px: 3,
+                          py: 1.3,
+                          '&:hover': { backgroundColor: '#FFF5F5', borderColor: '#EA580C', color: '#EA580C' },
+                        }}
+                      >
+                        Emergency Service
+                      </Button>
+                    )}
+                  </Box>
+                </Box>
+              </Box>
             </Box>
-          </Container>
-        </Box>
+          )}
+
+        </Container>
       </Box>
 
-      {/* ── Service Choice Section ── */}
-      <Box sx={{ padding: '64px 0', backgroundColor: '#FFFFFF' }}>
+      {/* ── Booking Options ── */}
+      <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#F5F7FA' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              fontWeight: 600,
-              color: '#022F49',
+              fontFamily: fonts.heading,
+              fontWeight: 800,
+              color: colors.navy,
               textAlign: 'center',
-              marginBottom: 1,
+              fontSize: { xs: '1.75rem', md: '2.1rem' },
+              mb: 1,
+              letterSpacing: '-0.3px',
             }}
           >
-            How Would You Like to Book?
+            Choose how you want to book
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              color: '#555555',
-              textAlign: 'center',
-              marginBottom: 5,
-              maxWidth: '600px',
-              margin: '0 auto 40px',
-            }}
-          >
-            Choose the service type that fits your situation.
+          <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, textAlign: 'center', mb: 6, fontSize: '1rem' }}>
+            Select the option that fits your situation.
           </Typography>
+
           <Box
             sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
-              gap: 3,
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              justifyContent: 'center',
+              gap: { xs: 2.5, md: '28px' },
+              alignItems: { xs: 'center', md: 'stretch' },
             }}
           >
-            {/* Regular Service Card */}
+            {/* Standard Appointment */}
             <Card
               sx={{
-                border: '2px solid #E5E5E5',
-                borderTop: '4px solid #22B1FB',
-                borderRadius: '20px',
-                boxShadow: 'none',
-                transition: 'box-shadow 0.2s',
-                '&:hover': { boxShadow: '0 8px 28px rgba(34,177,251,0.15)' },
+                maxWidth: 340,
+                width: '100%',
+                borderRadius: '22px',
+                border: '1px solid #E4E7EB',
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 2px 12px rgba(10, 37, 64, 0.04)',
+                transition: 'box-shadow 0.22s ease, transform 0.22s ease',
+                '&:hover': { boxShadow: '0 12px 32px rgba(11,94,215,0.14)', transform: 'translateY(-3px)' },
               }}
             >
-              <CardContent sx={{ p: 4 }}>
-                <CalendarMonthIcon sx={{ fontSize: 48, color: '#22B1FB', mb: 2 }} />
-                <Typography
-                  variant="h5"
-                  sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1 }}
+              <Box sx={{ p: '28px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Box
+                  sx={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '14px',
+                    backgroundColor: '#EAF5FF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 2,
+                  }}
                 >
-                  Regular Service Booking
+                  <CalendarMonthIcon sx={{ color: '#1A73E8', fontSize: 28 }} />
+                </Box>
+                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.12rem', color: colors.navy, mb: 1.5 }}>
+                  Standard Appointment
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', mb: 2.5 }}
-                >
-                  For non-urgent appliance issues and scheduled maintenance
-                </Typography>
-                <Box sx={{ mb: 3 }}>
-                  {[
-                    'Refrigerator not cooling properly',
-                    'Washer not draining',
-                    'Dryer not heating',
-                    'Dishwasher not cleaning',
-                    'Oven not heating',
-                    'Appliance noise or maintenance issue',
-                  ].map((item) => (
-                    <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.75 }}>
-                      <CheckCircleOutlineIcon sx={{ fontSize: 16, color: '#22B1FB', flexShrink: 0 }} />
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#444444' }}>
-                        {item}
+                <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none', flexGrow: 1, mb: 3 }}>
+                  {['Best for routine repair and installation.', 'Available in 1–3 days.'].map((line) => (
+                    <Box component="li" key={line} sx={{ display: 'flex', gap: 1.25, mb: 1.1, '&:last-of-type': { mb: 0 } }}>
+                      <Box component="span" sx={{ color: '#1A73E8', fontWeight: 700, lineHeight: 1.6, flexShrink: 0 }}>•</Box>
+                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.94rem', color: colors.darkText, lineHeight: 1.6 }}>
+                        {line}
                       </Typography>
                     </Box>
                   ))}
@@ -505,299 +1046,264 @@ const Home: React.FC = () => {
                   fullWidth
                   onClick={() => navigate('/book/regular')}
                   sx={{
-                    backgroundColor: '#22B1FB',
+                    backgroundColor: '#1A73E8',
                     color: '#FFFFFF',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontFamily: fonts.body,
                     fontWeight: 700,
                     textTransform: 'none',
                     borderRadius: '10px',
-                    py: 1.5,
-                    '&:hover': { backgroundColor: '#022F49' },
+                    py: 1.25,
+                    '&:hover': { backgroundColor: '#0B3D91' },
                   }}
                 >
-                  Book Regular Service
+                  Schedule
                 </Button>
-              </CardContent>
+              </Box>
             </Card>
 
-            {/* Emergency Service Card */}
+            {/* Same-Day Service */}
             <Card
               sx={{
-                border: '2px solid #FFE5E5',
-                borderTop: '4px solid #FF6B6B',
-                borderRadius: '20px',
-                backgroundColor: '#FFF8F8',
-                boxShadow: 'none',
-                transition: 'box-shadow 0.2s',
-                '&:hover': { boxShadow: '0 8px 28px rgba(255,107,107,0.15)' },
+                maxWidth: 340,
+                width: '100%',
+                borderRadius: '22px',
+                border: '1px solid #E4E7EB',
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 2px 12px rgba(10, 37, 64, 0.04)',
+                transition: 'box-shadow 0.22s ease, transform 0.22s ease',
+                '&:hover': { boxShadow: '0 12px 32px rgba(139,92,246,0.14)', transform: 'translateY(-3px)' },
               }}
             >
-              <CardContent sx={{ p: 4 }}>
-                <WarningAmberIcon sx={{ fontSize: 48, color: '#FF6B6B', mb: 2 }} />
-                <Typography
-                  variant="h5"
-                  sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1 }}
+              <Box sx={{ p: '28px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Box
+                  sx={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '14px',
+                    backgroundColor: '#F3F0FF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 2,
+                  }}
                 >
-                  Emergency Service
+                  <FlashOnIcon sx={{ color: '#8B5CF6', fontSize: 28 }} />
+                </Box>
+                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.12rem', color: colors.navy, mb: 1.5 }}>
+                  Same-Day Service
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666', mb: 2.5 }}
-                >
-                  For urgent issues that need immediate attention
-                </Typography>
-                <Box sx={{ mb: 2 }}>
-                  {[
-                    'Major water leak',
-                    'Burning smell or smoke',
-                    'Electrical issue',
-                    'Appliance overheating',
-                    'Refrigerator completely stopped',
-                    'No heating or cooling in extreme weather',
-                  ].map((item) => (
-                    <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.75 }}>
-                      <CheckCircleOutlineIcon sx={{ fontSize: 16, color: '#FF6B6B', flexShrink: 0 }} />
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#444444' }}>
-                        {item}
+                <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none', flexGrow: 1, mb: 3 }}>
+                  {['Priority scheduling for urgent non-emergency issues.', 'Availability may vary.'].map((line) => (
+                    <Box component="li" key={line} sx={{ display: 'flex', gap: 1.25, mb: 1.1, '&:last-of-type': { mb: 0 } }}>
+                      <Box component="span" sx={{ color: '#8B5CF6', fontWeight: 700, lineHeight: 1.6, flexShrink: 0 }}>•</Box>
+                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.94rem', color: colors.darkText, lineHeight: 1.6 }}>
+                        {line}
                       </Typography>
                     </Box>
                   ))}
                 </Box>
-                <Box
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={() => navigate('/book/regular', { state: { sameDayRequested: true } })}
                   sx={{
-                    backgroundColor: '#FFE5E5',
-                    borderRadius: '8px',
-                    p: 1.5,
-                    mb: 3,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
+                    backgroundColor: '#8B5CF6',
+                    color: '#FFFFFF',
+                    fontFamily: fonts.body,
+                    fontWeight: 700,
+                    textTransform: 'none',
+                    borderRadius: '10px',
+                    py: 1.25,
+                    '&:hover': { backgroundColor: '#7C3AED' },
                   }}
                 >
-                  <WarningAmberIcon sx={{ fontSize: 16, color: '#CC2200', flexShrink: 0 }} />
-                  <Typography variant="caption" sx={{ color: '#CC2200', fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 600 }}>
-                    If you smell gas or see smoke, call 911 immediately.
-                  </Typography>
+                  Check Availability
+                </Button>
+              </Box>
+            </Card>
+
+            {/* Emergency Priority */}
+            <Card
+              sx={{
+                maxWidth: 340,
+                width: '100%',
+                borderRadius: '22px',
+                border: '1px solid #FECDD3',
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 2px 12px rgba(10, 37, 64, 0.04)',
+                transition: 'box-shadow 0.22s ease, transform 0.22s ease',
+                '&:hover': { boxShadow: '0 12px 32px rgba(239,68,68,0.12)', transform: 'translateY(-3px)' },
+              }}
+            >
+              <Box sx={{ p: '28px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Box
+                  sx={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '14px',
+                    backgroundColor: '#FFF5F5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 2,
+                  }}
+                >
+                  <WarningAmberIcon sx={{ color: '#EF4444', fontSize: 28 }} />
+                </Box>
+                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.12rem', color: colors.navy, mb: 1.5 }}>
+                  Emergency Priority
+                </Typography>
+                <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none', flexGrow: 1, mb: 3 }}>
+                  {['For urgent breakdowns or safety-related issues.', 'Call 911 first for gas, smoke, or fire.'].map((line) => (
+                    <Box component="li" key={line} sx={{ display: 'flex', gap: 1.25, mb: 1.1, '&:last-of-type': { mb: 0 } }}>
+                      <Box component="span" sx={{ color: '#EF4444', fontWeight: 700, lineHeight: 1.6, flexShrink: 0 }}>•</Box>
+                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.94rem', color: colors.darkText, lineHeight: 1.6 }}>
+                        {line}
+                      </Typography>
+                    </Box>
+                  ))}
                 </Box>
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={() => navigate('/book/emergency')}
+                  onClick={() => navigate('/emergency-service')}
                   sx={{
-                    backgroundColor: '#FF6B6B',
+                    backgroundColor: '#EF4444',
                     color: '#FFFFFF',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    fontFamily: fonts.body,
                     fontWeight: 700,
                     textTransform: 'none',
                     borderRadius: '10px',
-                    py: 1.5,
-                    '&:hover': { backgroundColor: '#CC2200' },
+                    py: 1.25,
+                    '&:hover': { backgroundColor: '#DC2626' },
                   }}
                 >
-                  Request Emergency Service
+                  Emergency Service
                 </Button>
-              </CardContent>
+              </Box>
             </Card>
+          </Box>
+
+          {/* Safety note */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: '#94A3B8', textAlign: 'center' }}>
+              For gas leaks, smoke, fire, or life-safety emergencies — call{' '}
+              <Box component="span" sx={{ fontWeight: 700, color: '#EF4444' }}>911</Box>{' '}
+              immediately.
+            </Typography>
           </Box>
         </Container>
       </Box>
 
-      {/* ── Service Categories ── */}
-      <Box id="services" sx={{ padding: '72px 0', backgroundColor: '#F5F7F9' }}>
+      {/* ── Trust Section ── */}
+      <Box id="why-choose-us" sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#FFFFFF', scrollMarginTop: '80px' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              fontWeight: 600,
-              color: '#022F49',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              fontWeight: 800,
+              color: '#0B3D91',
               textAlign: 'center',
-              marginBottom: 1,
+              fontSize: { xs: '1.8rem', md: '2.1rem' },
+              mb: 1,
+              letterSpacing: '-0.3px',
             }}
           >
-            Our Service Categories
+            Why customers choose Smart Appliances
           </Typography>
-          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #22B1FB, #0077CC)', mx: 'auto', mt: 1.5, mb: 2 }} />
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              color: '#555555',
-              textAlign: 'center',
-              marginBottom: 4,
-              maxWidth: '780px',
-              margin: '0 auto 32px',
-              lineHeight: 1.8,
-            }}
-          >
-            Home services that match the brands and systems you trust — from appliance repair to emergency support,
-            HVAC care, plumbing, electrical, and smart home setup.
-          </Typography>
-
-          {/* Filter tabs */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center', marginBottom: 4 }}>
-            {sectionTags.map((tag) => (
-              <Button
-                key={tag}
-                onClick={() => setServiceCategoryFilter(tag)}
-                variant={serviceCategoryFilter === tag ? 'contained' : 'outlined'}
-                sx={{
-                  textTransform: 'none',
-                  borderRadius: '999px',
-                  px: 3,
-                  py: 0.75,
-                  borderColor: '#22B1FB',
-                  color: serviceCategoryFilter === tag ? '#FFFFFF' : '#022F49',
-                  backgroundColor: serviceCategoryFilter === tag ? '#22B1FB' : '#FFFFFF',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: serviceCategoryFilter === tag ? 700 : 500,
-                  '&:hover': { backgroundColor: serviceCategoryFilter === tag ? '#1A9FE0' : '#E8F4FD', borderColor: '#22B1FB' },
-                }}
-              >
-                {tag}
-              </Button>
-            ))}
-          </Box>
-
-          {/* Category cards */}
+          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #1A73E8, #4FC3F7)', mx: 'auto', mt: 1.5, mb: { xs: 4, md: 5 } }} />
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' },
-              gap: 3,
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+              gap: { xs: 2.5, md: '28px' },
             }}
           >
-            {filteredCategories.map((category) => (
-              <Card
-                key={category.id}
+            {trustItems.map((item) => (
+              <Box
+                key={item.title}
                 sx={{
-                  borderRadius: '20px',
-                  border: '1px solid #E5E5E5',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  gap: '16px',
                   backgroundColor: '#FFFFFF',
-                  minHeight: '340px',
-                  transition: 'all 0.25s ease',
-                  '&:hover': { boxShadow: '0 14px 40px rgba(34,177,251,0.18)', transform: 'translateY(-5px)', borderColor: 'rgba(34,177,251,0.4)' },
+                  border: '1px solid #E4E7EB',
+                  borderRadius: '18px',
+                  p: '24px',
+                  boxShadow: '0 2px 10px rgba(10, 37, 64, 0.04)',
+                  transition: 'box-shadow 0.22s ease, transform 0.22s ease',
+                  '&:hover': {
+                    boxShadow: '0 10px 28px rgba(11,94,215,0.10)',
+                    transform: 'translateY(-2px)',
+                  },
                 }}
               >
-                <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                    <Box
-                      sx={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: '14px',
-                        background: 'linear-gradient(135deg, rgba(34,177,251,0.15) 0%, rgba(34,177,251,0.05) 100%)',
-                        border: '1px solid rgba(34,177,251,0.2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {iconMap[category.icon] ?? <StarIcon sx={{ fontSize: 32, color: '#22B1FB' }} />}
-                    </Box>
-                    <Typography
-                      variant="h5"
-                      sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49' }}
-                    >
-                      {category.title}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" sx={{ color: '#666666', lineHeight: 1.8, mb: 2 }}>
-                    {category.description}
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    flexShrink: 0,
+                    borderRadius: '12px',
+                    backgroundColor: '#EAF5FF',
+                    border: '1px solid #D6E8FF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {item.icon}
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                  <Typography
+                    sx={{
+                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                      fontWeight: 700,
+                      fontSize: '0.95rem',
+                      color: '#0B3D91',
+                      mb: 0.5,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {item.title}
                   </Typography>
-
-                  {/* Top services list */}
-                  <Box sx={{ mb: 2, flexGrow: 1 }}>
-                    {category.services.slice(0, 4).map((service) => (
-                      <Box
-                        key={service.id}
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}
-                      >
-                        <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#22B1FB', flexShrink: 0 }} />
-                        <Typography
-                          variant="body2"
-                          sx={{ color: '#444444', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.82rem' }}
-                        >
-                          {service.label}
-                        </Typography>
-                      </Box>
-                    ))}
-                    {category.services.length > 4 && (
-                      <Typography
-                        variant="caption"
-                        sx={{ color: '#22B1FB', fontFamily: 'DM Sans, Arial, sans-serif', ml: 2.5 }}
-                      >
-                        +{category.services.length - 4} more services
-                      </Typography>
-                    )}
-                  </Box>
-
-                  <Box sx={{ display: 'grid', gap: 1 }}>
-                    <Button
-                      variant="contained"
-                      onClick={() => navigate('/book/regular')}
-                      sx={{
-                        backgroundColor: '#22B1FB',
-                        color: '#FFFFFF',
-                        textTransform: 'none',
-                        borderRadius: '10px',
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        '&:hover': { backgroundColor: '#022F49' },
-                      }}
-                    >
-                      Book Service
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => navigate('/book/emergency')}
-                      sx={{
-                        textTransform: 'none',
-                        borderRadius: '10px',
-                        borderColor: '#FF6B6B',
-                        color: '#FF6B6B',
-                        fontFamily: 'DM Sans, Arial, sans-serif',
-                        fontWeight: 600,
-                        '&:hover': { backgroundColor: '#FFF5F5', borderColor: '#CC2200', color: '#CC2200' },
-                      }}
-                    >
-                      Emergency Support
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
+                  <Typography
+                    sx={{
+                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                      fontSize: '0.84rem',
+                      color: '#4B5563',
+                      lineHeight: 1.65,
+                      m: 0,
+                    }}
+                  >
+                    {item.description}
+                  </Typography>
+                </Box>
+              </Box>
             ))}
           </Box>
         </Container>
       </Box>
 
       {/* ── How It Works ── */}
-      <Box sx={{ padding: '64px 0', backgroundColor: '#FFFFFF' }}>
+      <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#F5F7FA' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              color: '#022F49',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              fontWeight: 800,
+              color: '#0B3D91',
               textAlign: 'center',
-              marginBottom: 1,
+              fontSize: { xs: '1.8rem', md: '2.1rem' },
+              mb: 1,
+              letterSpacing: '-0.3px',
             }}
           >
             How It Works
           </Typography>
-          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #22B1FB, #0077CC)', mx: 'auto', mt: 1.5, mb: 2 }} />
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              color: '#555555',
-              textAlign: 'center',
-              marginBottom: 4,
-            }}
-          >
-            Book a service in minutes, get expert help fast.
-          </Typography>
+          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #1A73E8, #4FC3F7)', mx: 'auto', mt: 1.5, mb: 6 }} />
           <Box
             sx={{
               display: 'grid',
@@ -806,984 +1312,224 @@ const Home: React.FC = () => {
             }}
           >
             {howItWorks.map((item) => (
-              <Card
-                key={item.step}
-                sx={{ borderRadius: '18px', backgroundColor: '#F5F7F9', border: '1px solid #E5E5E5' }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #22B1FB 0%, #0077CC 100%)',
-                      boxShadow: '0 4px 16px rgba(34,177,251,0.4)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mb: 2,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        color: '#FFFFFF',
-                        fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                        fontWeight: 700,
-                        fontSize: '1.1rem',
-                      }}
-                    >
-                      {item.step}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                      color: '#022F49',
-                      marginBottom: 1.5,
-                    }}
-                  >
-                    {item.title}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#555555', lineHeight: 1.8, fontFamily: 'DM Sans, Arial, sans-serif' }}>
-                    {item.description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            ))}
-          </Box>
-        </Container>
-      </Box>
-
-      {/* ── Trust Section ── */}
-      <Box sx={{ padding: '72px 0', backgroundColor: '#F5F7F9' }}>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              color: '#022F49',
-              textAlign: 'center',
-              marginBottom: 1,
-            }}
-          >
-            Why Choose Us
-          </Typography>
-          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #22B1FB, #0077CC)', mx: 'auto', mt: 1.5, mb: 2 }} />
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              color: '#555555',
-              textAlign: 'center',
-              marginBottom: 4,
-            }}
-          >
-            Trusted service with transparent pricing and professional technicians.
-          </Typography>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
-              gap: 3,
-            }}
-          >
-            {trustItems.map((item) => (
-              <Card
-                key={item.title}
-                sx={{
-                  borderRadius: '18px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E8E8E8',
-                  borderTop: '3px solid #22B1FB',
-                  transition: 'all 0.25s ease',
-                  '&:hover': { boxShadow: '0 10px 30px rgba(34,177,251,0.14)', transform: 'translateY(-3px)' },
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box
-                    sx={{
-                      mb: 2.5,
-                      width: 56,
-                      height: 56,
-                      borderRadius: '14px',
-                      background: 'linear-gradient(135deg, rgba(34,177,251,0.15) 0%, rgba(34,177,251,0.05) 100%)',
-                      border: '1px solid rgba(34,177,251,0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {item.icon}
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 1.5 }}
-                  >
-                    {item.title}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#555555', lineHeight: 1.8, fontFamily: 'DM Sans, Arial, sans-serif' }}>
-                    {item.description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            ))}
-          </Box>
-        </Container>
-      </Box>
-
-      {/* ── Testimonials ── */}
-      <Box sx={{ padding: '72px 0', backgroundColor: '#022F49' }}>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', textAlign: 'center', mb: 1 }}
-          >
-            What Our Customers Say
-          </Typography>
-          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #22B1FB, #5DCAFF)', mx: 'auto', mt: 1.5, mb: 6 }} />
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
-              gap: 3,
-            }}
-          >
-            {testimonials.map((t) => (
               <Box
-                key={t.name}
+                key={item.step}
                 sx={{
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '20px',
-                  p: 3.5,
-                  transition: 'all 0.25s ease',
-                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.09)', transform: 'translateY(-4px)', boxShadow: '0 12px 40px rgba(0,0,0,0.2)' },
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '18px',
+                  border: '1px solid #E4E7EB',
+                  p: 3,
                 }}
               >
-                <Box sx={{ display: 'flex', gap: 0.5, mb: 2 }}>
-                  {[...Array(t.rating)].map((_, i) => (
-                    <StarIcon key={i} sx={{ color: '#FFB800', fontSize: 18 }} />
-                  ))}
-                </Box>
-                <Typography
-                  sx={{
-                    color: '#D0EEFF',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    lineHeight: 1.85,
-                    mb: 3,
-                    fontSize: '0.95rem',
-                    fontStyle: 'italic',
-                  }}
-                >
-                  "{t.text}"
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box
-                    sx={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #22B1FB 0%, #0077CC 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Typography sx={{ color: '#FFFFFF', fontWeight: 700, fontSize: '1.1rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>
-                      {t.name.charAt(0)}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography sx={{ color: '#FFFFFF', fontWeight: 700, fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.9rem' }}>
-                      {t.name}
-                    </Typography>
-                    <Typography sx={{ color: '#7FBBDD', fontSize: '0.8rem', fontFamily: 'DM Sans, Arial, sans-serif' }}>
-                      {t.location}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        </Container>
-      </Box>
-
-      {/* ── Brands ── */}
-      <Box sx={{ padding: '40px 0 56px', backgroundColor: '#FFFFFF' }}>
-        <Container maxWidth="lg">
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr auto 1fr' },
-              gap: 3,
-              alignItems: 'center',
-            }}
-          >
-            <Box>
-              <Typography
-                variant="h3"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', textAlign: 'center', mb: 3, color: '#022F49' }}
-              >
-                Brands We Sell
-              </Typography>
-              <Box sx={{ position: 'relative', overflow: 'hidden', maxWidth: '500px', margin: '0 auto', height: '80px' }}>
                 <Box
                   sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    background: '#1A73E8',
+                    boxShadow: '0 4px 14px rgba(11,94,215,0.38)',
                     display: 'flex',
-                    transition: 'transform 0.5s ease-in-out',
-                    transform: `translateX(-${currentBrandIndex * 152}px)`,
-                    gap: 4,
                     alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 2,
                   }}
                 >
-                  {infiniteBrandLogos.map((brand, index) => (
-                    <Box
-                      key={index}
-                      component="img"
-                      src={brand.src}
-                      alt={brand.alt}
-                      sx={{
-                        width: index % 5 === 4 ? '80px' : '120px',
-                        height: 'auto',
-                        objectFit: 'contain',
-                        flexShrink: 0,
-                      }}
-                    />
-                  ))}
+                  <Typography sx={{ color: '#FFFFFF', fontWeight: 800, fontSize: '1rem', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
+                    {item.step}
+                  </Typography>
                 </Box>
+                <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontWeight: 700, fontSize: '0.95rem', color: '#0B3D91', mb: 1 }}>
+                  {item.title}
+                </Typography>
+                <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem', color: '#1A1A1A', lineHeight: 1.75 }}>
+                  {item.description}
+                </Typography>
               </Box>
-            </Box>
-            <Box
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ── Brands Section ── */}
+      <Box id="brands" sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#F8FAFC', scrollMarginTop: '80px' }}>
+        <Container maxWidth="lg">
+          {/* Section header */}
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Chip
+              label="Certified Service"
+              size="small"
               sx={{
-                display: { xs: 'none', md: 'block' },
-                width: '2px',
-                backgroundColor: '#D9D9D9',
-                height: '200px',
-                margin: '0 auto',
-                borderRadius: '1px',
+                backgroundColor: colors.lightBlueBg,
+                color: colors.primaryBlue,
+                fontFamily: fonts.body,
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                letterSpacing: '0.5px',
+                mb: 2,
+                px: 1,
               }}
             />
-            <Box>
-              <Typography
-                variant="h3"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', textAlign: 'center', mb: 3, color: '#022F49' }}
-              >
-                Brands We Repair
-              </Typography>
-              <Box sx={{ position: 'relative', overflow: 'hidden', maxWidth: '500px', margin: '0 auto', height: '80px' }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    transition: 'transform 0.5s ease-in-out',
-                    transform: `translateX(-${currentRepairBrandIndex * 152}px)`,
-                    gap: 4,
-                    alignItems: 'center',
-                  }}
-                >
-                  {infiniteBrandLogos.map((brand, index) => (
-                    <Box
-                      key={`repair-${index}`}
-                      component="img"
-                      src={brand.src}
-                      alt={brand.alt}
-                      sx={{
-                        width: index % 5 === 4 ? '80px' : '120px',
-                        height: 'auto',
-                        objectFit: 'contain',
-                        flexShrink: 0,
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Container>
-      </Box>
-
-      {/* ── Repair & Emergency Services ── */}
-      <Box id="repair" sx={{ padding: '72px 0', backgroundColor: '#022F49' }}>
-        <Container maxWidth="lg">
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-              gap: 6,
-              alignItems: 'center',
-            }}
-          >
-            <Box>
-              <Typography
-                variant="h2"
-                sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                  color: '#FFFFFF',
-                  mb: 2,
-                  fontSize: { xs: '1.4rem', sm: '1.6rem', md: '1.75rem' },
-                  whiteSpace: { md: 'nowrap' },
-                }}
-              >
-                Repair & Emergency Services
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#A8D8F0',
-                  lineHeight: 1.9,
-                  mb: 3,
-                }}
-              >
-                Our certified technicians handle repairs of all kinds — from appliance breakdowns and HVAC failures to
-                plumbing emergencies and electrical issues. We respond fast, diagnose accurately, and fix it right.
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 4 }}>
-                {[
-                  'All major appliance brands serviced',
-                  'Licensed HVAC, plumbing & electrical techs',
-                  'Same-day emergency response available',
-                  'Transparent diagnosis before any repair',
-                  'Parts sourced and replaced on-site',
-                ].map((point) => (
-                  <Box key={point} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <CheckCircleOutlineIcon sx={{ color: '#22B1FB', fontSize: 20, flexShrink: 0 }} />
-                    <Typography
-                      variant="body2"
-                      sx={{ color: '#CCECFF', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.95rem' }}
-                    >
-                      {point}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Button
-                  variant="contained"
-                  onClick={() => navigate('/book/regular')}
-                  sx={{
-                    backgroundColor: '#22B1FB',
-                    color: '#FFFFFF',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 700,
-                    px: 3,
-                    py: 1.25,
-                    borderRadius: '10px',
-                    textTransform: 'none',
-                    '&:hover': { backgroundColor: '#FFFFFF', color: '#022F49' },
-                  }}
-                >
-                  Book Repair Service
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate('/book/emergency')}
-                  sx={{
-                    borderColor: '#FF6B6B',
-                    color: '#FF6B6B',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 700,
-                    px: 3,
-                    py: 1.25,
-                    borderRadius: '10px',
-                    textTransform: 'none',
-                    '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999' },
-                  }}
-                >
-                  Emergency Help
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Stats */}
-            <Box
+            <Typography
+              variant="h2"
               sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 2,
+                fontFamily: fonts.heading,
+                fontWeight: 800,
+                fontSize: { xs: '1.75rem', md: '2.1rem' },
+                color: colors.navy,
+                letterSpacing: '-0.3px',
+                mb: 1.5,
               }}
             >
-              {companyStats.map((stat) => (
+              We Service All Major Appliance Brands
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: fonts.body,
+                fontSize: { xs: '0.95rem', md: '1rem' },
+                color: colors.mutedText,
+                maxWidth: 540,
+                mx: 'auto',
+                lineHeight: 1.75,
+              }}
+            >
+              Our certified technicians are trained to diagnose and repair appliances from the industry's most trusted brands.
+            </Typography>
+          </Box>
+
+          {/* Brand marquee — white card strip */}
+          <Box
+            sx={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #E4E7EB',
+              boxShadow: '0 4px 20px rgba(10, 37, 64, 0.06)',
+              position: 'relative',
+              overflow: 'hidden',
+              py: { xs: 2.5, md: 3 },
+              '&::before, &::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                width: { xs: 48, md: 100 },
+                zIndex: 1,
+                pointerEvents: 'none',
+              },
+              '&::before': {
+                left: 0,
+                background: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255,255,255,0.9) 45%, transparent 100%)',
+              },
+              '&::after': {
+                right: 0,
+                background: 'linear-gradient(270deg, #FFFFFF 0%, rgba(255,255,255,0.9) 45%, transparent 100%)',
+              },
+            }}
+          >
+            <Box className="brand-marquee-track" sx={{ gap: { xs: 5, md: 7 }, alignItems: 'center' }}>
+              {[...majorBrands, ...majorBrands].map((brand, index) => (
                 <Box
-                  key={stat.label}
+                  key={`${brand.name}-${index}`}
                   sx={{
-                    backgroundColor: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    borderRadius: '16px',
-                    p: 3,
-                    textAlign: 'center',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: { xs: 44, md: 52 },
+                    px: { xs: 1, md: 1.5 },
                   }}
                 >
-                  <Typography
+                  <Box
+                    component="img"
+                    src={brand.logo}
+                    alt={`${brand.name} appliance repair`}
+                    loading="lazy"
                     sx={{
-                      fontFamily: 'Wasted Vindey, Arial, sans-serif',
-                      color: '#22B1FB',
-                      fontSize: '2rem',
-                      fontWeight: 700,
-                      lineHeight: 1.2,
-                      mb: 0.5,
+                      height: { xs: 32, md: 40 },
+                      maxWidth: { xs: 110, md: 140 },
+                      width: 'auto',
+                      objectFit: 'contain',
+                      opacity: 0.65,
+                      transition: 'opacity 0.25s ease, transform 0.25s ease',
+                      '&:hover': {
+                        opacity: 1,
+                        transform: 'scale(1.06)',
+                      },
                     }}
-                  >
-                    {stat.value}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: '#A8D8F0', fontFamily: 'DM Sans, Arial, sans-serif', fontSize: '0.85rem' }}
-                  >
-                    {stat.label}
-                  </Typography>
+                  />
                 </Box>
               ))}
             </Box>
           </Box>
-        </Container>
-      </Box>
 
-      {/* ── Buy Appliances ── */}
-      <Box id="appliances" sx={{ backgroundColor: '#E8F4FD' }}>
-        <Container maxWidth="lg" sx={{ padding: '56px 0' }}>
-          <Typography
-            variant="h2"
+          {/* Bottom trust note */}
+          <Box
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              fontWeight: 600,
-              textAlign: 'center',
-              marginBottom: 4,
-              color: '#022F49',
+              mt: 5,
+              pt: 4,
+              borderTop: `1px solid ${colors.border}`,
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: { xs: 2, md: 4 },
             }}
           >
-            Buy Our Premium Appliances
-          </Typography>
-          <Box
-            sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 4 }}
-          >
-            {[
-              {
-                src: '/Item2.png',
-                alt: 'Smart Refrigerator',
-                title: 'Smart Refrigerator',
-                description: 'Advanced temperature control, inventory tracking, and energy efficiency for modern kitchens.',
-                price: '$1,299',
-                type: 'refrigerator' as const,
-              },
-              {
-                src: '/Item1.png',
-                alt: 'Smart Washer',
-                title: 'Smart Washer',
-                description: 'Efficient laundry solutions with remote monitoring and automatic cycle updates.',
-                price: '$799',
-                type: 'washingMachine' as const,
-              },
-            ].map((product) => (
-              <Card
-                key={product.type}
-                sx={{
-                  height: '100%',
-                  backgroundColor: '#FFFFFF',
-                  border: '2px solid #D9D9D9',
-                  borderRadius: '16px',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    backgroundColor: '#022F49',
-                    borderColor: '#022F49',
-                    transform: 'translateY(-4px)',
-                    '& .MuiTypography-root': { color: '#FFFFFF' },
-                  },
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box
-                    component="img"
-                    src={product.src}
-                    alt={product.alt}
-                    sx={{ width: '100%', height: '150px', objectFit: 'contain', borderRadius: '8px', mb: 2 }}
-                  />
-                  <Typography
-                    variant="h5"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', fontWeight: 600, mb: 2, color: '#022F49' }}
-                  >
-                    {product.title}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#000000', lineHeight: 1.6, mb: 3 }}
-                  >
-                    {product.description}
-                  </Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                    <Typography
-                      variant="h6"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700, color: '#022F49' }}
-                    >
-                      {product.price}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Button
-                        variant="outlined"
-                        onClick={() => decreaseCount(product.type)}
-                        disabled={itemCounts[product.type] === 0}
-                        sx={{
-                          minWidth: '32px',
-                          width: '32px',
-                          height: '32px',
-                          p: 0,
-                          border: '2px solid #22B1FB',
-                          color: itemCounts[product.type] === 0 ? '#CCCCCC' : '#22B1FB',
-                          borderRadius: '8px',
-                          '&:hover': {
-                            backgroundColor: itemCounts[product.type] === 0 ? 'transparent' : '#22B1FB',
-                            color: itemCounts[product.type] === 0 ? '#CCCCCC' : '#FFFFFF',
-                          },
-                        }}
-                      >
-                        -
-                      </Button>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
-                          fontWeight: 600,
-                          color: '#022F49',
-                          minWidth: '20px',
-                          textAlign: 'center',
-                        }}
-                      >
-                        {itemCounts[product.type]}
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        onClick={() => increaseCount(product.type)}
-                        sx={{
-                          minWidth: '32px',
-                          width: '32px',
-                          height: '32px',
-                          p: 0,
-                          border: '2px solid #22B1FB',
-                          color: '#22B1FB',
-                          borderRadius: '8px',
-                          '&:hover': { backgroundColor: '#22B1FB', color: '#FFFFFF' },
-                        }}
-                      >
-                        +
-                      </Button>
-                      <Button
-                        variant="contained"
-                        disabled={itemCounts[product.type] === 0}
-                        sx={{
-                          backgroundColor: '#22B1FB',
-                          color: '#FFFFFF',
-                          textTransform: 'none',
-                          borderRadius: '10px',
-                          '&:hover': { backgroundColor: '#022F49' },
-                        }}
-                      >
-                        Add
-                      </Button>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
+            {['All brands serviced', 'OEM parts used', 'Warranty on repairs', 'Same-day availability'].map((note) => (
+              <Box key={note} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <CheckCircleOutlineIcon sx={{ fontSize: 15, color: colors.primaryBlue }} />
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.84rem', fontWeight: 600, color: colors.darkText }}>
+                  {note}
+                </Typography>
+              </Box>
             ))}
           </Box>
         </Container>
       </Box>
 
-      {/* ── About Us ── */}
-      <Box id="about" sx={{ padding: '80px 0', backgroundColor: '#FFFFFF' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 8, alignItems: 'center' }}>
-            <Box>
-              <Typography
-                variant="overline"
-                sx={{
-                  color: '#22B1FB',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 700,
-                  letterSpacing: 2,
-                  mb: 1,
-                  display: 'block',
-                }}
-              >
-                About Us
-              </Typography>
-              <Typography
-                variant="h2"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3, fontSize: { xs: '1.6rem', sm: '2rem', md: '2.2rem' }, whiteSpace: { md: 'nowrap' } }}
-              >
-                Your Trusted Home Service Partner
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#555555',
-                  lineHeight: 2,
-                  mb: 2,
-                }}
-              >
-                SmartAppliance is a full-service home solutions company dedicated to keeping your appliances, HVAC
-                systems, plumbing, and electrical running smoothly. Our team of certified technicians brings years of
-                experience and a commitment to quality work every time.
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#555555',
-                  lineHeight: 2,
-                  mb: 3,
-                }}
-              >
-                Whether you need a routine maintenance visit or urgent emergency support, we respond quickly, diagnose
-                accurately, and provide transparent pricing before any work begins.
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Button
-                  variant="contained"
-                  onClick={() => navigate('/book/regular')}
-                  sx={{
-                    backgroundColor: '#22B1FB',
-                    color: '#FFFFFF',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 700,
-                    px: 3,
-                    py: 1.25,
-                    borderRadius: '10px',
-                    textTransform: 'none',
-                    '&:hover': { backgroundColor: '#022F49' },
-                  }}
-                >
-                  Book a Service
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate('/contact')}
-                  sx={{
-                    borderColor: '#022F49',
-                    color: '#022F49',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
-                    fontWeight: 600,
-                    px: 3,
-                    py: 1.25,
-                    borderRadius: '10px',
-                    textTransform: 'none',
-                    '&:hover': { backgroundColor: '#F5F7F9' },
-                  }}
-                >
-                  Contact Us
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Values grid */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
-              {[
-                { icon: <SupportAgentIcon sx={{ fontSize: 28, color: '#22B1FB' }} />, title: '24/7 Emergency', desc: 'Round-the-clock support for urgent home service needs.' },
-                { icon: <EngineeringIcon sx={{ fontSize: 28, color: '#22B1FB' }} />, title: 'Certified Techs', desc: 'All technicians are licensed, insured, and background-checked.' },
-                { icon: <VerifiedIcon sx={{ fontSize: 28, color: '#22B1FB' }} />, title: 'Quality Guarantee', desc: 'We stand behind every repair with our service quality guarantee.' },
-                { icon: <HomeRepairServiceIcon sx={{ fontSize: 28, color: '#22B1FB' }} />, title: 'Full Coverage', desc: 'Appliances, HVAC, plumbing, electrical — all in one call.' },
-              ].map((val) => (
-                <Box
-                  key={val.title}
-                  sx={{
-                    backgroundColor: '#F5F7F9',
-                    borderRadius: '16px',
-                    p: 2.5,
-                    border: '1px solid #E8E8E8',
-                  }}
-                >
-                  <Box sx={{ mb: 1 }}>{val.icon}</Box>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 0.5 }}
-                  >
-                    {val.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: '#666666', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: 1.7, fontSize: '0.82rem' }}
-                  >
-                    {val.desc}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        </Container>
-      </Box>
-
-      {/* ── Contact Us ── */}
-      <Box id="contact" sx={{ padding: '80px 0', backgroundColor: '#F5F7F9' }}>
+      {/* ── FAQ ── */}
+      <Box id="faqs" sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#FFFFFF', scrollMarginTop: '80px' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              color: '#022F49',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              fontWeight: 800,
+              color: '#0B3D91',
               textAlign: 'center',
+              fontSize: { xs: '1.8rem', md: '2.1rem' },
               mb: 1,
-            }}
-          >
-            Contact Us
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', textAlign: 'center', mb: 6 }}
-          >
-            Have a question or ready to book? Reach out — we respond quickly.
-          </Typography>
-
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 6 }}>
-            {/* Contact info */}
-            <Box>
-              <Typography
-                variant="h5"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3 }}
-              >
-                Get In Touch
-              </Typography>
-              {[
-                { icon: <PhoneIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Phone', value: '+1 (555) 123-4567' },
-                { icon: <EmailIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Email', value: 'service@smartappliance.com' },
-                { icon: <LocationOnIcon sx={{ color: '#22B1FB', fontSize: 22 }} />, label: 'Address', value: '123 Main St, Anytown, USA 00000' },
-              ].map((item) => (
-                <Box key={item.label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 3 }}>
-                  <Box
-                    sx={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: '10px',
-                      backgroundColor: '#E8F4FD',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {item.icon}
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700 }}
-                    >
-                      {item.label}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', mt: 0.25 }}
-                    >
-                      {item.value}
-                    </Typography>
-                  </Box>
-                </Box>
-              ))}
-
-              {/* Hours */}
-              <Box
-                sx={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '14px',
-                  border: '1px solid #E5E5E5',
-                  p: 2.5,
-                  mt: 1,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                  <AccessTimeIcon sx={{ color: '#22B1FB', fontSize: 20 }} />
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', fontWeight: 700 }}
-                  >
-                    Service Hours
-                  </Typography>
-                </Box>
-                {[
-                  { day: 'Monday – Friday', hours: '8:00 AM – 6:00 PM' },
-                  { day: 'Saturday', hours: '9:00 AM – 4:00 PM' },
-                  { day: 'Sunday', hours: 'Closed (Emergency Only)' },
-                ].map((row) => (
-                  <Box
-                    key={row.day}
-                    sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', fontSize: '0.85rem' }}
-                    >
-                      {row.day}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 600, fontSize: '0.85rem' }}
-                    >
-                      {row.hours}
-                    </Typography>
-                  </Box>
-                ))}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1.5, pt: 1.5, borderTop: '1px solid #E5E5E5' }}>
-                  <WarningAmberIcon sx={{ color: '#FF6B6B', fontSize: 16 }} />
-                  <Typography
-                    variant="caption"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#CC2200', fontWeight: 600 }}
-                  >
-                    Emergency service available 24/7 — call anytime
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-
-            {/* Contact form */}
-            <Box>
-              <Typography
-                variant="h5"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', mb: 3 }}
-              >
-                Send Us a Message
-              </Typography>
-              {contactSent ? (
-                <Box
-                  sx={{
-                    backgroundColor: '#E8F5E9',
-                    border: '1px solid #A5D6A7',
-                    borderRadius: '14px',
-                    p: 4,
-                    textAlign: 'center',
-                  }}
-                >
-                  <CheckCircleOutlineIcon sx={{ color: '#2E7D32', fontSize: 48, mb: 2 }} />
-                  <Typography
-                    variant="h6"
-                    sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#2E7D32', mb: 1 }}
-                  >
-                    Message Sent!
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#388E3C' }}
-                  >
-                    Thank you for reaching out. We will get back to you as soon as possible.
-                  </Typography>
-                </Box>
-              ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                  <TextField
-                    label="Your Name"
-                    value={contactName}
-                    onChange={(e) => setContactName(e.target.value)}
-                    fullWidth
-                    variant="outlined"
-                    sx={{ backgroundColor: '#FFFFFF', borderRadius: '8px' }}
-                  />
-                  <TextField
-                    label="Email Address"
-                    type="email"
-                    value={contactEmail}
-                    onChange={(e) => setContactEmail(e.target.value)}
-                    fullWidth
-                    variant="outlined"
-                    sx={{ backgroundColor: '#FFFFFF', borderRadius: '8px' }}
-                  />
-                  <TextField
-                    label="Message"
-                    value={contactMessage}
-                    onChange={(e) => setContactMessage(e.target.value)}
-                    fullWidth
-                    multiline
-                    minRows={5}
-                    variant="outlined"
-                    sx={{ backgroundColor: '#FFFFFF', borderRadius: '8px' }}
-                  />
-                  <Button
-                    variant="contained"
-                    onClick={handleContactSubmit}
-                    disabled={!contactName || !contactEmail || !contactMessage}
-                    sx={{
-                      backgroundColor: '#22B1FB',
-                      color: '#FFFFFF',
-                      fontFamily: 'DM Sans, Arial, sans-serif',
-                      fontWeight: 700,
-                      py: 1.5,
-                      borderRadius: '10px',
-                      textTransform: 'none',
-                      fontSize: '1rem',
-                      '&:hover': { backgroundColor: '#022F49' },
-                    }}
-                  >
-                    Send Message
-                  </Button>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: '#888888', fontFamily: 'DM Sans, Arial, sans-serif', textAlign: 'center' }}
-                  >
-                    Or call us directly at{' '}
-                    <Box
-                      component="span"
-                      sx={{ color: '#22B1FB', fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      +1 (555) 123-4567
-                    </Box>{' '}
-                    — we are here to help.
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          </Box>
-        </Container>
-      </Box>
-
-      {/* ── FAQ Section ── */}
-      <Box sx={{ padding: '80px 0', backgroundColor: '#FFFFFF' }}>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              color: '#022F49',
-              textAlign: 'center',
-              mb: 1,
+              letterSpacing: '-0.3px',
             }}
           >
             Frequently Asked Questions
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5 }}>
-            <Box sx={{ width: 60, height: 4, backgroundColor: '#22B1FB', borderRadius: 2 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
+            <Box sx={{ width: 56, height: 4, backgroundColor: '#1A73E8', borderRadius: 2, mt: 1.5 }} />
           </Box>
-          <Box sx={{ maxWidth: '800px', margin: '0 auto' }}>
+          <Box sx={{ maxWidth: '800px', mx: 'auto' }}>
             {faqs.map((faq) => (
               <Accordion
                 key={faq.question}
                 disableGutters
                 elevation={0}
                 sx={{
-                  border: '1px solid #E5E5E5',
+                  border: '1px solid #E4E7EB',
                   borderRadius: '12px !important',
                   mb: 1.5,
                   '&:before': { display: 'none' },
-                  '&.Mui-expanded': { boxShadow: '0 4px 16px rgba(2,47,73,0.08)' },
+                  '&.Mui-expanded': { boxShadow: '0 4px 16px rgba(11,37,69,0.08)' },
                 }}
               >
                 <AccordionSummary
-                  expandIcon={<ExpandMoreIcon sx={{ color: '#22B1FB' }} />}
-                  sx={{
-                    px: 3,
-                    py: 1,
-                    '& .MuiAccordionSummary-content': { my: 1.5 },
-                  }}
+                  expandIcon={<ExpandMoreIcon sx={{ color: '#1A73E8' }} />}
+                  sx={{ px: 3, '& .MuiAccordionSummary-content': { my: 1.75 } }}
                 >
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 600 }}
-                  >
+                  <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 600, fontSize: '0.95rem' }}>
                     {faq.question}
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ px: 3, pb: 2.5 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', lineHeight: 1.8 }}
-                  >
+                  <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', lineHeight: 1.8, fontSize: '0.88rem' }}>
                     {faq.answer}
                   </Typography>
                 </AccordionDetails>
@@ -1794,280 +1540,374 @@ const Home: React.FC = () => {
       </Box>
 
       {/* ── Service Areas ── */}
-      <Box sx={{ padding: '72px 0', backgroundColor: '#F5F7F9' }}>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
-              color: '#022F49',
-              textAlign: 'center',
-              mb: 1,
-            }}
-          >
-            Service Areas
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-            <Box sx={{ width: 60, height: 4, backgroundColor: '#22B1FB', borderRadius: 2 }} />
-          </Box>
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
-              color: '#555555',
-              textAlign: 'center',
-              maxWidth: '600px',
-              margin: '0 auto 40px',
-              lineHeight: 1.8,
-            }}
-          >
-            SmartAppliance serves homeowners across the greater metro area and surrounding regions. Contact us to
-            confirm service availability in your location.
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1.5,
-              justifyContent: 'center',
-              mb: 5,
-            }}
-          >
-            {serviceAreas.map((area) => (
-              <Chip
-                key={area}
-                label={area}
-                variant="outlined"
-                sx={{
-                  borderColor: '#022F49',
-                  color: '#022F49',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 500,
-                  fontSize: '0.9rem',
-                  px: 1,
-                  '&:hover': { backgroundColor: '#E8F4FD', borderColor: '#22B1FB', color: '#22B1FB' },
-                }}
-              />
-            ))}
-          </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <Button
-              variant="contained"
-              onClick={() => navigate('/contact')}
-              sx={{
-                backgroundColor: '#022F49',
-                color: '#FFFFFF',
-                fontFamily: 'DM Sans, Arial, sans-serif',
-                fontWeight: 700,
-                px: 4,
-                py: 1.5,
-                borderRadius: '10px',
-                textTransform: 'none',
-                fontSize: '1rem',
-                '&:hover': { backgroundColor: '#22B1FB' },
-              }}
-            >
-              Check Your Area
-            </Button>
-          </Box>
-        </Container>
-      </Box>
-
-      {/* ── Footer ── */}
-      <Box component="footer" sx={{ backgroundColor: '#022F49', color: '#FFFFFF', pt: 7, pb: 4 }}>
-        <Container maxWidth="lg">
+      <Box id="service-areas" sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#F5F7FA', scrollMarginTop: '80px' }}>
+        <Container
+          maxWidth={false}
+          sx={{ maxWidth: '1180px', mx: 'auto', px: { xs: 2, sm: 3 } }}
+        >
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
-              gap: 5,
-              mb: 5,
+              gridTemplateColumns: { xs: '1fr', md: '55% 45%' },
+              gap: { xs: 3, md: '28px' },
+              alignItems: 'stretch',
             }}
           >
-            {/* Brand column */}
-            <Box>
-              <Box
-                component="img"
-                src="/Logo.png"
-                alt="SmartAppliance"
-                sx={{ height: '48px', width: 'auto', objectFit: 'contain', mb: 2 }}
-              />
+            {/* Left — ZIP checker + neighborhoods */}
+            <Box
+              sx={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E4E7EB',
+                borderRadius: '24px',
+                boxShadow: '0 18px 40px rgba(10, 37, 64, 0.08)',
+                p: { xs: '28px', md: '32px' },
+              }}
+            >
               <Typography
-                variant="body2"
+                variant="h2"
                 sx={{
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  color: '#A8D8F0',
-                  lineHeight: 1.9,
-                  mb: 2.5,
+                  fontFamily: fonts.heading,
+                  fontWeight: 800,
+                  color: '#0B3D91',
+                  fontSize: { xs: '1.65rem', md: '1.9rem' },
+                  mb: 1.25,
+                  letterSpacing: '-0.3px',
                 }}
               >
-                Your trusted partner for appliance repair, HVAC, plumbing, electrical, and smart home services — with
-                24/7 emergency support.
+                Service Areas
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1.5 }}>
-                {['FB', 'TW', 'YT', 'IG'].map((s) => (
+              <Typography
+                sx={{
+                  fontFamily: fonts.body,
+                  color: colors.darkText,
+                  fontSize: { xs: '0.94rem', md: '1rem' },
+                  lineHeight: 1.75,
+                  mb: 3,
+                }}
+              >
+                We provide appliance repair, installation, HVAC, plumbing, and urgent service across {SERVICE_AREA_REGION_LABEL}. Enter your ZIP code to check availability in your area.
+              </Typography>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  gap: 1.5,
+                  mb: 3,
+                }}
+              >
+                <TextField
+                  placeholder="Enter your ZIP code"
+                  value={areaZip}
+                  onChange={(e) => {
+                    setAreaZip(normalizeZipInput(e.target.value));
+                    setAreaZipTouched(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAreaZipCheck();
+                  }}
+                  fullWidth
+                  error={isZipFieldError(areaZip, areaZipTouched)}
+                  helperText={getZipFieldHelperText(areaZip, areaZipTouched) || ' '}
+                  inputProps={{ inputMode: 'numeric', maxLength: 5 }}
+                  sx={{
+                    flex: 1,
+                    '& .MuiOutlinedInput-root': {
+                      height: '52px',
+                      borderRadius: '14px',
+                      fontFamily: fonts.body,
+                      fontSize: '1rem',
+                      backgroundColor: '#FFFFFF',
+                      '& fieldset': { borderColor: '#E4E7EB' },
+                      '&:hover fieldset': { borderColor: '#1A73E8' },
+                      '&.Mui-focused fieldset': { borderColor: '#1A73E8' },
+                    },
+                    '& .MuiFormHelperText-root': { mx: 0, mt: 0.75 },
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleAreaZipCheck}
+                  sx={{
+                    height: '52px',
+                    minWidth: { xs: '100%', sm: 180 },
+                    flexShrink: 0,
+                    backgroundColor: '#1A73E8',
+                    color: '#FFFFFF',
+                    fontFamily: fonts.body,
+                    fontWeight: 700,
+                    fontSize: '0.95rem',
+                    textTransform: 'none',
+                    borderRadius: '14px',
+                    px: 3,
+                    boxShadow: '0 8px 24px rgba(26, 115, 232, 0.22)',
+                    '&:hover': { backgroundColor: '#0B3D91' },
+                  }}
+                >
+                  Check Availability
+                </Button>
+              </Box>
+
+              {areaZipTouched && areaZipValidation.isValid && areaZipInCoverage && (
+                <Typography
+                  sx={{
+                    fontFamily: fonts.body,
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    color: '#15803D',
+                    mb: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                  }}
+                >
+                  <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
+                  Great news — we service {areaZip}.
+                </Typography>
+              )}
+
+              {areaZipTouched && areaZipValidation.isValidFormat && !areaZipInCoverage && (
+                <Typography
+                  sx={{
+                    fontFamily: fonts.body,
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    color: colors.emergency,
+                    mb: 2,
+                  }}
+                >
+                  We don&apos;t currently service ZIP {areaZip}. Call (888) 555-0199 to check nearby options.
+                </Typography>
+              )}
+
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25 }}>
+                {serviceAreaNeighborhoods.map((area) => (
                   <Box
-                    key={s}
-                    component="a"
-                    href="#"
+                    key={area}
+                    component="span"
                     sx={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(255,255,255,0.08)',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#A8D8F0',
-                      textDecoration: 'none',
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      transition: 'all 0.2s',
-                      '&:hover': { backgroundColor: '#22B1FB', color: '#FFFFFF' },
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #D0E3FF',
+                      color: '#0B3D91',
+                      borderRadius: '999px',
+                      px: '14px',
+                      py: '8px',
+                      fontFamily: fonts.body,
+                      fontSize: '0.86rem',
+                      fontWeight: 600,
+                      lineHeight: 1,
+                      transition: 'background-color 0.2s ease, border-color 0.2s ease',
+                      '&:hover': {
+                        backgroundColor: '#E8F1FF',
+                        borderColor: '#1A73E8',
+                      },
                     }}
                   >
-                    {s}
+                    {area}
                   </Box>
                 ))}
               </Box>
             </Box>
 
-            {/* Quick links */}
-            <Box>
+            {/* Right — service coverage card */}
+            <Box
+              sx={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E4E7EB',
+                borderRadius: '24px',
+                boxShadow: '0 18px 40px rgba(10, 37, 64, 0.08)',
+                p: { xs: '28px', md: '32px' },
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
               <Typography
-                variant="subtitle1"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', mb: 2.5, fontWeight: 700 }}
-              >
-                Quick Links
-              </Typography>
-              {[
-                { label: 'Home', path: '/' },
-                { label: 'Services', path: '/services' },
-                { label: 'About', path: '/about' },
-                { label: 'Contact', path: '/contact' },
-              ].map((link) => (
-                <Box
-                  key={link.label}
-                  onClick={() => navigate(link.path)}
-                  sx={{ ...footerLinkStyle, cursor: 'pointer' }}
-                >
-                  {link.label}
-                </Box>
-              ))}
-            </Box>
-
-            {/* Services */}
-            <Box>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', mb: 2.5, fontWeight: 700 }}
-              >
-                Our Services
-              </Typography>
-              {[
-                'Appliance Repair',
-                'Appliance Installation',
-                'HVAC Services',
-                'Plumbing Services',
-                'Electrical Services',
-                'Smart Home Setup',
-                'Home Maintenance',
-              ].map((s) => (
-                <Box key={s} component="span" sx={{ ...footerLinkStyle, display: 'block', cursor: 'default' }}>
-                  {s}
-                </Box>
-              ))}
-            </Box>
-
-            {/* Contact */}
-            <Box>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#FFFFFF', mb: 2.5, fontWeight: 700 }}
-              >
-                Contact
-              </Typography>
-              {[
-                { icon: <PhoneIcon sx={{ fontSize: 16 }} />, text: '+1 (555) 123-4567' },
-                { icon: <EmailIcon sx={{ fontSize: 16 }} />, text: 'service@smartappliance.com' },
-                { icon: <LocationOnIcon sx={{ fontSize: 16 }} />, text: '123 Main St, Anytown, USA' },
-                { icon: <AccessTimeIcon sx={{ fontSize: 16 }} />, text: 'Mon–Fri: 8AM–6PM' },
-              ].map((item) => (
-                <Box
-                  key={item.text}
-                  sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25, mb: 1.75 }}
-                >
-                  <Box sx={{ color: '#22B1FB', mt: '2px', flexShrink: 0 }}>{item.icon}</Box>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#A8D8F0', fontSize: '0.85rem', lineHeight: 1.5 }}
-                  >
-                    {item.text}
-                  </Typography>
-                </Box>
-              ))}
-              <Button
-                variant="outlined"
-                onClick={() => navigate('/book/emergency')}
-                startIcon={<WarningAmberIcon sx={{ fontSize: 16 }} />}
                 sx={{
-                  borderColor: '#FF6B6B',
-                  color: '#FF9999',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                  fontSize: '0.8rem',
-                  mt: 1,
-                  '&:hover': { backgroundColor: 'rgba(255,107,107,0.1)', borderColor: '#FF9999' },
+                  fontFamily: fonts.heading,
+                  fontWeight: 800,
+                  color: '#0B3D91',
+                  fontSize: { xs: '1.25rem', md: '1.35rem' },
+                  mb: 2.5,
                 }}
               >
-                Emergency Service
-              </Button>
+                Service Coverage
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 3, flexGrow: 1 }}>
+                {serviceCoverageItems.map((item) => (
+                  <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                    <CheckCircleOutlineIcon sx={{ fontSize: 18, color: '#1A73E8', flexShrink: 0 }} />
+                    <Typography
+                      sx={{
+                        fontFamily: fonts.body,
+                        fontSize: '0.95rem',
+                        fontWeight: 600,
+                        color: colors.darkText,
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      {item}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+
+              <ServiceAreaMap height={{ xs: 220, md: 280 }} />
             </Box>
-          </Box>
-
-          <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', mb: 3 }} />
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: { xs: 'center', md: 'space-between' },
-              flexWrap: 'wrap',
-              gap: 2,
-              textAlign: { xs: 'center', md: 'left' },
-            }}
-          >
-            <Typography
-              variant="body2"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#7FBBDD', fontSize: '0.82rem' }}
-            >
-              © {new Date().getFullYear()} SmartAppliance. All rights reserved.
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#7FBBDD', fontSize: '0.82rem' }}
-            >
-              Licensed &amp; Insured · Serving homeowners across the region
-            </Typography>
           </Box>
         </Container>
       </Box>
+
+      {/* ── Get In Touch With Us ── */}
+      <Box id="contact" sx={{ py: { xs: 7, md: 9 }, backgroundColor: colors.surface, scrollMarginTop: '80px' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Typography
+              variant="h2"
+              sx={{
+                fontFamily: fonts.heading,
+                fontWeight: 800,
+                color: colors.navy,
+                fontSize: { xs: '1.8rem', md: '2.25rem' },
+                mb: 1.5,
+                letterSpacing: '-0.3px',
+              }}
+            >
+              Get In Touch With Us
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: fonts.body,
+                color: colors.darkText,
+                fontSize: { xs: '1rem', md: '1.05rem' },
+                maxWidth: 680,
+                mx: 'auto',
+                lineHeight: 1.75,
+              }}
+            >
+              Need reliable appliance repair, installation, or urgent service? Contact our team today.
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 6 }}>
+            <Box>
+              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.15rem', color: colors.navy, mb: 3 }}>
+                Contact Information
+              </Typography>
+              {[
+                { icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 20 }} />, label: 'Phone', value: '+1 (555) 123-4567' },
+                { icon: <EmailIcon sx={{ color: '#1A73E8', fontSize: 20 }} />, label: 'Email', value: 'service@smartappliance.com' },
+                { icon: <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 20 }} />, label: 'Address', value: '123 Main St, Anytown, USA 00000' },
+              ].map((item) => (
+                <Box key={item.label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2.5 }}>
+                  <Box sx={{ width: 40, height: 40, borderRadius: '10px', backgroundColor: '#E8F1FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {item.icon}
+                  </Box>
+                  <Box>
+                    <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontWeight: 700, fontSize: '0.85rem', color: '#0B3D91' }}>
+                      {item.label}
+                    </Typography>
+                    <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', fontSize: '0.85rem', mt: 0.25 }}>
+                      {item.value}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+              <Box sx={{ backgroundColor: '#F5F7FA', borderRadius: '14px', border: '1px solid #E4E7EB', p: 2.5, mt: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                  <AccessTimeIcon sx={{ color: '#1A73E8', fontSize: 18 }} />
+                  <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontWeight: 700, fontSize: '0.88rem', color: '#0B3D91' }}>
+                    Service Hours
+                  </Typography>
+                </Box>
+                {[
+                  { day: 'Monday – Friday', hours: '8:00 AM – 6:00 PM' },
+                  { day: 'Saturday', hours: '9:00 AM – 4:00 PM' },
+                  { day: 'Sunday', hours: 'Closed (Emergency Only)' },
+                ].map((row) => (
+                  <Box key={row.day} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.6 }}>
+                    <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', fontSize: '0.82rem' }}>{row.day}</Typography>
+                    <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 600, fontSize: '0.82rem' }}>{row.hours}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
+            <Box>
+              <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontWeight: 700, fontSize: '1.15rem', color: '#0B3D91', mb: 3 }}>
+                Send Us a Message
+              </Typography>
+              {contactSent ? (
+                <Box sx={{ backgroundColor: '#E8F5E9', border: '1px solid #A5D6A7', borderRadius: '14px', p: 4, textAlign: 'center' }}>
+                  <CheckCircleOutlineIcon sx={{ color: '#2E7D32', fontSize: 48, mb: 2 }} />
+                  <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontWeight: 700, color: '#2E7D32', mb: 1 }}>
+                    Message Sent!
+                  </Typography>
+                  <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#388E3C', fontSize: '0.9rem' }}>
+                    Thank you for reaching out. We will get back to you as soon as possible.
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                  <TextField
+                    label="Your Name"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    fullWidth
+                    size="small"
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: "'Inter', 'DM Sans', sans-serif" } }}
+                  />
+                  <TextField
+                    label="Email Address"
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    fullWidth
+                    size="small"
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: "'Inter', 'DM Sans', sans-serif" } }}
+                  />
+                  <TextField
+                    label="Message"
+                    value={contactMessage}
+                    onChange={(e) => setContactMessage(e.target.value)}
+                    fullWidth
+                    multiline
+                    minRows={5}
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: "'Inter', 'DM Sans', sans-serif" } }}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={handleContactSubmit}
+                    disabled={!contactName || !contactEmail || !contactMessage}
+                    sx={{
+                      background: '#1A73E8',
+                      color: '#FFFFFF',
+                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                      fontWeight: 700,
+                      py: 1.4,
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      '&:hover': { background: '#0B3D91' },
+                    }}
+                  >
+                    Send Message
+                  </Button>
+                  <Typography sx={{ color: '#888', fontFamily: "'Inter', 'DM Sans', sans-serif", textAlign: 'center', fontSize: '0.82rem' }}>
+                    Or call us directly at{' '}
+                    <Box component="span" sx={{ color: '#1A73E8', fontWeight: 700 }}>+1 (555) 123-4567</Box>
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+
+      <SiteFooter />
     </Box>
   );
-};
-
-const footerLinkStyle = {
-  display: 'block',
-  fontFamily: 'DM Sans, Arial, sans-serif',
-  color: '#A8D8F0',
-  textDecoration: 'none',
-  fontSize: '0.88rem',
-  lineHeight: 1.5,
-  mb: 1.25,
-  transition: 'color 0.2s',
-  '&:hover': { color: '#22B1FB' },
 };
 
 export default Home;

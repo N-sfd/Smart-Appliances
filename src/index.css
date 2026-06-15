@@ -1,16 +1,512 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Wasted+Vindey:wght@400;600;700&display=swap');
+:root {
+  --color-primary-50: #E8F1FF;
+  --color-primary-100: #D0E3FF;
+  --color-primary-300: #5EA3F5;
+  --color-primary-500: #1A73E8;
+  --color-primary-700: #0B3D91;
+
+  --color-accent-100: #DFF6FF;
+  --color-accent-300: #7FD9FF;
+  --color-accent-500: #4FC3F7;
+
+  --color-neutral-50: #FFFFFF;
+  --color-neutral-100: #F5F7FA;
+  --color-neutral-200: #E4E7EB;
+  --color-neutral-400: #9AA5B1;
+  --color-neutral-700: #1A1A1A;
+
+  --color-success-500: #22C55E;
+  --color-warning-500: #F59E0B;
+  --color-error-500: #EF4444;
+
+  --shadow-card: 0 18px 40px rgba(10, 37, 64, 0.12);
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1rem;
+}
 
 body {
   margin: 0;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+@keyframes brandMarqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.brand-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: brandMarqueeScroll 38s linear infinite;
+}
+
+.brand-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+    gap: 2rem;
+  }
+}
+
+/* Hero booking card — compact glass panel, does not dominate the image */
+.hero-booking-card {
+  max-width: 350px;
+  width: 100%;
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 24px 60px rgba(10, 37, 64, 0.18);
+  position: relative;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+.hero-form-input.MuiTextField-root .MuiOutlinedInput-root,
+.hero-form-input .MuiOutlinedInput-root {
+  height: 48px;
+  border-radius: 14px;
+  font-size: 15px;
+  background: #ffffff;
+}
+
+.hero-form-input .MuiOutlinedInput-input {
+  font-size: 15px;
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 48px;
+  box-sizing: border-box;
+}
+
+.hero-form-input .MuiSelect-select {
+  min-height: 48px !important;
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.hero-form-input .MuiOutlinedInput-root fieldset {
+  border-color: #E4E7EB;
+}
+
+.hero-form-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: #1A73E8;
+}
+
+.hero-form-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #1A73E8;
+  box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.12);
+}
+
+@media (max-width: 768px) {
+  .hero-booking-card {
+    max-width: 100%;
+    margin-top: 24px;
+  }
+}
+
+/* Booking form — responsive grid, no horizontal overflow */
+.form-card {
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .form-card {
+    padding: 20px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+.form-field {
+  min-width: 0;
+  width: 100%;
+}
+
+.form-field .MuiFormControl-root,
+.form-field .MuiTextField-root {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-field .MuiOutlinedInput-root {
+  width: 100%;
+  height: 56px;
+  border-radius: 16px;
+  font-size: 16px;
+  color: #1A1A1A;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.form-field .MuiOutlinedInput-input {
+  padding: 0 18px;
+  height: 56px;
+  font-size: 16px;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.form-field .MuiSelect-select {
+  min-height: 56px !important;
+  padding: 0 18px !important;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.form-field .MuiOutlinedInput-root fieldset {
+  border: 1px solid #E4E7EB;
+}
+
+.form-field .MuiOutlinedInput-root:hover fieldset {
+  border-color: #1A73E8;
+}
+
+.form-field .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #1A73E8;
+  box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.12);
+}
+
+.form-field .booking-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 16px 18px;
+  border: 1px solid #E4E7EB;
+  border-radius: 16px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #1A1A1A;
+  background: #ffffff;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+}
+
+.form-field .booking-textarea:focus {
+  border-color: #1A73E8;
+  box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.12);
+}
+
+.form-field .booking-textarea::placeholder {
+  color: #9AA5B1;
+}
+
+.form-field-note {
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  width: 100%;
+  padding-bottom: 4px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .form-field-note {
+    align-items: flex-start;
+    padding-bottom: 0;
+  }
+}
+
+.services-subnav-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.services-subnav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Services We Offer — premium segmented tab control */
+.service-segment-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0 4px 4px;
+}
+
+.service-segment-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.service-segment-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #F5F7FA;
+  border: 1px solid #E4E7EB;
+  border-radius: 22px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .service-segment-track {
+    margin: 0;
+  }
+}
+
+.service-segment-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #64748B;
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  transition: all 200ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  outline: none;
+}
+
+.service-segment-tab:hover {
+  background: #E8F1FF;
+  color: #1A73E8;
+}
+
+.service-segment-tab.is-active {
+  background: #FFFFFF;
+  color: #1A73E8;
+  border: 1px solid #D0E3FF;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(10, 37, 64, 0.10);
+}
+
+.service-segment-tab.is-active:hover {
+  background: #FFFFFF;
+  color: #1A73E8;
+  border: 1px solid #D0E3FF;
+  box-shadow: 0 8px 20px rgba(10, 37, 64, 0.10);
+}
+
+.service-segment-tab:focus-visible {
+  outline: 3px solid rgba(26, 115, 232, 0.20);
+  outline-offset: 2px;
+}
+
+.service-segment-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke-width: 2;
+  color: inherit;
+}
+
+@media (max-width: 768px) {
+  .service-segment-tab {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+}
+
+/* Services page — Thumbtack-style category browse tabs */
+.services-browse-tabs-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  border-bottom: 1px solid #E4E7EB;
+}
+
+.services-browse-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.services-browse-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-width: min-content;
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .services-browse-tabs {
+    justify-content: flex-start;
+    padding: 0 4px;
+  }
+}
+
+.services-browse-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 100px;
+  padding: 12px 20px 14px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #64748B;
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.18s ease, border-color 0.18s ease;
+  flex-shrink: 0;
+}
+
+.services-browse-tab:hover {
+  color: #1A73E8;
+}
+
+.services-browse-tab.is-active {
+  color: #1A73E8;
+  border-bottom-color: #1A73E8;
+}
+
+.services-browse-tab-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.75;
+  color: inherit;
+}
+
+/* Header Services dropdown — category menu */
+.services-nav-dropdown {
+  width: 340px;
+  padding: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #E4E7EB;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(10, 37, 64, 0.12);
+}
+
+.services-nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  height: 64px;
+  padding: 0 22px;
+  border: none;
+  border-bottom: 1px solid #E4E7EB;
+  border-radius: 0;
+  background: transparent;
+  color: #1A1A1A;
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.services-nav-dropdown-item.is-last {
+  border-bottom: none;
+}
+
+.services-nav-dropdown-item:hover,
+.services-nav-dropdown-item.is-active {
+  background: #E8F1FF;
+  color: #1A73E8;
+}
+
+.services-nav-dropdown-item.is-emergency .services-nav-dropdown-icon {
+  color: #EF4444;
+}
+
+.services-nav-dropdown-item.is-emergency:hover,
+.services-nav-dropdown-item.is-emergency.is-active {
+  background: #FEF2F2;
+  color: #EF4444;
+}
+
+.services-nav-dropdown-item:focus-visible {
+  outline: 3px solid rgba(26, 115, 232, 0.18);
+  outline-offset: -2px;
+}
+
+.services-nav-dropdown-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke-width: 1.75;
+  color: #64748B;
+}
+
+.services-nav-dropdown-item:hover .services-nav-dropdown-icon,
+.services-nav-dropdown-item.is-active .services-nav-dropdown-icon {
+  color: #1A73E8;
+}
+
+.services-nav-dropdown-item.is-emergency:hover .services-nav-dropdown-icon,
+.services-nav-dropdown-item.is-emergency.is-active .services-nav-dropdown-icon {
+  color: #EF4444;
 }

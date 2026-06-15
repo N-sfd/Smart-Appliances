@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" role="img" aria-label="Alexa">
+  <path d="M12 26c4-10 12-10 16 0" fill="none" stroke="#00CAFF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M20 26c2-5 6-5 8 0" fill="none" stroke="#00CAFF" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="20" cy="28" r="2" fill="#00CAFF"/>
+  <text x="38" y="26" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#00CAFF">alexa</text>
+</svg>

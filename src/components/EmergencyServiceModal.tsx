@@ -27,6 +27,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { serviceCategories, ServiceRequest, urgencyOptions } from '../data/services';
+import { validateZipCode, normalizeZipInput } from '../data/serviceAreas';
 import { saveServiceRequest } from '../lib/firebase';
 
 interface EmergencyServiceModalProps {
@@ -54,12 +55,12 @@ const SectionLabel: React.FC<{ icon: React.ReactNode; title: string; first?: boo
       <Box sx={{ color: EMERGENCY_COLOR, display: 'flex' }}>{icon}</Box>
       <Typography
         sx={{
-          fontFamily: 'DM Sans, Arial, sans-serif',
+          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
           fontWeight: 700,
           fontSize: '0.72rem',
           letterSpacing: 1.5,
           textTransform: 'uppercase',
-          color: '#022F49',
+          color: '#0B3D91',
         }}
       >
         {title}
@@ -139,6 +140,10 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
     if (!city.trim()) e.city = 'City is required.';
     if (!state.trim()) e.state = 'State is required.';
     if (!zip.trim()) e.zip = 'ZIP code is required.';
+    else {
+      const zipResult = validateZipCode(zip);
+      if (!zipResult.isValid) e.zip = zipResult.message ?? 'Enter a valid 5-digit ZIP code.';
+    }
     if (!description.trim()) e.description = 'Please describe the emergency.';
     if (!urgencyLevel) e.urgencyLevel = 'Please select urgency level.';
     if (!consent) e.consent = 'Please confirm before submitting.';
@@ -224,10 +229,10 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
             <Box>
               <Typography
                 sx={{
-                  fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                   fontWeight: 700,
                   fontSize: '1.3rem',
-                  color: '#022F49',
+                  color: '#0B3D91',
                   lineHeight: 1.2,
                 }}
               >
@@ -235,7 +240,7 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ color: '#666666', fontFamily: 'DM Sans, Arial, sans-serif', mt: 0.25 }}
+                sx={{ color: '#666666', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", mt: 0.25 }}
               >
                 Our team will prioritize and contact you as soon as possible.
               </Typography>
@@ -255,9 +260,9 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
             <CheckCircleIcon sx={{ fontSize: 56, color: EMERGENCY_COLOR, mb: 2 }} />
             <Typography
               sx={{
-                fontFamily: 'Wasted Vindey, Arial, sans-serif',
+                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                 fontSize: '1.4rem',
-                color: '#022F49',
+                color: '#0B3D91',
                 mb: 1,
               }}
             >
@@ -265,7 +270,7 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
             </Typography>
             <Typography
               variant="body1"
-              sx={{ color: '#555555', fontFamily: 'DM Sans, Arial, sans-serif', lineHeight: 1.8 }}
+              sx={{ color: '#1A1A1A', fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", lineHeight: 1.8 }}
             >
               Your emergency request has been received. Our team will contact you as soon as
               possible.
@@ -279,10 +284,10 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
                 color: '#FFFFFF',
                 textTransform: 'none',
                 borderRadius: '10px',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 700,
                 px: 5,
-                '&:hover': { backgroundColor: '#022F49' },
+                '&:hover': { backgroundColor: '#0B3D91' },
               }}
             >
               Close
@@ -300,7 +305,7 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
                 backgroundColor: EMERGENCY_BG,
                 border: `1px solid ${EMERGENCY_BORDER}`,
                 color: '#7A4000',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontSize: '0.85rem',
               }}
             >
@@ -450,7 +455,7 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
               <TextField
                 label="ZIP Code *"
                 value={zip}
-                onChange={(e) => setZip(e.target.value)}
+                onChange={(e) => setZip(normalizeZipInput(e.target.value))}
                 size="small"
                 fullWidth
                 error={Boolean(errors.zip)}
@@ -464,19 +469,39 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
               icon={<BuildIcon sx={{ fontSize: 16 }} />}
               title="Describe the Emergency"
             />
-            <TextField
-              label="What is happening? *"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              size="small"
-              fullWidth
-              multiline
-              minRows={4}
-              placeholder="Describe the issue clearly — this helps dispatch the right technician quickly."
-              error={Boolean(errors.description)}
-              helperText={errors.description}
-              sx={fieldSx}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: '#1A1A1A' }}>
+                What is happening? *
+              </Typography>
+              <Box
+                component="textarea"
+                value={description}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+                placeholder="Describe the issue clearly — this helps dispatch the right technician quickly."
+                sx={{
+                  width: '100%',
+                  minHeight: '120px',
+                  padding: '16px',
+                  border: errors.description ? '1px solid #EF4444' : '1px solid #E4E7EB',
+                  borderRadius: '16px',
+                  fontSize: '16px',
+                  lineHeight: 1.5,
+                  color: '#1A1A1A',
+                  backgroundColor: '#FFFFFF',
+                  resize: 'vertical',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  '&:focus': { borderColor: '#EF4444', boxShadow: '0 0 0 4px rgba(239,68,68,0.12)' },
+                  '&::placeholder': { color: '#9AA5B1' },
+                }}
+              />
+              {errors.description && (
+                <Typography sx={{ fontSize: '0.75rem', color: '#EF4444', mt: 0.25 }}>
+                  {errors.description}
+                </Typography>
+              )}
+            </Box>
 
             {/* Consent + Submit */}
             <Divider sx={{ mt: 3, mb: 2 }} />
@@ -492,8 +517,8 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
                 <Typography
                   variant="body2"
                   sx={{
-                    color: errors.consent ? '#D32F2F' : '#555555',
-                    fontFamily: 'DM Sans, Arial, sans-serif',
+                    color: errors.consent ? '#D32F2F' : '#1A1A1A',
+                    fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                   }}
                 >
                   I understand that emergency service availability and pricing may vary.
@@ -513,10 +538,10 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
                 variant="outlined"
                 sx={{
                   borderColor: '#D0D0D0',
-                  color: '#555555',
+                  color: '#1A1A1A',
                   textTransform: 'none',
                   borderRadius: '10px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                   py: 1.25,
                 }}
               >
@@ -532,11 +557,11 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
                   color: '#FFFFFF',
                   textTransform: 'none',
                   borderRadius: '10px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                   fontWeight: 700,
                   py: 1.25,
                   fontSize: '0.95rem',
-                  '&:hover': { backgroundColor: '#022F49' },
+                  '&:hover': { backgroundColor: '#0B3D91' },
                   '&.Mui-disabled': { backgroundColor: '#F5D5AA' },
                 }}
               >

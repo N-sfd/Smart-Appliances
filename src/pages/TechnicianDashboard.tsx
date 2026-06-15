@@ -47,24 +47,24 @@ const TechnicianDashboard: React.FC = () => {
               width: 56,
               height: 56,
               borderRadius: '14px',
-              backgroundColor: '#022F49',
+              backgroundColor: '#0B3D91',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <EngineeringIcon sx={{ fontSize: 30, color: '#22B1FB' }} />
+            <EngineeringIcon sx={{ fontSize: 30, color: '#1A73E8' }} />
           </Box>
           <Box>
             <Typography
               variant="h3"
-              sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49', lineHeight: 1.2 }}
+              sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', lineHeight: 1.2 }}
             >
               Technician Dashboard
             </Typography>
             <Typography
               variant="body2"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#666666' }}
+              sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#666666' }}
             >
               View and manage your assigned service jobs
             </Typography>
@@ -76,18 +76,18 @@ const TechnicianDashboard: React.FC = () => {
           <Chip
             label={`${activeJobs.length} Active Jobs`}
             sx={{
-              backgroundColor: '#022F49',
+              backgroundColor: '#0B3D91',
               color: '#FFFFFF',
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               fontWeight: 600,
             }}
           />
           <Chip
             label={`${activeJobs.filter((j) => j.servicePriority === 'emergency').length} Emergency`}
             sx={{
-              backgroundColor: activeJobs.filter((j) => j.servicePriority === 'emergency').length > 0 ? '#FF6B6B' : '#E0E0E0',
+              backgroundColor: activeJobs.filter((j) => j.servicePriority === 'emergency').length > 0 ? '#EF4444' : '#E0E0E0',
               color: activeJobs.filter((j) => j.servicePriority === 'emergency').length > 0 ? '#FFFFFF' : '#888888',
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               fontWeight: 600,
             }}
           />
@@ -107,13 +107,13 @@ const TechnicianDashboard: React.FC = () => {
             <EngineeringIcon sx={{ fontSize: 64, color: '#D9D9D9', mb: 2 }} />
             <Typography
               variant="h6"
-              sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#999999', mb: 1 }}
+              sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#999999', mb: 1 }}
             >
               No jobs assigned yet
             </Typography>
             <Typography
               variant="body2"
-              sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#AAAAAA' }}
+              sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#AAAAAA' }}
             >
               New job assignments will appear here once the admin schedules them.
             </Typography>
@@ -125,8 +125,8 @@ const TechnicianDashboard: React.FC = () => {
                 key={job.id}
                 sx={{
                   borderRadius: '16px',
-                  border: '1px solid #E5E5E5',
-                  borderLeft: `5px solid ${job.servicePriority === 'emergency' ? '#FF6B6B' : '#22B1FB'}`,
+                  border: '1px solid #E4E7EB',
+                  borderLeft: `5px solid ${job.servicePriority === 'emergency' ? '#EF4444' : '#1A73E8'}`,
                   backgroundColor: job.servicePriority === 'emergency' ? '#FFF8F8' : '#FFFFFF',
                   boxShadow: 'none',
                   transition: 'box-shadow 0.2s',
@@ -148,7 +148,7 @@ const TechnicianDashboard: React.FC = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                       <Typography
                         variant="h6"
-                        sx={{ fontFamily: 'Wasted Vindey, Arial, sans-serif', color: '#022F49' }}
+                        sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91' }}
                       >
                         {job.customerName}
                       </Typography>
@@ -161,9 +161,9 @@ const TechnicianDashboard: React.FC = () => {
                           ) : undefined
                         }
                         sx={{
-                          backgroundColor: job.servicePriority === 'emergency' ? '#FF6B6B' : '#22B1FB',
+                          backgroundColor: job.servicePriority === 'emergency' ? '#EF4444' : '#1A73E8',
                           color: '#FFFFFF',
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           fontWeight: 700,
                           fontSize: '0.72rem',
                         }}
@@ -173,8 +173,8 @@ const TechnicianDashboard: React.FC = () => {
                         size="small"
                         sx={{
                           backgroundColor: '#F5F7F9',
-                          color: '#022F49',
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          color: '#0B3D91',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           fontWeight: 600,
                           fontSize: '0.72rem',
                           textTransform: 'capitalize',
@@ -183,7 +183,7 @@ const TechnicianDashboard: React.FC = () => {
                     </Box>
                     <Typography
                       variant="caption"
-                      sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#888888' }}
+                      sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#888888' }}
                     >
                       {new Date(job.createdAt).toLocaleDateString()}
                     </Typography>
@@ -202,7 +202,7 @@ const TechnicianDashboard: React.FC = () => {
                       <Typography
                         variant="caption"
                         sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           color: '#888888',
                           fontWeight: 700,
                           textTransform: 'uppercase',
@@ -213,16 +213,16 @@ const TechnicianDashboard: React.FC = () => {
                       >
                         Contact & Location
                       </Typography>
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', mb: 0.25 }}>
+                      <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', mb: 0.25 }}>
                         {job.phone}
                       </Typography>
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#22B1FB', mb: 0.5, wordBreak: 'break-all', fontSize: '0.82rem' }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A73E8', mb: 0.5, wordBreak: 'break-all', fontSize: '0.82rem' }}
                       >
                         {job.email}
                       </Typography>
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', fontSize: '0.85rem' }}>
+                      <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', fontSize: '0.85rem' }}>
                         {job.address && `${job.address}, `}
                         {job.city}{job.city && job.state ? ', ' : ''}{job.state} {job.zipCode}
                       </Typography>
@@ -233,7 +233,7 @@ const TechnicianDashboard: React.FC = () => {
                       <Typography
                         variant="caption"
                         sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           color: '#888888',
                           fontWeight: 700,
                           textTransform: 'uppercase',
@@ -246,11 +246,11 @@ const TechnicianDashboard: React.FC = () => {
                       </Typography>
                       <Typography
                         variant="body2"
-                        sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', fontWeight: 700, mb: 0.25 }}
+                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 700, mb: 0.25 }}
                       >
                         {job.serviceCategory}
                       </Typography>
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555', mb: 0.25 }}>
+                      <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', mb: 0.25 }}>
                         {job.serviceType}
                       </Typography>
                       {job.applianceBrand && (
@@ -262,7 +262,7 @@ const TechnicianDashboard: React.FC = () => {
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                             color: '#444444',
                             fontSize: '0.82rem',
                             lineHeight: 1.5,
@@ -279,7 +279,7 @@ const TechnicianDashboard: React.FC = () => {
                       <Typography
                         variant="caption"
                         sx={{
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           color: '#888888',
                           fontWeight: 700,
                           textTransform: 'uppercase',
@@ -296,20 +296,20 @@ const TechnicianDashboard: React.FC = () => {
                           size="small"
                           sx={{
                             backgroundColor: '#FFE0E0',
-                            color: '#CC2200',
-                            fontFamily: 'DM Sans, Arial, sans-serif',
+                            color: '#EA580C',
+                            fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                             fontWeight: 600,
                           }}
                         />
                       ) : (
                         <Box>
                           {job.preferredDate && (
-                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#022F49', mb: 0.25 }}>
+                            <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', mb: 0.25 }}>
                               {job.preferredDate}
                             </Typography>
                           )}
                           {job.preferredTime && (
-                            <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', color: '#555555' }}>
+                            <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A' }}>
                               {job.preferredTime}
                             </Typography>
                           )}
@@ -329,13 +329,13 @@ const TechnicianDashboard: React.FC = () => {
                         backgroundColor: '#FFF3E0',
                         border: '1px solid #FFCC80',
                         '& .MuiAlert-message': {
-                          fontFamily: 'DM Sans, Arial, sans-serif',
+                          fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                           fontSize: '0.88rem',
                           color: '#E65100',
                         },
                       }}
                     >
-                      <Typography variant="body2" sx={{ fontFamily: 'DM Sans, Arial, sans-serif', fontWeight: 700, color: '#E65100', mb: 0.5 }}>
+                      <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontWeight: 700, color: '#E65100', mb: 0.5 }}>
                         Notes
                       </Typography>
                       {job.notes}

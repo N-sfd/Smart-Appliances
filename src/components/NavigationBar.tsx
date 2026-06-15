@@ -94,20 +94,20 @@ const NavigationBar: React.FC = () => {
                 href={item.href}
                 onClick={() => setSelectedItem(item.label)}
                 sx={{
-                  color: selectedItem === item.label ? '#22B1FB' : '#022F49',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  color: selectedItem === item.label ? '#0B5ED7' : '#0B3D91',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                   fontWeight: selectedItem === item.label ? 700 : 600,
                   fontSize: '1rem',
                   textTransform: 'none',
                   padding: '8px 16px',
                   borderRadius: '12px',
-                  borderBottom: selectedItem === item.label ? '3px solid #22B1FB' : '3px solid transparent',
+                  borderBottom: selectedItem === item.label ? '3px solid #0B5ED7' : '3px solid transparent',
                   '&:hover': {
-                    backgroundColor: selectedItem === item.label ? 'rgba(34, 177, 251, 0.2)' : '#022F49',
-                    color: selectedItem === item.label ? '#22B1FB' : '#FFFFFF',
+                    backgroundColor: selectedItem === item.label ? 'rgba(11, 94, 215, 0.2)' : '#0B3D91',
+                    color: selectedItem === item.label ? '#0B5ED7' : '#FFFFFF',
                   },
                   '&:active': {
-                    backgroundColor: '#22B1FB',
+                    backgroundColor: '#0B5ED7',
                     color: '#FFFFFF',
                   },
                 }}
@@ -122,9 +122,9 @@ const NavigationBar: React.FC = () => {
             variant="contained"
             onClick={handleScheduleClick}
             sx={{
-              backgroundColor: '#22B1FB',
+              backgroundColor: '#0B5ED7',
               color: '#FFFFFF',
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               fontWeight: 600,
               fontSize: '1rem',
               textTransform: 'none',
@@ -132,7 +132,7 @@ const NavigationBar: React.FC = () => {
               borderRadius: '12px',
               minHeight: '36px',
               '&:hover': {
-                backgroundColor: '#022F49',
+                backgroundColor: '#0B3D91',
               },
             }}
           >
@@ -188,9 +188,9 @@ const NavigationBar: React.FC = () => {
             id="schedule-modal-title"
             variant="h5"
             sx={{
-              fontFamily: 'Wasted Vindey, Arial, sans-serif',
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
               fontWeight: 600,
-              color: '#022F49',
+              color: '#0B3D91',
               marginBottom: 2,
               paddingRight: 4,
               marginTop: 0,
@@ -202,7 +202,7 @@ const NavigationBar: React.FC = () => {
           <Typography
             variant="body1"
             sx={{
-              fontFamily: 'DM Sans, Arial, sans-serif',
+              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
               color: '#666666',
               marginBottom: 3,
               lineHeight: 1.6,
@@ -217,9 +217,9 @@ const NavigationBar: React.FC = () => {
             <Typography
               variant="h6"
               sx={{
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 600,
-                color: '#022F49',
+                color: '#0B3D91',
                 marginBottom: 1,
               }}
             >
@@ -228,7 +228,7 @@ const NavigationBar: React.FC = () => {
             <Typography
               variant="body2"
               sx={{
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 color: '#666666',
                 marginBottom: 0.5,
               }}
@@ -238,7 +238,7 @@ const NavigationBar: React.FC = () => {
             <Typography
               variant="body2"
               sx={{
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 color: '#666666',
               }}
             >
@@ -256,7 +256,7 @@ const NavigationBar: React.FC = () => {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 },
               }}
             />
@@ -270,7 +270,7 @@ const NavigationBar: React.FC = () => {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 },
               }}
             />
@@ -284,25 +284,25 @@ const NavigationBar: React.FC = () => {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 },
               }}
             />
 
             {/* Repair Item Dropdown */}
             <FormControl variant="outlined" required>
-              <InputLabel sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
+              <InputLabel sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
                 Select Item for Repair
               </InputLabel>
               <Select
                 label="Select Item for Repair"
                 sx={{
                   borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 }}
               >
                 {repairItems.map((item) => (
-                  <MenuItem key={item} value={item} sx={{ fontFamily: 'DM Sans, Arial, sans-serif' }}>
+                  <MenuItem key={item} value={item} sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}>
                     {item}
                   </MenuItem>
                 ))}
@@ -318,7 +318,7 @@ const NavigationBar: React.FC = () => {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '8px',
-                  fontFamily: 'DM Sans, Arial, sans-serif',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 },
               }}
             />
@@ -328,9 +328,9 @@ const NavigationBar: React.FC = () => {
               variant="contained"
               type="submit"
               sx={{
-                backgroundColor: '#22B1FB',
+                backgroundColor: '#0B5ED7',
                 color: '#FFFFFF',
-                fontFamily: 'DM Sans, Arial, sans-serif',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 fontWeight: 600,
                 fontSize: '1rem',
                 textTransform: 'none',
@@ -338,7 +338,7 @@ const NavigationBar: React.FC = () => {
                 borderRadius: '12px',
                 marginTop: 2,
                 '&:hover': {
-                  backgroundColor: '#022F49',
+                  backgroundColor: '#0B3D91',
                 },
               }}
             >

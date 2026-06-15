@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 40" role="img" aria-label="Google Home">
+  <circle cx="14" cy="22" r="6" fill="#4285F4"/>
+  <circle cx="22" cy="14" r="6" fill="#EA4335"/>
+  <circle cx="30" cy="22" r="6" fill="#FBBC05"/>
+  <circle cx="22" cy="30" r="6" fill="#34A853"/>
+  <text x="44" y="26" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#4285F4">Google </text>
+  <text x="108" y="26" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#64748B">Home</text>
+</svg>

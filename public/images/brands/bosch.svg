@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" role="img" aria-label="Bosch">
+  <rect x="0" y="10" width="8" height="28" rx="2" fill="#EA0016"/>
+  <rect x="12" y="10" width="8" height="28" rx="2" fill="#EA0016"/>
+  <text x="28" y="32" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#EA0016">Bosch</text>
+</svg>
