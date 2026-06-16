@@ -61,6 +61,7 @@ import {
   validateFullName,
   validatePreferredDateField,
   validateStateField,
+  validateStreetAddress,
   validateUsPhone,
   SERVICE_AREA_STATES,
 } from '../lib/schedulerContactValidation';
@@ -393,6 +394,7 @@ const SchedulerPage: React.FC = () => {
   const [zipCode, setZipCode] = useState(prefillZip);
   const [zipTouched, setZipTouched] = useState(false);
   const [address, setAddress] = useState('');
+  const [addressTouched, setAddressTouched] = useState(false);
   const [suiteApt, setSuiteApt] = useState('');
   const [city, setCity] = useState('');
   const [stateField, setStateField] = useState('MD');
@@ -453,6 +455,7 @@ const SchedulerPage: React.FC = () => {
   const nameError = validateFullName(name);
   const emailError = validateEmailAddress(email);
   const phoneError = validateUsPhone(phone);
+  const addressError = validateStreetAddress(address);
   const cityError = validateCityField(city);
   const stateError = validateStateField(stateField);
   const preferredDateError = validatePreferredDateField(preferredDate);
@@ -565,6 +568,7 @@ const SchedulerPage: React.FC = () => {
         !nameError &&
         !emailError &&
         !phoneError &&
+        !addressError &&
         !cityError &&
         !stateError &&
         !preferredDateError
@@ -585,6 +589,7 @@ const SchedulerPage: React.FC = () => {
     nameError,
     emailError,
     phoneError,
+    addressError,
     cityError,
     stateError,
     preferredDateError,
@@ -696,8 +701,8 @@ const SchedulerPage: React.FC = () => {
       });
 
       if (insertError) {
-        console.error('[Booking] Supabase insert error:', insertError);
-        setSubmitError('Something went wrong saving your request. Please try again.');
+        console.error('[Booking] Error', insertError);
+        setSubmitError('We could not save your request. Please check your information and try again.');
         setIsSubmitting(false);
         return;
       }
@@ -1660,6 +1665,9 @@ const SchedulerPage: React.FC = () => {
                       label="Street address (optional)"
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
+                      onBlur={() => setAddressTouched(true)}
+                      error={showContactError(addressTouched, addressError)}
+                      helperText={showContactError(addressTouched, addressError) ? addressError : ''}
                       fullWidth
                       size="small"
                     />

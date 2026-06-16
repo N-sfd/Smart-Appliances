@@ -25,6 +25,15 @@ export function validateUsPhone(phone: string): string | null {
   return null;
 }
 
+export function validateStreetAddress(address: string): string | null {
+  const trimmed = address.trim();
+  if (!trimmed) return null;
+  if (trimmed.includes('@') || EMAIL_PATTERN.test(trimmed)) {
+    return 'Please enter a street address, not an email address.';
+  }
+  return null;
+}
+
 export function validateCityField(city: string): string | null {
   const trimmed = city.trim();
   if (!trimmed) return 'City is required.';

@@ -97,17 +97,20 @@ export async function insertBooking(
   row: BookingRow,
 ): Promise<{ id: string | null; error: string | null }> {
   if (!isSupabaseConfigured() || !supabase) {
-    return { id: null, error: null };
+    console.error('[Booking] insertBooking: Supabase not configured — REACT_APP_SUPABASE_URL / REACT_APP_SUPABASE_ANON_KEY may be missing');
+    return { id: null, error: 'Supabase not configured' };
   }
+  console.log('[Booking] FormData', row);
   const { data, error } = await supabase
     .from('service_requests')
     .insert([row])
     .select('id')
     .single();
   if (error) {
-    console.error('Supabase booking insert:', error.message);
+    console.error('[Booking] Error', error.message, error);
     return { id: null, error: error.message };
   }
+  console.log('[Booking] Success', data);
   return { id: (data as { id: string } | null)?.id ?? null, error: null };
 }
 

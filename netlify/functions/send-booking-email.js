@@ -8,9 +8,11 @@ exports.handler = async (event) => {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.error('[send-booking-email] RESEND_API_KEY not set');
-    return { statusCode: 500, body: JSON.stringify({ error: 'Email service not configured' }) };
+    console.warn('[send-booking-email] RESEND_API_KEY missing — skipping email');
+    return { statusCode: 200, body: JSON.stringify({ success: true, skipped: true }) };
   }
+
+  const fromEmail = process.env.FROM_EMAIL || 'noreply@smartappliancesmd.com';
 
   let body;
   try {
@@ -113,7 +115,7 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Smart Appliances MD <noreply@smartappliancesmd.com>',
+        from: `Smart Appliances MD <${fromEmail}>`,
         to: [email],
         subject: `Booking Confirmed – ${requestNumber}`,
         html: htmlBody,

@@ -68,6 +68,15 @@ const URGENCY_OPTIONS = [
   { id: 'emergency', label: 'Emergency', emergency: true  },
 ] as const;
 
+const HVAC_SERVICES    = ['AC Repair', 'Heating / Furnace Repair', 'Thermostat Installation', 'HVAC Maintenance', 'Duct Cleaning'] as const;
+const HVAC_PROBLEMS    = ['No cooling', 'No heat', 'Weak airflow', 'Strange noise', 'Thermostat issue', 'System not turning on'] as const;
+const HVAC_SYSTEM_TYPES = ['Central AC', 'Furnace', 'Heat Pump', 'Mini Split', 'Thermostat', 'Other'] as const;
+
+const APPLIANCE_PROBLEMS = ["Won't start", 'Not cooling / heating', 'Making noise', 'Leaking', 'Error code', 'Other'] as const;
+
+const PLUMBING_SERVICES = ['Drain Cleaning', 'Leak Repair', 'Water Heater', 'Pipe Repair', 'Faucet / Fixture', 'Sump Pump'] as const;
+const PLUMBING_PROBLEMS = ['Clogged drain', 'Leaking pipe', 'No hot water', 'Low pressure', 'Running toilet', 'Other'] as const;
+
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
@@ -91,6 +100,11 @@ const Home: React.FC = () => {
   // Urgency
   const [urgency, setUrgency] = useState<'regular' | 'sameday' | 'emergency'>('regular');
 
+  // Follow-up chip selections (category-contextual)
+  const [subService, setSubService] = useState('');
+  const [problemType, setProblemType] = useState('');
+  const [systemType, setSystemType] = useState('');
+
   // Submit state
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,6 +120,12 @@ const Home: React.FC = () => {
   const showErr = (touched: boolean, err: string | null) =>
     Boolean(err) && (touched || submitAttempted);
 
+  const resetFollowUps = () => {
+    setSubService('');
+    setProblemType('');
+    setSystemType('');
+  };
+
   const handleSelectPopular = (svc: typeof POPULAR_SERVICES[number]) => {
     setSelectedServiceId(svc.id);
     setSelectedProductName(svc.productName);
@@ -114,6 +134,10 @@ const Home: React.FC = () => {
     setSelectedTypeCode(svc.typeCode);
     setShowFullList(false);
     setFullListValue('');
+    resetFollowUps();
+    // Pre-select sub-service for HVAC / Plumbing popular chips
+    if (svc.serviceCategory === 'HVAC') setSubService(svc.productName);
+    if (svc.serviceCategory === 'Plumbing') setSubService(svc.productName);
   };
 
   const handleSelectFull = (e: SelectChangeEvent<string>) => {
@@ -129,6 +153,10 @@ const Home: React.FC = () => {
     setSelectedServiceCategory(svcCategory);
     setSelectedTypeCode(/install/i.test(found.label) ? 'i' : 'r');
     setShowFullList(false);
+    resetFollowUps();
+    // Pre-select sub-service when it matches a known chip value
+    if (svcCategory === 'HVAC' && (HVAC_SERVICES as readonly string[]).includes(found.label)) setSubService(found.label);
+    if (svcCategory === 'Plumbing' && (PLUMBING_SERVICES as readonly string[]).includes(found.label)) setSubService(found.label);
   };
 
   const handleReset = () => {
@@ -140,6 +168,7 @@ const Home: React.FC = () => {
     setSelectedTypeCode('r');
     setShowFullList(false);
     setFullListValue('');
+    resetFollowUps();
     setName('');
     setNameTouched(false);
     setEmail('');
@@ -169,7 +198,9 @@ const Home: React.FC = () => {
       zip_code: '',
       service_type: selectedServiceType,
       service_category: selectedServiceCategory,
-      product_name: selectedProductName,
+      product_name: subService || selectedProductName,
+      problem_type: problemType || null,
+      system_type: systemType || null,
       urgency: urgencyLabel,
       status: 'New',
       issue_description: 'Quick service request from homepage',
@@ -381,6 +412,61 @@ const Home: React.FC = () => {
           {serviceError}
         </Typography>
       )}
+
+      {/* ── Contextual follow-up chips ── */}
+      <Collapse in={selectedServiceCategory === 'HVAC'}>
+        <Box sx={{ mb: 0.75 }}>
+          <Typography component="div" sx={{ ...heroFieldLabelSx, mb: 0.6 }}>What HVAC service?</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mb: 1 }}>
+            {HVAC_SERVICES.map((s) => (
+              <Box key={s} onClick={() => setSubService(subService === s ? '' : s)} sx={{ ...chipSx(subService === s), fontSize: '0.76rem', px: 1, py: 0.4 }}>{s}</Box>
+            ))}
+          </Box>
+
+          <Typography component="div" sx={{ ...heroFieldLabelSx, mb: 0.6 }}>What problem are you having?</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mb: 1 }}>
+            {HVAC_PROBLEMS.map((p) => (
+              <Box key={p} onClick={() => setProblemType(problemType === p ? '' : p)} sx={{ ...chipSx(problemType === p), fontSize: '0.76rem', px: 1, py: 0.4 }}>{p}</Box>
+            ))}
+          </Box>
+
+          <Typography component="div" sx={{ ...heroFieldLabelSx, mb: 0.6 }}>System type</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
+            {HVAC_SYSTEM_TYPES.map((t) => (
+              <Box key={t} onClick={() => setSystemType(systemType === t ? '' : t)} sx={{ ...chipSx(systemType === t), fontSize: '0.76rem', px: 1, py: 0.4 }}>{t}</Box>
+            ))}
+          </Box>
+        </Box>
+      </Collapse>
+
+      <Collapse in={selectedServiceCategory === 'Appliance'}>
+        <Box sx={{ mb: 0.75 }}>
+          <Typography component="div" sx={{ ...heroFieldLabelSx, mb: 0.6 }}>What problem are you having?</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
+            {APPLIANCE_PROBLEMS.map((p) => (
+              <Box key={p} onClick={() => setProblemType(problemType === p ? '' : p)} sx={{ ...chipSx(problemType === p), fontSize: '0.76rem', px: 1, py: 0.4 }}>{p}</Box>
+            ))}
+          </Box>
+        </Box>
+      </Collapse>
+
+      <Collapse in={selectedServiceCategory === 'Plumbing'}>
+        <Box sx={{ mb: 0.75 }}>
+          <Typography component="div" sx={{ ...heroFieldLabelSx, mb: 0.6 }}>What plumbing service?</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mb: 1 }}>
+            {PLUMBING_SERVICES.map((s) => (
+              <Box key={s} onClick={() => setSubService(subService === s ? '' : s)} sx={{ ...chipSx(subService === s), fontSize: '0.76rem', px: 1, py: 0.4 }}>{s}</Box>
+            ))}
+          </Box>
+
+          <Typography component="div" sx={{ ...heroFieldLabelSx, mb: 0.6 }}>What problem are you having?</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
+            {PLUMBING_PROBLEMS.map((p) => (
+              <Box key={p} onClick={() => setProblemType(problemType === p ? '' : p)} sx={{ ...chipSx(problemType === p), fontSize: '0.76rem', px: 1, py: 0.4 }}>{p}</Box>
+            ))}
+          </Box>
+        </Box>
+      </Collapse>
 
       {/* Contact fields */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.875, mt: 0.5, mb: 1 }}>
