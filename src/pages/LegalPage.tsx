@@ -50,7 +50,7 @@ export const AccessibilityPage: React.FC = () => (
     <p>
       Smart Appliances is committed to making our website usable for all customers. If you experience difficulty
       accessing content or booking service online, please call{' '}
-      <a href="tel:+18885550199">(888) 555-0199</a> or email{' '}
+      <a href="tel:+15712764808">(571) 276-4808</a> or email{' '}
       <a href="mailto:service@smartappliance.com">service@smartappliance.com</a> for assistance.
     </p>
   </LegalPage>

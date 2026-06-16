@@ -608,8 +608,8 @@ const PricingPage: React.FC = () => {
 
                     <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: '#94A3B8', textAlign: 'center', lineHeight: 1.6 }}>
                       Questions? Call{' '}
-                      <Box component="a" href="tel:+18885550199" sx={{ color: colors.primaryBlue, textDecoration: 'none', fontWeight: 700 }}>
-                        (888) 555-0199
+                      <Box component="a" href="tel:+15712764808" sx={{ color: colors.primaryBlue, textDecoration: 'none', fontWeight: 700 }}>
+                        (571) 276-4808
                       </Box>
                       {' '}· Final price confirmed after in-home diagnosis
                     </Typography>

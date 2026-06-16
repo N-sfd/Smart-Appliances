@@ -1,8 +1,11 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Box, Typography, Button, Link as MuiLink } from '@mui/material';
+import { Box, Typography, Button, Link as MuiLink, IconButton } from '@mui/material';
 import PhoneIcon from '@mui/icons-material/Phone';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 import { fonts } from '../theme';
 
 const FOOTER_HEADING = {
@@ -139,7 +142,7 @@ const SiteFooter: React.FC = () => {
             </Typography>
             <Button
               component="a"
-              href="tel:+18885550199"
+              href="tel:+15712764808"
               variant="contained"
               startIcon={<PhoneIcon sx={{ fontSize: 18 }} />}
               sx={{
@@ -157,7 +160,7 @@ const SiteFooter: React.FC = () => {
                 '&:hover': { backgroundColor: '#0B3D91' },
               }}
             >
-              Call (888) 555-0199
+              Call (571) 276-4808
             </Button>
             <Typography sx={{ ...footerBodyText, fontSize: '0.8rem', mb: 1.5 }}>
               24/7 emergency service available
@@ -174,6 +177,32 @@ const SiteFooter: React.FC = () => {
             >
               service@smartappliance.com
             </MuiLink>
+
+            {/* Social media icons */}
+            <Box sx={{ display: 'flex', gap: 0.5, mt: 2 }}>
+              {[
+                { href: 'https://www.facebook.com/smartappliancesmd', icon: <FacebookIcon sx={{ fontSize: 20 }} />, label: 'Facebook' },
+                { href: 'https://www.instagram.com/smartappliancesmd', icon: <InstagramIcon sx={{ fontSize: 20 }} />, label: 'Instagram' },
+                { href: 'https://www.youtube.com/@smartappliancesmd', icon: <YouTubeIcon sx={{ fontSize: 20 }} />, label: 'YouTube' },
+              ].map(({ href, icon, label }) => (
+                <IconButton
+                  key={label}
+                  component="a"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  size="small"
+                  sx={{
+                    color: '#64748B',
+                    '&:hover': { color: '#1A73E8', backgroundColor: '#EBF2FF' },
+                    transition: 'color 0.2s, background-color 0.2s',
+                  }}
+                >
+                  {icon}
+                </IconButton>
+              ))}
+            </Box>
           </Box>
 
           {/* Column 2 — Services */}

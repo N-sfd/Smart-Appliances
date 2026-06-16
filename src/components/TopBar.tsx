@@ -289,7 +289,7 @@ const TopBar: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexShrink: 0 }}>
             <Button
               component="a"
-              href="tel:+18885550199"
+              href="tel:+15712764808"
               startIcon={<Phone sx={{ fontSize: '1rem !important' }} />}
               sx={{
                 display: { xs: 'none', sm: 'inline-flex' },
@@ -306,7 +306,7 @@ const TopBar: React.FC = () => {
                 '&:hover': { backgroundColor: colors.lightBlueBg, borderColor: colors.primaryBlue, color: colors.primaryBlue },
               }}
             >
-              (888) 555-0199
+              (571) 276-4808
             </Button>
 
             <IconButton
@@ -454,12 +454,12 @@ const TopBar: React.FC = () => {
           </Button>
           <Box
             component="a"
-            href="tel:+18885550199"
+            href="tel:+15712764808"
             sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center', mt: 0.5, textDecoration: 'none' }}
           >
             <Phone sx={{ color: colors.primaryBlue, fontSize: '1rem' }} />
             <Box component="span" sx={{ color: colors.navy, fontFamily: fonts.body, fontSize: '0.9rem', fontWeight: 700 }}>
-              (888) 555-0199
+              (571) 276-4808
             </Box>
           </Box>
         </Box>

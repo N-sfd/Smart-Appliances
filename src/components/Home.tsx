@@ -125,7 +125,7 @@ const Home: React.FC = () => {
       customer_name:     name,
       email,
       phone,
-      zip_code:          null,
+      zip_code:          '',
       service_type:      svc.serviceType,
       service_category:  svc.serviceCategory,
       product_name:      svc.label,

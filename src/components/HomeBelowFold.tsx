@@ -1102,7 +1102,7 @@ const HomeBelowFold: React.FC = () => {
                     mb: 2,
                   }}
                 >
-                  We don&apos;t currently service ZIP {areaZip}. Call (888) 555-0199 to check nearby options.
+                  We don&apos;t currently service ZIP {areaZip}. Call (571) 276-4808 to check nearby options.
                 </Typography>
               )}
 
@@ -1324,7 +1324,7 @@ const HomeBelowFold: React.FC = () => {
                   </Button>
                   <Typography sx={{ color: '#888', fontFamily: "'Inter', 'DM Sans', sans-serif", textAlign: 'center', fontSize: '0.82rem' }}>
                     Or call us directly at{' '}
-                    <Box component="span" sx={{ color: '#1A73E8', fontWeight: 700 }}>+1 (555) 123-4567</Box>
+                    <Box component="a" href="tel:+15712764808" sx={{ color: '#1A73E8', fontWeight: 700, textDecoration: 'none' }}>+1 (571) 276-4808</Box>
                   </Typography>
                 </Box>
               )}
