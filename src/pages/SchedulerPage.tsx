@@ -824,23 +824,16 @@ const SchedulerPage: React.FC = () => {
             borderRadius: '10px',
             textTransform: 'none',
             boxShadow: 'none',
-            ...(step === 2 && !canContinue
-              ? {
-                  backgroundColor: '#CBD5E1',
-                  '&:hover': { backgroundColor: '#CBD5E1' },
-                }
-              : {
-                  backgroundColor:
-                    serviceType === 'emergency' && step === 0
-                      ? colors.emergency
-                      : colors.primaryBlue,
-                  '&:hover': {
-                    backgroundColor:
-                      serviceType === 'emergency' && step === 0
-                        ? colors.emergencyHover
-                        : colors.navy,
-                  },
-                }),
+            backgroundColor:
+              serviceType === 'emergency' && step === 0
+                ? colors.emergency
+                : colors.primaryBlue,
+            '&:hover': {
+              backgroundColor:
+                serviceType === 'emergency' && step === 0
+                  ? colors.emergencyHover
+                  : colors.navy,
+            },
           }}
         >
           {serviceType === 'emergency' && step === 0 ? 'Get Emergency Help' : 'Continue'}
