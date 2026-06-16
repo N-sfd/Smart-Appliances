@@ -39,12 +39,12 @@ const allServiceOptions = serviceCategories.flatMap((cat) =>
 );
 
 const POPULAR_SERVICES = [
-  { id: 'refrigerator',   label: 'Refrigerator',   productName: 'Refrigerator',   serviceType: 'Repair', serviceCategory: 'Appliance', typeCode: 'r' },
-  { id: 'washer-dryer',   label: 'Washer / Dryer', productName: 'Washer / Dryer', serviceType: 'Repair', serviceCategory: 'Appliance', typeCode: 'r' },
-  { id: 'dishwasher',     label: 'Dishwasher',     productName: 'Dishwasher',     serviceType: 'Repair', serviceCategory: 'Appliance', typeCode: 'r' },
-  { id: 'oven-stove',     label: 'Oven / Stove',   productName: 'Oven / Stove',   serviceType: 'Repair', serviceCategory: 'Appliance', typeCode: 'r' },
-  { id: 'ac-repair',      label: 'AC Repair',      productName: 'AC Repair',      serviceType: 'Repair', serviceCategory: 'HVAC',      typeCode: 'r' },
-  { id: 'drain-cleaning', label: 'Drain Cleaning', productName: 'Drain Cleaning', serviceType: 'Repair', serviceCategory: 'Plumbing',  typeCode: 'r' },
+  { id: 'refrigerator',   label: 'Refrigerator',   productName: 'Refrigerator',   serviceType: 'Repair', serviceCategory: 'Appliance' },
+  { id: 'washer-dryer',   label: 'Washer / Dryer', productName: 'Washer / Dryer', serviceType: 'Repair', serviceCategory: 'Appliance' },
+  { id: 'dishwasher',     label: 'Dishwasher',     productName: 'Dishwasher',     serviceType: 'Repair', serviceCategory: 'Appliance' },
+  { id: 'oven-stove',     label: 'Oven / Stove',   productName: 'Oven / Stove',   serviceType: 'Repair', serviceCategory: 'Appliance' },
+  { id: 'ac-repair',      label: 'AC Repair',      productName: 'AC Repair',      serviceType: 'Repair', serviceCategory: 'HVAC'      },
+  { id: 'drain-cleaning', label: 'Drain Cleaning', productName: 'Drain Cleaning', serviceType: 'Repair', serviceCategory: 'Plumbing'  },
 ] as const;
 
 const generateRequestNumber = (): string => {
@@ -85,7 +85,6 @@ const Home: React.FC = () => {
   const [selectedProductName, setSelectedProductName] = useState('');
   const [selectedServiceType, setSelectedServiceType] = useState('Repair');
   const [selectedServiceCategory, setSelectedServiceCategory] = useState('');
-  const [selectedTypeCode, setSelectedTypeCode] = useState('r');
   const [showFullList, setShowFullList] = useState(false);
   const [fullListValue, setFullListValue] = useState('');
 
@@ -131,7 +130,6 @@ const Home: React.FC = () => {
     setSelectedProductName(svc.productName);
     setSelectedServiceType(svc.serviceType);
     setSelectedServiceCategory(svc.serviceCategory);
-    setSelectedTypeCode(svc.typeCode);
     setShowFullList(false);
     setFullListValue('');
     resetFollowUps();
@@ -151,7 +149,6 @@ const Home: React.FC = () => {
     setSelectedProductName(found.label);
     setSelectedServiceType(svcType);
     setSelectedServiceCategory(svcCategory);
-    setSelectedTypeCode(/install/i.test(found.label) ? 'i' : 'r');
     setShowFullList(false);
     resetFollowUps();
     // Pre-select sub-service when it matches a known chip value
@@ -165,7 +162,6 @@ const Home: React.FC = () => {
     setSelectedProductName('');
     setSelectedServiceType('Repair');
     setSelectedServiceCategory('');
-    setSelectedTypeCode('r');
     setShowFullList(false);
     setFullListValue('');
     resetFollowUps();
@@ -212,14 +208,22 @@ const Home: React.FC = () => {
       return;
     }
 
-    // Fire-and-forget email
+    // Fire-and-forget email — booking success is never blocked by this
     fetch('/.netlify/functions/send-booking-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ requestNumber: reqNum, customerName: name, email, service: selectedProductName, preferredDate: '', preferredTime: '' }),
     })
-      .then((r) => { if (r.ok && bookingId) updateEmailSent(bookingId); })
-      .catch(() => {});
+      .then(async (r) => {
+        if (!r.ok) return;
+        const json = await r.json().catch(() => ({}));
+        if (json.skipped) {
+          console.warn('[Booking] Email skipped because RESEND_API_KEY is missing');
+          return;
+        }
+        if (json.success && bookingId) updateEmailSent(bookingId);
+      })
+      .catch((err) => console.warn('[Booking] Email send failed (non-blocking):', err));
 
     setIsSubmitting(false);
     setSuccessData({ requestNumber: reqNum, serviceName: selectedProductName });

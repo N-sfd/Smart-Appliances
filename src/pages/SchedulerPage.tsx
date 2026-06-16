@@ -709,7 +709,7 @@ const SchedulerPage: React.FC = () => {
 
       console.log('[Booking] Success', { bookingId, reqNum });
 
-      // Fire-and-forget email — don't block navigation on this
+      // Fire-and-forget email — booking navigation is never blocked by this
       fetch('/.netlify/functions/send-booking-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -723,7 +723,13 @@ const SchedulerPage: React.FC = () => {
         }),
       })
         .then(async (r) => {
-          if (r.ok && bookingId) updateEmailSent(bookingId);
+          if (!r.ok) return;
+          const json = await r.json().catch(() => ({}));
+          if (json.skipped) {
+            console.warn('[Booking] Email skipped because RESEND_API_KEY is missing');
+            return;
+          }
+          if (json.success && bookingId) updateEmailSent(bookingId);
         })
         .catch((err) => console.warn('[Booking] Email send failed (non-blocking):', err));
 
