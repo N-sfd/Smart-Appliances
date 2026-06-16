@@ -712,7 +712,7 @@ const SchedulerPage: React.FC = () => {
 
       if (insertError) {
         console.error('[Booking] Error', insertError);
-        setSubmitError('We could not save your request. Please check your information and try again.');
+        setSubmitError(`Save failed: ${insertError}`);
         setIsSubmitting(false);
         return;
       }
