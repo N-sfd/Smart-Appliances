@@ -6,29 +6,31 @@ import {
   Container,
   Button,
   TextField,
-  InputAdornment,
   Select,
   MenuItem,
   FormControl,
-  OutlinedInput,
+  Collapse,
+  CircularProgress,
   SelectChangeEvent,
 } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import CheckIcon from '@mui/icons-material/Check';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import { serviceCategories } from '../data/services';
 import { colors, fonts, heroCtaButtonSx } from '../theme';
 import { HERO_TECHNICIAN_WIDTH, HERO_TECHNICIAN_HEIGHT } from '../constants/imageDimensions';
 import {
-  normalizeZipInput,
-  validateZipCode,
-  getZipFieldHelperText,
-  isZipFieldError,
-} from '../data/serviceAreas';
+  validateFullName,
+  validateEmailAddress,
+  validateUsPhone,
+} from '../lib/schedulerContactValidation';
+import { inferCategoryFromProductName } from '../data/schedulerPrefill';
+import { insertBooking, updateEmailSent } from '../lib/supabaseBookings';
 
 const HomeBelowFold = lazy(() => import('./HomeBelowFold'));
 
@@ -36,35 +38,160 @@ const allServiceOptions = serviceCategories.flatMap((cat) =>
   cat.services.map((s) => ({ id: s.id, label: s.label, categoryId: cat.id })),
 );
 
+const POPULAR_SERVICES = [
+  { id: 'refrigerator',   label: 'Refrigerator',   productName: 'Refrigerator',   serviceType: 'Repair', serviceCategory: 'Appliance', typeCode: 'r' },
+  { id: 'washer-dryer',   label: 'Washer / Dryer', productName: 'Washer / Dryer', serviceType: 'Repair', serviceCategory: 'Appliance', typeCode: 'r' },
+  { id: 'dishwasher',     label: 'Dishwasher',     productName: 'Dishwasher',     serviceType: 'Repair', serviceCategory: 'Appliance', typeCode: 'r' },
+  { id: 'oven-stove',     label: 'Oven / Stove',   productName: 'Oven / Stove',   serviceType: 'Repair', serviceCategory: 'Appliance', typeCode: 'r' },
+  { id: 'ac-repair',      label: 'AC Repair',      productName: 'AC Repair',      serviceType: 'Repair', serviceCategory: 'HVAC',      typeCode: 'r' },
+  { id: 'drain-cleaning', label: 'Drain Cleaning', productName: 'Drain Cleaning', serviceType: 'Repair', serviceCategory: 'Plumbing',  typeCode: 'r' },
+] as const;
+
+const generateRequestNumber = (): string => {
+  const year = new Date().getFullYear();
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let s = '';
+  for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return `SA-${year}-${s}`;
+};
+
+const formatPhone = (raw: string): string => {
+  const digits = raw.replace(/\D/g, '').slice(0, 10);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+
+const URGENCY_OPTIONS = [
+  { id: 'regular',   label: 'Regular',   emergency: false },
+  { id: 'sameday',   label: 'Same-Day',  emergency: false },
+  { id: 'emergency', label: 'Emergency', emergency: true  },
+] as const;
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
-  // Scheduler state
-  const [schedulerService, setSchedulerService] = useState('');
-  const [schedulerZip, setSchedulerZip] = useState('');
-  const [schedulerZipTouched, setSchedulerZipTouched] = useState(false);
-  const [schedulerUrgency, setSchedulerUrgency] = useState<'regular' | 'sameday' | 'emergency'>('regular');
+  // Service selection
+  const [selectedServiceId, setSelectedServiceId] = useState('');
+  const [selectedProductName, setSelectedProductName] = useState('');
+  const [selectedServiceType, setSelectedServiceType] = useState('Repair');
+  const [selectedServiceCategory, setSelectedServiceCategory] = useState('');
+  const [selectedTypeCode, setSelectedTypeCode] = useState('r');
+  const [showFullList, setShowFullList] = useState(false);
+  const [fullListValue, setFullListValue] = useState('');
 
-  const schedulerZipValidation = validateZipCode(schedulerZip);
-  const schedulerCanContinue = Boolean(schedulerService) && schedulerZipValidation.isValid;
+  // Contact info
+  const [name, setName] = useState('');
+  const [nameTouched, setNameTouched] = useState(false);
+  const [email, setEmail] = useState('');
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [phoneTouched, setPhoneTouched] = useState(false);
 
-  const schedulerContinue = () => {
-    setSchedulerZipTouched(true);
-    if (!schedulerCanContinue) return;
+  // Urgency
+  const [urgency, setUrgency] = useState<'regular' | 'sameday' | 'emergency'>('regular');
 
-    const found = allServiceOptions.find((o) => o.id === schedulerService);
-    const state = {
-      serviceCategory: found?.categoryId ?? '',
-      serviceType: schedulerService,
-      sameDayRequested: schedulerUrgency === 'sameday',
-      zipCode: schedulerZip,
-    };
-    if (schedulerUrgency === 'emergency') {
-      navigate('/emergency-service', { state });
-    } else {
-      navigate('/book/regular', { state });
+  // Submit state
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [successData, setSuccessData] = useState<{ requestNumber: string; serviceName: string } | null>(null);
+
+  // Validation
+  const nameError = validateFullName(name);
+  const emailError = validateEmailAddress(email);
+  const phoneError = validateUsPhone(phone);
+  const serviceError = !selectedServiceId ? 'Please select a service.' : null;
+
+  const showErr = (touched: boolean, err: string | null) =>
+    Boolean(err) && (touched || submitAttempted);
+
+  const handleSelectPopular = (svc: typeof POPULAR_SERVICES[number]) => {
+    setSelectedServiceId(svc.id);
+    setSelectedProductName(svc.productName);
+    setSelectedServiceType(svc.serviceType);
+    setSelectedServiceCategory(svc.serviceCategory);
+    setSelectedTypeCode(svc.typeCode);
+    setShowFullList(false);
+    setFullListValue('');
+  };
+
+  const handleSelectFull = (e: SelectChangeEvent<string>) => {
+    const val = e.target.value;
+    const found = allServiceOptions.find((o) => o.id === val);
+    if (!found) return;
+    const svcType = /install/i.test(found.label) ? 'Installation' : /mainten/i.test(found.label) ? 'Maintenance' : 'Repair';
+    const svcCategory = inferCategoryFromProductName(found.label) || 'Appliance';
+    setFullListValue(val);
+    setSelectedServiceId(val);
+    setSelectedProductName(found.label);
+    setSelectedServiceType(svcType);
+    setSelectedServiceCategory(svcCategory);
+    setSelectedTypeCode(/install/i.test(found.label) ? 'i' : 'r');
+    setShowFullList(false);
+  };
+
+  const handleReset = () => {
+    setSuccessData(null);
+    setSelectedServiceId('');
+    setSelectedProductName('');
+    setSelectedServiceType('Repair');
+    setSelectedServiceCategory('');
+    setSelectedTypeCode('r');
+    setShowFullList(false);
+    setFullListValue('');
+    setName('');
+    setNameTouched(false);
+    setEmail('');
+    setEmailTouched(false);
+    setPhone('');
+    setPhoneTouched(false);
+    setUrgency('regular');
+    setSubmitAttempted(false);
+    setSubmitError('');
+  };
+
+  const handleSubmit = async () => {
+    setSubmitAttempted(true);
+    if (serviceError || nameError || emailError || phoneError) return;
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    const reqNum = generateRequestNumber();
+    const urgencyLabel = urgency === 'regular' ? 'Regular' : urgency === 'sameday' ? 'Same-Day' : 'Emergency';
+
+    const { id: bookingId, error: insertError } = await insertBooking({
+      request_number: reqNum,
+      admin_status: 'New Lead',
+      customer_name: name,
+      email,
+      phone,
+      zip_code: '',
+      service_type: selectedServiceType,
+      service_category: selectedServiceCategory,
+      product_name: selectedProductName,
+      urgency: urgencyLabel,
+      status: 'New',
+      issue_description: 'Quick service request from homepage',
+    });
+
+    if (insertError) {
+      setSubmitError('Something went wrong. Please try again.');
+      setIsSubmitting(false);
+      return;
     }
+
+    // Fire-and-forget email
+    fetch('/.netlify/functions/send-booking-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requestNumber: reqNum, customerName: name, email, service: selectedProductName, preferredDate: '', preferredTime: '' }),
+    })
+      .then((r) => { if (r.ok && bookingId) updateEmailSent(bookingId); })
+      .catch(() => {});
+
+    setIsSubmitting(false);
+    setSuccessData({ requestNumber: reqNum, serviceName: selectedProductName });
   };
 
   const heroImageSrc = '/images/services/hero-appliance-technician.webp';
@@ -78,138 +205,275 @@ const Home: React.FC = () => {
     display: 'block',
   };
 
+  // Custom (non-popular) selection chip
+  const isCustomSelection = selectedServiceId && !POPULAR_SERVICES.find((s) => s.id === selectedServiceId);
+
+  const chipSx = (selected: boolean, emergency = false) => ({
+    cursor: 'pointer',
+    px: 1.25,
+    py: 0.55,
+    borderRadius: '9px',
+    border: `1.5px solid ${selected ? (emergency ? colors.emergency : colors.primaryBlue) : colors.border}`,
+    backgroundColor: selected ? (emergency ? '#FFF5F5' : colors.lightBlueBg) : '#fff',
+    color: selected ? (emergency ? colors.emergency : colors.primaryBlue) : colors.darkText,
+    fontFamily: fonts.body,
+    fontSize: '0.8rem',
+    fontWeight: selected ? 700 : 500,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 0.4,
+    userSelect: 'none' as const,
+    transition: 'all 0.14s',
+    '&:hover': {
+      borderColor: emergency ? colors.emergency : colors.primaryBlue,
+      backgroundColor: selected ? undefined : (emergency ? '#FFF5F5' : '#F0F7FF'),
+    },
+  });
+
+  const inputSx = {
+    '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.88rem' },
+    '& .MuiFormHelperText-root': { mx: 0, fontSize: '0.72rem', fontFamily: fonts.body, mt: 0.25 },
+  };
+
   const heroBookingCard = (
     <Box className="hero-booking-card">
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.75 }}>
-          <Box
+      {/* ── Success screen ── */}
+      {successData ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', py: 2 }}>
+          <CheckCircleIcon sx={{ color: '#22c55e', fontSize: 52, mb: 1.5 }} />
+          <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.15rem', color: colors.navy, mb: 0.5 }}>
+            Request Received!
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText, mb: 1.75, lineHeight: 1.5, maxWidth: 270 }}>
+            We'll contact you shortly to confirm your appointment. Check your email for details.
+          </Typography>
+
+          {/* Request ID badge */}
+          <Box sx={{ backgroundColor: colors.lightBlueBg, borderRadius: '10px', px: 2.5, py: 1.25, mb: 1.5, width: '100%' }}>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.7rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Request ID
+            </Typography>
+            <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.05rem', color: colors.primaryBlue, letterSpacing: '0.04em' }}>
+              {successData.requestNumber}
+            </Typography>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, mt: 0.25 }}>
+              {successData.serviceName}
+            </Typography>
+          </Box>
+
+          {/* Action buttons */}
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={<TrackChangesIcon />}
+            onClick={() => navigate(`/track-request?id=${successData.requestNumber}`)}
             sx={{
-              width: 36,
-              height: 36,
-              borderRadius: '10px',
-              backgroundColor: colors.lightBlueBg,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
+              backgroundColor: colors.primaryBlue, color: colors.white,
+              fontFamily: fonts.heading, fontWeight: 600, fontSize: '0.88rem',
+              textTransform: 'none', borderRadius: '11px', height: 42, mb: 1,
+              '&:hover': { backgroundColor: colors.primaryBlueHover },
             }}
           >
-            <CalendarMonthIcon sx={{ color: colors.primaryBlue, fontSize: 20 }} />
-          </Box>
-          <Box>
-            <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.05rem', color: colors.navy, lineHeight: 1.2 }}>
-              Book Your Service
-            </Typography>
-            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, mt: 0.15 }}>
-              It only takes a minute
-            </Typography>
+            Track Request Status
+          </Button>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={handleReset}
+            sx={{
+              borderColor: colors.primaryBlue, color: colors.primaryBlue,
+              fontFamily: fonts.heading, fontWeight: 600, fontSize: '0.88rem',
+              textTransform: 'none', borderRadius: '11px', height: 42,
+              '&:hover': { backgroundColor: colors.lightBlueBg },
+            }}
+          >
+            Book Another Service
+          </Button>
+        </Box>
+      ) : (
+      <>
+      {/* Header */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+        <Box sx={{ width: 34, height: 34, borderRadius: '9px', backgroundColor: colors.lightBlueBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <CalendarMonthIcon sx={{ color: colors.primaryBlue, fontSize: 19 }} />
+        </Box>
+        <Box>
+          <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1rem', color: colors.navy, lineHeight: 1.2 }}>
+            Book Your Service
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, mt: 0.1 }}>
+            It only takes a minute
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Popular service chips */}
+      <Typography component="div" sx={{ ...heroFieldLabelSx, mb: 0.75 }}>
+        Popular Services
+      </Typography>
+
+      {isCustomSelection && (
+        <Box sx={{ mb: 0.75 }}>
+          <Box
+            onClick={() => { setSelectedServiceId(''); setSelectedProductName(''); setFullListValue(''); }}
+            sx={{ ...chipSx(true), display: 'inline-flex' }}
+          >
+            <CheckIcon sx={{ fontSize: 12 }} />
+            {selectedProductName}
+            <Box component="span" sx={{ ml: 0.5, opacity: 0.6, fontSize: '0.7rem', cursor: 'pointer' }}>✕</Box>
           </Box>
         </Box>
+      )}
 
-        <Typography component="label" sx={heroFieldLabelSx}>What do you need help with?</Typography>
-        <FormControl fullWidth size="small" className="hero-form-input" sx={{ mb: 1.25 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.75, mb: 0.75 }}>
+        {POPULAR_SERVICES.map((svc) => {
+          const sel = selectedServiceId === svc.id;
+          return (
+            <Box key={svc.id} onClick={() => handleSelectPopular(svc)} sx={chipSx(sel)}>
+              {sel && <CheckIcon sx={{ fontSize: 12 }} />}
+              {svc.label}
+            </Box>
+          );
+        })}
+      </Box>
+
+      {/* View All Services toggle */}
+      <Box
+        component="button"
+        type="button"
+        onClick={() => setShowFullList((v) => !v)}
+        sx={{
+          background: 'none', border: 'none', cursor: 'pointer', p: 0, mb: 0.5,
+          color: colors.primaryBlue, fontFamily: fonts.body, fontSize: '0.78rem', fontWeight: 600,
+          display: 'flex', alignItems: 'center', gap: 0.4,
+          '&:hover': { textDecoration: 'underline' },
+        }}
+      >
+        {showFullList ? '← Back to popular' : 'View All Services →'}
+      </Box>
+
+      <Collapse in={showFullList}>
+        <FormControl fullWidth size="small" sx={{ mb: 0.75 }}>
           <Select
-            value={schedulerService}
+            value={fullListValue}
             displayEmpty
-            onChange={(e: SelectChangeEvent<string>) => setSchedulerService(e.target.value)}
-            renderValue={(v) => v ? allServiceOptions.find((o) => o.id === v)?.label ?? v : 'Select a service'}
-            MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
-            SelectDisplayProps={{ 'aria-label': 'What do you need help with?' }}
-            input={
-              <OutlinedInput
-                startAdornment={
-                  <InputAdornment position="start">
-                    <CalendarMonthIcon sx={{ fontSize: 20, color: colors.mutedText }} />
-                  </InputAdornment>
-                }
-              />
-            }
+            onChange={handleSelectFull}
+            renderValue={(v) => v ? allServiceOptions.find((o) => o.id === v)?.label ?? v : 'Browse all services…'}
+            MenuProps={{ PaperProps: { sx: { maxHeight: 260, fontFamily: fonts.body } } }}
+            sx={{ borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.85rem' }}
           >
             {serviceCategories.map((cat) => [
-              <MenuItem key={`cat-${cat.id}`} disabled value="" sx={{ fontFamily: fonts.body, fontWeight: 700, color: colors.navy, fontSize: '0.8rem', opacity: '1 !important' }}>
+              <MenuItem key={`cat-${cat.id}`} disabled value="" sx={{ fontFamily: fonts.body, fontWeight: 700, color: colors.navy, fontSize: '0.78rem', opacity: '1 !important' }}>
                 — {cat.title}
               </MenuItem>,
               ...cat.services.map((s) => (
-                <MenuItem key={s.id} value={s.id} sx={{ fontFamily: fonts.body, pl: 3 }}>
+                <MenuItem key={s.id} value={s.id} sx={{ fontFamily: fonts.body, pl: 3, fontSize: '0.84rem' }}>
                   {s.label}
                 </MenuItem>
               )),
             ])}
           </Select>
         </FormControl>
+      </Collapse>
 
-        <Typography component="label" sx={heroFieldLabelSx}>ZIP Code</Typography>
+      {submitAttempted && serviceError && (
+        <Typography sx={{ color: colors.emergency, fontSize: '0.72rem', mb: 0.5, fontFamily: fonts.body }}>
+          {serviceError}
+        </Typography>
+      )}
+
+      {/* Contact fields */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.875, mt: 0.5, mb: 1 }}>
         <TextField
-          fullWidth
+          placeholder="Full Name *"
+          value={name}
           size="small"
-          className="hero-form-input"
-          placeholder="Enter your ZIP code"
-          value={schedulerZip}
-          onChange={(e) => setSchedulerZip(normalizeZipInput(e.target.value))}
-          onBlur={() => setSchedulerZipTouched(true)}
-          inputProps={{ inputMode: 'numeric', maxLength: 5, pattern: '[0-9]{5}' }}
-          error={isZipFieldError(schedulerZip, schedulerZipTouched)}
-          helperText={getZipFieldHelperText(schedulerZip, schedulerZipTouched) || ' '}
-          FormHelperTextProps={{ sx: { mx: 0, fontFamily: fonts.body, fontSize: '0.75rem', minHeight: '1.25em' } }}
-          sx={{ mb: 1.25 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LocationOnIcon sx={{ fontSize: 20, color: colors.mutedText }} />
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <Typography component="label" sx={heroFieldLabelSx}>How soon do you need service?</Typography>
-        <FormControl fullWidth size="small" className="hero-form-input" sx={{ mb: 1.75 }}>
-          <Select
-            value={schedulerUrgency}
-            onChange={(e) => setSchedulerUrgency(e.target.value as typeof schedulerUrgency)}
-            input={
-              <OutlinedInput
-                startAdornment={
-                  <InputAdornment position="start">
-                    <AccessTimeIcon sx={{ fontSize: 20, color: colors.mutedText }} />
-                  </InputAdornment>
-                }
-              />
-            }
-          >
-            <MenuItem value="regular" sx={{ fontFamily: fonts.body }}>Schedule at a convenient time</MenuItem>
-            <MenuItem value="sameday" sx={{ fontFamily: fonts.body }}>Same-day service</MenuItem>
-            <MenuItem value="emergency" sx={{ fontFamily: fonts.body }}>Emergency — right away</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Button
           fullWidth
-          variant="contained"
-          endIcon={<ArrowForwardIcon />}
-          disabled={!schedulerCanContinue}
-          onClick={schedulerContinue}
-          sx={{
-            backgroundColor: colors.primaryBlue,
-            color: colors.white,
-            fontFamily: fonts.heading,
-            fontWeight: 600,
-            fontSize: '1rem',
-            textTransform: 'none',
-            borderRadius: '14px',
-            height: 48,
-            boxShadow: '0 12px 30px rgba(10, 37, 64, 0.18)',
-            '&:hover': { backgroundColor: colors.primaryBlueHover },
-            '&.Mui-disabled': { backgroundColor: colors.border, color: colors.mutedText, boxShadow: 'none' },
-          }}
-        >
-          Continue
-        </Button>
+          onChange={(e) => setName(e.target.value)}
+          onBlur={() => setNameTouched(true)}
+          error={showErr(nameTouched, nameError)}
+          helperText={showErr(nameTouched, nameError) ? nameError : undefined}
+          sx={inputSx}
+        />
+        <TextField
+          placeholder="Email Address *"
+          type="email"
+          value={email}
+          size="small"
+          fullWidth
+          onChange={(e) => setEmail(e.target.value)}
+          onBlur={() => setEmailTouched(true)}
+          error={showErr(emailTouched, emailError)}
+          helperText={showErr(emailTouched, emailError) ? emailError : undefined}
+          sx={inputSx}
+        />
+        <TextField
+          placeholder="Phone Number *"
+          value={phone}
+          size="small"
+          fullWidth
+          inputProps={{ inputMode: 'tel' }}
+          onChange={(e) => setPhone(formatPhone(e.target.value))}
+          onBlur={() => setPhoneTouched(true)}
+          error={showErr(phoneTouched, phoneError)}
+          helperText={showErr(phoneTouched, phoneError) ? phoneError : undefined}
+          sx={inputSx}
+        />
+      </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 1.5, justifyContent: 'center' }}>
-          <LockOutlinedIcon sx={{ fontSize: 14, color: colors.mutedText }} />
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.71rem', color: colors.mutedText }}>
-            Your information is secure and private
-          </Typography>
-        </Box>
+      {/* Urgency chips */}
+      <Typography component="div" sx={{ ...heroFieldLabelSx, mb: 0.75 }}>How soon?</Typography>
+      <Box sx={{ display: 'flex', gap: 0.75, mb: 1.5 }}>
+        {URGENCY_OPTIONS.map((opt) => {
+          const sel = urgency === opt.id;
+          return (
+            <Box
+              key={opt.id}
+              onClick={() => setUrgency(opt.id)}
+              sx={{ ...chipSx(sel, opt.emergency), flex: 1, justifyContent: 'center' }}
+            >
+              {opt.label}
+            </Box>
+          );
+        })}
+      </Box>
+
+      {/* Submit */}
+      {submitError && (
+        <Typography sx={{ color: colors.emergency, fontSize: '0.75rem', mb: 0.75, fontFamily: fonts.body, textAlign: 'center' }}>
+          {submitError}
+        </Typography>
+      )}
+      <Button
+        fullWidth
+        variant="contained"
+        endIcon={isSubmitting ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : <ArrowForwardIcon />}
+        onClick={() => { void handleSubmit(); }}
+        disabled={isSubmitting}
+        sx={{
+          backgroundColor: colors.primaryBlue,
+          color: colors.white,
+          fontFamily: fonts.heading,
+          fontWeight: 600,
+          fontSize: '0.95rem',
+          textTransform: 'none',
+          borderRadius: '13px',
+          height: 46,
+          boxShadow: '0 10px 28px rgba(10, 37, 64, 0.18)',
+          '&:hover': { backgroundColor: colors.primaryBlueHover },
+        }}
+      >
+        {isSubmitting ? 'Sending…' : 'Request Service'}
+      </Button>
+
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 1.25, justifyContent: 'center' }}>
+        <LockOutlinedIcon sx={{ fontSize: 13, color: colors.mutedText }} />
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.7rem', color: colors.mutedText }}>
+          Your information is secure and private
+        </Typography>
+      </Box>
+      </>
+      )}
     </Box>
   );
 
@@ -223,7 +487,7 @@ const Home: React.FC = () => {
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
           pt: { xs: 5, md: 6 },
           pb: { xs: 4, md: 5, lg: 5 },
-          minHeight: { md: 560, lg: 600 },
+          minHeight: { md: 610, lg: 640 },
           overflow: 'hidden',
         }}
       >

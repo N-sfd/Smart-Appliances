@@ -1,0 +1,137 @@
+// Netlify Function: send-booking-email
+// RESEND_API_KEY is set in Netlify environment — NEVER expose it in React frontend.
+
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error('[send-booking-email] RESEND_API_KEY not set');
+    return { statusCode: 500, body: JSON.stringify({ error: 'Email service not configured' }) };
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body ?? '{}');
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) };
+  }
+
+  const { requestNumber, customerName, email, service, preferredDate, preferredTime } = body;
+
+  if (!email || !requestNumber) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
+  }
+
+  const trackLink = `https://smartappliancesmd.com/track-request?id=${requestNumber}`;
+
+  const htmlBody = `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#F1F5F9;font-family:Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <!-- Header -->
+        <tr>
+          <td style="background:#0B3D91;padding:28px 36px;">
+            <p style="margin:0;color:#fff;font-size:20px;font-weight:800;letter-spacing:-0.02em;">Smart Appliances MD</p>
+            <p style="margin:4px 0 0;color:rgba(255,255,255,0.7);font-size:13px;">Home Service Booking Confirmation</p>
+          </td>
+        </tr>
+        <!-- Body -->
+        <tr>
+          <td style="padding:36px;">
+            <p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#0F172A;">
+              Request Received${customerName ? `, ${customerName}` : ''}!
+            </p>
+            <p style="margin:0 0 28px;font-size:15px;color:#64748B;line-height:1.6;">
+              We've received your service request and will contact you shortly to confirm your appointment.
+            </p>
+
+            <!-- Request ID badge -->
+            <div style="display:inline-block;background:#EFF6FF;border:1.5px solid #1A73E8;border-radius:999px;padding:8px 20px;margin-bottom:28px;">
+              <span style="font-size:15px;font-weight:800;color:#1A73E8;letter-spacing:0.04em;">${requestNumber}</span>
+            </div>
+
+            <!-- Details table -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;border-radius:12px;overflow:hidden;border:1px solid #E2E8F0;margin-bottom:28px;">
+              ${service ? `
+              <tr>
+                <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#64748B;width:40%;">Service</td>
+                <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#0F172A;font-weight:600;">${service}</td>
+              </tr>` : ''}
+              ${preferredDate ? `
+              <tr>
+                <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#64748B;">Preferred Date</td>
+                <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#0F172A;font-weight:600;">${preferredDate}</td>
+              </tr>` : ''}
+              ${preferredTime ? `
+              <tr>
+                <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#64748B;">Time Slots</td>
+                <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#0F172A;font-weight:600;">${preferredTime}</td>
+              </tr>` : ''}
+              <tr>
+                <td style="padding:12px 16px;font-size:13px;color:#64748B;">Status</td>
+                <td style="padding:12px 16px;font-size:13px;color:#15803D;font-weight:700;">New — Pending review</td>
+              </tr>
+            </table>
+
+            <!-- Track button -->
+            <a href="${trackLink}" style="display:block;background:#0B3D91;color:#fff;text-decoration:none;text-align:center;padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;margin-bottom:20px;">
+              Track Your Request Status
+            </a>
+
+            <p style="margin:0;font-size:13px;color:#94A3B8;line-height:1.6;text-align:center;">
+              Questions? Call <a href="tel:3017830977" style="color:#1A73E8;font-weight:600;">301-783-0977</a>
+              or reply to this email.
+            </p>
+          </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+          <td style="background:#F8FAFC;padding:20px 36px;border-top:1px solid #E2E8F0;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#94A3B8;">
+              Smart Appliances MD · Maryland, DC, Virginia, Pennsylvania, West Virginia
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Smart Appliances MD <noreply@smartappliancesmd.com>',
+        to: [email],
+        subject: `Booking Confirmed – ${requestNumber}`,
+        html: htmlBody,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('[send-booking-email] Resend API error:', res.status, errText);
+      return { statusCode: 500, body: JSON.stringify({ error: 'Failed to send email' }) };
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true }),
+    };
+  } catch (err) {
+    console.error('[send-booking-email] Unexpected error:', err);
+    return { statusCode: 500, body: JSON.stringify({ error: 'Internal error' }) };
+  }
+};

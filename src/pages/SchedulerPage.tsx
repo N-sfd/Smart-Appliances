@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -10,6 +10,11 @@ import {
   Step,
   StepLabel,
   Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
 } from '@mui/material';
 import BuildIcon from '@mui/icons-material/Build';
 import HandymanIcon from '@mui/icons-material/Handyman';
@@ -27,7 +32,6 @@ import KitchenIcon from '@mui/icons-material/Kitchen';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import { colors, fonts } from '../theme';
-import { ServiceRequest, ServicePriority } from '../data/services';
 import { HVAC_SERVICE_IMAGES } from '../data/hvacHub';
 import { PLUMBING_SERVICE_IMAGES } from '../data/plumbingHub';
 import { ELECTRICAL_SERVICE_IMAGES } from '../data/electricalHub';
@@ -39,12 +43,11 @@ import {
   getZipFieldHelperText,
   isZipFieldError,
 } from '../data/serviceAreas';
-import { saveServiceRequest } from '../lib/firebase';
 import {
   parseSchedulerPrefill,
   SchedulerServiceCategory,
 } from '../data/schedulerPrefill';
-import { insertBooking } from '../lib/supabaseBookings';
+import { insertBooking, updateEmailSent } from '../lib/supabaseBookings';
 import { useAuth } from '../contexts/AuthContext';
 import {
   addLocalDays,
@@ -59,6 +62,7 @@ import {
   validatePreferredDateField,
   validateStateField,
   validateUsPhone,
+  SERVICE_AREA_STATES,
 } from '../lib/schedulerContactValidation';
 
 const formatPhone = (raw: string): string => {
@@ -320,11 +324,22 @@ const getInitialPreferredDate = (
   return urgent ? today : addLocalDays(1);
 };
 
+// ── Request number generator ──────────────────────────────────────────────────
+const generateRequestNumber = (): string => {
+  const year = new Date().getFullYear();
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let suffix = '';
+  for (let i = 0; i < 6; i++) suffix += chars[Math.floor(Math.random() * chars.length)];
+  return `SA-${year}-${suffix}`;
+};
+
 // ── Main component ────────────────────────────────────────────────────────────
 const SchedulerPage: React.FC = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const location = useLocation();
   const { user } = useAuth();
+  const navContact = (location.state as { prefillName?: string; prefillEmail?: string; prefillPhone?: string } | null) ?? {};
   const prefillZip = params.get('zipCode') ?? '';
   const prefill = useMemo(() => parseSchedulerPrefill(params), [params]);
   const paramPreferredDate = params.get('preferredDate');
@@ -380,10 +395,10 @@ const SchedulerPage: React.FC = () => {
   const [address, setAddress] = useState('');
   const [suiteApt, setSuiteApt] = useState('');
   const [city, setCity] = useState('');
-  const [stateField, setStateField] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [stateField, setStateField] = useState('MD');
+  const [name, setName] = useState(navContact.prefillName ?? '');
+  const [email, setEmail] = useState(navContact.prefillEmail ?? '');
+  const [phone, setPhone] = useState(navContact.prefillPhone ?? '');
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [nameTouched, setNameTouched] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
@@ -400,7 +415,6 @@ const SchedulerPage: React.FC = () => {
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [dateOffset, setDateOffset] = useState(0);
 
-  const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -629,7 +643,6 @@ const SchedulerPage: React.FC = () => {
     setIsSubmitting(true);
 
     const isEmergency = serviceType === 'emergency' || hvacUrgency === 'Emergency';
-    const priority: ServicePriority = isEmergency ? 'emergency' : 'regular';
     const [firstDate] = selectedSlots[0]?.split('|') ?? [''];
     const resolvedPreferredDate = preferredDate || firstDate || null;
 
@@ -652,55 +665,14 @@ const SchedulerPage: React.FC = () => {
     if (garageDoorProblem) noteParts.push(`Problem: ${garageDoorProblem}`);
     if (issueDescription) noteParts.push(`Notes: ${issueDescription}`);
 
-    const req: ServiceRequest = {
-      id: `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-      customerName: name,
-      email,
-      phone,
-      address,
-      city,
-      state: stateField,
-      zipCode,
-      serviceCategory: category || (SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? ''),
-      serviceType: serviceTitle,
-      applianceType: appliance || category || null,
-      servicePriority: priority,
-      urgencyLevel: hvacUrgency || (isEmergency ? 'emergency' : null),
-      priorityScore: isEmergency ? 4 : 2,
-      possibleIssue: applianceIssue || hvacIssue || plumbingIssue || electricalIssue || null,
-      recommendedTechnicianType: null,
-      estimatedDuration: null,
-      safetyNotes:
-        electricalSafety && electricalSafety !== 'No safety concern' ? electricalSafety : null,
-      hasSafetyConcern: Boolean(
-        electricalSafety && electricalSafety !== 'No safety concern',
-      ),
-      applianceStillRunning: null,
-      issueStartDate: null,
-      preferredDate: resolvedPreferredDate,
-      preferredTime: slotLabels.join('; ') || null,
-      timeWindow: slotLabels.join('; ') || null,
-      requestedResponseTime: slotLabels.join('; ') || null,
-      callbackTime: null,
-      issueDescription: noteParts.join('\n') || issueDescription,
-      applianceBrand: brand || null,
-      applianceModel: model || null,
-      imageUrl: null,
-      notes: noteParts.join(' | ') || null,
-      emergencyBadge: isEmergency,
-      assignedTechnicianId: null,
-      technicianStatus: null,
-      status: 'new',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    const reqNum = generateRequestNumber();
+    console.log('[Booking] FormData', { name, email, phone, city, stateField, zipCode, reqNum });
 
     try {
-      await saveServiceRequest(req);
-
-      // Also persist to Supabase
-      await insertBooking({
+      const { id: bookingId, error: insertError } = await insertBooking({
         user_id: user?.id ?? null,
+        request_number: reqNum,
+        admin_status: 'New',
         customer_name: name,
         email,
         phone,
@@ -723,9 +695,46 @@ const SchedulerPage: React.FC = () => {
         status: 'New',
       });
 
-      setSubmitted(true);
+      if (insertError) {
+        console.error('[Booking] Supabase insert error:', insertError);
+        setSubmitError('Something went wrong saving your request. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('[Booking] Success', { bookingId, reqNum });
+
+      // Fire-and-forget email — don't block navigation on this
+      fetch('/.netlify/functions/send-booking-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestNumber: reqNum,
+          customerName: name,
+          email,
+          service: serviceTitle,
+          preferredDate: resolvedPreferredDate ?? '',
+          preferredTime: slotLabels.join('; ') || '',
+        }),
+      })
+        .then(async (r) => {
+          if (r.ok && bookingId) updateEmailSent(bookingId);
+        })
+        .catch((err) => console.warn('[Booking] Email send failed (non-blocking):', err));
+
+      navigate(`/booking-confirmation/${reqNum}`, {
+        replace: true,
+        state: {
+          requestNumber: reqNum,
+          customerName: name,
+          service: serviceTitle,
+          category,
+          preferredDate: resolvedPreferredDate ?? '',
+          preferredTime: slotLabels.join('; ') || '',
+        },
+      });
     } catch (error) {
-      console.error('Scheduler booking error:', error);
+      console.error('[Booking] Unexpected error:', error);
       setSubmitError('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -818,105 +827,6 @@ const SchedulerPage: React.FC = () => {
       )}
     </Box>
   );
-
-  // ── Confirmation screen ───────────────────────────────────────────────────
-  if (submitted) {
-    return (
-      <Box
-        sx={{
-          minHeight: '80vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: colors.background,
-          py: 6,
-          px: 2,
-        }}
-      >
-        <Container maxWidth="sm">
-          <Box
-            sx={{
-              backgroundColor: '#fff',
-              borderRadius: '20px',
-              textAlign: 'center',
-              p: { xs: 3, md: 5 },
-              boxShadow: colors.cardShadow,
-              border: `1px solid ${colors.border}`,
-            }}
-          >
-            <CheckCircleIcon sx={{ fontSize: 72, color: colors.primaryBlue, mb: 2 }} />
-            <Typography
-              variant="h4"
-              sx={{ fontFamily: fonts.heading, color: colors.navy, mb: 1.5 }}
-            >
-              Request Submitted!
-            </Typography>
-            <Typography
-              sx={{ fontFamily: fonts.body, color: colors.mutedText, mb: 3, lineHeight: 1.7 }}
-            >
-              Thanks, {name}. We've received your {category || 'service'} request and will contact
-              you shortly to confirm the appointment.
-            </Typography>
-            <Box
-              sx={{
-                backgroundColor: colors.lightBlueBg,
-                borderRadius: '14px',
-                p: 2.5,
-                mb: 3,
-                textAlign: 'left',
-              }}
-            >
-              {[
-                ['Service', serviceTitle],
-                ['Category', category || '—'],
-                ['ZIP Code', zipCode],
-                [
-                  'Availability',
-                  slotLabels.length
-                    ? slotLabels[0] + (slotLabels.length > 1 ? ` +${slotLabels.length - 1} more` : '')
-                    : 'Will confirm by phone',
-                ],
-              ].map(([lbl, val]) => (
-                <Box key={lbl} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.6 }}>
-                  <Typography
-                    sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '0.85rem' }}
-                  >
-                    {lbl}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontFamily: fonts.body,
-                      color: colors.navy,
-                      fontWeight: 600,
-                      fontSize: '0.85rem',
-                    }}
-                  >
-                    {val}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-            <Button
-              variant="contained"
-              onClick={() => navigate('/')}
-              sx={{
-                backgroundColor: colors.primaryBlue,
-                color: '#fff',
-                fontFamily: fonts.body,
-                fontWeight: 700,
-                px: 4,
-                py: 1.4,
-                borderRadius: '10px',
-                textTransform: 'none',
-              }}
-            >
-              Back to Home
-            </Button>
-          </Box>
-        </Container>
-      </Box>
-    );
-  }
 
   // ── Left panel (desktop sticky sidebar) ──────────────────────────────────
   const LeftPanel = (
@@ -1762,26 +1672,37 @@ const SchedulerPage: React.FC = () => {
                     />
                     <Box sx={{ display: 'flex', gap: 2 }}>
                       <TextField
-                        label="City"
+                        label="City *"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         onBlur={() => setCityTouched(true)}
                         error={showContactError(cityTouched, cityError)}
                         helperText={showContactError(cityTouched, cityError) ? cityError : ''}
-                        fullWidth
                         size="small"
+                        sx={{ flex: '0 0 68%' }}
+                        required
                       />
-                      <TextField
-                        label="State"
-                        value={stateField}
-                        onChange={(e) => setStateField(e.target.value.toUpperCase().slice(0, 2))}
-                        onBlur={() => setStateTouched(true)}
+                      <FormControl
+                        size="small"
+                        sx={{ flex: '0 0 32%' }}
                         error={showContactError(stateTouched, stateError)}
-                        helperText={showContactError(stateTouched, stateError) ? stateError : ''}
-                        size="small"
-                        sx={{ width: 100, flexShrink: 0 }}
-                        inputProps={{ maxLength: 2 }}
-                      />
+                      >
+                        <InputLabel id="state-label">State *</InputLabel>
+                        <Select
+                          labelId="state-label"
+                          label="State *"
+                          value={stateField}
+                          onChange={(e) => setStateField(e.target.value)}
+                          onBlur={() => setStateTouched(true)}
+                        >
+                          {SERVICE_AREA_STATES.map((s) => (
+                            <MenuItem key={s} value={s}>{s}</MenuItem>
+                          ))}
+                        </Select>
+                        {showContactError(stateTouched, stateError) && (
+                          <FormHelperText>{stateError}</FormHelperText>
+                        )}
+                      </FormControl>
                     </Box>
 
                     <Divider />

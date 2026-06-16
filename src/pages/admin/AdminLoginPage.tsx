@@ -10,11 +10,12 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { colors, fonts } from '../../theme';
 
 const AdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn, isAdmin } = useAuth();
+  const { signIn } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,15 +28,29 @@ const AdminLoginPage: React.FC = () => {
     setError('');
     setLoading(true);
     const { error: err } = await signIn(email.trim(), password);
-    setLoading(false);
     if (err) {
+      setLoading(false);
       setError('Invalid credentials. Please try again.');
       return;
     }
-    if (!isAdmin) {
-      setError('Access denied. This account does not have admin privileges.');
-      return;
+    // Fetch profile directly to check role — context state updates asynchronously
+    if (isSupabaseConfigured() && supabase) {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', authUser.id)
+          .single();
+        if (!profileData || profileData.role !== 'admin') {
+          await supabase.auth.signOut();
+          setLoading(false);
+          setError('Access denied. This account does not have admin privileges.');
+          return;
+        }
+      }
     }
+    setLoading(false);
     navigate('/admin/dashboard', { replace: true });
   };
 

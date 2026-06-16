@@ -76,12 +76,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     fullName: string,
   ): Promise<{ error: string | null }> => {
     if (!supabase) return { error: 'Database not configured.' };
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     });
-    return { error: error?.message ?? null };
+    if (error) return { error: error.message };
+    // Insert profile row — use upsert so it's safe even if a trigger also inserts
+    if (data.user) {
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        email,
+        full_name: fullName,
+        role: 'user',
+      }, { onConflict: 'id' });
+    }
+    return { error: null };
   };
 
   const signIn = async (

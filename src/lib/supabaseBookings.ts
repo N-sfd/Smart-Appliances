@@ -8,6 +8,13 @@ export interface BookingRow {
   customer_id?: string | null;
   service_id?: string | null;
 
+  request_number?: string | null;
+  admin_status?: string;
+  customer_message?: string | null;
+  email_sent?: boolean;
+  submitted_at?: string;
+  updated_at?: string;
+
   customer_name: string;
   email: string;
   phone: string;
@@ -46,6 +53,33 @@ export type BookingStatus =
 export const BOOKING_STATUSES: BookingStatus[] = [
   'New', 'Scheduled', 'In Progress', 'Completed', 'Cancelled',
 ];
+
+export type AdminStatus =
+  | 'New'
+  | 'Contacted'
+  | 'Scheduled'
+  | 'Technician Assigned'
+  | 'In Progress'
+  | 'Completed'
+  | 'Cancelled';
+
+export const ADMIN_STATUSES: AdminStatus[] = [
+  'New', 'Contacted', 'Scheduled', 'Technician Assigned', 'In Progress', 'Completed', 'Cancelled',
+];
+
+const ADMIN_TO_STATUS: Record<string, string> = {
+  'New': 'New',
+  'Contacted': 'New',
+  'Scheduled': 'Scheduled',
+  'Technician Assigned': 'Scheduled',
+  'In Progress': 'In Progress',
+  'Completed': 'Completed',
+  'Cancelled': 'Cancelled',
+};
+
+export const ADMIN_STATUS_STEPS = [
+  'New', 'Contacted', 'Scheduled', 'Technician Assigned', 'In Progress', 'Completed',
+] as const;
 
 // ── Booking notes ─────────────────────────────────────────────────────────────
 
@@ -220,6 +254,88 @@ export async function fetchCustomers(): Promise<CustomerSummary[]> {
     }
   }
   return Array.from(map.values());
+}
+
+// ── Admin: update admin_status ────────────────────────────────────────────────
+
+export async function updateAdminStatus(
+  id: string,
+  adminStatus: string,
+): Promise<{ error: string | null }> {
+  if (!isSupabaseConfigured() || !supabase) return { error: null };
+  const status = ADMIN_TO_STATUS[adminStatus] ?? 'New';
+  const { error } = await supabase
+    .from('service_requests')
+    .update({ admin_status: adminStatus, status, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  return { error: error?.message ?? null };
+}
+
+// ── Admin: update customer message ────────────────────────────────────────────
+
+export async function updateCustomerMessage(
+  id: string,
+  message: string,
+): Promise<{ error: string | null }> {
+  if (!isSupabaseConfigured() || !supabase) return { error: null };
+  const { error } = await supabase
+    .from('service_requests')
+    .update({ customer_message: message, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  return { error: error?.message ?? null };
+}
+
+// ── Mark email sent ───────────────────────────────────────────────────────────
+
+export async function updateEmailSent(id: string): Promise<void> {
+  if (!isSupabaseConfigured() || !supabase) return;
+  await supabase
+    .from('service_requests')
+    .update({ email_sent: true, updated_at: new Date().toISOString() })
+    .eq('id', id);
+}
+
+// ── Tracking: fetch by request number ─────────────────────────────────────────
+
+export async function fetchBookingByRequestNumber(
+  requestNumber: string,
+): Promise<BookingRow | null> {
+  if (!isSupabaseConfigured() || !supabase) return null;
+  const { data, error } = await supabase
+    .from('service_requests')
+    .select('*')
+    .eq('request_number', requestNumber.trim().toUpperCase())
+    .maybeSingle();
+  if (error) {
+    console.error('fetchBookingByRequestNumber:', error.message);
+    return null;
+  }
+  return (data as BookingRow | null);
+}
+
+// ── Tracking: fetch by email + phone ──────────────────────────────────────────
+
+export async function fetchBookingsByContact(
+  email: string,
+  phone: string,
+): Promise<BookingRow[]> {
+  if (!isSupabaseConfigured() || !supabase) return [];
+  const digits = phone.replace(/\D/g, '');
+  const formatted =
+    digits.length === 10
+      ? `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+      : phone.trim();
+  const { data, error } = await supabase
+    .from('service_requests')
+    .select('*')
+    .ilike('email', email.trim())
+    .ilike('phone', `%${formatted}%`)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('fetchBookingsByContact:', error.message);
+    return [];
+  }
+  return (data ?? []) as BookingRow[];
 }
 
 // ── Admin: booking stats ──────────────────────────────────────────────────────

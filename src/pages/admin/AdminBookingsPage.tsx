@@ -11,7 +11,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
 import SendIcon from '@mui/icons-material/Send';
 import {
-  fetchAllBookings, updateBookingStatus, BookingRow, BOOKING_STATUSES,
+  fetchAllBookings, updateAdminStatus, updateCustomerMessage, BookingRow,
+  BOOKING_STATUSES, ADMIN_STATUSES,
   fetchBookingNotes, insertBookingNote, BookingNote,
 } from '../../lib/supabaseBookings';
 import { useAuth } from '../../contexts/AuthContext';
@@ -125,25 +126,42 @@ const NotesPanel: React.FC<{ bookingId: string }> = ({ bookingId }) => {
 
 interface RowDetailProps {
   row: BookingRow;
-  onStatusChange: (id: string, status: string) => Promise<void>;
+  onStatusChange: (id: string, adminStatus: string) => Promise<void>;
 }
 
 const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange }) => {
-  const [status, setStatus] = useState(row.status);
+  const [adminStatus, setAdminStatus] = useState(row.admin_status ?? row.status);
+  const [customerMsg, setCustomerMsg] = useState(row.customer_message ?? '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [msgSaving, setMsgSaving] = useState(false);
+  const [msgSaved, setMsgSaved] = useState(false);
 
-  const handleSave = async () => {
+  const handleSaveStatus = async () => {
     if (!row.id) return;
     setSaving(true);
-    await onStatusChange(row.id, status);
+    await onStatusChange(row.id, adminStatus);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const handleSaveMessage = async () => {
+    if (!row.id) return;
+    setMsgSaving(true);
+    await updateCustomerMessage(row.id, customerMsg);
+    setMsgSaving(false);
+    setMsgSaved(true);
+    setTimeout(() => setMsgSaved(false), 2000);
+  };
+
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, backgroundColor: '#F8FAFC', borderTop: `1px solid ${colors.border}` }}>
+      {row.request_number && (
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', fontWeight: 700, color: colors.primaryBlue, mb: 2, letterSpacing: '0.04em' }}>
+          Request ID: {row.request_number}
+        </Typography>
+      )}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 2 }}>
         {/* Customer */}
         <Box>
@@ -204,24 +222,24 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange }) => {
 
       <Divider sx={{ mb: 2 }} />
 
-      {/* Status update */}
+      {/* Admin status update */}
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center', mb: 2 }}>
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>Status</InputLabel>
+        <FormControl size="small" sx={{ minWidth: 200 }}>
+          <InputLabel sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>Admin Status</InputLabel>
           <Select
-            value={status}
-            label="Status"
-            onChange={(e) => setStatus(e.target.value)}
+            value={adminStatus}
+            label="Admin Status"
+            onChange={(e) => setAdminStatus(e.target.value)}
             sx={{ borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.85rem' }}
           >
-            {BOOKING_STATUSES.map((s) => (
+            {ADMIN_STATUSES.map((s) => (
               <MenuItem key={s} value={s} sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>{s}</MenuItem>
             ))}
           </Select>
         </FormControl>
         <Button
-          onClick={() => void handleSave()}
-          disabled={saving || status === row.status}
+          onClick={() => void handleSaveStatus()}
+          disabled={saving || adminStatus === (row.admin_status ?? row.status)}
           variant="contained"
           sx={{
             backgroundColor: saved ? colors.success : colors.primaryBlue, color: '#fff',
@@ -232,6 +250,36 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange }) => {
           }}
         >
           {saving ? <CircularProgress size={14} sx={{ color: '#fff' }} /> : saved ? 'Saved!' : 'Update Status'}
+        </Button>
+      </Box>
+
+      {/* Customer message */}
+      <Box sx={{ mb: 2 }}>
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', fontWeight: 700, color: colors.navy, mb: 0.75, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Message to Customer
+        </Typography>
+        <TextField
+          value={customerMsg}
+          onChange={(e) => setCustomerMsg(e.target.value)}
+          placeholder="Visible to customer on the tracking page…"
+          size="small"
+          multiline
+          minRows={2}
+          fullWidth
+          sx={{ mb: 1, '& .MuiOutlinedInput-root': { borderRadius: '10px', fontSize: '0.82rem', fontFamily: fonts.body } }}
+        />
+        <Button
+          onClick={() => void handleSaveMessage()}
+          disabled={msgSaving || customerMsg === (row.customer_message ?? '')}
+          variant="outlined"
+          size="small"
+          sx={{
+            borderColor: msgSaved ? colors.success : colors.primaryBlue,
+            color: msgSaved ? colors.success : colors.primaryBlue,
+            fontFamily: fonts.body, fontWeight: 600, textTransform: 'none', borderRadius: '8px',
+          }}
+        >
+          {msgSaving ? <CircularProgress size={12} /> : msgSaved ? 'Saved!' : 'Save Message'}
         </Button>
       </Box>
 
@@ -274,9 +322,9 @@ const AdminBookingsPage: React.FC = () => {
 
   useEffect(() => { void load(); }, [load]);
 
-  const handleStatusChange = async (id: string, status: string) => {
-    await updateBookingStatus(id, status);
-    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
+  const handleStatusChange = async (id: string, adminStatus: string) => {
+    await updateAdminStatus(id, adminStatus);
+    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, admin_status: adminStatus } : b));
   };
 
   const filterSelect = (label: string, value: string, onChange: (v: string) => void, options: string[]) => (
@@ -377,7 +425,7 @@ const AdminBookingsPage: React.FC = () => {
           <Table size="small">
             <TableHead>
               <TableRow sx={{ backgroundColor: '#F8FAFC' }}>
-                {['Date', 'Customer', 'Service', 'ZIP', 'Urgency', 'Status', ''].map((h) => (
+                {['Request ID', 'Date', 'Customer', 'Service', 'ZIP', 'Urgency', 'Status', ''].map((h) => (
                   <TableCell key={h} sx={{ fontFamily: fonts.body, fontWeight: 700, color: colors.navy, fontSize: '0.75rem', py: 1.5 }}>
                     {h}
                   </TableCell>
@@ -398,6 +446,9 @@ const AdminBookingsPage: React.FC = () => {
                         '&:hover': { backgroundColor: '#F8FAFC' },
                       }}
                     >
+                      <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.75rem', fontWeight: 700, color: colors.primaryBlue, whiteSpace: 'nowrap', py: 1.5, letterSpacing: '0.03em' }}>
+                        {b.request_number ?? '—'}
+                      </TableCell>
                       <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, whiteSpace: 'nowrap', py: 1.5 }}>
                         {fmt(b.created_at)}
                       </TableCell>
@@ -442,7 +493,7 @@ const AdminBookingsPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={7} sx={{ p: 0, border: 0 }}>
+                      <TableCell colSpan={8} sx={{ p: 0, border: 0 }}>
                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                           <RowDetail row={b} onStatusChange={handleStatusChange} />
                         </Collapse>

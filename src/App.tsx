@@ -20,6 +20,7 @@ const ServiceCategoryPage = lazy(() => import('./pages/ServiceCategoryPage'));
 const RegularBookingPage = lazy(() => import('./pages/RegularBookingPage'));
 const EmergencyBookingPage = lazy(() => import('./pages/EmergencyBookingPage'));
 const TrackRequestPage = lazy(() => import('./pages/TrackRequestPage'));
+const BookingConfirmationPage = lazy(() => import('./pages/BookingConfirmationPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/LegalPage').then(m => ({ default: m.PrivacyPolicyPage })));
 const TermsOfServicePage = lazy(() => import('./pages/LegalPage').then(m => ({ default: m.TermsOfServicePage })));
 const AccessibilityPage = lazy(() => import('./pages/LegalPage').then(m => ({ default: m.AccessibilityPage })));
@@ -113,6 +114,7 @@ function AppRoutes() {
             <Route path="/book/emergency" element={<Navigate to="/emergency-service" replace />} />
             <Route path="/emergency-service" element={<EmergencyBookingPage />} />
             <Route path="/track-request" element={<TrackRequestPage />} />
+            <Route path="/booking-confirmation/:requestNumber" element={<BookingConfirmationPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/accessibility" element={<AccessibilityPage />} />

@@ -2,6 +2,9 @@ import { isPastLocalDate } from './localDate';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export const SERVICE_AREA_STATES = ['MD', 'DC', 'VA', 'PA', 'WV'] as const;
+export type ServiceAreaState = typeof SERVICE_AREA_STATES[number];
+
 export function validateFullName(name: string): string | null {
   const trimmed = name.trim();
   if (!trimmed) return 'Full name is required.';
@@ -24,15 +27,14 @@ export function validateUsPhone(phone: string): string | null {
 
 export function validateCityField(city: string): string | null {
   const trimmed = city.trim();
-  if (!trimmed) return null;
+  if (!trimmed) return 'City is required.';
   if (trimmed.length < 2) return 'City must be at least 2 characters.';
   return null;
 }
 
 export function validateStateField(state: string): string | null {
-  const trimmed = state.trim();
-  if (!trimmed) return null;
-  if (!/^[A-Za-z]{2}$/.test(trimmed)) return 'Enter a 2-letter state code.';
+  if (!state) return 'State is required.';
+  if (!(SERVICE_AREA_STATES as readonly string[]).includes(state)) return 'Select a valid state.';
   return null;
 }
 
