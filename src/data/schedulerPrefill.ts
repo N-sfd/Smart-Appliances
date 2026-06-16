@@ -108,7 +108,6 @@ const HVAC_FIELD_VALUES = [
   'Thermostat Installation',
   'HVAC Maintenance',
   'Duct Cleaning',
-  'Emergency HVAC',
 ] as const;
 
 const PLUMBING_FIELD_VALUES = [
@@ -345,10 +344,6 @@ export function parseSchedulerPrefill(params: URLSearchParams): SchedulerPrefill
   const serviceTypeFromUrl = serviceTypeParsed !== null;
 
   const fields = category && productName ? mapProductNameToFields(category, productName) : {};
-
-  if (category === 'HVAC' && /emergency/i.test(productName) && !fields.hvacService) {
-    fields.hvacService = 'Emergency HVAC';
-  }
 
   return {
     category,

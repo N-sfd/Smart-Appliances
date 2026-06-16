@@ -19,7 +19,7 @@ export interface BookingRow {
   email: string;
   phone: string;
 
-  zip_code: string;
+  zip_code?: string | null;
   street_address?: string | null;
   suite_apt?: string | null;
   city?: string | null;

@@ -346,8 +346,10 @@ const SchedulerPage: React.FC = () => {
   const paramPreferredDate = params.get('preferredDate');
   const todayLocal = getTodayLocalDate();
 
-  // Step
-  const [step, setStep] = useState(0);
+  // Step — skip service-type picker when both type and category come from URL
+  const [step, setStep] = useState(
+    prefill.serviceTypeFromUrl && Boolean(prefill.category) ? 1 : 0,
+  );
 
   // Step 0
   const [serviceType, setServiceType] = useState(prefill.serviceType);
@@ -427,6 +429,7 @@ const SchedulerPage: React.FC = () => {
       setCategory(next.category);
       setShowCategoryPicker(!next.skipCategoryPicker);
     }
+    if (next.serviceTypeFromUrl && Boolean(next.category)) setStep(1);
     if (next.fields.appliance) setAppliance(next.fields.appliance);
     if (next.fields.hvacService) setHvacService(next.fields.hvacService);
     if (next.fields.plumbingIssue) setPlumbingIssue(next.fields.plumbingIssue);
@@ -484,7 +487,6 @@ const SchedulerPage: React.FC = () => {
         'Thermostat Installation': HVAC_SERVICE_IMAGES['thermostat-installation'],
         'HVAC Maintenance': HVAC_SERVICE_IMAGES['hvac-maintenance'],
         'Duct Cleaning': HVAC_SERVICE_IMAGES['duct-cleaning'],
-        'Emergency HVAC': HVAC_SERVICE_IMAGES['emergency-hvac-service'],
       };
       if (map[hvacService]) return { ...base, image: map[hvacService], title: hvacService };
     }
@@ -1390,7 +1392,7 @@ const SchedulerPage: React.FC = () => {
                         required
                         options={[
                           'AC Repair', 'Heating / Furnace Repair', 'Thermostat Installation',
-                          'HVAC Maintenance', 'Duct Cleaning', 'Emergency HVAC',
+                          'HVAC Maintenance', 'Duct Cleaning',
                         ]}
                         value={hvacService}
                         onChange={setHvacService}
