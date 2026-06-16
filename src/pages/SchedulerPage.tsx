@@ -609,7 +609,15 @@ const SchedulerPage: React.FC = () => {
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
-  const handleBack = () => setStep((s) => Math.max(s - 1, 0));
+  const isPrefilled = prefill.serviceTypeFromUrl && Boolean(prefill.category);
+
+  const handleBack = () => {
+    if (isPrefilled && step === 1) {
+      navigate(-1);
+      return;
+    }
+    setStep((s) => Math.max(s - 1, 0));
+  };
 
   const resetCategoryFields = () => {
     setAppliance(''); setApplianceIssue(''); setBrand(''); setModel('');
@@ -772,7 +780,7 @@ const SchedulerPage: React.FC = () => {
           '&:hover': { borderColor: colors.navy, backgroundColor: 'rgba(11,61,145,0.04)' },
         }}
       >
-        {step === 0 ? 'Cancel' : 'Back'}
+        {step === 0 || (isPrefilled && step === 1) ? 'Cancel' : 'Back'}
       </Button>
 
       {isSubmitStep ? (
@@ -1237,7 +1245,7 @@ const SchedulerPage: React.FC = () => {
                             mb: 0.35,
                           }}
                         >
-                          Selected Service Category
+                          {isPrefilled && prefill.productName ? 'Selected Service' : 'Selected Service Category'}
                         </Typography>
                         <Typography
                           sx={{
@@ -1247,23 +1255,46 @@ const SchedulerPage: React.FC = () => {
                             fontSize: '1.05rem',
                           }}
                         >
-                          {category}
+                          {isPrefilled && prefill.productName ? prefill.productName : category}
                         </Typography>
+                        {isPrefilled && prefill.productName && (
+                          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.8rem', color: colors.mutedText, mt: 0.25 }}>
+                            {category}
+                          </Typography>
+                        )}
                       </Box>
-                      <Button
-                        variant="text"
-                        onClick={handleChangeCategory}
-                        sx={{
-                          textTransform: 'none',
-                          fontFamily: fonts.body,
-                          fontWeight: 600,
-                          color: colors.primaryBlue,
-                          px: 1,
-                          minWidth: 'auto',
-                        }}
-                      >
-                        Change Category
-                      </Button>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                        {isPrefilled && (
+                          <Button
+                            variant="text"
+                            onClick={() => setStep(0)}
+                            sx={{
+                              textTransform: 'none',
+                              fontFamily: fonts.body,
+                              fontWeight: 600,
+                              color: colors.mutedText,
+                              px: 1,
+                              minWidth: 'auto',
+                            }}
+                          >
+                            Change Service Type
+                          </Button>
+                        )}
+                        <Button
+                          variant="text"
+                          onClick={handleChangeCategory}
+                          sx={{
+                            textTransform: 'none',
+                            fontFamily: fonts.body,
+                            fontWeight: 600,
+                            color: colors.primaryBlue,
+                            px: 1,
+                            minWidth: 'auto',
+                          }}
+                        >
+                          Change Category
+                        </Button>
+                      </Box>
                     </Box>
                   )}
 

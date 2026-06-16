@@ -135,7 +135,8 @@ const Home: React.FC = () => {
     });
 
     if (insertError) {
-      setSubmitError('We could not save your request. Please check your information and try again.');
+      console.error('[Booking] Insert failed:', insertError);
+      setSubmitError(`Save failed: ${insertError}`);
       setIsSubmitting(false);
       return;
     }

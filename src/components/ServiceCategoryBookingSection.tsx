@@ -149,10 +149,12 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
     const schedulerCategory = schedulerCategoryFromHubId(categoryId);
     const title = service.title;
     const typeCode = /install/i.test(title) ? 'I' : /mainten|clean/i.test(title) ? 'M' : 'R';
-    const query = new URLSearchParams({
-      serviceType: typeCode,
-      productName: title,
-    });
+    const productName = /repair|install|mainten|clean|service|setup/i.test(title)
+      ? title
+      : typeCode === 'I' ? `${title} Installation`
+      : typeCode === 'M' ? `${title} Maintenance`
+      : `${title} Repair`;
+    const query = new URLSearchParams({ serviceType: typeCode, productName });
     if (schedulerCategory) {
       query.set('serviceCategory', schedulerCategory);
     }
