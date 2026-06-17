@@ -813,7 +813,7 @@ const SchedulerPage: React.FC = () => {
       ) : (
         <Button
           variant="contained"
-          disabled={step !== 2 && !canContinue}
+          disabled={!canContinue}
           onClick={handleNext}
           sx={{
             color: '#fff',
