@@ -31,8 +31,8 @@ export interface BookingRow {
 
   problem_type?: string | null;
   system_type?: string | null;
-  brand?: string | null;
-  model_number?: string | null;
+  appliance_brand?: string | null;
+  appliance_model?: string | null;
   issue_description?: string | null;
 
   urgency?: string | null;
