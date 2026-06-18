@@ -192,9 +192,9 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange }) => {
           <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>
             {[row.product_name, row.problem_type, row.system_type].filter(Boolean).join(' · ') || row.service_type}
           </Typography>
-          {row.brand && (
+          {row.appliance_brand && (
             <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText }}>
-              {row.brand}{row.model_number ? ` · ${row.model_number}` : ''}
+              {row.appliance_brand}{row.appliance_model ? ` · ${row.appliance_model}` : ''}
             </Typography>
           )}
         </Box>

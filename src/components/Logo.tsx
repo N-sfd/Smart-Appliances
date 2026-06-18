@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box } from '@mui/material';
-import logoBrand from '../assets/logo-brand.webp';
+import { Box, Typography } from '@mui/material';
+import logoBrand from '../assets/logo-brand.png';
+import { colors, fonts } from '../theme';
 import {
   LOGO_BRAND_WIDTH,
   LOGO_BRAND_HEIGHT,
@@ -12,6 +13,8 @@ interface BrandLogoProps {
   size?: number;
   mobileSize?: number;
   variant?: 'header' | 'footer';
+  /** Flat 2D mark + wordmark for header (default on header) */
+  flat?: boolean;
   dark?: boolean;
   onClick?: () => void;
 }
@@ -20,6 +23,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 108,
   mobileSize = 70,
   variant = 'header',
+  flat = false,
   onClick,
 }) => {
   const isHeader = variant === 'header';
@@ -31,6 +35,8 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     userSelect: 'none',
     flexShrink: 0,
     outline: 'none',
+    transition: 'opacity 0.3s ease',
+    '&:hover': onClick ? { opacity: 0.88 } : undefined,
     '&:focus-visible': onClick
       ? { outline: '2px solid #1A73E8', outlineOffset: 3, borderRadius: '8px' }
       : undefined,
@@ -50,6 +56,61 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         'aria-label': 'Smart Appliances',
       }
     : { 'aria-label': 'Smart Appliances' };
+
+  if (isHeader && flat) {
+    return (
+      <Box sx={wrapperSx} {...interactiveProps}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: 1, sm: 1.15, md: 1.35 },
+          }}
+        >
+          <Box
+            component="img"
+            src="/logo-mark.svg"
+            alt=""
+            aria-hidden
+            sx={{
+              width: { xs: 38, sm: 42, md: 46 },
+              height: { xs: 38, sm: 42, md: 46 },
+              flexShrink: 0,
+              display: 'block',
+            }}
+          />
+          <Box sx={{ textAlign: 'left', minWidth: 0 }}>
+            <Typography
+              sx={{
+                fontFamily: fonts.heading,
+                fontWeight: 800,
+                fontSize: { xs: '1rem', sm: '1.08rem', md: '1.15rem' },
+                color: colors.navy,
+                lineHeight: 1.15,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Smart Appliances
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: fonts.body,
+                fontSize: { xs: '0.62rem', sm: '0.68rem', md: '0.72rem' },
+                fontWeight: 500,
+                color: colors.mutedText,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                lineHeight: 1.3,
+                mt: 0.2,
+              }}
+            >
+              Repair · Install · Maintain
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   const displayWidth = isHeader
     ? LOGO_HEADER_WIDTH

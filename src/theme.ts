@@ -43,6 +43,7 @@ export const colors = {
   surface: tokens.neutral[50],
   border: tokens.neutral[200],
   mutedText: tokens.neutral[400],
+  sectionBg: '#F7F9FC',
   emergency: tokens.error[500],
   emergencyHover: '#DC2626',
   emergencyLight: '#FEF2F2',
@@ -211,14 +212,27 @@ export const theme = createTheme({
   shape: { borderRadius: 14 },
   typography: {
     fontFamily: fonts.body,
-    h1: { fontFamily: fonts.heading, fontWeight: 700 },
-    h2: { fontFamily: fonts.heading, fontWeight: 700 },
+    h1: { fontFamily: fonts.heading, fontWeight: 700, fontSize: '42px', lineHeight: 1.2 },
+    h2: { fontFamily: fonts.heading, fontWeight: 600, fontSize: '30px', lineHeight: 1.3 },
     h3: { fontFamily: fonts.heading, fontWeight: 700 },
     h4: { fontFamily: fonts.heading, fontWeight: 700 },
     h5: { fontFamily: fonts.heading, fontWeight: 700 },
     h6: { fontFamily: fonts.heading, fontWeight: 700 },
   },
   components: {
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          '&.MuiContainer-maxWidthLg': {
+            maxWidth: '1440px',
+            paddingLeft: '24px',
+            paddingRight: '24px',
+            '@media (min-width: 900px)': { paddingLeft: '48px', paddingRight: '48px' },
+            '@media (min-width: 1200px)': { paddingLeft: '80px', paddingRight: '80px' },
+          },
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {

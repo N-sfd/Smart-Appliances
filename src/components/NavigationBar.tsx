@@ -227,13 +227,19 @@ const NavigationBar: React.FC = () => {
             </Typography>
             <Typography
               variant="body2"
+              component="a"
+              href="tel:+15712764808"
               sx={{
                 fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                color: '#666666',
+                color: '#1A73E8',
+                fontWeight: 700,
                 marginBottom: 0.5,
+                textDecoration: 'none',
+                display: 'block',
+                '&:hover': { textDecoration: 'underline' },
               }}
             >
-              📞 +1 (555) 123-4567
+              📞 +1 (571) 276-4808
             </Typography>
             <Typography
               variant="body2"

@@ -10,16 +10,44 @@ import {
   AccordionDetails,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { TriangleAlert } from 'lucide-react';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { TriangleAlert, ClipboardList, CalendarClock, CheckCircle2, MessageSquareText, SearchCheck } from 'lucide-react';
 import { colors, fonts } from '../theme';
 import ServiceCategoryBookingSection from './ServiceCategoryBookingSection';
 import CategoryBrandSection from './CategoryBrandSection';
 import type { ServiceCategoryPageConfig } from '../data/serviceCategoryPages';
 import { SERVICE_SLUG_TO_SCHEDULER } from '../data/schedulerPrefill';
 
+const HOW_IT_WORKS_ICONS_BY_LENGTH: Record<number, (typeof ClipboardList)[]> = {
+  3: [ClipboardList, CalendarClock, CheckCircle2],
+  4: [ClipboardList, MessageSquareText, CalendarClock, SearchCheck],
+};
+
 interface ServiceCategoryPageLayoutProps {
   config: ServiceCategoryPageConfig;
 }
+
+/** FAQ answer body — lighter weight, charcoal tone for hierarchy */
+const FAQ_ANSWER_COLOR = '#333333';
+
+const faqAccordionSx = (index: number, total: number) => ({
+  border: '1px solid #E4E7EB',
+  borderRadius: index === 0 ? '12px 12px 0 0' : index === total - 1 ? '0 0 12px 12px' : 0,
+  '&:not(:last-child)': { borderBottom: 'none' },
+  '&::before': { display: 'none' },
+  transition: 'box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out',
+  '&.Mui-expanded': {
+    boxShadow: '0 4px 18px rgba(11, 61, 145, 0.07)',
+    borderColor: '#D0E3FF',
+  },
+});
+
+const ctaLiftHover = {
+  transition: 'all 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+  },
+};
 
 /** Unified split-hero background — smooth white-to-blue, no hard column split */
 const SPLIT_HERO_BACKGROUND = `
@@ -279,7 +307,13 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
                   borderRadius: '14px',
                   px: 3.5,
                   py: 1.4,
-                  '&:hover': { backgroundColor: colors.navy },
+                  boxShadow: '0 4px 14px rgba(26, 115, 232, 0.28)',
+                  ...ctaLiftHover,
+                  '&:hover': {
+                    backgroundColor: colors.navy,
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 22px rgba(11, 61, 145, 0.32)',
+                  },
                 }}
               >
                 {config.hero.primaryCta}
@@ -289,18 +323,24 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
                   variant="outlined"
                   onClick={handleSecondaryCta}
                   sx={{
-                    borderColor: isEmergencySecondary ? '#EF4444' : colors.primaryBlue,
-                    color: isEmergencySecondary ? '#EF4444' : colors.primaryBlue,
-                    backgroundColor: '#FFFFFF',
+                    borderWidth: 2,
+                    borderColor: isEmergencySecondary ? '#D97706' : colors.primaryBlue,
+                    color: isEmergencySecondary ? '#FFFFFF' : colors.primaryBlue,
+                    backgroundColor: isEmergencySecondary ? '#D97706' : '#FFFFFF',
                     fontFamily: fonts.body,
-                    fontWeight: 600,
+                    fontWeight: 700,
                     textTransform: 'none',
                     borderRadius: '14px',
                     px: 3,
                     py: 1.4,
+                    ...ctaLiftHover,
                     '&:hover': {
-                      borderColor: isEmergencySecondary ? '#DC2626' : colors.navy,
-                      backgroundColor: isEmergencySecondary ? '#FFF5F5' : '#E8F1FF',
+                      borderColor: isEmergencySecondary ? '#F59E0B' : colors.navy,
+                      backgroundColor: isEmergencySecondary ? '#B45309' : '#E8F1FF',
+                      transform: 'translateY(-2px)',
+                      boxShadow: isEmergencySecondary
+                        ? '0 6px 18px rgba(217, 119, 6, 0.35)'
+                        : '0 4px 14px rgba(26, 115, 232, 0.12)',
                     },
                   }}
                 >
@@ -479,7 +519,7 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
         <CategoryBrandSection config={brandBeforeHowItWorks} sectionMode={brandBeforeHowItWorksMode} />
       )}
 
-      <Box sx={{ py: { xs: 6, md: 8 }, backgroundColor: '#F8FAFC', borderTop: '1px solid #EEF0F3' }}>
+      <Box sx={{ py: { xs: 6, md: 8 }, backgroundColor: colors.sectionBg, borderTop: '1px solid #EEF0F3' }}>
         <Container maxWidth="md">
           <Typography
             sx={{
@@ -531,24 +571,63 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
               gap: 4,
             }}
           >
-            {config.howItWorks.map(({ step, title, description }) => (
-              <Box key={step} sx={{ textAlign: 'center' }}>
+            {config.howItWorks.map(({ step, title, description }, index) => {
+              const stepIcons = HOW_IT_WORKS_ICONS_BY_LENGTH[config.howItWorks.length] ?? HOW_IT_WORKS_ICONS_BY_LENGTH[3];
+              const StepIcon = stepIcons[index] ?? CheckCircle2;
+              return (
+              <Box
+                key={step}
+                sx={{
+                  textAlign: 'center',
+                  transition: 'transform 0.3s ease-in-out',
+                  '&:hover': { transform: 'translateY(-2px)' },
+                }}
+              >
                 <Box
                   sx={{
-                    width: 52,
-                    height: 52,
+                    position: 'relative',
+                    width: 56,
+                    height: 56,
                     borderRadius: '50%',
                     background: `linear-gradient(135deg, ${colors.primaryBlue} 0%, ${colors.navy} 100%)`,
+                    boxShadow: '0 6px 20px rgba(26, 115, 232, 0.28)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     mx: 'auto',
                     mb: 2,
+                    transition: 'box-shadow 0.3s ease-in-out',
+                    '&:hover': { boxShadow: '0 10px 28px rgba(26, 115, 232, 0.38)' },
                   }}
                 >
-                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.2rem', color: '#fff' }}>
+                  <Typography
+                    sx={{
+                      fontFamily: fonts.heading,
+                      fontWeight: 800,
+                      fontSize: '1.25rem',
+                      color: '#fff',
+                      lineHeight: 1,
+                    }}
+                  >
                     {step}
                   </Typography>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: -6,
+                      right: -6,
+                      width: 24,
+                      height: 24,
+                      borderRadius: '50%',
+                      backgroundColor: '#fff',
+                      border: `1.5px solid ${colors.primaryBlue}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <StepIcon size={13} color={colors.primaryBlue} />
+                  </Box>
                 </Box>
                 <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1rem', color: '#1A1A1A', mb: 0.75 }}>
                   {title}
@@ -557,7 +636,8 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
                   {description}
                 </Typography>
               </Box>
-            ))}
+              );
+            })}
           </Box>
         </Container>
       </Box>
@@ -592,7 +672,15 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
         </Box>
       )}
 
-      <Box sx={{ py: { xs: 5, md: 7 }, backgroundColor: '#FFFFFF' }}>
+      <Box
+        sx={{
+          position: 'relative',
+          py: { xs: 5, md: 7 },
+          backgroundColor: '#FFFFFF',
+          boxShadow: '0 16px 40px rgba(11, 61, 145, 0.07)',
+          zIndex: 1,
+        }}
+      >
         <Container maxWidth="md">
           <Typography
             sx={{
@@ -606,36 +694,110 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
           >
             {config.faqTitle ?? 'FAQ'}
           </Typography>
+          <Box
+            sx={{
+              borderRadius: '14px',
+              border: '1px solid #E4E7EB',
+              boxShadow: '0 10px 36px rgba(11, 61, 145, 0.08)',
+              overflow: 'hidden',
+              backgroundColor: '#FFFFFF',
+            }}
+          >
           {config.faqs.map((faq, index) => (
             <Accordion
               key={faq.question}
               disableGutters
               elevation={0}
               defaultExpanded={index === 0}
-              TransitionProps={{ unmountOnExit: true, mountOnEnter: true }}
+              TransitionProps={{ unmountOnExit: true, mountOnEnter: true, timeout: 300 }}
               sx={{
-                border: '1px solid #E4E7EB',
-                borderRadius: index === 0 ? '12px 12px 0 0' : index === config.faqs.length - 1 ? '0 0 12px 12px' : 0,
-                '&:not(:last-child)': { borderBottom: 'none' },
-                '&::before': { display: 'none' },
+                ...faqAccordionSx(index, config.faqs.length),
+                borderRadius: 0,
+                borderLeft: 'none',
+                borderRight: 'none',
+                ...(index === 0 ? { borderTop: 'none' } : {}),
+                ...(index === config.faqs.length - 1 ? { borderBottom: 'none' } : {}),
               }}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#1A73E8' }} />} sx={{ px: { xs: 2, md: 3 } }}>
-                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: '#1A1A1A' }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon sx={{ color: '#1A73E8', transition: 'transform 0.3s ease' }} />}
+                sx={{
+                  px: { xs: 2.25, md: 3.25 },
+                  py: { xs: 1.25, md: 1.5 },
+                  minHeight: { xs: 56, md: 60 },
+                  transition: 'background-color 0.3s ease-in-out',
+                  '&:hover': { backgroundColor: 'rgba(232, 241, 255, 0.45)' },
+                  '& .MuiAccordionSummary-content': {
+                    my: { xs: 1.25, md: 1.5 },
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.25,
+                  },
+                }}
+              >
+                <HelpOutlineIcon sx={{ fontSize: 19, color: colors.primaryBlue, flexShrink: 0 }} />
+                <Typography
+                  sx={{
+                    fontFamily: fonts.heading,
+                    fontWeight: 700,
+                    fontSize: { xs: '0.95rem', md: '1rem' },
+                    color: '#1A1A1A',
+                    lineHeight: 1.45,
+                  }}
+                >
                   {faq.question}
                 </Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{ px: { xs: 2, md: 3 }, pt: 0, pb: 2.5 }}>
-                <Typography sx={{ fontFamily: fonts.body, color: '#64748B', fontSize: '0.925rem', lineHeight: 1.7 }}>
+              <AccordionDetails
+                sx={{
+                  px: { xs: 2.5, md: 3.5 },
+                  pt: { xs: 1.5, md: 2 },
+                  pb: { xs: 3.25, md: 3.75 },
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: fonts.body,
+                    color: FAQ_ANSWER_COLOR,
+                    fontWeight: 400,
+                    fontSize: { xs: '0.875rem', md: '0.9rem' },
+                    lineHeight: 1.8,
+                  }}
+                >
                   {faq.answer}
                 </Typography>
               </AccordionDetails>
             </Accordion>
           ))}
+          </Box>
         </Container>
+
+        {/* Wave transition into bottom CTA */}
+        <Box
+          component="svg"
+          viewBox="0 0 1440 56"
+          preserveAspectRatio="none"
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: { xs: 36, md: 56 },
+            display: 'block',
+            transform: 'translateY(99%)',
+            pointerEvents: 'none',
+          }}
+        >
+          <path
+            d="M0,24 C360,56 720,0 1080,24 C1260,36 1380,48 1440,40 L1440,56 L0,56 Z"
+            fill={colors.navy}
+          />
+        </Box>
       </Box>
 
-      <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: colors.navy, textAlign: 'center' }}>
+      <Box sx={{ pt: { xs: 5, md: 6 }, pb: { xs: 7, md: 9 }, backgroundColor: colors.navy, textAlign: 'center' }}>
         <Container maxWidth="sm">
           <Typography
             sx={{
@@ -649,49 +811,9 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
           >
             {config.bottomCta.title}
           </Typography>
-          <Typography sx={{ fontFamily: fonts.body, color: 'rgba(255,255,255,0.88)', fontSize: '1.05rem', mb: 3.5, lineHeight: 1.6 }}>
+          <Typography sx={{ fontFamily: fonts.body, color: 'rgba(255,255,255,0.88)', fontSize: '1.05rem', lineHeight: 1.6 }}>
             {config.bottomCta.subtitle}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handlePrimaryCta}
-              sx={{
-                background: '#FFFFFF',
-                color: colors.navy,
-                fontFamily: fonts.body,
-                fontWeight: 700,
-                textTransform: 'none',
-                borderRadius: '999px',
-                px: 4,
-                py: 1.5,
-                '&:hover': { background: '#E8F1FF' },
-              }}
-            >
-              {config.bottomCta.primaryLabel}
-            </Button>
-            {config.bottomCta.secondaryLabel && (
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={handleSecondaryCta}
-                sx={{
-                  borderColor: 'rgba(255,255,255,0.45)',
-                  color: '#FFFFFF',
-                  fontFamily: fonts.body,
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  borderRadius: '999px',
-                  px: 3.5,
-                  py: 1.5,
-                  '&:hover': { borderColor: '#FFFFFF', backgroundColor: 'rgba(255,255,255,0.08)' },
-                }}
-              >
-                {config.bottomCta.secondaryLabel}
-              </Button>
-            )}
-          </Box>
         </Container>
       </Box>
     </Box>

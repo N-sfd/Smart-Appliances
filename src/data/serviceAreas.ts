@@ -20,6 +20,59 @@ export function isInServiceArea(zip: string): boolean {
   return num >= SERVICE_AREA_ZIP_MIN && num <= SERVICE_AREA_ZIP_MAX;
 }
 
+/** States we serve in the DC metro service area */
+export type MetroServiceState = 'MD' | 'DC' | 'VA' | 'PA' | 'WV';
+
+const METRO_STATE_LABELS: Record<MetroServiceState, string> = {
+  MD: 'Maryland',
+  DC: 'Washington DC',
+  VA: 'Virginia',
+  PA: 'Pennsylvania',
+  WV: 'West Virginia',
+};
+
+/** 3-digit ZIP prefix → state for our service area (20001–21930) */
+const ZIP_PREFIX_TO_STATE: Record<string, MetroServiceState> = {
+  '200': 'DC',
+  '201': 'VA',
+  '202': 'DC',
+  '203': 'DC',
+  '204': 'DC',
+  '205': 'VA',
+  '206': 'MD',
+  '207': 'MD',
+  '208': 'MD',
+  '209': 'MD',
+  '210': 'MD',
+  '211': 'MD',
+  '212': 'MD',
+  '214': 'MD',
+  '216': 'MD',
+  '217': 'MD',
+  '218': 'MD',
+  '219': 'MD',
+};
+
+export function getMetroStateLabel(state: MetroServiceState): string {
+  return METRO_STATE_LABELS[state];
+}
+
+/** Infer state from a valid in-service-area ZIP (e.g. 20166 → VA). */
+export function inferStateFromZip(zip: string): MetroServiceState | '' {
+  if (!isInServiceArea(zip)) return '';
+  const prefix = zip.trim().slice(0, 3);
+  return ZIP_PREFIX_TO_STATE[prefix] ?? '';
+}
+
+export function validateZipStateMatch(zip: string, state: string): string | null {
+  const expected = inferStateFromZip(zip);
+  if (!expected || !state) return null;
+  if (state !== expected) {
+    return `ZIP ${zip} is in ${METRO_STATE_LABELS[expected]}. Select ${expected}, not ${state}.`;
+  }
+  return null;
+}
+
 export interface ZipValidationOptions {
   /** When true (default), ZIP must fall within the service area */
   requireServiceArea?: boolean;
@@ -96,6 +149,61 @@ export function getZipFieldHelperText(
 export function isZipFieldError(zip: string, touched: boolean, options: ZipValidationOptions = {}): boolean {
   if (!touched && !zip) return false;
   return !validateZipCode(zip, options).isValid;
+}
+
+export interface ServiceAreaZipOption {
+  zip: string;
+  city: string;
+  state: MetroServiceState;
+}
+
+/** Curated ZIP/city/state combos offered in the scheduler's location dropdowns */
+export const SERVICE_AREA_ZIP_OPTIONS: ServiceAreaZipOption[] = [
+  { zip: '20001', city: 'Washington DC', state: 'DC' },
+  { zip: '21201', city: 'Baltimore', state: 'MD' },
+  { zip: '20910', city: 'Silver Spring', state: 'MD' },
+  { zip: '20850', city: 'Rockville', state: 'MD' },
+  { zip: '20814', city: 'Bethesda', state: 'MD' },
+  { zip: '21044', city: 'Columbia', state: 'MD' },
+  { zip: '21401', city: 'Annapolis', state: 'MD' },
+  { zip: '21701', city: 'Frederick', state: 'MD' },
+  { zip: '20877', city: 'Gaithersburg', state: 'MD' },
+  { zip: '21204', city: 'Towson', state: 'MD' },
+  { zip: '21740', city: 'Hagerstown', state: 'MD' },
+  { zip: '20601', city: 'Waldorf', state: 'MD' },
+  { zip: '20164', city: 'Sterling', state: 'VA' },
+  { zip: '20166', city: 'Sterling', state: 'VA' },
+  { zip: '20147', city: 'Ashburn', state: 'VA' },
+  { zip: '20175', city: 'Leesburg', state: 'VA' },
+  { zip: '20170', city: 'Herndon', state: 'VA' },
+  { zip: '20190', city: 'Reston', state: 'VA' },
+  { zip: '20110', city: 'Manassas', state: 'VA' },
+];
+
+/** Match a ZIP to a curated dropdown row, or the closest same-prefix option in our service area. */
+export function findServiceAreaZipOption(zip: string): ServiceAreaZipOption | undefined {
+  const exact = SERVICE_AREA_ZIP_OPTIONS.find((o) => o.zip === zip);
+  if (exact) return exact;
+  if (!isInServiceArea(zip)) return undefined;
+  const state = inferStateFromZip(zip);
+  if (!state) return undefined;
+  const prefix = zip.slice(0, 3);
+  return SERVICE_AREA_ZIP_OPTIONS.find((o) => o.zip.startsWith(prefix) && o.state === state);
+}
+
+/** Options for the scheduler ZIP select — includes a valid prefilled ZIP even if not curated. */
+export function getSchedulerZipSelectOptions(zip: string): ServiceAreaZipOption[] {
+  if (!zip || SERVICE_AREA_ZIP_OPTIONS.some((o) => o.zip === zip)) {
+    return SERVICE_AREA_ZIP_OPTIONS;
+  }
+  if (!isInServiceArea(zip)) return SERVICE_AREA_ZIP_OPTIONS;
+  const state = inferStateFromZip(zip);
+  if (!state) return SERVICE_AREA_ZIP_OPTIONS;
+  const matched = findServiceAreaZipOption(zip);
+  return [
+    ...SERVICE_AREA_ZIP_OPTIONS,
+    { zip, city: matched?.city ?? '', state },
+  ];
 }
 
 export const serviceAreaNeighborhoods = [

@@ -107,23 +107,6 @@ const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({ height = { xs: 220, md:
         {SERVICE_AREA_REGION_LABEL}
       </Typography>
     </Box>
-
-    <Box
-      sx={{
-        position: 'absolute',
-        bottom: 10,
-        right: 10,
-        px: 1,
-        py: 0.5,
-        borderRadius: '8px',
-        backgroundColor: 'rgba(255, 255, 255, 0.88)',
-        border: '1px solid #E4E7EB',
-      }}
-    >
-      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.65rem', color: '#64748B', lineHeight: 1.3 }}>
-        ZIP {20001}–{21930}
-      </Typography>
-    </Box>
   </Box>
 );
 

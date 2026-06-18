@@ -103,13 +103,14 @@ export const homeAppliancesPageConfig: ServiceCategoryPageConfig = {
   slug: 'home-appliances',
   categoryId: HUB_CATEGORY_IDS.appliances,
   hero: {
-    title: 'Home Appliance Repair & Installation',
+    title: 'Fast, Certified Appliance Repair — Same-Day Service',
     subtitle:
       'Book trusted technicians for appliance repair, installation, diagnostics, and urgent appliance service.',
     image: `${BASE}/home-appliances/hero.jpg`,
     primaryCta: 'Book Appliance Service',
-    secondaryCta: 'Emergency Help',
+    secondaryCta: 'Emergency Repair',
     layout: 'split',
+    trustBullets: ['Licensed & Insured', 'Same-Day Availability', 'Certified Technicians'],
   },
   iconSectionTitle: 'What appliance needs service?',
   iconCards: homeApplianceIconCards,
@@ -117,7 +118,7 @@ export const homeAppliancesPageConfig: ServiceCategoryPageConfig = {
   brandSection: {
     title: 'Brands We Service',
     subtitle: 'Our technicians service most major appliance brands.',
-    brands: ['GE', 'Sharp', 'Bosch', 'Samsung', 'LG', 'Frigidaire', 'Kenmore'],
+    brands: ['GE', 'Whirlpool', 'Samsung', 'LG', 'Bosch', 'Frigidaire', 'Maytag'],
     variant: 'marquee',
     placement: 'before-how-it-works',
   },
@@ -145,25 +146,27 @@ export const homeAppliancesPageConfig: ServiceCategoryPageConfig = {
     },
   ],
   bottomCta: {
-    title: 'Ready to fix your appliance?',
-    subtitle: 'Book online in minutes or call to speak with our team.',
+    title: 'Need appliance repair today?',
+    subtitle: 'Schedule online or request emergency service.',
     primaryLabel: 'Book Appliance Service',
-    secondaryLabel: 'Emergency Help',
+    secondaryLabel: 'Emergency Repair',
   },
   desktopIconColumns: 4,
+  cardHoverLift: true,
 };
 
 export const plumbingPageConfig: ServiceCategoryPageConfig = {
   slug: 'plumbing',
   categoryId: HUB_CATEGORY_IDS.plumbing,
   hero: {
-    title: 'Plumbing Repair & Installation',
+    title: 'Professional Plumbing Services',
     subtitle:
       'Book help for leaks, drains, faucets, toilets, water heaters, garbage disposals, and urgent plumbing issues.',
     image: `${BASE}/plumbing-service.jpg`,
     primaryCta: 'Schedule Plumbing Service',
     secondaryCta: 'Emergency Plumbing',
     layout: 'banner',
+    trustBullets: ['Licensed & Insured', 'Same-Day Availability', 'Safety-Focused Service'],
   },
   iconSectionTitle: 'What plumbing issue do you need help with?',
   iconCards: plumbingIconCards,
@@ -207,6 +210,7 @@ export const plumbingPageConfig: ServiceCategoryPageConfig = {
     secondaryLabel: 'Emergency Plumbing',
   },
   desktopIconColumns: 4,
+  cardHoverLift: true,
 };
 
 export const smartHomePageConfig: ServiceCategoryPageConfig = {
@@ -267,22 +271,32 @@ export const smartHomePageConfig: ServiceCategoryPageConfig = {
     secondaryLabel: 'Ask About Installation',
   },
   desktopIconColumns: 4,
+  cardHoverLift: true,
 };
 
 export const hvacPageConfig: ServiceCategoryPageConfig = {
   slug: 'hvac',
   categoryId: HUB_CATEGORY_IDS.hvac,
   hero: {
-    title: 'HVAC Repair & Maintenance',
+    title: 'HVAC Services — Heating, Cooling & Air Quality',
     subtitle: 'Heating, cooling, and ventilation service from certified HVAC technicians.',
     image: `${BASE}/hvac-service.jpg`,
-    primaryCta: 'Schedule HVAC Service',
-    secondaryCta: 'Emergency HVAC',
+    primaryCta: 'Book HVAC Service',
+    secondaryCta: 'Emergency HVAC Help',
     layout: 'banner',
+    trustBullets: ['Licensed & Insured', 'Same-Day Availability', 'Safety-Focused Service'],
   },
   iconSectionTitle: 'What HVAC service do you need?',
   iconCards: hvacIconCards,
   popularSectionTitle: 'Popular HVAC Services',
+  brandSection: {
+    title: 'Brands We Service',
+    subtitle: 'Trusted HVAC equipment and thermostat brands we work with.',
+    brands: ['Carrier', 'Trane', 'Lennox', 'Rheem', 'Goodman', 'Honeywell'],
+    variant: 'logo-marquee',
+    logoMarqueePlain: true,
+    placement: 'after-icon-selection',
+  },
   howItWorks: DEFAULT_HOW_IT_WORKS,
   faqs: [
     {
@@ -303,12 +317,13 @@ export const hvacPageConfig: ServiceCategoryPageConfig = {
     },
   ],
   bottomCta: {
-    title: 'Stay comfortable year-round',
-    subtitle: 'Book HVAC repair or maintenance online today.',
-    primaryLabel: 'Schedule HVAC Service',
-    secondaryLabel: 'Emergency HVAC',
+    title: 'Need HVAC help?',
+    subtitle: 'Schedule online or request emergency HVAC service.',
+    primaryLabel: 'Book HVAC Service',
+    secondaryLabel: 'Emergency HVAC Help',
   },
   desktopIconColumns: 3,
+  cardHoverLift: true,
 };
 
 export const electricalPageConfig: ServiceCategoryPageConfig = {

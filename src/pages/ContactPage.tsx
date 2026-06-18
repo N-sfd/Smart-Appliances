@@ -10,6 +10,7 @@ import {
   Select,
   FormControl,
   InputLabel,
+  InputAdornment,
   SelectChangeEvent,
 } from '@mui/material';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -17,7 +18,15 @@ import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import { serviceCategories } from '../data/services';
+import { primaryButtonSx, radii } from '../theme';
+
+const contactInputSx = {
+  '& .MuiOutlinedInput-root': { borderRadius: radii.xl },
+};
 
 interface ContactInfo {
   icon: React.ReactNode;
@@ -25,12 +34,14 @@ interface ContactInfo {
   value: string;
   sublabel: string;
   iconBg: string;
+  href?: string;
 }
 
 const contactInfoItems: ContactInfo[] = [
   {
     icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 22 }} />,
-    label: '+1 (555) 123-4567',
+    label: '+1 (571) 276-4808',
+    href: 'tel:+15712764808',
     sublabel: 'Mon–Fri 8AM–6PM, Sat 9AM–4PM',
     iconBg: '#E8F1FF',
     value: 'phone',
@@ -195,7 +206,9 @@ const ContactPage: React.FC = () => {
                   <Box>
                     <Typography
                       variant="subtitle1"
-                      sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 700, lineHeight: 1.3 }}
+                      component={item.href ? 'a' : 'p'}
+                      href={item.href}
+                      sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#0B3D91', fontWeight: 700, lineHeight: 1.3, textDecoration: 'none', display: 'block', '&:hover': item.href ? { color: '#1A73E8', textDecoration: 'underline' } : {} }}
                     >
                       {item.label}
                     </Typography>
@@ -284,57 +297,85 @@ const ContactPage: React.FC = () => {
                     Send Us a Message
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                    <TextField
-                      label="Name *"
-                      value={form.name}
-                      onChange={handleChange('name')}
-                      error={errors.name}
-                      helperText={errors.name ? 'Name is required' : ''}
-                      fullWidth
-                      variant="outlined"
-                    />
-                    <TextField
-                      label="Email *"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange('email')}
-                      error={errors.email || errors.emailFormat}
-                      helperText={
-                        errors.email
-                          ? 'Email is required'
-                          : errors.emailFormat
-                          ? 'Enter a valid email address'
-                          : ''
-                      }
-                      fullWidth
-                      variant="outlined"
-                    />
-                    <TextField
-                      label="Phone"
-                      value={form.phone}
-                      onChange={handleChange('phone')}
-                      fullWidth
-                      variant="outlined"
-                    />
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel id="service-category-label">Service Category</InputLabel>
-                      <Select
-                        labelId="service-category-label"
-                        value={form.serviceCategory}
-                        onChange={handleSelectChange}
-                        label="Service Category"
-                        sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}
-                      >
-                        <MenuItem value="">
-                          <em>Select a category</em>
-                        </MenuItem>
-                        {serviceCategories.map((cat) => (
-                          <MenuItem key={cat.id} value={cat.id}>
-                            {cat.title}
+                    <Box sx={{ display: 'flex', gap: 2.5, flexDirection: { xs: 'column', sm: 'row' } }}>
+                      <TextField
+                        label="Name *"
+                        value={form.name}
+                        onChange={handleChange('name')}
+                        error={errors.name}
+                        helperText={errors.name ? 'Name is required' : ''}
+                        fullWidth
+                        variant="outlined"
+                        sx={contactInputSx}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <PersonOutlineIcon sx={{ fontSize: 19, color: '#9AA5B1' }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                      <TextField
+                        label="Email *"
+                        type="email"
+                        value={form.email}
+                        onChange={handleChange('email')}
+                        error={errors.email || errors.emailFormat}
+                        helperText={
+                          errors.email
+                            ? 'Email is required'
+                            : errors.emailFormat
+                            ? 'Enter a valid email address'
+                            : ''
+                        }
+                        fullWidth
+                        variant="outlined"
+                        sx={contactInputSx}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <EmailOutlinedIcon sx={{ fontSize: 19, color: '#9AA5B1' }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 2.5, flexDirection: { xs: 'column', sm: 'row' } }}>
+                      <TextField
+                        label="Phone"
+                        value={form.phone}
+                        onChange={handleChange('phone')}
+                        fullWidth
+                        variant="outlined"
+                        sx={contactInputSx}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <PhoneOutlinedIcon sx={{ fontSize: 19, color: '#9AA5B1' }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                      <FormControl fullWidth variant="outlined" sx={contactInputSx}>
+                        <InputLabel id="service-category-label">Service Category</InputLabel>
+                        <Select
+                          labelId="service-category-label"
+                          value={form.serviceCategory}
+                          onChange={handleSelectChange}
+                          label="Service Category"
+                          sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif" }}
+                        >
+                          <MenuItem value="">
+                            <em>Select a category</em>
                           </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                          {serviceCategories.map((cat) => (
+                            <MenuItem key={cat.id} value={cat.id}>
+                              {cat.title}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
                     <TextField
                       label="Message *"
                       value={form.message}
@@ -345,21 +386,12 @@ const ContactPage: React.FC = () => {
                       multiline
                       minRows={5}
                       variant="outlined"
+                      sx={contactInputSx}
                     />
                     <Button
                       variant="contained"
                       onClick={handleSubmit}
-                      sx={{
-                        backgroundColor: '#1A73E8',
-                        color: '#FFFFFF',
-                        fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                        fontWeight: 700,
-                        py: 1.75,
-                        borderRadius: '10px',
-                        textTransform: 'none',
-                        fontSize: '1rem',
-                        '&:hover': { backgroundColor: '#0B3D91' },
-                      }}
+                      sx={{ ...primaryButtonSx, py: 1.75, fontSize: '1rem' }}
                     >
                       Send Message
                     </Button>

@@ -15,7 +15,7 @@ const ServiceGridCard: React.FC<ServiceGridCardProps> = ({ title, subtitle, imag
   <Card
     onClick={onClick}
     sx={{
-      borderRadius: '18px',
+      borderRadius: '16px',
       border: `1px solid ${colors.border}`,
       boxShadow: '0 4px 18px rgba(10, 37, 64, 0.07)',
       cursor: 'pointer',
@@ -32,6 +32,10 @@ const ServiceGridCard: React.FC<ServiceGridCardProps> = ({ title, subtitle, imag
           color: colors.primaryBlue,
           transform: 'translateX(4px)',
         },
+      },
+      '&:active': {
+        transform: 'scale(0.97)',
+        boxShadow: '0 4px 18px rgba(10, 37, 64, 0.07)',
       },
     }}
   >

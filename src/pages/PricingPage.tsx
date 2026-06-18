@@ -24,6 +24,7 @@ import {
 import { colors, fonts } from '../theme';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ServiceAreaMap from '../components/ServiceAreaMap';
+import TransparentPricingSection from '../components/TransparentPricingSection';
 import {
   normalizeZipInput,
   validateZipCode,
@@ -176,6 +177,8 @@ const PricingPage: React.FC = () => {
           </Typography>
         </Container>
       </Box>
+
+      <TransparentPricingSection />
 
       {/* Category tabs + pricing grid */}
       <Box sx={{ py: { xs: 5, md: 7 } }}>

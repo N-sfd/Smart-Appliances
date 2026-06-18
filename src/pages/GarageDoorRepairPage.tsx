@@ -883,31 +883,11 @@ const GarageDoorRepairPage: React.FC = () => {
               fontFamily: fonts.body,
               color: 'rgba(255,255,255,0.88)',
               fontSize: '1.05rem',
-              mb: 3.5,
               lineHeight: 1.6,
             }}
           >
             Book online in minutes — same-day appointments often available.
           </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => goToScheduler()}
-            sx={{
-              background: '#FFFFFF',
-              color: colors.navy,
-              fontFamily: fonts.body,
-              fontWeight: 700,
-              textTransform: 'none',
-              borderRadius: '999px',
-              px: 5,
-              py: 1.6,
-              fontSize: '1rem',
-              '&:hover': { background: '#E8F1FF' },
-            }}
-          >
-            Schedule Your Repair
-          </Button>
         </Container>
       </Box>
     </Box>

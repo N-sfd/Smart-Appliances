@@ -4,7 +4,7 @@ import { Plug, ToggleLeft, Lightbulb, Fan, Zap, PanelsTopLeft, Wifi, Cable } fro
 import type { LucideIcon } from 'lucide-react';
 import BrandMarquee from './BrandMarquee';
 import LogoBrandMarquee from './LogoBrandMarquee';
-import { fonts } from '../theme';
+import { colors, fonts } from '../theme';
 import type { CategoryBrandConfig } from '../data/serviceCategoryPages';
 import { resolveSmartHomeBrands } from '../data/smartHomeBrands';
 import { resolvePlumbingBrands } from '../data/plumbingBrands';
@@ -41,7 +41,7 @@ const CategoryBrandSection: React.FC<CategoryBrandSectionProps> = ({
         sx={{
           mb: embedded ? 5 : 0,
           py: embedded ? { xs: 4, md: 5 } : { xs: 5, md: 6 },
-          backgroundColor: '#F8FAFC',
+          backgroundColor: colors.sectionBg,
           borderTop: embedded ? 'none' : '1px solid #EEF0F3',
           borderRadius: embedded ? '16px' : 0,
           mx: embedded ? 0 : undefined,
@@ -238,7 +238,7 @@ const CategoryBrandSection: React.FC<CategoryBrandSectionProps> = ({
   }
 
   return (
-    <Box sx={{ py: { xs: 5, md: 6 }, backgroundColor: '#F8FAFC', borderTop: '1px solid #EEF0F3' }}>
+    <Box sx={{ py: { xs: 5, md: 6 }, backgroundColor: colors.sectionBg, borderTop: '1px solid #EEF0F3' }}>
       <Box sx={{ maxWidth: 900, mx: 'auto', px: { xs: 2, sm: 3 }, textAlign: 'center' }}>
         <Typography
           sx={{

@@ -93,7 +93,7 @@ function AppRoutes() {
   return (
     <>
       <TopBar />
-      <Box component="main" sx={{ paddingTop: { xs: '112px', md: '128px' } }}>
+      <Box component="main" sx={{ paddingTop: { xs: '72px', md: '80px' } }}>
         <Suspense fallback={<PageFallback />}>
           <Routes>
             {/* Public routes */}

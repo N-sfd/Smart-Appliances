@@ -8,7 +8,7 @@ import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import { fetchCustomers, CustomerSummary } from '../../lib/supabaseBookings';
 import { colors, fonts } from '../../theme';
 
-const fmt = (iso?: string) => {
+const fmt = (iso?: string | null) => {
   if (!iso) return '—';
   try {
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });

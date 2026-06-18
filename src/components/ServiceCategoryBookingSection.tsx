@@ -114,6 +114,7 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
   brandAfterIcons,
   brandWithIconHeader,
   detailPanelVariant = 'default',
+  cardHoverLift = false,
   compactIconCards = false,
 }) => {
   const navigate = useNavigate();
@@ -220,6 +221,7 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
               lg: lgIconCols,
             },
             gap: { xs: 1.5, md: 2 },
+            alignItems: 'stretch',
             maxWidth: desktopColumns === 4 && iconCards.length === 8 ? 960 : undefined,
             mx: desktopColumns === 4 && iconCards.length === 8 ? 'auto' : undefined,
             mb: displayService ? 4 : brandAfterIcons ? 0 : 0,
@@ -248,18 +250,22 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
                   alignItems: 'center',
                   justifyContent: 'center',
                   width: '100%',
-                  minHeight: compactIconCards ? { sm: 108, md: 112 } : { sm: 120, md: 132 },
+                  height: '100%',
+                  minHeight: compactIconCards ? { xs: 108, sm: 112, md: 116 } : { xs: 120, sm: 128, md: 132 },
                   backgroundColor: isActive ? '#E8F1FF' : '#FFFFFF',
                   border: `1px solid ${isActive ? '#1A73E8' : '#E4E7EB'}`,
                   borderRadius: compactIconCards ? '16px' : '20px',
                   py: compactIconCards ? { xs: '16px', md: '18px' } : '28px',
                   px: compactIconCards ? { xs: '12px', md: '14px' } : '20px',
                   cursor: 'pointer',
-                  transition: 'all 0.18s ease',
+                  transition: 'all 0.3s ease-in-out',
                   outline: 'none',
+                  boxShadow: isActive ? '0 6px 18px rgba(26, 115, 232, 0.12)' : 'none',
                   '&:hover': {
                     borderColor: '#1A73E8',
                     backgroundColor: '#E8F1FF',
+                    transform: cardHoverLift ? 'translateY(-2px)' : 'none',
+                    boxShadow: '0 8px 22px rgba(26, 115, 232, 0.14)',
                     '& .hub-icon': { color: '#1A73E8' },
                   },
                 }}
@@ -455,7 +461,7 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
                       py: 1.25,
                     }}
                   >
-                    Emergency Help
+                    Emergency Service
                   </Button>
                 )}
               </Box>

@@ -38,13 +38,19 @@ import { ELECTRICAL_SERVICE_IMAGES } from '../data/electricalHub';
 import { APPLIANCE_SERVICE_IMAGES, APPLIANCE_DEFAULT_IMAGE } from '../data/applianceHub';
 import { SMART_HOME_SERVICE_IMAGES } from '../data/smartHomeHub';
 import {
-  normalizeZipInput,
   validateZipCode,
   getZipFieldHelperText,
   isZipFieldError,
+  inferStateFromZip,
+  getMetroStateLabel,
+  isInServiceArea,
+  findServiceAreaZipOption,
+  getSchedulerZipSelectOptions,
 } from '../data/serviceAreas';
 import {
+  mapProductNameToFields,
   parseSchedulerPrefill,
+  resolvePrefilledCategoryDetail,
   SchedulerServiceCategory,
 } from '../data/schedulerPrefill';
 import { insertBooking, updateEmailSent } from '../lib/supabaseBookings';
@@ -60,6 +66,7 @@ import {
   validateEmailAddress,
   validateFullName,
   validatePreferredDateField,
+  resolveSchedulerPreferredDate,
   validateStateField,
   validateStreetAddress,
   validateUsPhone,
@@ -112,12 +119,12 @@ const SERVICE_TYPES = [
 
 // ── Service categories (Step 1) ───────────────────────────────────────────────
 const SERVICE_CATEGORIES = [
-  { id: 'Appliance', label: 'Appliance', icon: <KitchenIcon /> },
-  { id: 'HVAC', label: 'HVAC', icon: <AcUnitIcon /> },
-  { id: 'Plumbing', label: 'Plumbing', icon: <OpacityIcon /> },
-  { id: 'Electrical', label: 'Electrical', icon: <BoltIcon /> },
-  { id: 'Smart Home', label: 'Smart Home', icon: <HomeIcon /> },
-  { id: 'Garage Door', label: 'Garage Door', icon: <GarageIcon /> },
+  { id: 'Appliance',    label: 'Appliance',    icon: <KitchenIcon />,          desc: "Fridge, washer, dryer, oven & more" },
+  { id: 'HVAC',         label: 'HVAC',         icon: <AcUnitIcon />,           desc: "AC, heating, furnace & thermostat" },
+  { id: 'Plumbing',     label: 'Plumbing',     icon: <OpacityIcon />,          desc: "Leaks, drains, toilets & water heaters" },
+  { id: 'Electrical',   label: 'Electrical',   icon: <BoltIcon />,             desc: "Outlets, fixtures & ceiling fans" },
+  { id: 'Smart Home',   label: 'Smart Home',   icon: <HomeIcon />,             desc: "Thermostats, cameras & smart devices" },
+  { id: 'Garage Door',  label: 'Garage Door',  icon: <GarageIcon />,           desc: "Opener, panels, springs & cables" },
 ];
 
 const BRANDS = [
@@ -430,12 +437,30 @@ const SchedulerPage: React.FC = () => {
       setShowCategoryPicker(!next.skipCategoryPicker);
     }
     if (next.serviceTypeFromUrl && Boolean(next.category)) setStep(1);
-    if (next.fields.appliance) setAppliance(next.fields.appliance);
-    if (next.fields.hvacService) setHvacService(next.fields.hvacService);
-    if (next.fields.plumbingIssue) setPlumbingIssue(next.fields.plumbingIssue);
-    if (next.fields.electricalIssue) setElectricalIssue(next.fields.electricalIssue);
-    if (next.fields.smartDevice) setSmartDevice(next.fields.smartDevice);
-    if (next.fields.garageDoorService) setGarageDoorService(next.fields.garageDoorService);
+
+    const mapped =
+      next.category && next.productName
+        ? mapProductNameToFields(next.category, next.productName)
+        : {};
+
+    if (mapped.appliance ?? next.fields.appliance) {
+      setAppliance(mapped.appliance ?? next.fields.appliance ?? '');
+    }
+    if (mapped.hvacService ?? next.fields.hvacService) {
+      setHvacService(mapped.hvacService ?? next.fields.hvacService ?? '');
+    }
+    if (mapped.plumbingIssue ?? next.fields.plumbingIssue) {
+      setPlumbingIssue(mapped.plumbingIssue ?? next.fields.plumbingIssue ?? '');
+    }
+    if (mapped.electricalIssue ?? next.fields.electricalIssue) {
+      setElectricalIssue(mapped.electricalIssue ?? next.fields.electricalIssue ?? '');
+    }
+    if (mapped.smartDevice ?? next.fields.smartDevice) {
+      setSmartDevice(mapped.smartDevice ?? next.fields.smartDevice ?? '');
+    }
+    if (mapped.garageDoorService ?? next.fields.garageDoorService) {
+      setGarageDoorService(mapped.garageDoorService ?? next.fields.garageDoorService ?? '');
+    }
   }, [params]);
 
   useEffect(() => {
@@ -452,6 +477,39 @@ const SchedulerPage: React.FC = () => {
     if (step !== 2) setContactSubmitAttempted(false);
   }, [step]);
 
+  useEffect(() => {
+    if (!isInServiceArea(zipCode) || stateTouched) return;
+    const inferred = inferStateFromZip(zipCode);
+    if (inferred) setStateField(inferred);
+  }, [zipCode, stateTouched]);
+
+  useEffect(() => {
+    if (!zipCode || !isInServiceArea(zipCode)) return;
+    const option = findServiceAreaZipOption(zipCode);
+    if (!option) return;
+    if (!city) setCity(option.city);
+    if (!stateTouched) setStateField(option.state);
+  }, [zipCode, city, stateTouched]);
+
+  const zipSelectOptions = useMemo(
+    () => getSchedulerZipSelectOptions(zipCode),
+    [zipCode],
+  );
+
+  const citySelectOptions = useMemo(() => {
+    const seen = new Set<string>();
+    return zipSelectOptions.filter((o) => {
+      if (!o.city || seen.has(o.city)) return false;
+      seen.add(o.city);
+      return true;
+    });
+  }, [zipSelectOptions]);
+
+  const resolvedPreferredDate = useMemo(
+    () => resolveSchedulerPreferredDate(preferredDate, selectedSlots),
+    [preferredDate, selectedSlots],
+  );
+
   const showContactError = (touched: boolean, message: string | null): boolean =>
     Boolean(message) && (touched || contactSubmitAttempted);
 
@@ -460,8 +518,9 @@ const SchedulerPage: React.FC = () => {
   const phoneError = validateUsPhone(phone);
   const addressError = validateStreetAddress(address);
   const cityError = validateCityField(city);
-  const stateError = validateStateField(stateField);
-  const preferredDateError = validatePreferredDateField(preferredDate);
+  const stateError = validateStateField(stateField, zipCode);
+  const inferredZipState = inferStateFromZip(zipCode);
+  const preferredDateError = validatePreferredDateField(resolvedPreferredDate);
   const zipValidation = validateZipCode(zipCode);
 
   const schedule = useMemo(() => buildSchedule(14), []);
@@ -551,18 +610,77 @@ const SchedulerPage: React.FC = () => {
     return parts.filter(Boolean).join(' • ');
   }, [category, serviceType, hvacUrgency]);
 
+  const resolvedCategoryDetail = useMemo(
+    () =>
+      resolvePrefilledCategoryDetail(
+        category,
+        prefill.productName,
+        prefill.fields,
+        {
+          appliance,
+          hvacService,
+          plumbingIssue,
+          electricalIssue,
+          smartDevice,
+          garageDoorService,
+        },
+      ),
+    [
+      category,
+      prefill.productName,
+      prefill.fields,
+      appliance,
+      hvacService,
+      plumbingIssue,
+      electricalIssue,
+      smartDevice,
+      garageDoorService,
+    ],
+  );
+
+  const contactStepDirty =
+    contactSubmitAttempted ||
+    zipTouched ||
+    nameTouched ||
+    emailTouched ||
+    phoneTouched ||
+    cityTouched ||
+    stateTouched ||
+    preferredDateTouched ||
+    addressTouched ||
+    selectedSlots.length > 0;
+
+  const contactStepBlockers = useMemo(() => {
+    const blockers: string[] = [];
+    if (!zipValidation.isValid) {
+      blockers.push(zipValidation.message ?? 'Enter a valid ZIP code in our service area.');
+    }
+    if (nameError) blockers.push(nameError);
+    if (emailError) blockers.push(emailError);
+    if (phoneError) blockers.push(phoneError);
+    if (cityError) blockers.push(cityError);
+    if (stateError) blockers.push(stateError);
+    if (preferredDateError) blockers.push(preferredDateError);
+    if (addressError) blockers.push(addressError);
+    return blockers;
+  }, [
+    zipValidation.isValid,
+    zipValidation.message,
+    nameError,
+    emailError,
+    phoneError,
+    cityError,
+    stateError,
+    preferredDateError,
+    addressError,
+  ]);
+
   // ── Per-step validation ───────────────────────────────────────────────────
   const canContinue = useMemo<boolean>(() => {
     if (step === 0) return Boolean(serviceType);
     if (step === 1) {
       if (!category) return false;
-      if (category === 'Appliance') return Boolean(appliance);
-      if (category === 'HVAC') return Boolean(hvacService);
-      if (category === 'Plumbing') return Boolean(plumbingIssue);
-      if (category === 'Electrical') return Boolean(electricalIssue);
-      if (category === 'Smart Home') return Boolean(smartDevice);
-      if (category === 'Garage Door') return Boolean(garageDoorService);
-      return true;
+      return Boolean(resolvedCategoryDetail);
     }
     if (step === 2) {
       return (
@@ -581,12 +699,7 @@ const SchedulerPage: React.FC = () => {
     step,
     serviceType,
     category,
-    appliance,
-    hvacService,
-    plumbingIssue,
-    electricalIssue,
-    smartDevice,
-    garageDoorService,
+    resolvedCategoryDetail,
     zipValidation.isValid,
     nameError,
     emailError,
@@ -604,7 +717,18 @@ const SchedulerPage: React.FC = () => {
     }
     if (step === 2) {
       setContactSubmitAttempted(true);
-      if (!canContinue) return;
+      setZipTouched(true);
+      setNameTouched(true);
+      setEmailTouched(true);
+      setPhoneTouched(true);
+      setCityTouched(true);
+      setStateTouched(true);
+      setPreferredDateTouched(true);
+      setAddressTouched(true);
+      if (!canContinue) {
+        document.getElementById('scheduler-contact-zip')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
     }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
@@ -647,9 +771,24 @@ const SchedulerPage: React.FC = () => {
     if (!available) return;
     const key = slotKey(iso, slotId);
     setSelectedSlots((prev) => {
-      if (prev.includes(key)) return prev.filter((k) => k !== key);
-      if (prev.length >= MAX_SLOTS) return prev;
-      return [...prev, key];
+      let next: string[];
+      if (prev.includes(key)) {
+        next = prev.filter((k) => k !== key);
+      } else if (prev.length >= MAX_SLOTS) {
+        return prev;
+      } else {
+        next = [...prev, key];
+      }
+
+      if (next.length > 0) {
+        const earliest = next
+          .map((k) => k.split('|')[0])
+          .sort()[0];
+        if (earliest >= getTodayLocalDate()) {
+          setPreferredDate(earliest);
+        }
+      }
+      return next;
     });
   };
 
@@ -699,8 +838,6 @@ const SchedulerPage: React.FC = () => {
         service_type: SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? serviceType,
         service_category: category || (SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? ''),
         product_name: prefill.productName || appliance || hvacService || plumbingIssue || electricalIssue || smartDevice || garageDoorService || null,
-        problem_type: applianceIssue || hvacIssue || plumbingIssue || electricalIssue || garageDoorProblem || null,
-        system_type: hvacSystemType || null,
         appliance_brand: brand || null,
         appliance_model: model || null,
         issue_description: noteParts.join('\n') || issueDescription || null,
@@ -763,20 +900,25 @@ const SchedulerPage: React.FC = () => {
   };
 
   // ── Shared nav button bar ─────────────────────────────────────────────────
+  const sharedBtnSx = {
+    textTransform: 'none' as const,
+    borderRadius: '10px',
+    px: 4,
+    py: 1.4,
+    fontWeight: 700,
+    fontFamily: fonts.body,
+    minWidth: 140,
+  };
+
   const NavButtons = ({ isSubmitStep }: { isSubmitStep: boolean }) => (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, gap: 2 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 4, gap: 2 }}>
       <Button
         onClick={step === 0 ? () => navigate(-1) : handleBack}
         variant="outlined"
         sx={{
+          ...sharedBtnSx,
           borderColor: colors.navy,
           color: colors.navy,
-          textTransform: 'none',
-          borderRadius: '10px',
-          px: 3,
-          py: 1.2,
-          fontWeight: 600,
-          fontFamily: fonts.body,
           '&:hover': { borderColor: colors.navy, backgroundColor: 'rgba(11,61,145,0.04)' },
         }}
       >
@@ -784,9 +926,9 @@ const SchedulerPage: React.FC = () => {
       </Button>
 
       {isSubmitStep ? (
-        <>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {submitError ? (
-            <Typography sx={{ color: colors.emergency, fontSize: '14px', alignSelf: 'center' }}>
+            <Typography sx={{ color: colors.emergency, fontSize: '14px' }}>
               {submitError}
             </Typography>
           ) : null}
@@ -795,45 +937,42 @@ const SchedulerPage: React.FC = () => {
             disabled={isSubmitting}
             onClick={handleSubmit}
             sx={{
+              ...sharedBtnSx,
               backgroundColor: colors.primaryBlue,
               color: '#fff',
-              fontFamily: fonts.body,
-              fontWeight: 700,
-              px: 4,
-              py: 1.4,
-              borderRadius: '10px',
-              textTransform: 'none',
               boxShadow: 'none',
               '&:hover': { backgroundColor: colors.navy },
             }}
           >
             {isSubmitting ? 'Submitting…' : 'Submit Request'}
           </Button>
-        </>
+        </Box>
       ) : (
         <Button
           variant="contained"
           disabled={!canContinue}
           onClick={handleNext}
           sx={{
+            ...sharedBtnSx,
             color: '#fff',
-            fontFamily: fonts.body,
-            fontWeight: 700,
-            px: 4,
-            py: 1.4,
-            borderRadius: '10px',
-            textTransform: 'none',
             boxShadow: 'none',
-            backgroundColor:
-              serviceType === 'emergency' && step === 0
-                ? colors.emergency
-                : colors.primaryBlue,
-            '&:hover': {
-              backgroundColor:
-                serviceType === 'emergency' && step === 0
-                  ? colors.emergencyHover
-                  : colors.navy,
-            },
+            ...(!canContinue
+              ? {
+                  backgroundColor: '#CBD5E1',
+                  '&:hover': { backgroundColor: '#CBD5E1' },
+                }
+              : {
+                  backgroundColor:
+                    serviceType === 'emergency' && step === 0
+                      ? colors.emergency
+                      : colors.primaryBlue,
+                  '&:hover': {
+                    backgroundColor:
+                      serviceType === 'emergency' && step === 0
+                        ? colors.emergencyHover
+                        : colors.navy,
+                  },
+                }),
           }}
         >
           {serviceType === 'emergency' && step === 0 ? 'Get Emergency Help' : 'Continue'}
@@ -948,10 +1087,10 @@ const SchedulerPage: React.FC = () => {
           Questions? Call{' '}
           <Box
             component="a"
-            href="tel:3017830977"
+            href="tel:+15712764808"
             sx={{ color: colors.primaryBlue, fontWeight: 700, textDecoration: 'none' }}
           >
-            301-783-0977
+            (571) 276-4808
           </Box>
         </Typography>
       </Box>
@@ -1351,12 +1490,23 @@ const SchedulerPage: React.FC = () => {
                           <Typography
                             sx={{
                               fontFamily: fonts.body,
-                              fontWeight: active ? 700 : 500,
+                              fontWeight: active ? 700 : 600,
                               color: active ? colors.navy : colors.darkText,
-                              fontSize: '0.8rem',
+                              fontSize: '0.82rem',
+                              mb: 0.3,
                             }}
                           >
                             {cat.label}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontFamily: fonts.body,
+                              fontSize: '0.7rem',
+                              color: active ? colors.primaryBlue : colors.mutedText,
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {cat.desc}
                           </Typography>
                         </Box>
                       );
@@ -1375,7 +1525,7 @@ const SchedulerPage: React.FC = () => {
                           'Refrigerator', 'Washer', 'Dryer', 'Dishwasher',
                           'Oven / Stove', 'Microwave', 'Garbage Disposal', 'Smart Appliance',
                         ]}
-                        value={appliance}
+                        value={appliance || resolvedCategoryDetail}
                         onChange={setAppliance}
                       />
                       {appliance && (
@@ -1511,6 +1661,68 @@ const SchedulerPage: React.FC = () => {
                   {/* ── Smart Home ── */}
                   {category === 'Smart Home' && (
                     <>
+                      {/* What's included callout */}
+                      <Box
+                        sx={{
+                          mb: 2.5,
+                          p: 2.25,
+                          borderRadius: '14px',
+                          backgroundColor: '#F0F7FF',
+                          border: `1px solid ${colors.border}`,
+                        }}
+                      >
+                        <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.82rem', color: colors.navy, mb: 1.25, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          What's included with Smart Home service
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1.75 }}>
+                          {['Wi-Fi pairing & network setup', 'App download & account linking', 'Smart controls & automation', 'Firmware updates', 'Voice assistant integration', 'Multi-device coordination'].map((item) => (
+                            <Box
+                              key={item}
+                              component="span"
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                backgroundColor: '#fff',
+                                border: `1px solid ${colors.border}`,
+                                borderRadius: '999px',
+                                px: 1.25,
+                                py: 0.4,
+                                fontFamily: fonts.body,
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                color: colors.primaryBlue,
+                              }}
+                            >
+                              ✓ {item}
+                            </Box>
+                          ))}
+                        </Box>
+                        <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.78rem', color: colors.mutedText, mb: 0.75 }}>
+                          Supported brands
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                          {['Google Nest', 'Amazon Alexa', 'Ring', 'ecobee', 'Wyze', 'Lutron', 'Philips Hue', 'Samsung SmartThings', 'Apple HomeKit'].map((brand) => (
+                            <Box
+                              key={brand}
+                              component="span"
+                              sx={{
+                                backgroundColor: 'rgba(11,61,145,0.07)',
+                                borderRadius: '6px',
+                                px: 1,
+                                py: 0.3,
+                                fontFamily: fonts.body,
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                color: colors.navy,
+                              }}
+                            >
+                              {brand}
+                            </Box>
+                          ))}
+                        </Box>
+                      </Box>
+
                       <ChipGroup
                         label="What smart device?"
                         required
@@ -1524,7 +1736,7 @@ const SchedulerPage: React.FC = () => {
                       {smartDevice && (
                         <ChipGroup
                           label="What help do you need?"
-                          options={['Installation', 'Setup', 'Troubleshooting', 'App Pairing', 'Wi-Fi Connection']}
+                          options={['Installation', 'Setup & App Pairing', 'Wi-Fi Connection', 'Troubleshooting', 'Voice Assistant Setup', 'Automation Config']}
                           value={smartHelp}
                           onChange={setSmartHelp}
                         />
@@ -1626,37 +1838,74 @@ const SchedulerPage: React.FC = () => {
                   </Typography>
 
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <TextField
-                      label="ZIP Code *"
-                      value={zipCode}
-                      onChange={(e) => setZipCode(normalizeZipInput(e.target.value))}
-                      onBlur={() => setZipTouched(true)}
-                      inputProps={{ inputMode: 'numeric', maxLength: 5 }}
-                      error={isZipFieldError(zipCode, zipTouched || contactSubmitAttempted)}
-                      helperText={getZipFieldHelperText(
-                        zipCode,
-                        zipTouched || contactSubmitAttempted,
-                      )}
+                    <FormControl
+                      id="scheduler-contact-zip"
                       fullWidth
                       size="small"
-                    />
+                      error={isZipFieldError(zipCode, zipTouched || contactSubmitAttempted)}
+                    >
+                      <InputLabel id="zip-label">ZIP Code *</InputLabel>
+                      <Select
+                        labelId="zip-label"
+                        label="ZIP Code *"
+                        value={zipCode}
+                        onChange={(e) => {
+                          const nextZip = e.target.value;
+                          setZipCode(nextZip);
+                          setZipTouched(true);
+                          const option = findServiceAreaZipOption(nextZip)
+                            ?? zipSelectOptions.find((o) => o.zip === nextZip);
+                          if (option) {
+                            setCity(option.city);
+                            setCityTouched(true);
+                            setStateField(option.state);
+                            setStateTouched(true);
+                          }
+                        }}
+                        onBlur={() => setZipTouched(true)}
+                      >
+                        {zipSelectOptions.map((o) => (
+                          <MenuItem key={o.zip} value={o.zip}>
+                            {o.city ? `${o.zip} — ${o.city}, ${o.state}` : `${o.zip} — ${o.state}`}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <FormHelperText>
+                        {getZipFieldHelperText(zipCode, zipTouched || contactSubmitAttempted)}
+                      </FormHelperText>
+                    </FormControl>
 
                     {zipValidation.isValid && (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 1,
-                          color: '#2E7D32',
-                          mt: -1,
-                        }}
-                      >
-                        <CheckCircleIcon sx={{ fontSize: 17 }} />
-                        <Typography
-                          sx={{ fontFamily: fonts.body, fontSize: '0.85rem', fontWeight: 600 }}
+                      <Box sx={{ mt: -1 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            color: '#2E7D32',
+                          }}
                         >
-                          Great — we service {zipCode}.
-                        </Typography>
+                          <CheckCircleIcon sx={{ fontSize: 17 }} />
+                          <Typography
+                            sx={{ fontFamily: fonts.body, fontSize: '0.85rem', fontWeight: 600 }}
+                          >
+                            Great — we service {zipCode}.
+                          </Typography>
+                        </Box>
+                        {inferredZipState && (
+                          <Typography
+                            sx={{
+                              fontFamily: fonts.body,
+                              fontSize: '0.82rem',
+                              color: colors.mutedText,
+                              mt: 0.5,
+                              ml: 3.5,
+                            }}
+                          >
+                            This ZIP is in {getMetroStateLabel(inferredZipState)} ({inferredZipState}
+                            ).
+                          </Typography>
+                        )}
                       </Box>
                     )}
 
@@ -1683,10 +1932,10 @@ const SchedulerPage: React.FC = () => {
                             ⚠️ We can't confirm service in that area. Call{' '}
                             <Box
                               component="a"
-                              href="tel:3017830977"
+                              href="tel:+15712764808"
                               sx={{ color: '#92400E', fontWeight: 700 }}
                             >
-                              301-783-0977
+                              (571) 276-4808
                             </Box>{' '}
                             to check availability.
                           </Typography>
@@ -1711,17 +1960,41 @@ const SchedulerPage: React.FC = () => {
                       size="small"
                     />
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                      <TextField
-                        label="City *"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        onBlur={() => setCityTouched(true)}
-                        error={showContactError(cityTouched, cityError)}
-                        helperText={showContactError(cityTouched, cityError) ? cityError : ''}
+                      <FormControl
                         size="small"
                         sx={{ flex: '0 0 68%' }}
-                        required
-                      />
+                        error={showContactError(cityTouched, cityError)}
+                      >
+                        <InputLabel id="city-label">City *</InputLabel>
+                        <Select
+                          labelId="city-label"
+                          label="City *"
+                          value={city}
+                          onChange={(e) => {
+                            const nextCity = e.target.value;
+                            setCity(nextCity);
+                            setCityTouched(true);
+                            const option = findServiceAreaZipOption(zipCode)
+                              ?? zipSelectOptions.find((o) => o.city === nextCity);
+                            if (option) {
+                              setZipCode(option.zip);
+                              setZipTouched(true);
+                              setStateField(option.state);
+                              setStateTouched(true);
+                            }
+                          }}
+                          onBlur={() => setCityTouched(true)}
+                        >
+                          {citySelectOptions.map((o) => (
+                            <MenuItem key={o.city} value={o.city}>
+                              {o.city}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {showContactError(cityTouched, cityError) && (
+                          <FormHelperText>{cityError}</FormHelperText>
+                        )}
+                      </FormControl>
                       <FormControl
                         size="small"
                         sx={{ flex: '0 0 32%' }}
@@ -1732,7 +2005,10 @@ const SchedulerPage: React.FC = () => {
                           labelId="state-label"
                           label="State *"
                           value={stateField}
-                          onChange={(e) => setStateField(e.target.value)}
+                          onChange={(e) => {
+                            setStateField(e.target.value);
+                            setStateTouched(true);
+                          }}
                           onBlur={() => setStateTouched(true)}
                         >
                           {SERVICE_AREA_STATES.map((s) => (
@@ -2127,6 +2403,46 @@ const SchedulerPage: React.FC = () => {
                       </Typography>
                     </Box>
                   )}
+                </Box>
+              )}
+
+              {step === 2 && !canContinue && contactStepDirty && contactStepBlockers.length > 0 && (
+                <Box
+                  sx={{
+                    mt: 3,
+                    p: 2,
+                    borderRadius: '10px',
+                    backgroundColor: '#FEF2F2',
+                    border: '1px solid #FECACA',
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily: fonts.body,
+                      fontSize: '0.875rem',
+                      color: '#991B1B',
+                      fontWeight: 600,
+                      mb: 0.75,
+                    }}
+                  >
+                    Please complete the required fields above:
+                  </Typography>
+                  <Box component="ul" sx={{ m: 0, pl: 2.25 }}>
+                    {contactStepBlockers.map((msg) => (
+                      <Typography
+                        component="li"
+                        key={msg}
+                        sx={{
+                          fontFamily: fonts.body,
+                          fontSize: '0.85rem',
+                          color: '#7F1D1D',
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        {msg}
+                      </Typography>
+                    ))}
+                  </Box>
                 </Box>
               )}
 

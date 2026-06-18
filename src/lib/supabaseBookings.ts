@@ -43,6 +43,15 @@ export interface BookingRow {
   created_at?: string;
 }
 
+export interface Customer {
+  id?: string;
+  profile_id?: string | null;
+  email: string;
+  full_name?: string | null;
+  phone?: string | null;
+  zip_code?: string | null;
+}
+
 export type BookingStatus =
   | 'New'
   | 'Scheduled'
@@ -91,6 +100,62 @@ export interface BookingNote {
   created_at?: string;
 }
 
+// ── Customers ─────────────────────────────────────────────────────────────────
+
+export async function findOrCreateCustomer(input: {
+  email: string;
+  full_name?: string | null;
+  phone?: string | null;
+  zip_code?: string | null;
+  profile_id?: string | null;
+}): Promise<string | null> {
+  if (!isSupabaseConfigured() || !supabase) return null;
+  const email = input.email.trim().toLowerCase();
+  if (!email) return null;
+
+  const { data: existing, error: selectError } = await supabase
+    .from('customers')
+    .select('id, profile_id, full_name, phone, zip_code')
+    .eq('email', email)
+    .maybeSingle();
+  if (selectError) {
+    console.error('findOrCreateCustomer: select failed', selectError.message);
+    return null;
+  }
+
+  if (existing) {
+    const patch: Partial<Customer> = {};
+    if (!existing.profile_id && input.profile_id) patch.profile_id = input.profile_id;
+    if (!existing.full_name && input.full_name) patch.full_name = input.full_name;
+    if (!existing.phone && input.phone) patch.phone = input.phone;
+    if (!existing.zip_code && input.zip_code) patch.zip_code = input.zip_code;
+    if (Object.keys(patch).length > 0) {
+      await supabase
+        .from('customers')
+        .update({ ...patch, updated_at: new Date().toISOString() })
+        .eq('id', existing.id);
+    }
+    return existing.id as string;
+  }
+
+  const { data: created, error: insertError } = await supabase
+    .from('customers')
+    .insert([{
+      email,
+      profile_id: input.profile_id ?? null,
+      full_name: input.full_name ?? null,
+      phone: input.phone ?? null,
+      zip_code: input.zip_code ?? null,
+    }])
+    .select('id')
+    .single();
+  if (insertError) {
+    console.error('findOrCreateCustomer: insert failed', insertError.message);
+    return null;
+  }
+  return (created as { id: string } | null)?.id ?? null;
+}
+
 // ── Insert booking ────────────────────────────────────────────────────────────
 
 export async function insertBooking(
@@ -100,10 +165,20 @@ export async function insertBooking(
     console.error('[Booking] insertBooking: Supabase not configured — REACT_APP_SUPABASE_URL / REACT_APP_SUPABASE_ANON_KEY may be missing');
     return { id: null, error: 'Supabase not configured' };
   }
-  console.log('[Booking] FormData', row);
+
+  const customerId = await findOrCreateCustomer({
+    email: row.email,
+    full_name: row.customer_name,
+    phone: row.phone,
+    zip_code: row.zip_code,
+    profile_id: row.user_id ?? null,
+  });
+  const rowWithCustomer = { ...row, customer_id: customerId ?? row.customer_id ?? null };
+
+  console.log('[Booking] FormData', rowWithCustomer);
   const { data, error } = await supabase
     .from('service_requests')
-    .insert([row])
+    .insert([rowWithCustomer])
     .select('id')
     .single();
   if (error) {
@@ -225,38 +300,46 @@ export async function insertBookingNote(
 // ── Admin: customer list ──────────────────────────────────────────────────────
 
 export interface CustomerSummary {
+  id: string;
+  profile_id: string | null;
   email: string;
   customer_name: string;
   phone: string;
   zip_code: string;
   booking_count: number;
-  last_booking: string;
+  last_booking: string | null;
 }
 
 export async function fetchCustomers(): Promise<CustomerSummary[]> {
   if (!isSupabaseConfigured() || !supabase) return [];
   const { data, error } = await supabase
-    .from('service_requests')
-    .select('email, customer_name, phone, zip_code, created_at')
-    .order('created_at', { ascending: false });
-  if (error) return [];
-
-  const map = new Map<string, CustomerSummary>();
-  for (const row of (data ?? []) as { email: string; customer_name: string; phone: string; zip_code: string; created_at: string }[]) {
-    if (map.has(row.email)) {
-      map.get(row.email)!.booking_count++;
-    } else {
-      map.set(row.email, {
-        email: row.email,
-        customer_name: row.customer_name,
-        phone: row.phone,
-        zip_code: row.zip_code,
-        booking_count: 1,
-        last_booking: row.created_at,
-      });
-    }
+    .from('customer_summary')
+    .select('*')
+    .order('last_booking', { ascending: false, nullsFirst: false });
+  if (error) {
+    console.error('fetchCustomers:', error.message);
+    return [];
   }
-  return Array.from(map.values());
+
+  return ((data ?? []) as {
+    id: string;
+    profile_id: string | null;
+    email: string;
+    full_name: string | null;
+    phone: string | null;
+    zip_code: string | null;
+    booking_count: number;
+    last_booking: string | null;
+  }[]).map((row) => ({
+    id: row.id,
+    profile_id: row.profile_id,
+    email: row.email,
+    customer_name: row.full_name ?? '',
+    phone: row.phone ?? '',
+    zip_code: row.zip_code ?? '',
+    booking_count: row.booking_count,
+    last_booking: row.last_booking,
+  }));
 }
 
 // ── Admin: update admin_status ────────────────────────────────────────────────

@@ -1,3 +1,4 @@
+import { isInServiceArea, validateZipStateMatch } from '../data/serviceAreas';
 import { isPastLocalDate } from './localDate';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,16 +35,37 @@ export function validateStreetAddress(address: string): string | null {
   return null;
 }
 
+const STATE_NAME_VALUES = new Set([
+  'maryland',
+  'virginia',
+  'district of columbia',
+  'washington dc',
+  'pennsylvania',
+  'west virginia',
+  'md',
+  'va',
+  'dc',
+  'pa',
+  'wv',
+]);
+
 export function validateCityField(city: string): string | null {
   const trimmed = city.trim();
   if (!trimmed) return 'City is required.';
   if (trimmed.length < 2) return 'City must be at least 2 characters.';
+  if (STATE_NAME_VALUES.has(trimmed.toLowerCase())) {
+    return 'Enter a city name (e.g., Sterling), not a state.';
+  }
   return null;
 }
 
-export function validateStateField(state: string): string | null {
+export function validateStateField(state: string, zip = ''): string | null {
   if (!state) return 'State is required.';
   if (!(SERVICE_AREA_STATES as readonly string[]).includes(state)) return 'Select a valid state.';
+  if (zip && isInServiceArea(zip)) {
+    const zipStateError = validateZipStateMatch(zip, state);
+    if (zipStateError) return zipStateError;
+  }
   return null;
 }
 
@@ -51,4 +73,16 @@ export function validatePreferredDateField(dateStr: string): string | null {
   if (!dateStr) return 'Please choose a preferred date.';
   if (isPastLocalDate(dateStr)) return 'Please select today or a future date.';
   return null;
+}
+
+/** Prefer the earliest selected slot date, then the date field value. */
+export function resolveSchedulerPreferredDate(
+  preferredDate: string,
+  selectedSlots: string[],
+): string {
+  const slotDates = selectedSlots
+    .map((key) => key.split('|')[0] ?? '')
+    .filter((date) => date && !isPastLocalDate(date));
+  if (slotDates.length > 0) return slotDates.sort()[0];
+  return preferredDate;
 }

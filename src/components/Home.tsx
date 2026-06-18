@@ -21,7 +21,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
-import { colors, fonts, heroCtaButtonSx } from '../theme';
+import { colors, fonts, heroCtaButtonSx, primaryButtonSx, secondaryButtonSx } from '../theme';
 import { HERO_TECHNICIAN_WIDTH, HERO_TECHNICIAN_HEIGHT } from '../constants/imageDimensions';
 import {
   validateFullName,
@@ -229,12 +229,12 @@ const Home: React.FC = () => {
       ) : (
         <>
           {/* Header */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.75 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <Box sx={{ width: 34, height: 34, borderRadius: '9px', backgroundColor: colors.lightBlueBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <CalendarMonthIcon sx={{ color: colors.primaryBlue, fontSize: 19 }} />
             </Box>
             <Box>
-              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1rem', color: colors.navy, lineHeight: 1.2 }}>
+              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.05rem', color: colors.navy, lineHeight: 1.2 }}>
                 Book Your Service
               </Typography>
               <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, mt: 0.1 }}>
@@ -242,6 +242,7 @@ const Home: React.FC = () => {
               </Typography>
             </Box>
           </Box>
+          <Box sx={{ height: '2px', width: '40px', backgroundColor: colors.primaryBlue, borderRadius: '2px', mb: 1.75 }} />
 
           {/* Service dropdown */}
           <FormControl
@@ -321,18 +322,7 @@ const Home: React.FC = () => {
             endIcon={isSubmitting ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : <ArrowForwardIcon />}
             onClick={() => { void handleSubmit(); }}
             disabled={isSubmitting}
-            sx={{
-              backgroundColor: colors.primaryBlue,
-              color: colors.white,
-              fontFamily: fonts.heading,
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              textTransform: 'none',
-              borderRadius: '13px',
-              height: 46,
-              boxShadow: '0 10px 28px rgba(10, 37, 64, 0.18)',
-              '&:hover': { backgroundColor: colors.primaryBlueHover },
-            }}
+            sx={{ ...primaryButtonSx, height: 46 }}
           >
             {isSubmitting ? 'Sending…' : 'Request Service'}
           </Button>
@@ -475,15 +465,15 @@ const Home: React.FC = () => {
                 sx={{
                   fontFamily: fonts.heading,
                   fontWeight: 800,
-                  fontSize: { xs: '1.85rem', md: '2.2rem', lg: '2.5rem' },
+                  fontSize: { xs: '1.85rem', md: '2.35rem', lg: '42px' },
                   color: '#FFFFFF',
                   lineHeight: 1.1,
                   mb: 1.5,
                   letterSpacing: '-0.4px',
                 }}
               >
-                Professional Appliance Repair{' '}
-                <Box component="span" sx={{ color: '#4FC3F7' }}>Made Easy</Box>
+                Fast, Certified Appliance Repair —{' '}
+                <Box component="span" sx={{ color: '#4FC3F7' }}>Same‑Day Availability</Box>
               </Typography>
 
               {/* Subtext */}
@@ -505,33 +495,14 @@ const Home: React.FC = () => {
                 <Button
                   variant="contained"
                   onClick={() => navigate('/scheduler')}
-                  sx={{
-                    ...heroCtaButtonSx,
-                    backgroundColor: colors.primaryBlue,
-                    color: colors.white,
-                    boxShadow: '0 12px 30px rgba(10, 37, 64, 0.18)',
-                    '&:hover': {
-                      backgroundColor: colors.primaryBlueHover,
-                      boxShadow: '0 18px 40px rgba(10, 37, 64, 0.22)',
-                    },
-                  }}
+                  sx={{ ...primaryButtonSx, ...heroCtaButtonSx }}
                 >
                   Book Service
                 </Button>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   onClick={() => navigate('/emergency-service')}
-                  sx={{
-                    ...heroCtaButtonSx,
-                    backgroundColor: colors.white,
-                    color: colors.primaryBlue,
-                    border: `1px solid ${colors.primaryBlue}`,
-                    boxShadow: '0 12px 30px rgba(10, 37, 64, 0.12)',
-                    '&:hover': {
-                      backgroundColor: colors.lightBlueBg,
-                      boxShadow: '0 16px 36px rgba(10, 37, 64, 0.16)',
-                    },
-                  }}
+                  sx={{ ...secondaryButtonSx, ...heroCtaButtonSx }}
                 >
                   Emergency Service
                 </Button>
@@ -539,7 +510,7 @@ const Home: React.FC = () => {
 
               {/* Trust row */}
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.5, md: 2.5 }, alignItems: 'center' }}>
-                {['Licensed & Insured', 'Same-Day Available', 'Estimate After Diagnosis'].map((item) => (
+                {['Licensed & Insured', 'Same-Day Service', 'Certified Technicians'].map((item) => (
                   <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
                     <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#4FC3F7' }} />
                     <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.82)' }}>

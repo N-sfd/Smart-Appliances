@@ -13,10 +13,14 @@ import {
   ListItemText,
   Divider,
   Collapse,
+  Avatar,
+  Tooltip,
 } from '@mui/material';
-import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon } from '@mui/icons-material';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import { colors, fonts, primaryButtonSx } from '../theme';
+import { useAuth } from '../contexts/AuthContext';
+import AuthModal from './AuthModal';
 import { BrandLogo } from './Logo';
 import {
   serviceNavItems,
@@ -35,18 +39,19 @@ interface NavLink {
 const navLinks: NavLink[] = [
   { label: 'Services', path: '/services' },
   { label: 'Pricing', path: '/pricing' },
-  { label: 'Brands We Service', path: '/', hash: 'brands' },
-  { label: 'Why Choose Us', path: '/', hash: 'why-choose-us' },
-  { label: 'Service Areas', path: '/', hash: 'service-areas' },
-  { label: 'About Us', path: '/about' },
+  { label: 'Areas', path: '/', hash: 'service-areas' },
+  { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ];
 
 const TopBar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, profile, signOut } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalView, setAuthModalView] = useState<'login' | 'signup'>('login');
   const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
   const [servicesDrawerOpen, setServicesDrawerOpen] = useState(false);
   const servicesMenuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -286,32 +291,158 @@ const TopBar: React.FC = () => {
             })}
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexShrink: 0 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: { xs: 0.75, sm: 1 },
+              flexShrink: 0,
+            }}
+          >
             <Button
               component="a"
               href="tel:+15712764808"
               startIcon={<Phone sx={{ fontSize: '1rem !important' }} />}
               sx={{
                 display: { xs: 'none', sm: 'inline-flex' },
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 44,
+                minHeight: 44,
                 color: colors.navy,
                 fontFamily: fonts.body,
                 fontWeight: 700,
                 fontSize: '0.82rem',
+                lineHeight: 1,
                 textTransform: 'none',
-                border: `1.5px solid ${colors.border}`,
-                borderRadius: '10px',
-                px: 1.5,
-                py: 0.55,
+                backgroundColor: '#EEF4FF',
+                border: `2px solid #C5DCFA`,
+                borderRadius: '50px',
+                px: 2,
+                py: 0,
                 whiteSpace: 'nowrap',
-                '&:hover': { backgroundColor: colors.lightBlueBg, borderColor: colors.primaryBlue, color: colors.primaryBlue },
+                transition: 'all 0.3s ease-in-out',
+                '& .MuiButton-startIcon': {
+                  marginRight: '6px',
+                  marginLeft: 0,
+                  display: 'inherit',
+                },
+                '&:hover': {
+                  backgroundColor: colors.lightBlueBg,
+                  borderColor: colors.primaryBlue,
+                  color: colors.primaryBlue,
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 18px rgba(26, 115, 232, 0.18)',
+                },
               }}
             >
               (571) 276-4808
             </Button>
 
+            {/* Auth buttons or user avatar — desktop */}
+            {!user ? (
+              <>
+                <Button
+                  onClick={() => { setAuthModalView('login'); setAuthModalOpen(true); }}
+                  sx={{
+                    display: { xs: 'none', md: 'inline-flex' },
+                    height: 44,
+                    color: colors.navy,
+                    fontFamily: fonts.body,
+                    fontWeight: 600,
+                    fontSize: '0.85rem',
+                    textTransform: 'none',
+                    border: `1.5px solid ${colors.border}`,
+                    borderRadius: '50px',
+                    px: 2,
+                    whiteSpace: 'nowrap',
+                    '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg },
+                  }}
+                >
+                  Log in
+                </Button>
+                <Button
+                  onClick={() => { setAuthModalView('signup'); setAuthModalOpen(true); }}
+                  sx={{
+                    display: { xs: 'none', md: 'inline-flex' },
+                    height: 44,
+                    backgroundColor: colors.primaryBlue,
+                    color: '#fff',
+                    fontFamily: fonts.body,
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    textTransform: 'none',
+                    borderRadius: '50px',
+                    px: 2.25,
+                    whiteSpace: 'nowrap',
+                    '&:hover': { backgroundColor: colors.navy },
+                  }}
+                >
+                  Sign up
+                </Button>
+              </>
+            ) : (
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
+                <Tooltip title={profile?.full_name ?? user.email ?? 'Account'}>
+                  <Avatar
+                    onClick={() => navigate('/my-bookings')}
+                    sx={{ width: 36, height: 36, backgroundColor: colors.primaryBlue, fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', '&:hover': { backgroundColor: colors.navy } }}
+                  >
+                    {(profile?.full_name ?? user.email ?? '?').charAt(0).toUpperCase()}
+                  </Avatar>
+                </Tooltip>
+                <Tooltip title="Sign out">
+                  <IconButton onClick={() => signOut()} size="small" sx={{ color: colors.mutedText, '&:hover': { color: '#EF4444' } }}>
+                    <LogoutIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
+
+            <IconButton
+              component="a"
+              href="tel:+15712764808"
+              aria-label="Call (571) 276-4808"
+              sx={{
+                display: { xs: 'inline-flex', sm: 'none' },
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 44,
+                height: 44,
+                color: colors.navy,
+                backgroundColor: '#EEF4FF',
+                border: `2px solid #C5DCFA`,
+                borderRadius: '50px',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  backgroundColor: colors.lightBlueBg,
+                  borderColor: colors.primaryBlue,
+                  color: colors.primaryBlue,
+                  transform: 'translateY(-2px)',
+                },
+              }}
+            >
+              <Phone sx={{ fontSize: '1.15rem' }} />
+            </IconButton>
+
             <IconButton
               onClick={() => setDrawerOpen(true)}
-              sx={{ display: { xs: 'flex', lg: 'none' }, color: colors.navy }}
+              sx={{
+                display: { xs: 'inline-flex', lg: 'none' },
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 44,
+                height: 44,
+                color: colors.navy,
+                border: `2px solid ${colors.border}`,
+                borderRadius: '50px',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  backgroundColor: colors.lightBlueBg,
+                  borderColor: colors.primaryBlue,
+                  transform: 'translateY(-2px)',
+                },
+              }}
               aria-label="Open navigation menu"
             >
               <MenuIcon />
@@ -444,14 +575,44 @@ const TopBar: React.FC = () => {
         </List>
         <Divider sx={{ borderColor: colors.border }} />
         <Box sx={{ px: 3, py: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Button
-            fullWidth
-            onClick={() => { navigate('/scheduler'); setDrawerOpen(false); }}
-            startIcon={<EventAvailableIcon />}
-            sx={{ ...primaryButtonSx, py: 1.25 }}
-          >
-            Schedule Service
-          </Button>
+          {!user ? (
+            <>
+              <Button
+                fullWidth
+                onClick={() => { setAuthModalView('signup'); setDrawerOpen(false); setAuthModalOpen(true); }}
+                sx={{ ...primaryButtonSx, py: 1.25 }}
+              >
+                Sign up
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => { setAuthModalView('login'); setDrawerOpen(false); setAuthModalOpen(true); }}
+                sx={{ borderRadius: '12px', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderColor: colors.border, color: colors.navy, py: 1.25, '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg } }}
+              >
+                Log in
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                fullWidth
+                onClick={() => { navigate('/my-bookings'); setDrawerOpen(false); }}
+                sx={{ ...primaryButtonSx, py: 1.25 }}
+              >
+                My Bookings
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => { signOut(); setDrawerOpen(false); }}
+                startIcon={<LogoutIcon />}
+                sx={{ borderRadius: '12px', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderColor: colors.border, color: colors.navy, py: 1.25, '&:hover': { borderColor: '#EF4444', color: '#EF4444' } }}
+              >
+                Sign out
+              </Button>
+            </>
+          )}
           <Box
             component="a"
             href="tel:+15712764808"
@@ -464,6 +625,12 @@ const TopBar: React.FC = () => {
           </Box>
         </Box>
       </Drawer>
+
+      <AuthModal
+        open={authModalOpen}
+        initialView={authModalView}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </>
   );
 };

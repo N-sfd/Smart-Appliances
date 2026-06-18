@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { findOrCreateCustomer } from '../lib/supabaseBookings';
 
 export interface UserProfile {
   id: string;
@@ -19,6 +20,7 @@ interface AuthContextValue {
   isLoading: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signInWithProvider: (provider: 'google' | 'facebook') => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -90,6 +92,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         full_name: fullName,
         role: 'user',
       }, { onConflict: 'id' });
+      await findOrCreateCustomer({ email, full_name: fullName, profile_id: data.user.id });
     }
     return { error: null };
   };
@@ -100,6 +103,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   ): Promise<{ error: string | null }> => {
     if (!supabase) return { error: 'Database not configured.' };
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message ?? null };
+  };
+
+  const signInWithProvider = async (
+    provider: 'google' | 'facebook',
+  ): Promise<{ error: string | null }> => {
+    if (!supabase) return { error: 'Database not configured.' };
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: window.location.origin },
+    });
     return { error: error?.message ?? null };
   };
 
@@ -121,6 +135,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isLoading,
         signUp,
         signIn,
+        signInWithProvider,
         signOut,
       }}
     >

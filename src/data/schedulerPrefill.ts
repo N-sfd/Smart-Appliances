@@ -359,3 +359,30 @@ export function parseSchedulerPrefill(params: URLSearchParams): SchedulerPrefill
 export function schedulerCategoryFromHubId(categoryId: string): SchedulerServiceCategory | '' {
   return HUB_CATEGORY_TO_SCHEDULER[categoryId] ?? '';
 }
+
+/** Resolved category-specific answer from URL prefill (for step-1 validation). */
+export function resolvePrefilledCategoryDetail(
+  category: SchedulerServiceCategory | '',
+  productName: string,
+  fields: SchedulerCategoryFields,
+  state: SchedulerCategoryFields,
+): string {
+  if (!category) return '';
+  const mapped = productName ? mapProductNameToFields(category, productName) : {};
+  switch (category) {
+    case 'Appliance':
+      return state.appliance || fields.appliance || mapped.appliance || '';
+    case 'HVAC':
+      return state.hvacService || fields.hvacService || mapped.hvacService || '';
+    case 'Plumbing':
+      return state.plumbingIssue || fields.plumbingIssue || mapped.plumbingIssue || '';
+    case 'Electrical':
+      return state.electricalIssue || fields.electricalIssue || mapped.electricalIssue || '';
+    case 'Smart Home':
+      return state.smartDevice || fields.smartDevice || mapped.smartDevice || '';
+    case 'Garage Door':
+      return state.garageDoorService || fields.garageDoorService || mapped.garageDoorService || '';
+    default:
+      return '';
+  }
+}
