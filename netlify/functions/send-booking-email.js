@@ -27,16 +27,41 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
   }
 
-  const trackLink = `https://smartappliancesmd.com/track-request?id=${requestNumber}`;
+  const siteUrl = process.env.SITE_URL || 'https://smartappliancesmd.com';
+  const trackLink = `${siteUrl}/track-request`;
+
+  const formatPreferredDate = (dateStr) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(Number.isNaN)) return dateStr;
+    const [year, month, day] = parts;
+    return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const formattedDate = formatPreferredDate(preferredDate);
 
   const htmlBody = `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @media only screen and (max-width: 600px) {
+    .email-container { width: 100% !important; }
+    .email-body { padding: 24px !important; }
+  }
+</style>
+</head>
 <body style="margin:0;padding:0;background:#F1F5F9;font-family:Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:40px 20px;">
     <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+      <table width="560" class="email-container" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:100%;">
         <!-- Header -->
         <tr>
           <td style="background:#0B3D91;padding:28px 36px;">
@@ -46,7 +71,7 @@ exports.handler = async (event) => {
         </tr>
         <!-- Body -->
         <tr>
-          <td style="padding:36px;">
+          <td class="email-body" style="padding:36px;">
             <p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#0F172A;">
               Request Received${customerName ? `, ${customerName}` : ''}!
             </p>
@@ -55,8 +80,9 @@ exports.handler = async (event) => {
             </p>
 
             <!-- Request ID badge -->
+            <p style="margin:0 0 8px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Request ID</p>
             <div style="display:inline-block;background:#EFF6FF;border:1.5px solid #1A73E8;border-radius:999px;padding:8px 20px;margin-bottom:28px;">
-              <span style="font-size:15px;font-weight:800;color:#1A73E8;letter-spacing:0.04em;">${requestNumber}</span>
+              <span style="font-size:16px;font-weight:800;color:#1A73E8;letter-spacing:0.04em;">${requestNumber}</span>
             </div>
 
             <!-- Details table -->
@@ -66,10 +92,10 @@ exports.handler = async (event) => {
                 <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#64748B;width:40%;">Service</td>
                 <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#0F172A;font-weight:600;">${service}</td>
               </tr>` : ''}
-              ${preferredDate ? `
+              ${formattedDate ? `
               <tr>
                 <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#64748B;">Preferred Date</td>
-                <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#0F172A;font-weight:600;">${preferredDate}</td>
+                <td style="padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#0F172A;font-weight:600;">${formattedDate}</td>
               </tr>` : ''}
               ${preferredTime ? `
               <tr>
@@ -83,13 +109,15 @@ exports.handler = async (event) => {
             </table>
 
             <!-- Track button -->
-            <a href="${trackLink}" style="display:block;background:#0B3D91;color:#fff;text-decoration:none;text-align:center;padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;margin-bottom:20px;">
-              Track Your Request Status
+            <a href="${trackLink}" style="display:block;background:#0B3D91;color:#fff;text-decoration:none;text-align:center;padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;margin-bottom:12px;">
+              Track Request Status
             </a>
+            <p style="margin:0 0 24px;font-size:13px;color:#94A3B8;line-height:1.6;text-align:center;">
+              Use your Request ID to check your service status.
+            </p>
 
             <p style="margin:0;font-size:13px;color:#94A3B8;line-height:1.6;text-align:center;">
-              Questions? Call <a href="tel:3017830977" style="color:#1A73E8;font-weight:600;">301-783-0977</a>
-              or reply to this email.
+              Questions? Call us at <a href="tel:3017830977" style="color:#1A73E8;font-weight:600;">301-783-0977</a>
             </p>
           </td>
         </tr>
