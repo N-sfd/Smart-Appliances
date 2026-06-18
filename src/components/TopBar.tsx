@@ -17,7 +17,6 @@ import {
   Tooltip,
 } from '@mui/material';
 import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon } from '@mui/icons-material';
-import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import { colors, fonts, primaryButtonSx } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';

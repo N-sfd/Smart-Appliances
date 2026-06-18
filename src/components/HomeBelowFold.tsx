@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -108,7 +108,6 @@ const HomeBelowFold: React.FC = () => {
   const [notifySubmitted, setNotifySubmitted] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<string | false>(false);
   const [stickyVisible, setStickyVisible] = useState(false);
-  const heroRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let ticking = false;
