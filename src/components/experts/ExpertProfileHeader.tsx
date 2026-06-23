@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Chip, Stack, IconButton, Tooltip } from '@mui/material';
+import { Box, Typography, Chip, IconButton, Tooltip } from '@mui/material';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import StarIcon from '@mui/icons-material/Star';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
@@ -7,6 +7,7 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import { colors, fonts } from '../../theme';
 import { Expert } from '../../data/experts';
 import ExpertAvatar from './ExpertAvatar';
+import ExpertCardImage from './ExpertCardImage';
 
 type Props = {
   expert: Expert;
@@ -15,6 +16,7 @@ type Props = {
 export default function ExpertProfileHeader({ expert }: Props) {
   const filledStars = Math.round(expert.rating);
   const [copied, setCopied] = useState(false);
+  const isTeam = expert.slug === 'smart-appliances-team';
 
   const handleShare = async () => {
     const shareData = { title: expert.name, text: `${expert.name} — ${expert.title}`, url: window.location.href };
@@ -30,19 +32,36 @@ export default function ExpertProfileHeader({ expert }: Props) {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        gap: 2.5,
-        flexDirection: { xs: 'column', sm: 'row' },
-        alignItems: { xs: 'flex-start', sm: 'center' },
-      }}
-    >
-      {/* LEFT — LARGE AVATAR */}
-      <ExpertAvatar name={expert.name} avatarUrl={expert.avatarUrl} size={96} fontSize={32} />
+    <Box>
+      {/* LARGE COMPANY IMAGE (team profile only) */}
+      {isTeam && (
+        <Box
+          sx={{
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: colors.cardShadow,
+            mb: 2.5,
+          }}
+        >
+          <ExpertCardImage name={expert.name} avatarUrl={expert.avatarUrl} height={220} />
+        </Box>
+      )}
 
-      {/* RIGHT — TEXT STACK */}
-      <Box sx={{ flex: 1, width: '100%' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2.5,
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', sm: 'center' },
+        }}
+      >
+        {/* LEFT — AVATAR (individual experts only) */}
+        {!isTeam && (
+          <ExpertAvatar name={expert.name} avatarUrl={expert.avatarUrl} size={96} fontSize={32} />
+        )}
+
+        {/* RIGHT — TEXT STACK */}
+        <Box sx={{ flex: 1, width: '100%' }}>
         {/* NAME + SHARE */}
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
           <Typography
@@ -89,7 +108,9 @@ export default function ExpertProfileHeader({ expert }: Props) {
           sx={{
             display: 'flex',
             alignItems: 'center',
+            flexWrap: 'wrap',
             gap: 0.5,
+            rowGap: 0.5,
             mt: 1,
           }}
         >
@@ -111,15 +132,13 @@ export default function ExpertProfileHeader({ expert }: Props) {
               ml: 1,
             }}
           >
-            {expert.rating} · {expert.reviewCount} reviews · {expert.jobsCompleted} jobs completed
+            {expert.rating} · {expert.reviewCount} reviews · {expert.jobsCompleted} {expert.jobsLabel ?? 'jobs completed'}
           </Typography>
         </Box>
 
         {/* BADGES */}
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ flexWrap: 'wrap', mt: 1 }}
+        <Box
+          sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}
         >
           <Chip
             icon={<VerifiedIcon />}
@@ -147,7 +166,7 @@ export default function ExpertProfileHeader({ expert }: Props) {
               height: 30,
             }}
           />
-        </Stack>
+        </Box>
 
         {/* RESPONSE TIME (OPTIONAL) */}
         {expert.responseTime && (
@@ -171,9 +190,10 @@ export default function ExpertProfileHeader({ expert }: Props) {
               color: colors.mutedText,
             }}
           >
-            {expert.serviceAreas.join(' · ')}
+            Serving {expert.serviceAreas.join(', ')}
           </Typography>
         )}
+        </Box>
       </Box>
     </Box>
   );

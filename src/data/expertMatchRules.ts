@@ -1,5 +1,6 @@
 import type { SchedulerServiceCategory } from './schedulerPrefill';
 import { URGENCY_OPTIONS, type EstimatorUrgency } from './pricingData';
+import { getExpertBySlug } from './experts';
 
 export type ExpertCategoryId =
   | 'Appliance'
@@ -103,7 +104,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Appliance',
       productName: 'Refrigerator Repair',
-      startingEstimate: '$89 diagnostic',
+      startingEstimate: 'Service call from $89',
       reason: "Cooling issues usually require appliance diagnostics for compressor, fan, thermostat, or refrigerant-related problems.",
     },
     'Washer not draining': {
@@ -111,7 +112,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Appliance',
       productName: 'Washer / Dryer Repair',
-      startingEstimate: '$89 diagnostic',
+      startingEstimate: 'Service call from $89',
       reason: 'A washer that will not drain is often caused by a clogged pump, blocked hose, or faulty lid switch — best diagnosed in person.',
     },
     'Dryer not heating': {
@@ -119,7 +120,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Appliance',
       productName: 'Washer / Dryer Repair',
-      startingEstimate: '$89 diagnostic',
+      startingEstimate: 'Service call from $89',
       reason: 'No-heat dryer issues are commonly caused by a failed heating element, thermostat, or fuse that a technician can test on site.',
     },
     'Dishwasher leaking': {
@@ -127,7 +128,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Appliance',
       productName: 'Dishwasher Repair',
-      startingEstimate: '$89 diagnostic',
+      startingEstimate: 'Service call from $89',
       reason: 'Leaks can come from the door seal, pump, or hose connections, so an in-home diagnostic pinpoints the source before repair.',
     },
     'Oven/stove not working': {
@@ -135,7 +136,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Appliance',
       productName: 'Oven / Stove Repair',
-      startingEstimate: '$89 diagnostic',
+      startingEstimate: 'Service call from $89',
       reason: 'Heating, ignition, and burner failures need a hands-on inspection to confirm whether the issue is electrical or mechanical.',
     },
     'Microwave issue': {
@@ -143,7 +144,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Appliance',
       productName: 'Microwave Repair',
-      startingEstimate: '$79 diagnostic',
+      startingEstimate: 'Service call from $79',
       reason: 'Microwave heating, power, or turntable issues are quickly diagnosed and repaired by an appliance specialist.',
     },
     'Appliance installation': {
@@ -151,7 +152,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Appliance',
       productName: 'Appliance Installation',
-      startingEstimate: 'Starting at $149',
+      startingEstimate: 'Starting from $149',
       reason: 'New appliance hookup, leveling, and test cycles are handled by our installation team to ensure everything runs safely.',
     },
     'Other appliance issue': {
@@ -159,7 +160,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Appliance',
       productName: 'Appliance Diagnostic Visit',
-      startingEstimate: '$89 diagnostic',
+      startingEstimate: 'Service call from $89',
       reason: "When the issue isn't clear, a general appliance diagnostic visit identifies the cause and next steps.",
     },
   },
@@ -169,7 +170,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'HVAC',
       productName: 'AC Repair',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'No-cooling issues are often tied to refrigerant levels, airflow, or compressor problems that need an HVAC inspection.',
     },
     'Heat not working': {
@@ -177,7 +178,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'HVAC',
       productName: 'Heating / Furnace Repair',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'A furnace or heat pump that stops producing heat typically needs an on-site diagnostic of ignition, blower, or control components.',
     },
     'Thermostat issue': {
@@ -185,7 +186,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'HVAC',
       productName: 'Thermostat Installation',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'Thermostat problems are usually resolved fastest with a fresh installation or wiring check by an HVAC technician.',
     },
     'Strange noise': {
@@ -193,7 +194,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'HVAC',
       productName: 'AC Repair',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'Unusual HVAC noises often signal a loose part, failing motor, or airflow obstruction that needs an in-person diagnostic.',
     },
     'Airflow issue': {
@@ -201,7 +202,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'HVAC',
       productName: 'HVAC Maintenance',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'Weak or uneven airflow is commonly fixed with a duct, filter, and blower inspection during a maintenance visit.',
     },
     'HVAC maintenance': {
@@ -209,7 +210,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'M',
       serviceCategory: 'HVAC',
       productName: 'HVAC Maintenance',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'A seasonal tune-up keeps your system efficient and catches small issues before they become costly repairs.',
     },
     'Emergency HVAC issue': {
@@ -217,7 +218,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'E',
       serviceCategory: 'HVAC',
       productName: 'Emergency Service Visit',
-      startingEstimate: 'Starting at $149',
+      startingEstimate: 'Starting from $149',
       reason: 'A complete loss of heating or cooling is treated as urgent so a technician can respond the same day.',
     },
   },
@@ -227,7 +228,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Plumbing',
       productName: 'Drain Cleaning',
-      startingEstimate: 'Starting at $149',
+      startingEstimate: 'Starting from $149',
       reason: 'Clogged or slow drains are cleared with professional drain cleaning equipment to fully restore flow.',
     },
     'Garbage disposal issue': {
@@ -235,7 +236,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Plumbing',
       productName: 'Garbage Disposal Repair',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'Jammed, leaking, or unresponsive disposals are diagnosed in person to determine if a repair or replacement is needed.',
     },
     Leak: {
@@ -243,7 +244,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Plumbing',
       productName: 'Leak Inspection',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'Leaks should be inspected quickly to locate the source and prevent water damage before repair.',
     },
     'Toilet issue': {
@@ -251,7 +252,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Plumbing',
       productName: 'Toilet Repair',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'Running, clogged, or leaking toilets are addressed with a standard toilet repair visit.',
     },
     'Faucet issue': {
@@ -259,7 +260,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Plumbing',
       productName: 'Faucet Repair / Replacement',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'Drips, low pressure, or handle problems are typically resolved with a faucet repair or replacement.',
     },
     'Water pressure issue': {
@@ -267,7 +268,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Plumbing',
       productName: 'Leak Inspection',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'Pressure changes can point to a hidden leak or fixture problem, so a plumbing inspection is the right first step.',
     },
     'Other plumbing issue': {
@@ -275,7 +276,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Plumbing',
       productName: 'Leak Inspection',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: "When the plumbing issue isn't clear, a general inspection visit identifies the cause and next steps.",
     },
   },
@@ -285,7 +286,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Electrical',
       productName: 'Light Fixture Installation',
-      startingEstimate: 'Starting at $149',
+      startingEstimate: 'Starting from $149',
       reason: 'Indoor and outdoor fixture installs are completed safely by a licensed electrician.',
     },
     'Outlet or switch issue': {
@@ -293,7 +294,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Electrical',
       productName: 'Outlet / Switch Repair',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'Dead outlets, GFCI trips, and switch problems need an electrical diagnostic to rule out wiring issues.',
     },
     'Breaker problem': {
@@ -301,7 +302,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Electrical',
       productName: 'Breaker / Panel Inspection',
-      startingEstimate: '$129 diagnostic',
+      startingEstimate: 'Service call from $129',
       reason: 'Tripping breakers can indicate an overloaded circuit or panel issue that should be inspected for safety.',
     },
     'Ceiling fan installation': {
@@ -309,7 +310,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Electrical',
       productName: 'Ceiling Fan Installation',
-      startingEstimate: 'Starting at $179',
+      startingEstimate: 'Starting from $179',
       reason: 'Ceiling fan mounting, wiring, and balancing is handled safely by a licensed electrician.',
     },
     'Doorbell wiring': {
@@ -317,7 +318,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Electrical',
       productName: 'Doorbell Wiring',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'Doorbell wiring issues or upgrades are best handled with a dedicated electrical visit.',
     },
     'Electrical safety concern': {
@@ -325,7 +326,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'E',
       serviceCategory: 'Electrical',
       productName: 'Breaker / Panel Inspection',
-      startingEstimate: '$129 diagnostic',
+      startingEstimate: 'Service call from $129',
       reason: 'Sparks, burning smells, or other safety concerns are treated as urgent and inspected as soon as possible.',
     },
   },
@@ -335,7 +336,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Smart Home',
       productName: 'Video Doorbell Installation',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'Video doorbell mounting and app pairing is set up correctly the first time by a smart home technician.',
     },
     'Smart thermostat installation': {
@@ -343,7 +344,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Smart Home',
       productName: 'Smart Thermostat Installation',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'Smart thermostat wiring and schedule setup is completed by a technician familiar with major brands.',
     },
     'Smart lock installation': {
@@ -351,7 +352,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Smart Home',
       productName: 'Smart Lock Installation',
-      startingEstimate: 'Starting at $149',
+      startingEstimate: 'Starting from $149',
       reason: 'Smart lock fitting and app pairing is handled to make sure the door is secure and connected.',
     },
     'Security camera installation': {
@@ -359,7 +360,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Smart Home',
       productName: 'Security Camera Installation',
-      startingEstimate: 'Starting at $149',
+      startingEstimate: 'Starting from $149',
       reason: 'Indoor or outdoor camera mounting and connectivity setup is completed by a smart home technician.',
     },
     'Wi-Fi device setup': {
@@ -367,7 +368,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: 'Smart Home',
       productName: 'Wi-Fi Device Setup',
-      startingEstimate: 'Starting at $99',
+      startingEstimate: 'Starting from $99',
       reason: 'Connecting and configuring smart devices on your network is quickest with hands-on setup help.',
     },
     'Smart home troubleshooting': {
@@ -375,7 +376,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Smart Home',
       productName: 'Wi-Fi Device Setup',
-      startingEstimate: 'Starting at $99',
+      startingEstimate: 'Starting from $99',
       reason: 'Connectivity or device problems are diagnosed and resolved by a smart home technician.',
     },
   },
@@ -385,7 +386,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Garage Door',
       productName: 'Garage Door Repair',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'A door that will not open can be caused by the opener, track, or spring — best confirmed with a diagnostic visit.',
     },
     'Door will not close': {
@@ -393,7 +394,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Garage Door',
       productName: 'Garage Door Repair',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'Doors that will not close are often a sensor alignment or opener issue that needs an in-person check.',
     },
     'Broken spring': {
@@ -401,7 +402,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Garage Door',
       productName: 'Spring Repair',
-      startingEstimate: 'Quote required',
+      startingEstimate: 'Estimate required',
       reason: 'Spring replacement involves high-tension parts, so pricing is confirmed after an in-home safety inspection.',
     },
     'Opener not working': {
@@ -409,7 +410,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Garage Door',
       productName: 'Opener Repair',
-      startingEstimate: '$99 diagnostic',
+      startingEstimate: 'Service call from $99',
       reason: 'Opener motor, remote, or wiring issues are diagnosed on site to determine the right fix.',
     },
     'Sensor issue': {
@@ -417,7 +418,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: 'Garage Door',
       productName: 'Sensor Alignment',
-      startingEstimate: 'Starting at $89',
+      startingEstimate: 'Starting from $89',
       reason: 'Misaligned safety sensors are a common, quick fix for doors that reverse or will not close.',
     },
     'Garage door maintenance': {
@@ -425,7 +426,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'M',
       serviceCategory: 'Garage Door',
       productName: 'Garage Door Maintenance',
-      startingEstimate: 'Starting at $129',
+      startingEstimate: 'Starting from $129',
       reason: 'Routine maintenance keeps tracks, rollers, and springs in safe working condition.',
     },
   },
@@ -435,7 +436,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: null,
       productName: 'General Diagnostic Visit',
-      startingEstimate: '$89 diagnostic',
+      startingEstimate: 'Service call from $89',
       reason: "When you're not sure what's wrong, a general diagnostic visit identifies the issue so we can route you to the right specialist.",
     },
     'Need installation': {
@@ -443,7 +444,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'I',
       serviceCategory: null,
       productName: 'Installation Service',
-      startingEstimate: 'Quote required',
+      startingEstimate: 'Estimate required',
       reason: 'Installation pricing depends on the device or system, so a technician will confirm details before your visit.',
     },
     'Need maintenance': {
@@ -451,7 +452,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'M',
       serviceCategory: null,
       productName: 'Maintenance Visit',
-      startingEstimate: 'Quote required',
+      startingEstimate: 'Estimate required',
       reason: 'Maintenance scope varies by system, so we will confirm the right plan based on what you need serviced.',
     },
     'Need emergency help': {
@@ -459,7 +460,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'E',
       serviceCategory: null,
       productName: 'Emergency Service Visit',
-      startingEstimate: 'Starting at $149',
+      startingEstimate: 'Starting from $149',
       reason: 'Urgent issues are prioritized so a technician can respond as quickly as possible.',
     },
     'Need a quote': {
@@ -467,7 +468,7 @@ export const MATCH_RULES: Record<ExpertCategoryId, Record<string, ExpertMatch>> 
       serviceType: 'R',
       serviceCategory: null,
       productName: 'Custom Quote Request',
-      startingEstimate: 'Quote required',
+      startingEstimate: 'Estimate required',
       reason: 'A coordinator will gather a few more details and connect you with the right specialist for an accurate quote.',
     },
   },
@@ -495,4 +496,12 @@ export const EXPERT_TYPE_TO_SLUG: Record<string, string> = {
 
 export function getExpertSlugForMatch(expertType: string): string | undefined {
   return EXPERT_TYPE_TO_SLUG[expertType];
+}
+
+/** Customer-facing label for a match's internal expertType key — sourced from the matched
+ * expert's real profile name so it always reflects the current public-facing wording. */
+export function getExpertTypeDisplayName(expertType: string): string {
+  const slug = EXPERT_TYPE_TO_SLUG[expertType];
+  const expert = slug ? getExpertBySlug(slug) : undefined;
+  return expert?.name ?? expertType;
 }

@@ -3,6 +3,7 @@ import { Box, Typography, Button, Chip } from '@mui/material';
 import { colors, fonts } from '../../theme';
 import { ExpertService } from '../../data/experts';
 import { calculateServiceEstimate, formatCurrency } from '../../utils/pricing';
+import { getServiceDisplayName } from '../../utils/serviceDisplayNames';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {
@@ -58,10 +59,10 @@ export default function ExpertServices({ services, expertSlug }: Props) {
 
           const quoteRequired = !estimate || estimate.quoteRequired;
           const priceLine = quoteRequired
-            ? 'Quote required'
+            ? 'Estimate required'
             : service.isDiagnostic
-            ? `Starting at ${formatCurrency(estimate.baseFee ?? 0)} diagnostic`
-            : `Starting at ${formatCurrency(estimate.baseFee ?? 0)}`;
+            ? `Service call from ${formatCurrency(estimate.baseFee ?? 0)}`
+            : `Starting from ${formatCurrency(estimate.baseFee ?? 0)}`;
 
           return (
             <Box
@@ -86,11 +87,11 @@ export default function ExpertServices({ services, expertSlug }: Props) {
                     color: colors.darkText,
                   }}
                 >
-                  {service.name}
+                  {getServiceDisplayName(service.name)}
                 </Typography>
                 {quoteRequired && (
                   <Chip
-                    label="Quote Required"
+                    label="Estimate Required"
                     size="small"
                     sx={{ backgroundColor: '#FFF3E0', color: '#E65100', fontFamily: fonts.body, fontWeight: 700, fontSize: '10.5px', height: 22, flexShrink: 0 }}
                   />

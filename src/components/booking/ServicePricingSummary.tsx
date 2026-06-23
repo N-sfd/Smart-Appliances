@@ -6,6 +6,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { colors, fonts } from '../../theme';
 import { calculateServiceEstimate, formatCurrency } from '../../utils/pricing';
+import { getServiceDisplayName } from '../../utils/serviceDisplayNames';
 
 export interface ServicePricingSummaryProps {
   serviceCategory?: string | null;
@@ -92,7 +93,7 @@ const ServicePricingSummary: React.FC<ServicePricingSummaryProps> = ({
             {estimate.categoryLabel}{serviceTypeLabel ? ` ${serviceTypeLabel}` : ''}
           </Typography>
           <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.05rem', color: colors.navy }}>
-            {productName || `${estimate.categoryLabel} Service`}
+            {productName ? getServiceDisplayName(productName) : `${estimate.categoryLabel} Service`}
           </Typography>
         </Box>
 
@@ -138,7 +139,7 @@ const ServicePricingSummary: React.FC<ServicePricingSummaryProps> = ({
               {estimate.quoteRequired ? 'Estimate' : 'Estimated Total'}
             </Typography>
             <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.15rem', color: colors.primaryBlue }}>
-              {estimate.quoteRequired ? 'Quote required' : formatCurrency(estimate.estimatedTotal ?? 0)}
+              {estimate.quoteRequired ? 'Estimate required' : formatCurrency(estimate.estimatedTotal ?? 0)}
             </Typography>
           </Box>
         </Box>

@@ -29,11 +29,13 @@ export interface Expert {
   reviews: ExpertReview[];
   galleryCategories: string[];
   avatarUrl?: string;
+  /** Overrides the default "jobs completed" suffix shown next to jobsCompleted (e.g. "service requests"). */
+  jobsLabel?: string;
 }
 
 const SERVICE_AREAS = ['Maryland', 'Washington DC', 'Virginia', 'Pennsylvania', 'West Virginia'];
 
-const GALLERY_CATEGORIES = [
+export const GALLERY_CATEGORIES = [
   'Appliance repair',
   'HVAC service',
   'Plumbing service',
@@ -46,16 +48,17 @@ export const EXPERTS: Expert[] = [
   {
     slug: 'smart-appliances-team',
     name: 'Smart Appliances Team',
-    title: 'Home Service Experts',
+    title: 'Home Service Team',
     avatarUrl: '/images/experts/team.svg',
     rating: 4.9,
     reviewCount: 128,
     jobsCompleted: '750+',
+    jobsLabel: 'service requests',
     responseTime: 'Usually responds within 30 minutes',
     serviceAreas: SERVICE_AREAS,
-    specialties: ['Appliance Repair', 'HVAC Services', 'Plumbing', 'Electrical', 'Smart Home', 'Garage Door'],
+    specialties: ['Appliance Care', 'HVAC Services', 'Plumbing', 'Electrical', 'Smart Home', 'Garage Door'],
     about:
-      'Smart Appliances provides reliable home service support for appliance repair, HVAC, plumbing, electrical, smart home, and garage door needs. Our team focuses on fast scheduling, clear communication, request tracking, and professional service.',
+      'Smart Appliances helps homeowners book appliance, HVAC, plumbing, electrical, smart home, and garage door services through a simple online request process. Customers receive a Request ID, confirmation email, and status tracking for every service request.',
     services: [
       { name: 'Refrigerator Repair', serviceCategory: 'Appliance', isDiagnostic: true },
       { name: 'AC Repair', serviceCategory: 'HVAC', isDiagnostic: true },
@@ -70,36 +73,36 @@ export const EXPERTS: Expert[] = [
         rating: 5,
         date: 'Recently',
         serviceType: 'Appliance Repair',
-        text: 'Great communication and fast response. The technician explained the issue clearly.',
+        text: 'Easy booking process and clear request tracking.',
       },
       {
         firstName: 'Casey',
         rating: 5,
         date: 'Recently',
         serviceType: 'HVAC Service',
-        text: 'Easy booking process and I received a request ID right away.',
+        text: 'Professional communication and helpful follow-up.',
       },
       {
         firstName: 'Morgan',
-        rating: 4,
+        rating: 5,
         date: 'Recently',
         serviceType: 'Plumbing',
-        text: 'Professional service and helpful follow-up.',
+        text: 'The service summary made it easy to understand the starting cost.',
       },
     ],
     galleryCategories: GALLERY_CATEGORIES,
   },
   {
     slug: 'hvac-repair-specialist',
-    name: 'HVAC Repair Specialist',
-    title: 'HVAC Repair & Maintenance Expert',
+    name: 'HVAC Comfort Expert',
+    title: 'Heating, Cooling & Air Quality Services',
     avatarUrl: '/images/experts/hvac-specialist.svg',
     rating: 4.8,
     reviewCount: 74,
     jobsCompleted: '320+',
     responseTime: 'Usually responds within 1 hour',
     serviceAreas: SERVICE_AREAS,
-    specialties: ['AC Repair', 'Furnace Repair', 'Thermostat Installation', 'HVAC Maintenance', 'Emergency HVAC Service'],
+    specialties: ['AC Service', 'Furnace Service', 'Thermostat Installation', 'HVAC Maintenance', 'Emergency HVAC Service'],
     about:
       'Focused on heating and cooling systems, this specialist diagnoses and repairs AC and furnace issues, installs thermostats, and performs seasonal maintenance to keep your system running efficiently.',
     services: [
@@ -136,15 +139,15 @@ export const EXPERTS: Expert[] = [
   },
   {
     slug: 'appliance-repair-specialist',
-    name: 'Appliance Repair Specialist',
-    title: 'Appliance Repair Expert',
+    name: 'Appliance Care Expert',
+    title: 'Kitchen & Laundry Appliance Services',
     avatarUrl: '/images/experts/appliance-specialist.svg',
     rating: 4.9,
     reviewCount: 96,
     jobsCompleted: '410+',
     responseTime: 'Usually responds within 1 hour',
     serviceAreas: SERVICE_AREAS,
-    specialties: ['Refrigerator Repair', 'Washer/Dryer Repair', 'Dishwasher Repair', 'Oven/Stove Repair', 'Microwave Repair', 'Appliance Installation'],
+    specialties: ['Refrigerator Service', 'Washer & Dryer Service', 'Dishwasher Service', 'Oven & Stove Service', 'Microwave Service', 'Appliance Installation'],
     about:
       'Specializes in diagnosing and repairing major household appliances — refrigerators, washers, dryers, dishwashers, ovens, and microwaves — plus professional installation for new appliances.',
     services: [
@@ -182,15 +185,15 @@ export const EXPERTS: Expert[] = [
   },
   {
     slug: 'plumbing-repair-specialist',
-    name: 'Plumbing Repair Specialist',
-    title: 'Plumbing Service Expert',
+    name: 'Plumbing Service Expert',
+    title: 'Drain, Disposal, Leak & Fixture Services',
     avatarUrl: '/images/experts/plumbing-specialist.svg',
     rating: 4.8,
     reviewCount: 61,
     jobsCompleted: '260+',
     responseTime: 'Usually responds within 1 hour',
     serviceAreas: SERVICE_AREAS,
-    specialties: ['Drain Cleaning', 'Garbage Disposal Repair', 'Leak Inspection', 'Faucet Repair', 'Toilet Repair'],
+    specialties: ['Drain Cleaning', 'Garbage Disposal Service', 'Leak Inspection', 'Faucet Service', 'Toilet Service'],
     about:
       'Handles drain clogs, leak inspections, garbage disposal issues, faucet repairs, and toilet repairs with upfront pricing and clear communication before any work begins.',
     services: [
@@ -227,8 +230,8 @@ export const EXPERTS: Expert[] = [
   },
   {
     slug: 'electrical-service-specialist',
-    name: 'Electrical Service Specialist',
-    title: 'Electrical & Smart Home Expert',
+    name: 'Electrical & Smart Home Expert',
+    title: 'Electrical Installations & Connected Home Setup',
     avatarUrl: '/images/experts/electrical-specialist.svg',
     rating: 4.8,
     reviewCount: 58,
@@ -238,7 +241,7 @@ export const EXPERTS: Expert[] = [
     specialties: [
       'Light Fixture Installation',
       'Ceiling Fan Installation',
-      'Outlet/Switch Repair',
+      'Outlet & Switch Service',
       'Video Doorbell Installation',
       'Smart Thermostat Installation',
       'Security Camera Installation',

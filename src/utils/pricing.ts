@@ -186,7 +186,7 @@ export function getStartingFeeLabel(services: { serviceCategory: string | null; 
     .filter((e) => !e.quoteRequired && e.baseFee != null)
     .map((e) => e.baseFee as number);
 
-  return baseFees.length > 0 ? `Starting at ${formatCurrency(Math.min(...baseFees))}` : 'Quote required';
+  return baseFees.length > 0 ? `Service call from ${formatCurrency(Math.min(...baseFees))}` : 'Estimate required';
 }
 
 export function calculateServiceEstimate(input: ServiceEstimateInput): ServiceEstimate | null {
@@ -211,7 +211,7 @@ export function calculateServiceEstimate(input: ServiceEstimateInput): ServiceEs
 
   const estimatedTotal = quoteRequired || baseFee === null ? null : baseFee + priorityFee + emergencyFee;
   const displayLabel = quoteRequired
-    ? 'Quote required after inspection'
+    ? 'Estimate required after inspection'
     : estimatedTotal !== null
       ? formatCurrency(estimatedTotal)
       : '';

@@ -25,15 +25,6 @@ import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import PriceCheckOutlinedIcon from '@mui/icons-material/PriceCheckOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
-import {
-  Refrigerator,
-  Snowflake,
-  Droplets,
-  Zap,
-  HouseWifi,
-  DoorOpen,
-  LucideIcon,
-} from 'lucide-react';
 import { colors, fonts } from '../theme';
 import { getExpertBySlug, Expert } from '../data/experts';
 import { fetchActiveExpertBySlug } from '../services/adminExperts';
@@ -50,15 +41,6 @@ import {
   isZipFieldError,
 } from '../data/serviceAreas';
 
-const GALLERY_ICONS: Record<string, LucideIcon> = {
-  'Appliance repair': Refrigerator,
-  'HVAC service': Snowflake,
-  'Plumbing service': Droplets,
-  'Electrical installation': Zap,
-  'Smart home setup': HouseWifi,
-  'Garage door service': DoorOpen,
-};
-
 const CATEGORY_TO_SERVICE_PATH: Record<SchedulerServiceCategory, { label: string; path: string }> = {
   Appliance: { label: 'Appliance Repair', path: '/services/home-appliances' },
   HVAC: { label: 'HVAC Services', path: '/services/hvac' },
@@ -68,24 +50,51 @@ const CATEGORY_TO_SERVICE_PATH: Record<SchedulerServiceCategory, { label: string
   'Garage Door': { label: 'Garage Door Services', path: '/services/garage-door' },
 };
 
-const CREDENTIALS_ITEMS = [
-  'Smart Appliances service process for every request',
-  'Email confirmation sent for every booking',
-  'Request ID tracking on every service request',
-  'Admin-reviewed service requests',
-  'Starting estimate shown before booking',
-  'Final price confirmed before work begins',
+const TEAM_SERVICE_CATEGORIES: {
+  title: string;
+  description: string;
+  priceLabel: string;
+  serviceCategory: SchedulerServiceCategory | null;
+}[] = [
+  { title: 'Appliance Care', description: 'Refrigerator, washer, dryer, dishwasher, oven, and microwave service.', priceLabel: 'Service call from $89', serviceCategory: 'Appliance' },
+  { title: 'HVAC Services', description: 'AC and heating repair, thermostat installs, and seasonal maintenance.', priceLabel: 'Service call from $99', serviceCategory: 'HVAC' },
+  { title: 'Plumbing Services', description: 'Drain clearing, leak inspection, faucet and toilet service.', priceLabel: 'Service call from $99', serviceCategory: 'Plumbing' },
+  { title: 'Electrical Services', description: 'Lighting, outlets, ceiling fans, and panel inspections.', priceLabel: 'Service call from $99', serviceCategory: 'Electrical' },
+  { title: 'Smart Home Setup', description: 'Smart thermostats, locks, cameras, and device setup.', priceLabel: 'Starting from $99', serviceCategory: 'Smart Home' },
+  { title: 'Garage Door Services', description: 'Garage door repair, opener service, and safety checks.', priceLabel: 'Service call from $99', serviceCategory: 'Garage Door' },
+  { title: 'Emergency Service', description: 'Priority response for urgent home service issues.', priceLabel: 'Estimate after review', serviceCategory: null },
 ];
 
-const FAQ_ITEMS = [
-  {
-    q: 'How do I book this expert?',
-    a: 'Use the "Book This Expert" button to open the scheduler with this expert pre-selected.',
-  },
-  {
-    q: 'Can I request a specific expert?',
-    a: 'You can request an expert when booking. Your requested expert is subject to availability, and our team will confirm assignment after you submit your request.',
-  },
+const GALLERY_CATEGORY_IMAGES: Record<string, string> = {
+  'Appliance repair': '/images/experts/appliance-specialist.svg',
+  'HVAC service': '/images/experts/hvac-specialist.svg',
+  'Plumbing service': '/images/experts/plumbing-specialist.svg',
+  'Electrical installation': '/images/experts/electrical-specialist.svg',
+  'Smart home setup': '/images/experts/smart-home-setup.svg',
+  'Garage door service': '/images/experts/garage-door-service.svg',
+};
+
+const CREDENTIALS_ITEMS = [
+  'Online booking request submitted',
+  'Request ID generated instantly',
+  'Email confirmation sent',
+  'Admin reviews the request',
+  'Customer tracks status updates',
+  'Technician follow-up to complete service',
+];
+
+function getFaqItems(isTeam: boolean) {
+  return [
+    {
+      q: isTeam ? 'How do I book Smart Appliances Team?' : 'How do I book this expert?',
+      a: isTeam
+        ? 'Use the "Book This Team" button to open the scheduler with Smart Appliances Team pre-selected.'
+        : 'Use the "Book This Expert" button to open the scheduler with this expert pre-selected.',
+    },
+    {
+      q: isTeam ? 'Can I choose a specific expert?' : 'Can I request a specific expert?',
+      a: 'You can request an expert when booking. Your requested expert is subject to availability, and our team will confirm assignment after you submit your request.',
+    },
   {
     q: 'How does the service call fee work?',
     a: 'A technician reviews the issue in person and confirms the final price before work begins. The service call fee may be applied toward the repair cost if you move forward.',
@@ -106,7 +115,12 @@ const FAQ_ITEMS = [
     q: 'Do you offer emergency service?',
     a: 'Yes, emergency and same-day service is available for urgent issues, with a priority fee added to cover faster scheduling.',
   },
-];
+    {
+      q: 'What areas do you serve?',
+      a: 'We currently serve Maryland, Washington DC, Virginia, Pennsylvania, and West Virginia.',
+    },
+  ];
+}
 
 const TABS = [
   { id: 'about', label: 'About' },
@@ -194,8 +208,9 @@ export default function ExpertProfilePage() {
   }
 
   const zipValidation = validateZipCode(zip);
+  const isTeam = expert.slug === 'smart-appliances-team';
   const primaryCategory = expert.services.find((s) => s.serviceCategory)?.serviceCategory ?? null;
-  const breadcrumbCategory = primaryCategory ? CATEGORY_TO_SERVICE_PATH[primaryCategory] : null;
+  const breadcrumbCategory = !isTeam && primaryCategory ? CATEGORY_TO_SERVICE_PATH[primaryCategory] : null;
 
   const handleTabClick = (id: string) => {
     setActiveTab(id);
@@ -233,7 +248,7 @@ export default function ExpertProfilePage() {
           }}
         >
           {/* LEFT COLUMN */}
-          <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
             <Box sx={{ mb: { xs: 3, md: 4 } }}>
               <ExpertProfileHeader expert={expert} />
             </Box>
@@ -301,7 +316,7 @@ export default function ExpertProfilePage() {
               <Typography
                 sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '22px', color: colors.navy, mb: 1.5 }}
               >
-                About
+                {isTeam ? 'About Smart Appliances' : 'About'}
               </Typography>
               <Typography sx={{ fontFamily: fonts.body, fontSize: '14px', color: colors.darkText, lineHeight: 1.65, mb: 2.5 }}>
                 {expert.about}
@@ -315,13 +330,20 @@ export default function ExpertProfilePage() {
                   gap: 1.5,
                 }}
               >
-                {[
-                  { icon: WorkOutlineIcon, label: `${expert.jobsCompleted} jobs completed` },
+                {(isTeam ? [
+                  { icon: WorkOutlineIcon, label: `${expert.jobsCompleted} service requests supported` },
+                  { icon: TrackChangesIcon, label: 'Request ID tracking' },
+                  { icon: MarkEmailReadOutlinedIcon, label: 'Email confirmation' },
+                  { icon: VerifiedOutlinedIcon, label: 'Admin-reviewed requests' },
+                  { icon: PriceCheckOutlinedIcon, label: 'Starting estimates before booking' },
+                  { icon: FactCheckOutlinedIcon, label: 'Final pricing confirmed before work begins' },
+                ] : [
+                  { icon: WorkOutlineIcon, label: `${expert.jobsCompleted} ${expert.jobsLabel ?? 'jobs completed'}` },
                   ...(expert.responseTime ? [{ icon: AccessTimeIcon, label: expert.responseTime }] : []),
                   { icon: CategoryOutlinedIcon, label: `Categories: ${expert.specialties.slice(0, 3).join(', ')}` },
                   { icon: PlaceOutlinedIcon, label: `Serves: ${expert.serviceAreas.join(', ')}` },
                   { icon: TrackChangesIcon, label: 'Request tracking available on every booking' },
-                ].map(({ icon: Icon, label }) => (
+                ]).map(({ icon: Icon, label }) => (
                   <Box key={label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, p: 1.5, borderRadius: '12px', backgroundColor: '#fff', border: `1px solid ${colors.border}` }}>
                     <Icon sx={{ fontSize: 18, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} />
                     <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.darkText, lineHeight: 1.5 }}>
@@ -334,7 +356,63 @@ export default function ExpertProfilePage() {
 
             {/* SERVICES */}
             <Box ref={sectionRefs.services} sx={{ mb: { xs: 4, md: 5 }, scrollMarginTop: '96px' }}>
-              <ExpertServices services={expert.services} expertSlug={expert.slug} />
+              {isTeam ? (
+                <Box>
+                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '22px', color: colors.navy, mb: 0.5 }}>
+                    Services Offered
+                  </Typography>
+                  <Typography sx={{ fontFamily: fonts.body, fontSize: '14px', color: colors.mutedText, mb: 2.5 }}>
+                    Choose a category to get started, or book a specific service from the scheduler.
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+                      gap: 2,
+                    }}
+                  >
+                    {TEAM_SERVICE_CATEGORIES.map((cat) => (
+                      <Box
+                        key={cat.title}
+                        sx={{
+                          borderRadius: '18px',
+                          border: `1px solid ${colors.border}`,
+                          boxShadow: colors.cardShadow,
+                          p: 2.5,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          height: '100%',
+                          backgroundColor: '#fff',
+                        }}
+                      >
+                        <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '16px', color: colors.darkText, mb: 0.75 }}>
+                          {cat.title}
+                        </Typography>
+                        <Typography sx={{ fontFamily: fonts.body, fontSize: '12.5px', color: colors.mutedText, mb: 1.5, lineHeight: 1.5 }}>
+                          {cat.description}
+                        </Typography>
+                        <Typography sx={{ fontFamily: fonts.body, fontSize: '14px', color: colors.primaryBlue, fontWeight: 700, mb: 2 }}>
+                          {cat.priceLabel}
+                        </Typography>
+                        <Box sx={{ flexGrow: 1 }} />
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            const params = new URLSearchParams({ expert: expert.slug });
+                            if (cat.serviceCategory) params.set('serviceCategory', cat.serviceCategory);
+                            else params.set('serviceType', 'E');
+                            navigate(`/scheduler?${params.toString()}`);
+                          }}
+                        >
+                          Book
+                        </Button>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              ) : (
+                <ExpertServices services={expert.services} expertSlug={expert.slug} />
+              )}
             </Box>
 
             {/* GALLERY */}
@@ -352,7 +430,7 @@ export default function ExpertProfilePage() {
                 }}
               >
                 {expert.galleryCategories.map((cat) => {
-                  const Icon = GALLERY_ICONS[cat] ?? HouseWifi;
+                  const imageSrc = GALLERY_CATEGORY_IMAGES[cat];
                   return (
                     <Box
                       key={cat}
@@ -361,33 +439,23 @@ export default function ExpertProfilePage() {
                         border: `1px solid ${colors.border}`,
                         boxShadow: colors.cardShadow,
                         backgroundColor: '#fff',
-                        p: 2,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center',
-                        minHeight: 130,
+                        overflow: 'hidden',
                         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                         '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 20px 40px rgba(10,37,64,0.14)' },
                       }}
                     >
                       <Box
+                        component="img"
+                        src={imageSrc}
+                        alt={`${cat} provided by Smart Appliances`}
                         sx={{
-                          mb: 1.5,
-                          color: colors.primaryBlue,
-                          width: 48,
-                          height: 48,
-                          borderRadius: '50%',
-                          backgroundColor: colors.lightBlueBg,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          width: '100%',
+                          height: 130,
+                          objectFit: 'cover',
+                          display: 'block',
                         }}
-                      >
-                        <Icon size={24} strokeWidth={1.8} />
-                      </Box>
-                      <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, fontSize: '13px', color: colors.darkText }}>
+                      />
+                      <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, fontSize: '13px', color: colors.darkText, textAlign: 'center', py: 1.25 }}>
                         {cat}
                       </Typography>
                     </Box>
@@ -481,7 +549,7 @@ export default function ExpertProfilePage() {
                 Frequently Asked Questions
               </Typography>
 
-              {FAQ_ITEMS.map((item) => (
+              {getFaqItems(isTeam).map((item) => (
                 <Accordion
                   key={item.q}
                   sx={{ mb: 1, borderRadius: '12px !important', border: `1px solid ${colors.border}`, boxShadow: 'none', '&:before': { display: 'none' } }}
@@ -524,10 +592,10 @@ export default function ExpertProfilePage() {
           }}
         >
           <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '20px', md: '24px' }, mb: 1.5 }}>
-            Ready to book with this expert?
+            {isTeam ? 'Ready to book with Smart Appliances?' : 'Ready to book with this expert?'}
           </Typography>
           <Typography sx={{ fontFamily: fonts.body, fontSize: '14px', mb: 3, color: '#E2E8F0' }}>
-            Choose this expert, compare pricing, or track an existing request.
+            {isTeam ? 'Book the team, compare pricing, or track an existing request.' : 'Choose this expert, compare pricing, or track an existing request.'}
           </Typography>
 
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: { sm: 'center' }, gap: 1.5 }}>
@@ -537,7 +605,7 @@ export default function ExpertProfilePage() {
               sx={{ backgroundColor: '#fff', color: '#0B2D6B' }}
               onClick={() => navigate(`/scheduler?expert=${expert.slug}`)}
             >
-              Book This Expert
+              {isTeam ? 'Book This Team' : 'Book This Expert'}
             </Button>
             <Button
               variant="outlined"

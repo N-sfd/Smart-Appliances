@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { DbExpert, DbExpertService, DbExpertReview } from '../types/admin';
-import { Expert as LocalExpert } from '../data/experts';
+import { Expert as LocalExpert, getExpertBySlug, GALLERY_CATEGORIES } from '../data/experts';
 
 // ── Public reads (used by ExpertsPage / ExpertProfilePage with local fallback) ─
 
@@ -44,32 +44,42 @@ export async function fetchActiveExpertBySlug(slug: string): Promise<LocalExpert
   return mapToLocalExpert(expert as DbExpert, (services ?? []) as DbExpertService[], (reviews ?? []) as DbExpertReview[]);
 }
 
+// DB rows created via the admin UI may not have every field filled in yet (avatar,
+// gallery, sample services/reviews). Fall back to the matching built-in local expert
+// (by slug) for any field the DB leaves empty, so the public page never looks blank —
+// admin-entered content still always wins when present.
 function mapToLocalExpert(e: DbExpert, services: DbExpertService[], reviews: DbExpertReview[]): LocalExpert {
+  const local = getExpertBySlug(e.slug);
+
+  const mappedServices = services.map((s) => ({
+    name: s.service_name,
+    serviceCategory: (s.service_category as LocalExpert['services'][number]['serviceCategory']) ?? null,
+    isDiagnostic: s.quote_required,
+  }));
+
+  const mappedReviews = reviews.map((r) => ({
+    firstName: r.customer_first_name ?? '',
+    rating: r.rating ?? 5,
+    date: r.review_date ?? '',
+    serviceType: r.service_type ?? '',
+    text: r.review_text ?? '',
+  }));
+
   return {
     slug: e.slug,
     name: e.name,
-    title: e.title ?? '',
+    title: e.title || local?.title || '',
     rating: e.rating,
     reviewCount: e.review_count,
-    jobsCompleted: e.jobs_completed ?? '',
-    responseTime: e.response_time ?? undefined,
-    serviceAreas: e.service_areas ?? [],
-    specialties: e.specialties ?? [],
-    about: e.bio ?? '',
-    services: services.map((s) => ({
-      name: s.service_name,
-      serviceCategory: (s.service_category as LocalExpert['services'][number]['serviceCategory']) ?? null,
-      isDiagnostic: s.quote_required,
-    })),
-    reviews: reviews.map((r) => ({
-      firstName: r.customer_first_name ?? '',
-      rating: r.rating ?? 5,
-      date: r.review_date ?? '',
-      serviceType: r.service_type ?? '',
-      text: r.review_text ?? '',
-    })),
-    galleryCategories: [],
-    avatarUrl: e.avatar_url ?? undefined,
+    jobsCompleted: e.jobs_completed || local?.jobsCompleted || '',
+    responseTime: e.response_time ?? local?.responseTime,
+    serviceAreas: e.service_areas?.length ? e.service_areas : local?.serviceAreas ?? [],
+    specialties: e.specialties?.length ? e.specialties : local?.specialties ?? [],
+    about: e.bio || local?.about || '',
+    services: mappedServices.length > 0 ? mappedServices : local?.services ?? [],
+    reviews: mappedReviews.length > 0 ? mappedReviews : local?.reviews ?? [],
+    galleryCategories: local?.galleryCategories ?? GALLERY_CATEGORIES,
+    avatarUrl: e.avatar_url || local?.avatarUrl,
   };
 }
 

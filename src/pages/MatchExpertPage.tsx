@@ -32,10 +32,12 @@ import {
   MATCH_EXPERT_SOURCE_TAG,
   getExpertMatch,
   getExpertSlugForMatch,
+  getExpertTypeDisplayName,
   type ExpertCategoryId,
   type EstimatorUrgency,
   type ExpertMatch,
 } from '../data/expertMatchRules';
+import { getServiceDisplayName } from '../utils/serviceDisplayNames';
 import { SERVICE_AREA_STATES, validateFullName, validateEmailAddress, validateUsPhone } from '../lib/schedulerContactValidation';
 import {
   normalizeZipInput,
@@ -335,7 +337,7 @@ const MatchExpertPage: React.FC = () => {
               <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
                 <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText }}>Recommended Expert</Typography>
                 <Box sx={{ textAlign: 'right' }}>
-                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.9rem', color: colors.navy }}>{match.expertType}</Typography>
+                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.9rem', color: colors.navy }}>{getExpertTypeDisplayName(match.expertType)}</Typography>
                   {expertSlug && (
                     <Typography
                       component={RouterLink}
@@ -353,7 +355,7 @@ const MatchExpertPage: React.FC = () => {
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
                 <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText }}>Recommended Service</Typography>
-                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.9rem', color: colors.navy, textAlign: 'right' }}>{match.productName}</Typography>
+                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.9rem', color: colors.navy, textAlign: 'right' }}>{getServiceDisplayName(match.productName)}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
                 <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText }}>Urgency</Typography>

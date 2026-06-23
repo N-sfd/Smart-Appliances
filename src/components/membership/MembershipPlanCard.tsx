@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button, Chip } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import StarIcon from '@mui/icons-material/Star';
 import { colors, fonts } from '../../theme';
 import type { MembershipPlan } from '../../data/membershipPlans';
 import { formatMembershipPrice } from '../../data/membershipPlans';
@@ -23,31 +24,35 @@ const MembershipPlanCard: React.FC<MembershipPlanCardProps> = ({ plan, onChoose 
       borderRadius: '22px',
       border: plan.highlighted ? `2px solid ${colors.primaryBlue}` : `1px solid ${colors.border}`,
       boxShadow: plan.highlighted
-        ? '0 18px 40px rgba(26, 115, 232, 0.14)'
+        ? '0 20px 44px rgba(26, 115, 232, 0.18)'
         : '0 2px 12px rgba(10, 37, 64, 0.06)',
       p: { xs: 2.5, md: 3 },
+      pt: plan.highlighted ? { xs: 3.5, md: 4 } : { xs: 2.5, md: 3 },
       transition: 'transform 0.2s ease, box-shadow 0.2s ease',
       '&:hover': {
         transform: 'translateY(-3px)',
         boxShadow: plan.highlighted
-          ? '0 22px 48px rgba(26, 115, 232, 0.18)'
+          ? '0 24px 52px rgba(26, 115, 232, 0.22)'
           : '0 12px 32px rgba(10, 37, 64, 0.1)',
       },
     }}
   >
     {plan.highlighted && (
       <Chip
+        icon={<StarIcon sx={{ fontSize: '14px !important', color: '#fff !important' }} />}
         label="Most Popular"
         size="small"
         sx={{
           position: 'absolute',
-          top: 16,
-          right: 16,
+          top: -14,
+          left: '50%',
+          transform: 'translateX(-50%)',
           backgroundColor: colors.primaryBlue,
           color: colors.white,
           fontFamily: fonts.body,
           fontWeight: 700,
           fontSize: '0.72rem',
+          boxShadow: '0 6px 16px rgba(26, 115, 232, 0.35)',
         }}
       />
     )}
@@ -60,14 +65,17 @@ const MembershipPlanCard: React.FC<MembershipPlanCardProps> = ({ plan, onChoose 
         fontSize: '1.2rem',
         color: colors.navy,
         mb: 0.75,
-        pr: plan.highlighted ? 6 : 0,
       }}
     >
       {plan.name}
     </Typography>
 
-    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', color: colors.mutedText, mb: 2, lineHeight: 1.55 }}>
+    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', color: colors.mutedText, mb: 0.5, lineHeight: 1.55 }}>
       {plan.description}
+    </Typography>
+
+    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.8rem', fontWeight: 700, color: colors.primaryBlue, mb: 2 }}>
+      {plan.bestFor}
     </Typography>
 
     <Box sx={{ mb: 2 }}>
@@ -77,8 +85,11 @@ const MembershipPlanCard: React.FC<MembershipPlanCardProps> = ({ plan, onChoose 
           /month
         </Box>
       </Typography>
-      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText, mt: 0.5 }}>
-        or {formatMembershipPrice(plan.yearlyPrice)}/year
+      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, mt: 0.5 }}>
+        Billed monthly
+      </Typography>
+      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText, mt: 0.25 }}>
+        or {formatMembershipPrice(plan.yearlyPrice)}/year — annual option available
       </Typography>
     </Box>
 

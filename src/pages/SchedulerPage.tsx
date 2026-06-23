@@ -59,6 +59,7 @@ import ServicePricingSummary from '../components/booking/ServicePricingSummary';
 import { calculateServiceEstimate } from '../utils/pricing';
 import { getExpertBySlug } from '../data/experts';
 import { getMembershipPlanById } from '../data/membershipPlans';
+import { getServiceDisplayName } from '../utils/serviceDisplayNames';
 import {
   addLocalDays,
   formatLocalDateIso,
@@ -608,6 +609,9 @@ const SchedulerPage: React.FC = () => {
     return 'Home Service';
   }, [category, serviceType, appliance, hvacService, plumbingIssue, electricalIssue, smartDevice, smartHelp, garageDoorService]);
 
+  // Customer-facing label for serviceTitle — internal value above stays raw for save/email matching.
+  const displayServiceTitle = useMemo(() => getServiceDisplayName(serviceTitle), [serviceTitle]);
+
   const serviceSubtitle = useMemo(() => {
     const parts: string[] = [];
     const typeLabel = SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? 'Service';
@@ -905,7 +909,7 @@ const SchedulerPage: React.FC = () => {
           requestNumber: reqNum,
           customerName: name,
           email,
-          service: serviceTitle,
+          service: displayServiceTitle,
           preferredDate: resolvedPreferredDate ?? '',
           preferredTime: slotLabels.join('; ') || '',
         }),
@@ -926,7 +930,7 @@ const SchedulerPage: React.FC = () => {
         state: {
           requestNumber: reqNum,
           customerName: name,
-          service: serviceTitle,
+          service: displayServiceTitle,
           category,
           preferredDate: resolvedPreferredDate ?? '',
           preferredTime: slotLabels.join('; ') || '',
@@ -1119,7 +1123,7 @@ const SchedulerPage: React.FC = () => {
               mb: serviceSubtitle ? 0.4 : 0,
             }}
           >
-            {serviceTitle}
+            {displayServiceTitle}
           </Typography>
           {serviceSubtitle && (
             <Typography
@@ -1470,7 +1474,7 @@ const SchedulerPage: React.FC = () => {
                             fontSize: '1.05rem',
                           }}
                         >
-                          {isPrefilled && prefill.productName ? prefill.productName : category}
+                          {isPrefilled && prefill.productName ? getServiceDisplayName(prefill.productName) : category}
                         </Typography>
                         {isPrefilled && prefill.productName && (
                           <Typography sx={{ fontFamily: fonts.body, fontSize: '0.8rem', color: colors.mutedText, mt: 0.25 }}>
@@ -2393,7 +2397,7 @@ const SchedulerPage: React.FC = () => {
                         SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? '',
                       ],
                       ['Category', category || '—'],
-                      ['Service', serviceTitle],
+                      ['Service', displayServiceTitle],
                       ...(requestedExpert ? [['Selected Expert', requestedExpert.name]] : []),
                       ...(requestedPlan ? [['Selected Membership Plan', requestedPlan.name]] : []),
                       ...(brand ? [['Brand', brand]] : []),
@@ -2491,7 +2495,7 @@ const SchedulerPage: React.FC = () => {
                             {reviewEstimate.quoteRequired ? 'Estimate' : 'Estimated Total'}
                           </Typography>
                           <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1rem', color: colors.primaryBlue }}>
-                            {reviewEstimate.quoteRequired ? 'Quote required' : `$${(reviewEstimate.estimatedTotal ?? 0).toFixed(2)}`}
+                            {reviewEstimate.quoteRequired ? 'Estimate required' : `$${(reviewEstimate.estimatedTotal ?? 0).toFixed(2)}`}
                           </Typography>
                         </Box>
                       </Box>

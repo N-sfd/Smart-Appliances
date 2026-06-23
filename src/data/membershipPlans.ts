@@ -4,6 +4,7 @@ export interface MembershipPlan {
   monthlyPrice: number;
   yearlyPrice: number;
   description: string;
+  bestFor: string;
   benefits: string[];
   highlighted?: boolean;
   ctaLabel: string;
@@ -20,15 +21,16 @@ export interface MembershipComparisonFeature {
 }
 
 export const MEMBERSHIP_DISCLAIMER =
-  'Smart Care Membership is a service membership plan that provides priority scheduling, reminders, and discounts. It is not an insurance policy or full home warranty. Final pricing and availability depend on diagnosis, parts, labor, and service area.';
+  'Smart Care Membership provides discounts, reminders, and priority service benefits. It is not insurance or a full home warranty. Final pricing depends on diagnosis, parts, labor, and service availability.';
 
 export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
-    id: 'smart-care-basic',
+    id: 'basic',
     name: 'Smart Care Basic',
     monthlyPrice: 14.99,
     yearlyPrice: 149,
     description: 'Best for homeowners who want priority support and savings.',
+    bestFor: 'Best for occasional appliance support.',
     benefits: [
       'Priority scheduling when available',
       '10% off repair labor',
@@ -41,11 +43,12 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     ctaLabel: 'Choose Basic',
   },
   {
-    id: 'smart-care-plus',
+    id: 'plus',
     name: 'Smart Care Plus',
     monthlyPrice: 24.99,
     yearlyPrice: 249,
     description: 'Best for appliance and HVAC service savings.',
+    bestFor: 'Best for appliance and HVAC savings.',
     highlighted: true,
     benefits: [
       'Everything in Basic',
@@ -59,12 +62,13 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     ctaLabel: 'Choose Plus',
   },
   {
-    id: 'whole-home-care',
+    id: 'whole-home',
     name: 'Whole Home Care',
     monthlyPrice: 49.99,
     yearlyPrice: 499,
     description:
       'Best for appliance, HVAC, plumbing, electrical, smart home, and garage door support.',
+    bestFor: 'Best for whole-home service support.',
     benefits: [
       'Everything in Plus',
       '20% off repair labor',
@@ -102,6 +106,20 @@ export const MEMBERSHIP_COMPARISON_FEATURES: MembershipComparisonFeature[] = [
   { id: 'follow-up', label: 'Dedicated support follow-up', basic: false, plus: false, wholeHome: true },
 ];
 
+export const HERO_BENEFITS = [
+  'Save up to 20% on eligible repair labor',
+  'Priority scheduling when available',
+  'Seasonal maintenance reminders',
+  'Easy online request tracking',
+];
+
+export const WHY_SMART_CARE = [
+  { title: 'Save on eligible repairs', description: 'Members receive labor discounts on covered repair visits.' },
+  { title: 'Get priority scheduling', description: 'Earlier appointment options when technician capacity allows.' },
+  { title: 'Stay ahead with reminders', description: 'Seasonal maintenance prompts help you avoid bigger repairs.' },
+  { title: 'Track every request online', description: 'Every booking gets a request ID you can track anytime.' },
+];
+
 export const MEMBERSHIP_INCLUDED = [
   { title: 'Appliance support', description: 'Member savings and reminders for major home appliances.' },
   { title: 'HVAC support', description: 'Seasonal tune-up reminders and priority booking when available.' },
@@ -113,15 +131,38 @@ export const MEMBERSHIP_INCLUDED = [
   { title: 'Priority scheduling', description: 'Earlier appointment options when technician capacity allows.' },
 ];
 
+export const COVERAGE_NOTE_INTRO =
+  'Smart Care is a service membership plan, not insurance or a full home warranty.';
+
 export const MEMBERSHIP_EXCLUSIONS = [
   'Parts are not automatically included',
   'Replacement appliances are not included',
-  'Pre-existing major failures may not be covered',
+  'Emergency availability is not guaranteed',
   'Final pricing depends on technician diagnosis',
   'Service availability depends on ZIP/service area',
-  'Emergency availability is not guaranteed',
-  'This is not insurance or a full home warranty',
 ];
+
+export const ONE_TIME_VS_MEMBERSHIP = {
+  oneTime: {
+    title: 'One-Time Service',
+    items: [
+      'Pay per request',
+      'Standard scheduling',
+      'Standard diagnostic / service fee',
+      'No membership discount',
+    ],
+  },
+  membership: {
+    title: 'Smart Care',
+    items: [
+      'Priority scheduling when available',
+      'Repair labor discounts',
+      'Seasonal reminders',
+      'Member-only offers',
+      'Request tracking',
+    ],
+  },
+};
 
 export const MEMBERSHIP_FAQS = [
   {

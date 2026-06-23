@@ -15,6 +15,15 @@ import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import KitchenOutlinedIcon from '@mui/icons-material/KitchenOutlined';
+import AcUnitOutlinedIcon from '@mui/icons-material/AcUnitOutlined';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import ElectricBoltOutlinedIcon from '@mui/icons-material/ElectricBoltOutlined';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import GarageOutlinedIcon from '@mui/icons-material/GarageOutlined';
 import { colors, fonts, primaryButtonSx, secondaryButtonSx } from '../theme';
 import {
   MEMBERSHIP_PLANS,
@@ -23,6 +32,10 @@ import {
   MEMBERSHIP_EXCLUSIONS,
   MEMBERSHIP_FAQS,
   HOW_IT_WORKS_STEPS,
+  HERO_BENEFITS,
+  WHY_SMART_CARE,
+  COVERAGE_NOTE_INTRO,
+  ONE_TIME_VS_MEMBERSHIP,
 } from '../data/membershipPlans';
 import MembershipPlanCard from '../components/membership/MembershipPlanCard';
 import MembershipComparisonTable from '../components/membership/MembershipComparisonTable';
@@ -43,6 +56,24 @@ const HOW_IT_WORKS_ICONS = [
   SavingsOutlinedIcon,
 ];
 
+const WHY_SMART_CARE_ICONS = [
+  SavingsOutlinedIcon,
+  BoltOutlinedIcon,
+  EventRepeatOutlinedIcon,
+  TrackChangesIcon,
+];
+
+const WHATS_INCLUDED_ICONS = [
+  KitchenOutlinedIcon,
+  AcUnitOutlinedIcon,
+  WaterDropOutlinedIcon,
+  ElectricBoltOutlinedIcon,
+  HomeOutlinedIcon,
+  GarageOutlinedIcon,
+  EventRepeatOutlinedIcon,
+  BoltOutlinedIcon,
+];
+
 const sectionTitleSx = {
   fontFamily: fonts.heading,
   fontWeight: 800,
@@ -51,6 +82,9 @@ const sectionTitleSx = {
   mb: 1,
   letterSpacing: '-0.3px',
 };
+
+// 48px mobile / 72px desktop — consistent rhythm across all standard sections.
+const sectionPy = { xs: 6, md: 9 };
 
 const MembershipPage: React.FC = () => {
   const navigate = useNavigate();
@@ -70,82 +104,176 @@ const MembershipPage: React.FC = () => {
       <Box
         sx={{
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          py: { xs: 5, md: 6.5 },
+          py: { xs: 5, md: 6 },
           px: 2,
-          textAlign: 'center',
         }}
       >
-        <Container maxWidth="md">
-          <ShieldOutlinedIcon sx={{ fontSize: 44, color: colors.skyBlue, mb: 1.5 }} />
-          <Typography
-            component="h1"
+        <Container maxWidth="lg">
+          <Box
             sx={{
-              fontFamily: fonts.heading,
-              fontWeight: 800,
-              fontSize: { xs: '1.85rem', md: '2.5rem' },
-              color: colors.white,
-              lineHeight: 1.15,
-              mb: 1.5,
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'center',
+              gap: { xs: 4, md: 6 },
             }}
           >
-            Protect Your Home with Smart Care
-          </Typography>
-          <Typography
-            sx={{
-              fontFamily: fonts.body,
-              fontSize: { xs: '0.95rem', md: '1.05rem' },
-              color: 'rgba(255,255,255,0.78)',
-              lineHeight: 1.7,
-              maxWidth: 640,
-              mx: 'auto',
-              mb: 3,
-            }}
-          >
-            Get priority scheduling, repair savings, seasonal maintenance reminders, and member-only
-            service benefits for your home appliances and systems.
-          </Typography>
-
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center', mb: 3 }}>
-            {TRUST_BADGES.map(({ label, icon: Icon }) => (
-              <Chip
-                key={label}
-                icon={<Icon sx={{ fontSize: 16, color: '#fff !important' }} />}
-                label={label}
-                sx={{
-                  backgroundColor: 'rgba(255,255,255,0.12)',
-                  color: '#fff',
-                  fontFamily: fonts.body,
-                  fontWeight: 600,
-                  fontSize: '12.5px',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                }}
+            {/* Left — copy */}
+            <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
+              <ShieldOutlinedIcon
+                sx={{ fontSize: 36, color: colors.skyBlue, mb: 1.5, display: { xs: 'inline-block', md: 'block' } }}
               />
-            ))}
-          </Box>
+              <Typography
+                component="h1"
+                sx={{
+                  fontFamily: fonts.heading,
+                  fontWeight: 800,
+                  fontSize: { xs: '1.8rem', md: '2.4rem' },
+                  color: colors.white,
+                  lineHeight: 1.15,
+                  mb: 1.5,
+                }}
+              >
+                Protect Your Home with Smart Care
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: fonts.body,
+                  fontSize: { xs: '0.95rem', md: '1.05rem' },
+                  color: 'rgba(255,255,255,0.78)',
+                  lineHeight: 1.7,
+                  maxWidth: 520,
+                  mx: { xs: 'auto', md: 0 },
+                  mb: 2.5,
+                }}
+              >
+                Priority scheduling, repair savings, seasonal reminders, and member-only service
+                benefits for your appliances and home systems.
+              </Typography>
 
-          <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'center', flexWrap: 'wrap', mb: 2 }}>
-            <Button variant="contained" onClick={scrollToPlans} sx={{ ...primaryButtonSx, px: 3.5, py: 1.25 }}>
-              Join Smart Care
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/scheduler')}
-              sx={{
-                ...secondaryButtonSx,
-                background: 'transparent',
-                borderColor: 'rgba(255,255,255,0.5)',
-                color: colors.white,
-                px: 3.5,
-                py: 1.25,
-                '&:hover': { background: 'rgba(255,255,255,0.08)', borderColor: colors.white },
-              }}
-            >
-              Book a Service
-            </Button>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: { xs: 'center', md: 'flex-start' }, mb: 3 }}>
+                {TRUST_BADGES.map(({ label, icon: Icon }) => (
+                  <Chip
+                    key={label}
+                    icon={<Icon sx={{ fontSize: 16, color: '#fff !important' }} />}
+                    label={label}
+                    sx={{
+                      backgroundColor: 'rgba(255,255,255,0.12)',
+                      color: '#fff',
+                      fontFamily: fonts.body,
+                      fontWeight: 600,
+                      fontSize: '12.5px',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                    }}
+                  />
+                ))}
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 1.5, justifyContent: { xs: 'center', md: 'flex-start' }, flexWrap: 'wrap' }}>
+                <Button variant="contained" onClick={scrollToPlans} sx={{ ...primaryButtonSx, px: 3.5, py: 1.25 }}>
+                  Join Smart Care
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/scheduler')}
+                  sx={{
+                    ...secondaryButtonSx,
+                    background: 'transparent',
+                    borderColor: 'rgba(255,255,255,0.5)',
+                    color: colors.white,
+                    px: 3.5,
+                    py: 1.25,
+                    '&:hover': { background: 'rgba(255,255,255,0.08)', borderColor: colors.white },
+                  }}
+                >
+                  Book a Service
+                </Button>
+              </Box>
+            </Box>
+
+            {/* Right — benefits card */}
+            <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 420, md: 'none' } }}>
+              <Box
+                sx={{
+                  backgroundColor: '#fff',
+                  borderRadius: '20px',
+                  p: { xs: 3, md: 3.5 },
+                  boxShadow: '0 24px 56px rgba(0,0,0,0.28)',
+                }}
+              >
+                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.1rem', color: colors.navy, mb: 2 }}>
+                  Smart Care Benefits
+                </Typography>
+                <Box sx={{ display: 'grid', gap: 1.5 }}>
+                  {HERO_BENEFITS.map((benefit) => (
+                    <Box key={benefit} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <CheckCircleOutlineIcon sx={{ fontSize: 19, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} />
+                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.darkText, lineHeight: 1.5 }}>
+                        {benefit}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </Box>
           </Box>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.8rem', fontWeight: 600, color: colors.skyBlue }}>
-            Priority service • Member savings • Easy request tracking
+        </Container>
+      </Box>
+
+      {/* Why Smart Care */}
+      <Box sx={{ py: sectionPy }}>
+        <Container maxWidth="lg">
+          <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 4 }}>
+            Why Smart Care?
           </Typography>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+              gap: 2.5,
+              alignItems: 'stretch',
+            }}
+          >
+            {WHY_SMART_CARE.map((item, index) => {
+              const Icon = WHY_SMART_CARE_ICONS[index] ?? ShieldOutlinedIcon;
+              return (
+                <Box
+                  key={item.title}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: '16px',
+                    backgroundColor: colors.surface,
+                    border: `1px solid ${colors.border}`,
+                    boxShadow: '0 4px 16px rgba(10, 37, 64, 0.05)',
+                    height: '100%',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 10px 28px rgba(10, 37, 64, 0.1)' },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: '50%',
+                      backgroundColor: colors.lightBlueBg,
+                      color: colors.primaryBlue,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 1.5,
+                    }}
+                  >
+                    <Icon sx={{ fontSize: 22 }} />
+                  </Box>
+                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.98rem', color: colors.navy, mb: 0.5 }}>
+                    {item.title}
+                  </Typography>
+                  <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText, lineHeight: 1.55 }}>
+                    {item.description}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
         </Container>
       </Box>
 
@@ -154,8 +282,9 @@ const MembershipPage: React.FC = () => {
         ref={plansRef}
         id="plans"
         sx={{
-          pt: { xs: 7, md: 9 },
-          pb: { xs: 6, md: 8 },
+          pt: sectionPy,
+          pb: sectionPy,
+          backgroundColor: colors.sectionBg,
           scrollMarginTop: { xs: '128px', md: '152px' },
         }}
       >
@@ -168,7 +297,7 @@ const MembershipPage: React.FC = () => {
               fontFamily: fonts.body,
               color: colors.mutedText,
               textAlign: 'center',
-              mb: 4,
+              mb: 5,
               maxWidth: 560,
               mx: 'auto',
               lineHeight: 1.65,
@@ -181,7 +310,7 @@ const MembershipPage: React.FC = () => {
             sx={{
               display: 'grid',
               gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
-              gap: { xs: 2.5, md: 3 },
+              gap: { xs: 3, md: 3 },
               alignItems: 'stretch',
             }}
           >
@@ -208,7 +337,7 @@ const MembershipPage: React.FC = () => {
       </Box>
 
       {/* Comparison */}
-      <Box sx={{ py: { xs: 5, md: 7 }, backgroundColor: colors.surface }}>
+      <Box sx={{ py: sectionPy, backgroundColor: colors.surface }}>
         <Container maxWidth="lg">
           <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 3 }}>
             Compare Plans
@@ -218,7 +347,7 @@ const MembershipPage: React.FC = () => {
       </Box>
 
       {/* How it works */}
-      <Box sx={{ py: { xs: 5, md: 7 } }}>
+      <Box sx={{ py: sectionPy }}>
         <Container maxWidth="md">
           <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 4 }}>
             How It Works
@@ -297,7 +426,7 @@ const MembershipPage: React.FC = () => {
       </Box>
 
       {/* What's included */}
-      <Box sx={{ py: { xs: 5, md: 7 }, backgroundColor: colors.sectionBg }}>
+      <Box sx={{ py: sectionPy, backgroundColor: colors.sectionBg }}>
         <Container maxWidth="lg">
           <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 4 }}>
             What&apos;s Included
@@ -310,74 +439,165 @@ const MembershipPage: React.FC = () => {
               alignItems: 'stretch',
             }}
           >
-            {MEMBERSHIP_INCLUDED.map((item) => (
-              <Box
-                key={item.title}
-                sx={{
-                  p: 2,
-                  borderRadius: '14px',
-                  backgroundColor: colors.surface,
-                  border: `1px solid ${colors.border}`,
-                  boxShadow: '0 2px 8px rgba(10, 37, 64, 0.04)',
-                  height: '100%',
-                }}
-              >
-                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: colors.navy, mb: 0.75 }}>
-                  {item.title}
-                </Typography>
-                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.84rem', color: colors.mutedText, lineHeight: 1.55 }}>
-                  {item.description}
-                </Typography>
-              </Box>
-            ))}
+            {MEMBERSHIP_INCLUDED.map((item, index) => {
+              const Icon = WHATS_INCLUDED_ICONS[index] ?? ShieldOutlinedIcon;
+              return (
+                <Box
+                  key={item.title}
+                  sx={{
+                    p: 2.25,
+                    borderRadius: '14px',
+                    backgroundColor: colors.surface,
+                    border: `1px solid ${colors.border}`,
+                    boxShadow: '0 2px 8px rgba(10, 37, 64, 0.04)',
+                    height: '100%',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 8px 20px rgba(10, 37, 64, 0.08)' },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: '10px',
+                      backgroundColor: colors.lightBlueBg,
+                      color: colors.primaryBlue,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 1.25,
+                    }}
+                  >
+                    <Icon sx={{ fontSize: 19 }} />
+                  </Box>
+                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: colors.navy, mb: 0.75 }}>
+                    {item.title}
+                  </Typography>
+                  <Typography sx={{ fontFamily: fonts.body, fontSize: '0.84rem', color: colors.mutedText, lineHeight: 1.55 }}>
+                    {item.description}
+                  </Typography>
+                </Box>
+              );
+            })}
           </Box>
         </Container>
       </Box>
 
-      {/* Exclusions */}
-      <Box sx={{ py: { xs: 5, md: 7 } }}>
+      {/* Membership vs one-time service */}
+      <Box sx={{ py: sectionPy }}>
         <Container maxWidth="md">
-          <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 3 }}>
-            What&apos;s Not Included
+          <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 4 }}>
+            Membership vs. One-Time Service
           </Typography>
           <Box
-            component="ul"
             sx={{
-              m: 0,
-              p: 2,
-              borderRadius: '14px',
-              backgroundColor: '#FFFBEB',
-              border: '1px solid #FDE68A',
-              listStyle: 'none',
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+              gap: 2.5,
+              alignItems: 'stretch',
             }}
           >
-            {MEMBERSHIP_EXCLUSIONS.map((item) => (
-              <Box
-                component="li"
-                key={item}
-                sx={{
-                  fontFamily: fonts.body,
-                  fontSize: '0.88rem',
-                  color: colors.darkText,
-                  lineHeight: 1.6,
-                  mb: 0.6,
-                  pl: 2,
-                  position: 'relative',
-                  '&::before': { content: '"•"', position: 'absolute', left: 0, color: '#B45309' },
-                  '&:last-of-type': { mb: 0 },
-                }}
-              >
-                {item}
+            <Box
+              sx={{
+                p: 3,
+                borderRadius: '18px',
+                backgroundColor: colors.surface,
+                border: `1px solid ${colors.border}`,
+                height: '100%',
+              }}
+            >
+              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.05rem', color: colors.mutedText, mb: 2 }}>
+                {ONE_TIME_VS_MEMBERSHIP.oneTime.title}
+              </Typography>
+              <Box sx={{ display: 'grid', gap: 1.25 }}>
+                {ONE_TIME_VS_MEMBERSHIP.oneTime.items.map((item) => (
+                  <Box key={item} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                    <RemoveCircleOutlineIcon sx={{ fontSize: 18, color: colors.mutedText, mt: '1px', flexShrink: 0 }} />
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: colors.darkText }}>
+                      {item}
+                    </Typography>
+                  </Box>
+                ))}
               </Box>
-            ))}
+            </Box>
+
+            <Box
+              sx={{
+                p: 3,
+                borderRadius: '18px',
+                backgroundColor: colors.surface,
+                border: `2px solid ${colors.primaryBlue}`,
+                boxShadow: '0 16px 36px rgba(26, 115, 232, 0.12)',
+                height: '100%',
+              }}
+            >
+              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.05rem', color: colors.navy, mb: 2 }}>
+                {ONE_TIME_VS_MEMBERSHIP.membership.title}
+              </Typography>
+              <Box sx={{ display: 'grid', gap: 1.25 }}>
+                {ONE_TIME_VS_MEMBERSHIP.membership.items.map((item) => (
+                  <Box key={item} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                    <CheckCircleOutlineIcon sx={{ fontSize: 18, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} />
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: colors.darkText, fontWeight: 600 }}>
+                      {item}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* Coverage notes */}
+      <Box sx={{ py: sectionPy, backgroundColor: colors.sectionBg }}>
+        <Container maxWidth="md">
+          <Box
+            sx={{
+              p: { xs: 2.5, md: 3 },
+              borderRadius: '16px',
+              backgroundColor: '#FFFBEB',
+              border: '1px solid #FDE68A',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <ReportProblemOutlinedIcon sx={{ fontSize: 22, color: '#B45309' }} />
+              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.05rem', color: colors.navy }}>
+                Important Coverage Notes
+              </Typography>
+            </Box>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: colors.darkText, lineHeight: 1.6, mb: 1.5 }}>
+              {COVERAGE_NOTE_INTRO}
+            </Typography>
+            <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none' }}>
+              {MEMBERSHIP_EXCLUSIONS.map((item) => (
+                <Box
+                  component="li"
+                  key={item}
+                  sx={{
+                    fontFamily: fonts.body,
+                    fontSize: '0.88rem',
+                    color: colors.darkText,
+                    lineHeight: 1.6,
+                    mb: 0.6,
+                    pl: 2,
+                    position: 'relative',
+                    '&::before': { content: '"•"', position: 'absolute', left: 0, color: '#B45309' },
+                    '&:last-of-type': { mb: 0 },
+                  }}
+                >
+                  {item}
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Container>
       </Box>
 
       {/* FAQ */}
-      <Box sx={{ py: { xs: 4.5, md: 6 }, backgroundColor: colors.surface }}>
+      <Box sx={{ py: sectionPy, backgroundColor: colors.surface }}>
         <Container maxWidth="md">
-          <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 2.5 }}>
+          <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 3 }}>
             Frequently Asked Questions
           </Typography>
           <MembershipFaq faqs={MEMBERSHIP_FAQS} />
@@ -387,7 +607,7 @@ const MembershipPage: React.FC = () => {
       {/* Bottom CTA */}
       <Box
         sx={{
-          py: { xs: 5, md: 6.5 },
+          py: { xs: 5, md: 7 },
           textAlign: 'center',
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 100%)',
           px: 2,
@@ -401,10 +621,23 @@ const MembershipPage: React.FC = () => {
               fontWeight: 800,
               fontSize: { xs: '1.5rem', md: '1.85rem' },
               color: colors.white,
-              mb: 2.5,
+              mb: 1.5,
             }}
           >
-            Ready to protect your home?
+            Ready to save on future home services?
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: fonts.body,
+              fontSize: '0.95rem',
+              color: 'rgba(255,255,255,0.78)',
+              lineHeight: 1.65,
+              maxWidth: 480,
+              mx: 'auto',
+              mb: 3,
+            }}
+          >
+            Join Smart Care today and get priority scheduling, member savings, and easy service tracking.
           </Typography>
           <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Button variant="contained" onClick={scrollToPlans} sx={{ ...primaryButtonSx, px: 3.5 }}>

@@ -20,10 +20,13 @@ const MembershipFaq: React.FC<MembershipFaqProps> = ({ faqs }) => (
         disableGutters
         elevation={0}
         sx={{
-          mb: 1,
-          borderRadius: '12px !important',
+          mb: 1.5,
+          borderRadius: '14px !important',
           border: `1px solid ${colors.border}`,
+          transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
           '&:before': { display: 'none' },
+          '&:hover': { borderColor: colors.primaryBlue },
+          '&.Mui-expanded': { boxShadow: '0 4px 16px rgba(10, 37, 64, 0.06)' },
         }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>

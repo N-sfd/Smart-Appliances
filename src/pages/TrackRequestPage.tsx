@@ -16,6 +16,7 @@ import {
   ADMIN_STATUS_STEPS,
 } from '../lib/supabaseBookings';
 import { fetchExpertById } from '../services/adminExperts';
+import { getServiceDisplayName } from '../utils/serviceDisplayNames';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -107,7 +108,7 @@ const StatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatus }) 
 const BookingCard: React.FC<{ b: BookingRow }> = ({ b }) => {
   const displayStatus = b.admin_status ?? b.status ?? 'New';
   const estimateLabel = b.quote_required
-    ? 'Quote required'
+    ? 'Estimate required'
     : b.estimated_total != null
       ? `$${b.estimated_total.toFixed(2)}`
       : null;
@@ -147,7 +148,7 @@ const BookingCard: React.FC<{ b: BookingRow }> = ({ b }) => {
         {[
           ['Service', b.service_type || '—'],
           ['Category', b.service_category || '—'],
-          ...(b.product_name ? [['Product / Service', b.product_name]] : []),
+          ...(b.product_name ? [['Product / Service', getServiceDisplayName(b.product_name)]] : []),
           ...(b.preferred_date ? [['Preferred Date', fmtDate(b.preferred_date)]] : []),
           ...(b.preferred_time ? [['Preferred Time', b.preferred_time]] : []),
           ...(assignedExpertName ? [['Assigned Expert', assignedExpertName]] : b.expert_name ? [['Requested Expert', b.expert_name]] : []),

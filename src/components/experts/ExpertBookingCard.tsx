@@ -5,6 +5,7 @@ import {
 import PhoneIcon from '@mui/icons-material/Phone';
 import { colors, fonts } from '../../theme';
 import { Expert } from '../../data/experts';
+import { SchedulerServiceCategory } from '../../data/schedulerPrefill';
 import { getStartingFeeLabel } from '../../utils/pricing';
 import { normalizeZipInput } from '../../data/serviceAreas';
 import { useNavigate } from 'react-router-dom';
@@ -22,8 +23,14 @@ export default function ExpertBookingCard({ expert }: Props) {
   const [serviceName, setServiceName] = useState(expert.services[0]?.name ?? '');
   const [urgency, setUrgency] = useState('Regular');
 
+  const isTeam = expert.slug === 'smart-appliances-team';
   const startingText = getStartingFeeLabel(expert.services);
   const selectedService = expert.services.find((s) => s.name === serviceName) ?? expert.services[0];
+
+  const serviceCategories = Array.from(
+    new Set(expert.services.map((s) => s.serviceCategory).filter((c): c is SchedulerServiceCategory => Boolean(c))),
+  );
+  const [serviceCategory, setServiceCategory] = useState(serviceCategories[0] ?? '');
 
   const buildSchedulerUrl = (extra?: Record<string, string>) => {
     const params = new URLSearchParams({ expert: expert.slug });
@@ -37,8 +44,15 @@ export default function ExpertBookingCard({ expert }: Props) {
   const handleRequestEstimate = () => navigate(buildSchedulerUrl());
 
   const handleBookExpert = () => navigate(buildSchedulerUrl(
-    selectedService?.serviceCategory ? { serviceCategory: selectedService.serviceCategory } : undefined,
+    isTeam
+      ? (serviceCategory ? { serviceCategory } : undefined)
+      : (selectedService?.serviceCategory ? { serviceCategory: selectedService.serviceCategory } : undefined),
   ));
+
+  const handleSecondaryAction = () => {
+    if (isTeam) navigate('/contact');
+    else handleRequestEstimate();
+  };
 
   return (
     <Box
@@ -56,17 +70,28 @@ export default function ExpertBookingCard({ expert }: Props) {
           p: 2.75,
         }}
       >
-        <Typography
-          sx={{
-            fontFamily: fonts.heading,
-            fontWeight: 800,
-            fontSize: '18px',
-            color: colors.navy,
-            mb: 0.5,
-          }}
-        >
-          {startingText}
-        </Typography>
+        {isTeam ? (
+          <>
+            <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '13px', color: colors.mutedText, textTransform: 'uppercase', letterSpacing: '0.04em', mb: 0.25 }}>
+              Starting service call
+            </Typography>
+            <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '18px', color: colors.navy, mb: 0.5 }}>
+              From $79–$149
+            </Typography>
+          </>
+        ) : (
+          <Typography
+            sx={{
+              fontFamily: fonts.heading,
+              fontWeight: 800,
+              fontSize: '18px',
+              color: colors.navy,
+              mb: 0.5,
+            }}
+          >
+            {startingText}
+          </Typography>
+        )}
         <Typography
           sx={{
             fontFamily: fonts.body,
@@ -98,19 +123,35 @@ export default function ExpertBookingCard({ expert }: Props) {
             InputLabelProps={{ shrink: true }}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
           />
-          <FormControl size="small" fullWidth>
-            <InputLabel>Service needed</InputLabel>
-            <Select
-              value={serviceName}
-              label="Service needed"
-              onChange={(e) => setServiceName(e.target.value)}
-              sx={{ borderRadius: '10px' }}
-            >
-              {expert.services.map((s) => (
-                <MenuItem key={s.name} value={s.name}>{s.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {isTeam ? (
+            <FormControl size="small" fullWidth>
+              <InputLabel>Service category</InputLabel>
+              <Select
+                value={serviceCategory}
+                label="Service category"
+                onChange={(e) => setServiceCategory(e.target.value)}
+                sx={{ borderRadius: '10px' }}
+              >
+                {serviceCategories.map((cat) => (
+                  <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <FormControl size="small" fullWidth>
+              <InputLabel>Service needed</InputLabel>
+              <Select
+                value={serviceName}
+                label="Service needed"
+                onChange={(e) => setServiceName(e.target.value)}
+                sx={{ borderRadius: '10px' }}
+              >
+                {expert.services.map((s) => (
+                  <MenuItem key={s.name} value={s.name}>{s.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
           <FormControl size="small" fullWidth>
             <InputLabel>Urgency</InputLabel>
             <Select
@@ -141,11 +182,11 @@ export default function ExpertBookingCard({ expert }: Props) {
 
         <Box sx={{ display: 'grid', gap: 1.25 }}>
           <Button variant="contained" onClick={handleBookExpert}>
-            Book This Expert
+            {isTeam ? 'Book This Team' : 'Book This Expert'}
           </Button>
 
-          <Button variant="outlined" onClick={handleRequestEstimate}>
-            Request Estimate
+          <Button variant="outlined" onClick={handleSecondaryAction}>
+            {isTeam ? 'Ask a Question' : 'Request Estimate'}
           </Button>
 
           <Button

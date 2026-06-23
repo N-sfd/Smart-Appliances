@@ -40,10 +40,10 @@ const serviceLinks: FooterLink[] = [
 ];
 
 const popularServiceLinks: FooterLink[] = [
-  { label: 'Refrigerator Repair', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Refrigerator+Repair' },
-  { label: 'Washer / Dryer Repair', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Washer+Dryer+Repair' },
-  { label: 'Oven / Stove Repair', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Oven+Stove+Repair' },
-  { label: 'AC Repair', path: '/scheduler?serviceType=R&serviceCategory=HVAC&productName=AC+Repair' },
+  { label: 'Refrigerator Service', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Refrigerator+Repair' },
+  { label: 'Washer & Dryer Service', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Washer+Dryer+Repair' },
+  { label: 'Oven & Stove Service', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Oven+Stove+Repair' },
+  { label: 'AC Service', path: '/scheduler?serviceType=R&serviceCategory=HVAC&productName=AC+Repair' },
   { label: 'Drain Cleaning', path: '/scheduler?serviceType=R&serviceCategory=Plumbing&productName=Drain+Cleaning' },
   { label: 'Light Fixture Installation', path: '/scheduler?serviceType=I&serviceCategory=Electrical&productName=Light+Fixture+Installation' },
   { label: 'Video Doorbell Installation', path: '/scheduler?serviceType=I&serviceCategory=Smart%20Home&productName=Video+Doorbell+Installation' },

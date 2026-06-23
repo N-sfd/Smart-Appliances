@@ -18,7 +18,7 @@ interface MembershipUpsellCardProps {
   onMembershipInterestChange?: (checked: boolean) => void;
 }
 
-const basicPlan = getMembershipPlanById('smart-care-basic');
+const basicPlan = getMembershipPlanById('basic');
 
 const MembershipUpsellCard: React.FC<MembershipUpsellCardProps> = ({
   variant = 'scheduler',

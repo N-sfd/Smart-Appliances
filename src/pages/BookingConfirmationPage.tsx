@@ -56,7 +56,7 @@ const BookingConfirmationPage: React.FC = () => {
   const quoteRequired = navState?.estimate?.quoteRequired ?? booking?.quote_required ?? false;
   const estimatedTotal = navState?.estimate?.estimatedTotal ?? booking?.estimated_total ?? null;
   const estimateLabel = quoteRequired
-    ? 'Quote required'
+    ? 'Estimate required'
     : estimatedTotal != null
       ? `$${estimatedTotal.toFixed(2)}`
       : null;
