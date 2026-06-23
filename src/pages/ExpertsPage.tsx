@@ -247,6 +247,7 @@ export default function ExpertsPage() {
                         src={getExpertImageUrl(expert.slug, expert.imageUrl, expert.avatarUrl)}
                         alt={expert.name}
                         initials={expert.initials}
+                        slug={expert.slug}
                         size={42}
                       />
                       <Box sx={{ minWidth: 0, flex: 1 }}>

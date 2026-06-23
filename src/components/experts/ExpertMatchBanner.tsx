@@ -42,6 +42,7 @@ export default function ExpertMatchBanner() {
                   src={getExpertImageUrl(expert!.slug, expert!.imageUrl, expert!.avatarUrl)}
                   alt={expert!.name}
                   initials={expert!.initials}
+                  slug={expert!.slug}
                   size={44}
                 />
               </Box>

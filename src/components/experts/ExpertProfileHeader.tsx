@@ -50,6 +50,7 @@ export default function ExpertProfileHeader({ expert }: Props) {
         alt={expert.name}
         initials={expert.initials}
         category={expert.category}
+        slug={expert.slug}
         size={130}
       />
 

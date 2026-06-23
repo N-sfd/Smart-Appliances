@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { colors, fonts } from '../../theme';
-import { getExpertInitials } from '../../data/expertImages';
+import { getExpertInitials, getExpertAvatarObjectPosition } from '../../data/expertImages';
 
 interface ExpertAvatarProps {
   src?: string | null;
@@ -9,6 +9,8 @@ interface ExpertAvatarProps {
   initials?: string;
   size?: number;
   category?: string;
+  slug?: string;
+  objectPosition?: string;
 }
 
 export default function ExpertAvatar({
@@ -17,11 +19,14 @@ export default function ExpertAvatar({
   initials,
   size = 96,
   category,
+  slug,
+  objectPosition,
 }: ExpertAvatarProps) {
   const [errored, setErrored] = useState(false);
   const showImage = Boolean(src) && !errored;
   const label = initials ?? getExpertInitials(alt);
   const fontSize = size <= 48 ? '0.85rem' : size <= 80 ? '1.1rem' : '1.5rem';
+  const cropPosition = objectPosition ?? (slug ? getExpertAvatarObjectPosition(slug) : 'center 25%');
 
   return (
     <Box
@@ -48,7 +53,7 @@ export default function ExpertAvatar({
           src={src ?? undefined}
           alt={alt}
           onError={() => setErrored(true)}
-          sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: cropPosition, display: 'block' }}
         />
       ) : (
         <Typography

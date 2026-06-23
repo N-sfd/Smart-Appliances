@@ -76,6 +76,7 @@ export default function ExpertCard({ expert }: Props) {
           alt={expert.name}
           initials={expert.initials}
           category={primaryCategory ?? undefined}
+          slug={expert.slug}
           size={104}
         />
       </Box>
