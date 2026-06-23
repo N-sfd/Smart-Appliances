@@ -16,6 +16,7 @@ import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutl
 import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import AddIcon from '@mui/icons-material/Add';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { fetchBookingStats, fetchAllBookings, BookingStats, BookingRow } from '../../lib/supabaseBookings';
 import { colors, fonts } from '../../theme';
 import { exportCsv } from '../../utils/csvExport';
@@ -78,7 +79,7 @@ const ActivityList: React.FC<{ title: string; rows: BookingRow[] }> = ({ title, 
           <Box key={b.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.75, borderBottom: `1px solid ${colors.border}` }}>
             <Box sx={{ minWidth: 0 }}>
               <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, fontSize: '0.82rem', color: colors.darkText, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {b.customer_name}
+                {b.customer_name?.trim() || 'Guest Customer'}
               </Typography>
               <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText }}>{fmt(b.created_at)}</Typography>
             </Box>
@@ -152,6 +153,7 @@ const AdminDashboardPage: React.FC = () => {
             <StatCard label="Membership Interested" value={stats.membershipInterested} accent="#F3E5F5" icon={<CardMembershipOutlinedIcon sx={{ color: '#4A148C', fontSize: 22 }} />} to="/admin/membership" />
             <StatCard label="Expert Requested" value={stats.expertRequestedCount} accent="#E3F2FD" icon={<BadgeOutlinedIcon sx={{ color: '#0B3D91', fontSize: 22 }} />} to="/admin/experts" />
             <StatCard label="Customers" value="—" accent="#EDE7F6" icon={<PeopleOutlineIcon sx={{ color: '#4527A0', fontSize: 22 }} />} to="/admin/customers" />
+            <StatCard label="Estimated Revenue" value={`$${stats.estimatedRevenue.toFixed(2)}`} accent="#E0F2F1" icon={<AttachMoneyIcon sx={{ color: '#004D40', fontSize: 22 }} />} to="/admin/bookings" />
           </Box>
 
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 4 }}>

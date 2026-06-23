@@ -35,14 +35,23 @@ function getLeadSource(row: BookingRow): LeadSource {
 
 const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
   New: { bg: '#E3F2FD', text: '#0B3D91' },
-  Scheduled: { bg: '#E8F5E9', text: '#1B5E20' },
+  'New Lead': { bg: '#E3F2FD', text: '#0B3D91' },
+  Contacted: { bg: '#FFF8E1', text: '#8D6E00' },
+  Scheduled: { bg: '#F3E5F5', text: '#6A1B9A' },
+  'Technician Assigned': { bg: '#F3E5F5', text: '#6A1B9A' },
   'In Progress': { bg: '#FFF3E0', text: '#E65100' },
-  Completed: { bg: '#E0F2F1', text: '#004D40' },
-  Cancelled: { bg: '#FAFAFA', text: '#616161' },
+  Completed: { bg: '#E8F5E9', text: '#1B5E20' },
+  Cancelled: { bg: '#FAFAFA', text: '#B71C1C' },
+  Emergency: { bg: '#FDECEA', text: '#C62828' },
 };
 
 const SERVICE_CATEGORIES = ['Appliance', 'HVAC', 'Plumbing', 'Electrical', 'Smart Home', 'Garage Door'];
 const SERVICE_TYPES = ['Repair', 'Installation', 'Maintenance', 'Emergency'];
+
+const displayCustomerName = (name?: string | null) => {
+  const trimmed = (name ?? '').trim();
+  return trimmed.length > 0 ? trimmed : 'Guest Customer';
+};
 
 const fmt = (iso?: string) => {
   if (!iso) return '—';
@@ -185,18 +194,25 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange, activeExpert
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, backgroundColor: '#F8FAFC', borderTop: `1px solid ${colors.border}` }}>
-      {row.request_number && (
-        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', fontWeight: 700, color: colors.primaryBlue, mb: 2, letterSpacing: '0.04em' }}>
-          Request ID: {row.request_number}
-        </Typography>
-      )}
+      <Typography
+        sx={{
+          fontFamily: fonts.body,
+          fontSize: '0.78rem',
+          fontWeight: 700,
+          color: row.request_number ? colors.primaryBlue : '#B71C1C',
+          mb: 2,
+          letterSpacing: '0.04em',
+        }}
+      >
+        Request ID: {row.request_number || 'Missing Request ID'}
+      </Typography>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 2 }}>
         {/* Customer */}
         <Box>
           <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Customer
           </Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, color: colors.darkText }}>{row.customer_name}</Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, color: colors.darkText }}>{displayCustomerName(row.customer_name)}</Typography>
           <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText }}>{row.email}</Typography>
           <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText }}>{row.phone}</Typography>
         </Box>
@@ -432,10 +448,37 @@ const AdminBookingsPage: React.FC = () => {
     .filter((b) => emailSentFilter === 'all' || String(Boolean(b.email_sent)) === emailSentFilter)
     .filter((b) => membershipFilter === 'all' || String(Boolean(b.membership_interest)) === membershipFilter);
 
+  const hasActiveFilters =
+    Boolean(search) ||
+    statusFilter !== 'all' ||
+    categoryFilter !== 'all' ||
+    typeFilter !== 'all' ||
+    Boolean(zipFilter) ||
+    Boolean(dateFrom) ||
+    Boolean(dateTo) ||
+    leadSourceFilter !== 'all' ||
+    expertFilter !== 'all' ||
+    emailSentFilter !== 'all' ||
+    membershipFilter !== 'all';
+
+  const handleClearFilters = () => {
+    setSearch('');
+    setStatusFilter('all');
+    setCategoryFilter('all');
+    setTypeFilter('all');
+    setZipFilter('');
+    setDateFrom('');
+    setDateTo('');
+    setLeadSourceFilter('all');
+    setExpertFilter('all');
+    setEmailSentFilter('all');
+    setMembershipFilter('all');
+  };
+
   const handleExport = () => {
     exportCsv('bookings.csv', visibleBookings, [
-      { header: 'Request ID', value: (b) => b.request_number },
-      { header: 'Customer Name', value: (b) => b.customer_name },
+      { header: 'Request ID', value: (b) => b.request_number || 'Missing Request ID' },
+      { header: 'Customer Name', value: (b) => displayCustomerName(b.customer_name) },
       { header: 'Email', value: (b) => b.email },
       { header: 'Phone', value: (b) => b.phone },
       { header: 'Service Category', value: (b) => b.service_category },
@@ -491,13 +534,23 @@ const AdminBookingsPage: React.FC = () => {
             {visibleBookings.length} result{visibleBookings.length !== 1 ? 's' : ''}
           </Typography>
         </Box>
-        <Button
-          onClick={handleExport}
-          variant="outlined"
-          sx={{ borderColor: colors.border, color: colors.darkText, fontFamily: fonts.body, fontWeight: 600, textTransform: 'none', borderRadius: '10px' }}
-        >
-          Export CSV
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Button
+            onClick={handleClearFilters}
+            disabled={!hasActiveFilters}
+            variant="outlined"
+            sx={{ borderColor: colors.border, color: colors.darkText, fontFamily: fonts.body, fontWeight: 600, textTransform: 'none', borderRadius: '10px' }}
+          >
+            Clear Filters
+          </Button>
+          <Button
+            onClick={handleExport}
+            variant="outlined"
+            sx={{ borderColor: colors.border, color: colors.darkText, fontFamily: fonts.body, fontWeight: 600, textTransform: 'none', borderRadius: '10px' }}
+          >
+            Export CSV
+          </Button>
+        </Box>
       </Box>
 
       {/* Filter row */}
@@ -569,7 +622,18 @@ const AdminBookingsPage: React.FC = () => {
         </Box>
       ) : visibleBookings.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText }}>No bookings match your filters.</Typography>
+          <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, mb: hasActiveFilters ? 2 : 0 }}>
+            {bookings.length === 0 ? 'No service requests yet' : 'No matching requests found'}
+          </Typography>
+          {hasActiveFilters && (
+            <Button
+              onClick={handleClearFilters}
+              variant="outlined"
+              sx={{ borderColor: colors.border, color: colors.darkText, fontFamily: fonts.body, fontWeight: 600, textTransform: 'none', borderRadius: '10px' }}
+            >
+              Clear Filters
+            </Button>
+          )}
         </Box>
       ) : (
         <TableContainer component={Paper} elevation={0} sx={{ border: `1px solid ${colors.border}`, borderRadius: '16px', overflow: 'hidden' }}>
@@ -598,15 +662,15 @@ const AdminBookingsPage: React.FC = () => {
                         '&:hover': { backgroundColor: '#F8FAFC' },
                       }}
                     >
-                      <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.75rem', fontWeight: 700, color: colors.primaryBlue, whiteSpace: 'nowrap', py: 1.5, letterSpacing: '0.03em' }}>
-                        {b.request_number ?? '—'}
+                      <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.75rem', fontWeight: 700, color: b.request_number ? colors.primaryBlue : '#B71C1C', whiteSpace: 'nowrap', py: 1.5, letterSpacing: '0.03em' }}>
+                        {b.request_number || 'Missing Request ID'}
                       </TableCell>
                       <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, whiteSpace: 'nowrap', py: 1.5 }}>
                         {fmt(b.created_at)}
                       </TableCell>
                       <TableCell sx={{ py: 1.5 }}>
                         <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, fontSize: '0.85rem', color: colors.darkText }}>
-                          {b.customer_name}
+                          {displayCustomerName(b.customer_name)}
                         </Typography>
                         <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText }}>{b.email}</Typography>
                         <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText }}>{b.phone}</Typography>

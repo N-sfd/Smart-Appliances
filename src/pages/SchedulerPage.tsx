@@ -214,7 +214,6 @@ const TIME_SLOTS = [
   { id: '2-4', label: '2pm – 4pm', startHour: 14 },
   { id: '4-6', label: '4pm – 6pm', startHour: 16 },
 ];
-const MAX_SLOTS = 4;
 const VISIBLE_DAYS = 3;
 
 interface DaySlot {
@@ -432,7 +431,7 @@ const SchedulerPage: React.FC = () => {
   );
   const [preferredDateTouched, setPreferredDateTouched] = useState(false);
   const [contactSubmitAttempted, setContactSubmitAttempted] = useState(false);
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [dateOffset, setDateOffset] = useState(0);
 
   const [submitError, setSubmitError] = useState('');
@@ -515,8 +514,8 @@ const SchedulerPage: React.FC = () => {
   }, [zipSelectOptions]);
 
   const resolvedPreferredDate = useMemo(
-    () => resolveSchedulerPreferredDate(preferredDate, selectedSlots),
-    [preferredDate, selectedSlots],
+    () => resolveSchedulerPreferredDate(preferredDate, selectedSlot),
+    [preferredDate, selectedSlot],
   );
 
   const showContactError = (touched: boolean, message: string | null): boolean =>
@@ -534,7 +533,7 @@ const SchedulerPage: React.FC = () => {
 
   const schedule = useMemo(() => buildSchedule(14), []);
   const visibleDays = schedule.slice(dateOffset, dateOffset + VISIBLE_DAYS);
-  const slotLabels = selectedSlots.map(parseSlotKey);
+  const slotLabel = selectedSlot ? parseSlotKey(selectedSlot) : '';
   const viewCount = useMemo(
     () => 24 + ((new Date().getHours() * 7 + new Date().getDate()) % 17),
     [],
@@ -684,7 +683,7 @@ const SchedulerPage: React.FC = () => {
     stateTouched ||
     preferredDateTouched ||
     addressTouched ||
-    selectedSlots.length > 0;
+    Boolean(selectedSlot);
 
   const contactStepBlockers = useMemo(() => {
     const blockers: string[] = [];
@@ -727,7 +726,8 @@ const SchedulerPage: React.FC = () => {
         !addressError &&
         !cityError &&
         !stateError &&
-        !preferredDateError
+        !preferredDateError &&
+        Boolean(selectedSlot)
       );
     }
     return true;
@@ -744,6 +744,7 @@ const SchedulerPage: React.FC = () => {
     cityError,
     stateError,
     preferredDateError,
+    selectedSlot,
   ]);
 
   const handleNext = () => {
@@ -803,29 +804,13 @@ const SchedulerPage: React.FC = () => {
 
   const categorySummaryVisible = Boolean(category) && !showCategoryPicker;
 
-  const toggleSlot = (iso: string, slotId: string, available: boolean) => {
+  const selectSlot = (iso: string, slotId: string, available: boolean) => {
     if (!available) return;
     const key = slotKey(iso, slotId);
-    setSelectedSlots((prev) => {
-      let next: string[];
-      if (prev.includes(key)) {
-        next = prev.filter((k) => k !== key);
-      } else if (prev.length >= MAX_SLOTS) {
-        return prev;
-      } else {
-        next = [...prev, key];
-      }
-
-      if (next.length > 0) {
-        const earliest = next
-          .map((k) => k.split('|')[0])
-          .sort()[0];
-        if (earliest >= getTodayLocalDate()) {
-          setPreferredDate(earliest);
-        }
-      }
-      return next;
-    });
+    setSelectedSlot(key);
+    if (iso >= getTodayLocalDate()) {
+      setPreferredDate(iso);
+    }
   };
 
   const handleSubmit = async () => {
@@ -833,8 +818,8 @@ const SchedulerPage: React.FC = () => {
     setIsSubmitting(true);
 
     const isEmergency = serviceType === 'emergency' || hvacUrgency === 'Emergency';
-    const [firstDate] = selectedSlots[0]?.split('|') ?? [''];
-    const resolvedPreferredDate = preferredDate || firstDate || null;
+    const [slotDate] = selectedSlot?.split('|') ?? [''];
+    const resolvedPreferredDate = preferredDate || slotDate || null;
 
     const noteParts: string[] = [];
     if (appliance) noteParts.push(`Appliance: ${appliance}`);
@@ -879,7 +864,7 @@ const SchedulerPage: React.FC = () => {
         issue_description: noteParts.join('\n') || issueDescription || null,
         urgency: hvacUrgency || (isEmergency ? 'Emergency' : 'Regular'),
         preferred_date: resolvedPreferredDate,
-        preferred_time: slotLabels.join('; ') || null,
+        preferred_time: slotLabel || null,
         status: 'New',
         estimated_base_fee: reviewEstimate?.baseFee ?? null,
         estimated_priority_fee: reviewEstimate?.priorityFee ?? null,
@@ -911,7 +896,7 @@ const SchedulerPage: React.FC = () => {
           email,
           service: displayServiceTitle,
           preferredDate: resolvedPreferredDate ?? '',
-          preferredTime: slotLabels.join('; ') || '',
+          preferredTime: slotLabel || '',
         }),
       })
         .then(async (r) => {
@@ -933,7 +918,7 @@ const SchedulerPage: React.FC = () => {
           service: displayServiceTitle,
           category,
           preferredDate: resolvedPreferredDate ?? '',
-          preferredTime: slotLabels.join('; ') || '',
+          preferredTime: slotLabel || '',
           estimate: reviewEstimate,
           expertName: requestedExpert?.name ?? null,
         },
@@ -2180,7 +2165,7 @@ const SchedulerPage: React.FC = () => {
                         fontSize: '1rem',
                       }}
                     >
-                      Preferred appointment times
+                      Choose a time
                     </Typography>
                     <Typography
                       sx={{
@@ -2191,8 +2176,8 @@ const SchedulerPage: React.FC = () => {
                         lineHeight: 1.5,
                       }}
                     >
-                      Select up to {MAX_SLOTS} time slots — more options helps us match you
-                      faster.
+                      Select one available appointment window. Your request stays pending
+                      until the business confirms.
                     </Typography>
 
                     <Box
@@ -2221,18 +2206,16 @@ const SchedulerPage: React.FC = () => {
                       </Typography>
                     </Box>
 
-                    {selectedSlots.length > 0 && (
-                      <Typography
-                        sx={{
-                          fontFamily: fonts.body,
-                          fontSize: '0.82rem',
-                          color: colors.mutedText,
-                          mb: 1.5,
-                        }}
-                      >
-                        {selectedSlots.length} of {MAX_SLOTS} slots selected
-                      </Typography>
-                    )}
+                    <Typography
+                      sx={{
+                        fontFamily: fonts.body,
+                        fontSize: '0.82rem',
+                        color: colors.mutedText,
+                        mb: 1.5,
+                      }}
+                    >
+                      {selectedSlot ? `Selected time: ${slotLabel}` : 'No time selected yet'}
+                    </Typography>
 
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 } }}
@@ -2285,10 +2268,8 @@ const SchedulerPage: React.FC = () => {
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                               {day.slots.map((slot) => {
                                 const key = slotKey(day.iso, slot.id);
-                                const isSel = selectedSlots.includes(key);
-                                const isDisabled =
-                                  !slot.available ||
-                                  (!isSel && selectedSlots.length >= MAX_SLOTS);
+                                const isSel = selectedSlot === key;
+                                const isDisabled = !slot.available;
                                 return (
                                   <Box
                                     key={key}
@@ -2296,7 +2277,7 @@ const SchedulerPage: React.FC = () => {
                                     type="button"
                                     disabled={isDisabled}
                                     onClick={() =>
-                                      toggleSlot(day.iso, slot.id, slot.available)
+                                      selectSlot(day.iso, slot.id, slot.available)
                                     }
                                     sx={{
                                       width: '100%',
@@ -2417,7 +2398,7 @@ const SchedulerPage: React.FC = () => {
                       ['Preferred Date', preferredDate || '—'],
                       [
                         'Availability',
-                        slotLabels.length ? slotLabels.join('; ') : 'Will confirm by phone',
+                        slotLabel || 'Will confirm by phone',
                       ],
                     ].map(([label, value], idx, arr) => (
                       <React.Fragment key={label}>

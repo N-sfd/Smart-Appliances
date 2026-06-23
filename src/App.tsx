@@ -15,7 +15,6 @@ const ContactPage = lazy(() => import('./pages/ContactPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const ServiceDetailPage = lazy(() => import('./pages/ServiceDetailPage'));
 const SchedulerPage = lazy(() => import('./pages/SchedulerPage'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const TechnicianDashboard = lazy(() => import('./pages/TechnicianDashboard'));
 const ServiceCategoryPage = lazy(() => import('./pages/ServiceCategoryPage'));
 const RegularBookingPage = lazy(() => import('./pages/RegularBookingPage'));
@@ -279,8 +278,8 @@ function AppRoutes() {
 <Route path="/experts" element={<ExpertsPage />} />
 <Route path="/experts/:expertSlug" element={<ExpertProfilePage />} />
 
-            {/* Legacy admin route */}
-            <Route path="/admin" element={<AdminDashboard />} />
+            {/* /admin now resolves to the real Supabase-backed admin dashboard */}
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
             </Routes>
           </Suspense>
         </Box>

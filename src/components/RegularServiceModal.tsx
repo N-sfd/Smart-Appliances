@@ -136,6 +136,7 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (!name.trim()) e.name = 'Name is required.';
+    else if (name.trim().length < 2) e.name = 'Full name must be at least 2 characters.';
     if (!email.trim()) e.email = 'Email is required.';
     if (!phone.trim()) e.phone = 'Phone number is required.';
     if (!address.trim()) e.address = 'Address is required.';

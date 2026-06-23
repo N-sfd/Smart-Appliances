@@ -75,14 +75,12 @@ export function validatePreferredDateField(dateStr: string): string | null {
   return null;
 }
 
-/** Prefer the earliest selected slot date, then the date field value. */
+/** Prefer the selected slot's date, then the date field value. */
 export function resolveSchedulerPreferredDate(
   preferredDate: string,
-  selectedSlots: string[],
+  selectedSlot: string | null,
 ): string {
-  const slotDates = selectedSlots
-    .map((key) => key.split('|')[0] ?? '')
-    .filter((date) => date && !isPastLocalDate(date));
-  if (slotDates.length > 0) return slotDates.sort()[0];
+  const slotDate = selectedSlot?.split('|')[0] ?? '';
+  if (slotDate && !isPastLocalDate(slotDate)) return slotDate;
   return preferredDate;
 }

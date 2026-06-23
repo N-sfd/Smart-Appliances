@@ -101,6 +101,7 @@ export const BOOKING_STATUSES: BookingStatus[] = [
 
 export type AdminStatus =
   | 'New'
+  | 'New Lead'
   | 'Contacted'
   | 'Scheduled'
   | 'Technician Assigned'
@@ -109,11 +110,12 @@ export type AdminStatus =
   | 'Cancelled';
 
 export const ADMIN_STATUSES: AdminStatus[] = [
-  'New', 'Contacted', 'Scheduled', 'Technician Assigned', 'In Progress', 'Completed', 'Cancelled',
+  'New', 'New Lead', 'Contacted', 'Scheduled', 'Technician Assigned', 'In Progress', 'Completed', 'Cancelled',
 ];
 
 const ADMIN_TO_STATUS: Record<string, string> = {
   'New': 'New',
+  'New Lead': 'New',
   'Contacted': 'New',
   'Scheduled': 'Scheduled',
   'Technician Assigned': 'Scheduled',
@@ -123,7 +125,7 @@ const ADMIN_TO_STATUS: Record<string, string> = {
 };
 
 export const ADMIN_STATUS_STEPS = [
-  'New', 'Contacted', 'Scheduled', 'Technician Assigned', 'In Progress', 'Completed',
+  'New', 'New Lead', 'Contacted', 'Scheduled', 'Technician Assigned', 'In Progress', 'Completed',
 ] as const;
 
 // ── Booking notes ─────────────────────────────────────────────────────────────
@@ -493,17 +495,19 @@ export interface BookingStats {
   emailPending: number;
   membershipInterested: number;
   expertRequestedCount: number;
+  estimatedRevenue: number;
 }
 
 export async function fetchBookingStats(): Promise<BookingStats> {
   const empty: BookingStats = {
     total: 0, newCount: 0, scheduled: 0, inProgress: 0, completed: 0, cancelled: 0, emergency: 0,
     newLeads: 0, emailSent: 0, emailPending: 0, membershipInterested: 0, expertRequestedCount: 0,
+    estimatedRevenue: 0,
   };
   if (!isSupabaseConfigured() || !supabase) return empty;
   const { data } = await supabase
     .from('service_requests')
-    .select('status, urgency, admin_status, email_sent, membership_interest, expert_slug');
+    .select('status, urgency, admin_status, email_sent, membership_interest, expert_slug, estimated_total');
   const rows = (data ?? []) as {
     status: string;
     urgency: string | null;
@@ -511,6 +515,7 @@ export async function fetchBookingStats(): Promise<BookingStats> {
     email_sent: boolean | null;
     membership_interest: boolean | null;
     expert_slug: string | null;
+    estimated_total: number | null;
   }[];
   return {
     total: rows.length,
@@ -525,5 +530,6 @@ export async function fetchBookingStats(): Promise<BookingStats> {
     emailPending: rows.filter((r) => !r.email_sent).length,
     membershipInterested: rows.filter((r) => r.membership_interest === true).length,
     expertRequestedCount: rows.filter((r) => Boolean(r.expert_slug)).length,
+    estimatedRevenue: rows.reduce((sum, r) => sum + (r.estimated_total ?? 0), 0),
   };
 }
