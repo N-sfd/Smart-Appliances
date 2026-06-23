@@ -24,7 +24,8 @@ import { EXPERTS, Expert, getExpertBySlug, resolveExpertImages } from '../data/e
 import { getExpertImageUrl } from '../data/expertImages';
 import { SchedulerServiceCategory } from '../data/schedulerPrefill';
 import ExpertCard from '../components/experts/ExpertCard';
-import ExpertImage from '../components/experts/ExpertImage';
+import ExpertAvatar from '../components/experts/ExpertAvatar';
+import ExpertMatchBanner from '../components/experts/ExpertMatchBanner';
 import { fetchActiveExpertsWithDetails } from '../services/adminExperts';
 
 const TRUST_BADGES = [
@@ -242,13 +243,11 @@ export default function ExpertsPage() {
                         '&:hover': { backgroundColor: colors.lightBlueBg },
                       }}
                     >
-                      <ExpertImage
+                      <ExpertAvatar
                         src={getExpertImageUrl(expert.slug, expert.imageUrl, expert.avatarUrl)}
                         alt={expert.name}
-                        fallbackInitials={expert.name}
-                        variant="avatar"
-                        width={42}
-                        height={42}
+                        initials={expert.initials}
+                        size={42}
                       />
                       <Box sx={{ minWidth: 0, flex: 1 }}>
                         <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', color: colors.darkText, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -343,7 +342,9 @@ export default function ExpertsPage() {
           </Box>
         </Box>
 
-        {/* GRID OF EXPERTS */}
+        <ExpertMatchBanner />
+
+        {/* Expert listings */}
         {visibleExperts.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, mb: 2 }}>
@@ -358,17 +359,7 @@ export default function ExpertsPage() {
             </Button>
           </Box>
         ) : (
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                sm: 'repeat(2, 1fr)',
-                md: 'repeat(3, 1fr)',
-              },
-              gap: 3,
-            }}
-          >
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {visibleExperts.map((expert) => (
               <ExpertCard key={expert.slug} expert={expert} />
             ))}

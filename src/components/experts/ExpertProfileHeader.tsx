@@ -7,7 +7,7 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import { colors, fonts } from '../../theme';
 import { Expert } from '../../data/experts';
 import { getExpertImageUrl } from '../../data/expertImages';
-import ExpertImage from './ExpertImage';
+import ExpertAvatar from './ExpertAvatar';
 
 type Props = {
   expert: Expert;
@@ -37,26 +37,31 @@ export default function ExpertProfileHeader({ expert }: Props) {
         display: 'flex',
         gap: { xs: 2, sm: 2.5 },
         flexDirection: { xs: 'column', sm: 'row' },
-        alignItems: { xs: 'flex-start', sm: 'flex-start' },
-        p: { xs: 2, sm: 2.5 },
+        alignItems: { xs: 'center', sm: 'flex-start' },
+        p: { xs: 2.5, sm: 3 },
         borderRadius: '20px',
         backgroundColor: '#fff',
         border: `1px solid ${colors.border}`,
         boxShadow: colors.cardShadow,
       }}
     >
-      <ExpertImage
+      <ExpertAvatar
         src={imageSrc}
-        alt={`${expert.name} profile`}
-        fallbackInitials={expert.name}
-        variant="profile"
-        width={120}
-        height={120}
-        sx={{ alignSelf: { xs: 'center', sm: 'flex-start' } }}
+        alt={expert.name}
+        initials={expert.initials}
+        category={expert.category}
+        size={130}
       />
 
-      <Box sx={{ flex: 1, width: '100%', minWidth: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
+      <Box sx={{ flex: 1, width: '100%', minWidth: 0, textAlign: { xs: 'center', sm: 'left' } }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: { xs: 'center', sm: 'space-between' },
+            gap: 1,
+          }}
+        >
           <Typography
             component="h1"
             sx={{
@@ -76,6 +81,7 @@ export default function ExpertProfileHeader({ expert }: Props) {
                 border: `1px solid ${colors.border}`,
                 color: colors.primaryBlue,
                 flexShrink: 0,
+                display: { xs: 'none', sm: 'inline-flex' },
                 '&:hover': { backgroundColor: colors.lightBlueBg },
               }}
             >
@@ -104,6 +110,7 @@ export default function ExpertProfileHeader({ expert }: Props) {
             gap: 0.25,
             rowGap: 0.5,
             mt: 1,
+            justifyContent: { xs: 'center', sm: 'flex-start' },
           }}
         >
           <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '14px', color: colors.navy, mr: 0.5 }}>
@@ -112,10 +119,7 @@ export default function ExpertProfileHeader({ expert }: Props) {
           {Array.from({ length: 5 }).map((_, i) => (
             <StarIcon
               key={i}
-              sx={{
-                fontSize: 18,
-                color: i < filledStars ? colors.warningOrange : colors.border,
-              }}
+              sx={{ fontSize: 18, color: i < filledStars ? colors.warningOrange : colors.border }}
             />
           ))}
           <Typography sx={{ fontSize: '14px', color: colors.mutedText, ml: 0.75 }}>
@@ -123,7 +127,15 @@ export default function ExpertProfileHeader({ expert }: Props) {
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1.25 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 1,
+            mt: 1.25,
+            justifyContent: { xs: 'center', sm: 'flex-start' },
+          }}
+        >
           <Chip
             icon={<VerifiedIcon />}
             label="Verified Smart Appliances Provider"
@@ -148,6 +160,12 @@ export default function ExpertProfileHeader({ expert }: Props) {
         {expert.serviceAreas?.length > 0 && (
           <Typography sx={{ mt: 0.5, fontSize: '14px', color: colors.mutedText, lineHeight: 1.55 }}>
             Serving {expert.serviceAreas.join(', ')}
+          </Typography>
+        )}
+
+        {expert.shortSummary && (
+          <Typography sx={{ mt: 1.25, fontSize: '14px', color: colors.darkText, lineHeight: 1.6 }}>
+            {expert.shortSummary}
           </Typography>
         )}
       </Box>

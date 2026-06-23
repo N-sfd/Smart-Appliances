@@ -81,6 +81,8 @@ function mapToLocalExpert(e: DbExpert, services: DbExpertService[], reviews: DbE
     reviews: mappedReviews.length > 0 ? mappedReviews : local?.reviews ?? [],
     galleryCategories: local?.galleryCategories ?? GALLERY_CATEGORIES,
     category: local?.category,
+    initials: local?.initials,
+    shortSummary: local?.shortSummary,
     jobsLabel: local?.jobsLabel,
     startingFeeLabel: local?.startingFeeLabel,
     imageUrl: getExpertImageUrl(e.slug, e.avatar_url, local?.imageUrl, local?.avatarUrl),

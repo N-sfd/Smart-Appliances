@@ -1,11 +1,11 @@
-/** Local service photos used for expert cards and profiles when DB images are empty. */
+/** Local photos used for circular expert avatars when DB images are empty. */
 export const EXPERT_IMAGE_BY_SLUG: Record<string, string> = {
-  'smart-appliances-team': '/images/services/hero-technician.jpg',
-  'hvac-repair-specialist': '/images/services/hvac-service.jpg',
-  'appliance-repair-specialist': '/images/services/refrigerator-repair.jpg',
-  'plumbing-repair-specialist': '/images/services/plumbing-service.jpg',
-  'electrical-service-specialist': '/images/services/electrical/hero.jpg',
-  'garage-door-specialist': '/images/services/garage-door/hero.jpg',
+  'smart-appliances-team': '/images/services/hero-appliance-technician.webp',
+  'hvac-repair-specialist': '/images/services/hvac/ac-repair.jpg',
+  'appliance-repair-specialist': '/images/services/appliances/technician-default.png',
+  'plumbing-repair-specialist': '/images/services/plumbing/trust-technician.webp',
+  'electrical-service-specialist': '/images/services/smart-home/hero-installer.webp',
+  'garage-door-specialist': '/images/services/garage-door/tech-1.webp',
 };
 
 export const GALLERY_CATEGORY_IMAGES: Record<string, string> = {
@@ -36,5 +36,5 @@ export function getExpertImageUrl(slug: string, ...candidates: (string | null | 
     if (candidate.startsWith(LEGACY_SVG_PREFIX)) continue;
     return candidate;
   }
-  return EXPERT_IMAGE_BY_SLUG[slug] ?? '/images/services/hero-technician.jpg';
+  return EXPERT_IMAGE_BY_SLUG[slug] ?? '/images/services/hero-appliance-technician.webp';
 }
