@@ -58,7 +58,9 @@ export default function ExpertBookingCard({ expert }: Props) {
     <Box
       sx={{
         position: { md: 'sticky' },
-        top: { md: '152px' },
+        top: { md: '136px' },
+        maxHeight: { md: 'calc(100vh - 152px)' },
+        overflowY: { md: 'auto' },
       }}
     >
       <Box

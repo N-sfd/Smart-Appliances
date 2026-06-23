@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { DbExpert, DbExpertService, DbExpertReview } from '../types/admin';
-import { Expert as LocalExpert, getExpertBySlug, GALLERY_CATEGORIES } from '../data/experts';
+import { Expert as LocalExpert, getExpertBySlug, GALLERY_CATEGORIES, resolveExpertImages } from '../data/experts';
+import { getExpertImageUrl } from '../data/expertImages';
 
 // ── Public reads (used by ExpertsPage / ExpertProfilePage with local fallback) ─
 
@@ -19,11 +20,11 @@ export async function fetchActiveExpertsWithDetails(): Promise<LocalExpert[] | n
     supabase.from('expert_reviews').select('*').in('expert_id', ids).order('review_date', { ascending: false }),
   ]);
 
-  return (experts as DbExpert[]).map((e) => mapToLocalExpert(
+  return (experts as DbExpert[]).map((e) => resolveExpertImages(mapToLocalExpert(
     e,
     ((services ?? []) as DbExpertService[]).filter((s) => s.expert_id === e.id),
     ((reviews ?? []) as DbExpertReview[]).filter((r) => r.expert_id === e.id),
-  ));
+  )));
 }
 
 export async function fetchActiveExpertBySlug(slug: string): Promise<LocalExpert | null> {
@@ -41,7 +42,7 @@ export async function fetchActiveExpertBySlug(slug: string): Promise<LocalExpert
     supabase.from('expert_reviews').select('*').eq('expert_id', (expert as DbExpert).id).order('review_date', { ascending: false }),
   ]);
 
-  return mapToLocalExpert(expert as DbExpert, (services ?? []) as DbExpertService[], (reviews ?? []) as DbExpertReview[]);
+  return resolveExpertImages(mapToLocalExpert(expert as DbExpert, (services ?? []) as DbExpertService[], (reviews ?? []) as DbExpertReview[]));
 }
 
 // DB rows created via the admin UI may not have every field filled in yet (avatar,
@@ -79,7 +80,11 @@ function mapToLocalExpert(e: DbExpert, services: DbExpertService[], reviews: DbE
     services: mappedServices.length > 0 ? mappedServices : local?.services ?? [],
     reviews: mappedReviews.length > 0 ? mappedReviews : local?.reviews ?? [],
     galleryCategories: local?.galleryCategories ?? GALLERY_CATEGORIES,
-    avatarUrl: e.avatar_url || local?.avatarUrl,
+    category: local?.category,
+    jobsLabel: local?.jobsLabel,
+    startingFeeLabel: local?.startingFeeLabel,
+    imageUrl: getExpertImageUrl(e.slug, e.avatar_url, local?.imageUrl, local?.avatarUrl),
+    avatarUrl: getExpertImageUrl(e.slug, e.avatar_url, local?.avatarUrl, local?.imageUrl),
   };
 }
 

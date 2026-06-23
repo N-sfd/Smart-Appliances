@@ -33,6 +33,7 @@ import ExpertProfileHeader from '../components/experts/ExpertProfileHeader';
 import ExpertServices from '../components/experts/ExpertServices';
 import ExpertReviews from '../components/experts/ExpertReviews';
 import ExpertBookingCard from '../components/experts/ExpertBookingCard';
+import ExpertGalleryCard from '../components/experts/ExpertGalleryCard';
 import ServiceAreaMap from '../components/ServiceAreaMap';
 import {
   normalizeZipInput,
@@ -64,15 +65,6 @@ const TEAM_SERVICE_CATEGORIES: {
   { title: 'Garage Door Services', description: 'Garage door repair, opener service, and safety checks.', priceLabel: 'Service call from $99', serviceCategory: 'Garage Door' },
   { title: 'Emergency Service', description: 'Priority response for urgent home service issues.', priceLabel: 'Estimate after review', serviceCategory: null },
 ];
-
-const GALLERY_CATEGORY_IMAGES: Record<string, string> = {
-  'Appliance repair': '/images/experts/appliance-specialist.svg',
-  'HVAC service': '/images/experts/hvac-specialist.svg',
-  'Plumbing service': '/images/experts/plumbing-specialist.svg',
-  'Electrical installation': '/images/experts/electrical-specialist.svg',
-  'Smart home setup': '/images/experts/smart-home-setup.svg',
-  'Garage door service': '/images/experts/garage-door-service.svg',
-};
 
 const CREDENTIALS_ITEMS = [
   'Online booking request submitted',
@@ -219,7 +211,7 @@ export default function ExpertProfilePage() {
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
-      <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
+      <Container maxWidth={false} sx={{ maxWidth: 1280, py: { xs: 3, md: 5 }, px: { xs: 2, md: 3 } }}>
         {/* BREADCRUMB */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, flexWrap: 'wrap' }}>
           <Typography component={RouterLink} to="/experts" sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText, textDecoration: 'none', '&:hover': { color: colors.primaryBlue } }}>
@@ -266,8 +258,8 @@ export default function ExpertProfilePage() {
                 variant="scrollable"
                 scrollButtons="auto"
                 allowScrollButtonsMobile
-                TabIndicatorProps={{ sx: { backgroundColor: colors.primaryBlue, height: 3 } }}
-                sx={{ minHeight: 44 }}
+                TabIndicatorProps={{ sx: { backgroundColor: colors.primaryBlue, height: 2, borderRadius: '2px 2px 0 0' } }}
+                sx={{ minHeight: 40 }}
               >
                 {TABS.map((tab) => (
                   <Tab
@@ -276,12 +268,14 @@ export default function ExpertProfilePage() {
                     label={tab.label}
                     sx={{
                       fontFamily: fonts.body,
-                      fontWeight: 700,
-                      fontSize: '13.5px',
+                      fontWeight: 600,
+                      fontSize: '13px',
                       textTransform: 'none',
                       color: colors.mutedText,
-                      minHeight: 44,
-                      '&.Mui-selected': { color: colors.primaryBlue },
+                      minHeight: 40,
+                      py: 1,
+                      px: { xs: 1.25, sm: 2 },
+                      '&.Mui-selected': { color: colors.primaryBlue, fontWeight: 700 },
                     }}
                   />
                 ))}
@@ -301,13 +295,13 @@ export default function ExpertProfilePage() {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                 <VerifiedOutlinedIcon sx={{ fontSize: 20, color: colors.primaryBlue }} />
                 <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '16px', color: colors.navy }}>
-                  Why this expert?
+                  {isTeam ? 'Why choose this team?' : 'Why this expert?'}
                 </Typography>
               </Box>
               <Typography sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: colors.darkText, lineHeight: 1.65 }}>
-                This expert is recommended based on service category, customer rating, response time, and completed
-                service requests. Smart Appliances focuses on clear communication, request tracking, and professional
-                service follow-up.
+                {isTeam
+                  ? 'Smart Appliances is recommended for customers who want clear communication, request ID tracking, starting estimates, and professional service follow-up across appliance, HVAC, plumbing, electrical, smart home, and garage door needs.'
+                  : 'This expert is recommended based on service category, customer rating, response time, and completed service requests. Smart Appliances focuses on clear communication, request tracking, and professional service follow-up.'}
               </Typography>
             </Box>
 
@@ -429,38 +423,9 @@ export default function ExpertProfilePage() {
                   gap: 2,
                 }}
               >
-                {expert.galleryCategories.map((cat) => {
-                  const imageSrc = GALLERY_CATEGORY_IMAGES[cat];
-                  return (
-                    <Box
-                      key={cat}
-                      sx={{
-                        borderRadius: '16px',
-                        border: `1px solid ${colors.border}`,
-                        boxShadow: colors.cardShadow,
-                        backgroundColor: '#fff',
-                        overflow: 'hidden',
-                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                        '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 20px 40px rgba(10,37,64,0.14)' },
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={imageSrc}
-                        alt={`${cat} provided by Smart Appliances`}
-                        sx={{
-                          width: '100%',
-                          height: 130,
-                          objectFit: 'cover',
-                          display: 'block',
-                        }}
-                      />
-                      <Typography sx={{ fontFamily: fonts.body, fontWeight: 600, fontSize: '13px', color: colors.darkText, textAlign: 'center', py: 1.25 }}>
-                        {cat}
-                      </Typography>
-                    </Box>
-                  );
-                })}
+                {expert.galleryCategories.map((cat) => (
+                  <ExpertGalleryCard key={cat} category={cat} />
+                ))}
               </Box>
             </Box>
 
@@ -570,14 +535,9 @@ export default function ExpertProfilePage() {
           </Box>
 
           {/* RIGHT COLUMN — DESKTOP BOOKING CARD */}
-          <Box sx={{ width: { md: '340px' }, flexShrink: 0, display: { xs: 'none', md: 'block' } }}>
+          <Box sx={{ width: { md: 360 }, flexShrink: 0, display: { xs: 'none', md: 'block' } }}>
             <ExpertBookingCard expert={expert} />
           </Box>
-        </Box>
-
-        {/* MOBILE BOOKING CARD NEAR BOTTOM */}
-        <Box sx={{ mt: { xs: 4, md: 0 }, display: { xs: 'block', md: 'none' } }}>
-          <ExpertBookingCard expert={expert} />
         </Box>
 
         {/* BOTTOM CTA */}

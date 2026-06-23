@@ -7,14 +7,16 @@ import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 
 import { colors, fonts } from '../../theme';
 import { Expert } from '../../data/experts';
+import { getExpertImageUrl } from '../../data/expertImages';
 import { getStartingFeeLabel } from '../../utils/pricing';
-import ExpertCardImage from './ExpertCardImage';
+import ExpertImage from './ExpertImage';
 
 type Props = {
   expert: Expert;
 };
 
 function getPrimaryCategory(expert: Expert): string | null {
+  if (expert.category && expert.category !== 'All Services') return expert.category;
   const counts = new Map<string, number>();
   expert.services.forEach((s) => {
     if (!s.serviceCategory) return;
@@ -36,12 +38,15 @@ export default function ExpertCard({ expert }: Props) {
 
   const specialties = expert.specialties.slice(0, 4);
   const extraCount = expert.specialties.length - specialties.length;
-  const startingFeeLabel = getStartingFeeLabel(expert.services);
+  const startingFeeLabel = expert.startingFeeLabel ?? getStartingFeeLabel(expert.services);
   const areaSummary = expert.serviceAreas.slice(0, 2).join(', ')
     + (expert.serviceAreas.length > 2 ? ` +${expert.serviceAreas.length - 2}` : '');
-  const primaryCategory = getPrimaryCategory(expert);
+  const primaryCategory = expert.category ?? getPrimaryCategory(expert);
+  const imageSrc = getExpertImageUrl(expert.slug, expert.imageUrl, expert.avatarUrl);
+  const filledStars = Math.round(expert.rating);
+  const jobsSuffix = expert.jobsLabel ?? 'jobs completed';
 
-  const bookHref = primaryCategory
+  const bookHref = primaryCategory && primaryCategory !== 'All Services'
     ? `/scheduler?serviceCategory=${encodeURIComponent(primaryCategory)}&expert=${expert.slug}`
     : `/scheduler?expert=${expert.slug}`;
 
@@ -63,9 +68,14 @@ export default function ExpertCard({ expert }: Props) {
         },
       }}
     >
-      {/* IMAGE BANNER */}
       <Box sx={{ position: 'relative' }}>
-        <ExpertCardImage name={expert.name} avatarUrl={expert.avatarUrl} height={200} />
+        <ExpertImage
+          src={imageSrc}
+          alt={`${expert.name} — Smart Appliances service expert`}
+          fallbackInitials={expert.name}
+          variant="card"
+          height={{ xs: 150, sm: 150, md: 160, lg: 170 }}
+        />
         {primaryCategory && (
           <Chip
             label={primaryCategory}
@@ -85,7 +95,6 @@ export default function ExpertCard({ expert }: Props) {
       </Box>
 
       <Box sx={{ p: 2.5, display: 'flex', flexDirection: 'column', flex: 1 }}>
-        {/* Name + Title */}
         <Typography
           sx={{
             fontFamily: fonts.body,
@@ -107,22 +116,22 @@ export default function ExpertCard({ expert }: Props) {
           {expert.title}
         </Typography>
 
-        {/* STATS ROW */}
-        <Typography
-          sx={{
-            fontSize: '13px',
-            color: colors.mutedText,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-          }}
-        >
-          <StarIcon sx={{ fontSize: 16, color: colors.warningOrange }} />
-          {expert.rating} · {expert.reviewCount} reviews · {expert.jobsCompleted} jobs
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.25, mb: 0.5 }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <StarIcon
+              key={i}
+              sx={{
+                fontSize: 15,
+                color: i < filledStars ? colors.warningOrange : colors.border,
+              }}
+            />
+          ))}
+          <Typography sx={{ fontSize: '13px', color: colors.mutedText, ml: 0.75 }}>
+            {expert.rating} · {expert.reviewCount} reviews · {expert.jobsCompleted} {jobsSuffix}
+          </Typography>
+        </Box>
 
-        {/* RESPONSE TIME + SERVICE AREA */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, mt: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, mt: 0.75 }}>
           {expert.responseTime && (
             <Typography sx={{ fontSize: '12.5px', color: colors.mutedText, display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <AccessTimeIcon sx={{ fontSize: 14, color: colors.primaryBlue }} />
@@ -137,7 +146,6 @@ export default function ExpertCard({ expert }: Props) {
           )}
         </Box>
 
-        {/* SPECIALTY CHIPS */}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
           {specialties.map((spec) => (
             <Chip
@@ -173,10 +181,8 @@ export default function ExpertCard({ expert }: Props) {
           )}
         </Box>
 
-        {/* SPACER */}
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* STARTING FEE */}
         <Typography
           sx={{
             fontFamily: fonts.heading,
@@ -189,20 +195,19 @@ export default function ExpertCard({ expert }: Props) {
           {startingFeeLabel}
         </Typography>
 
-        {/* BUTTON ROW */}
         <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
           <Button
             variant="outlined"
             component={Link}
             to={`/experts/${expert.slug}`}
-            sx={{ flex: 1 }}
+            sx={{ flex: 1, textTransform: 'none', borderRadius: '10px', fontFamily: fonts.body, fontWeight: 600 }}
           >
             View Profile
           </Button>
 
           <Button
             variant="contained"
-            sx={{ flex: 1 }}
+            sx={{ flex: 1, textTransform: 'none', borderRadius: '10px', fontFamily: fonts.body, fontWeight: 700 }}
             onClick={() => navigate(bookHref)}
           >
             Book

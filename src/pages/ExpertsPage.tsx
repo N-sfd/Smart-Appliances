@@ -20,10 +20,11 @@ import {
   Refrigerator, Snowflake, Droplets, Zap, HouseWifi, DoorOpen, AlertTriangle, LucideIcon,
 } from 'lucide-react';
 import { colors, fonts } from '../theme';
-import { EXPERTS, Expert, getExpertBySlug } from '../data/experts';
+import { EXPERTS, Expert, getExpertBySlug, resolveExpertImages } from '../data/experts';
+import { getExpertImageUrl } from '../data/expertImages';
 import { SchedulerServiceCategory } from '../data/schedulerPrefill';
 import ExpertCard from '../components/experts/ExpertCard';
-import ExpertAvatar from '../components/experts/ExpertAvatar';
+import ExpertImage from '../components/experts/ExpertImage';
 import { fetchActiveExpertsWithDetails } from '../services/adminExperts';
 
 const TRUST_BADGES = [
@@ -94,7 +95,7 @@ const matchesCategory = (expert: Expert, category: SchedulerServiceCategory | 'A
 
 export default function ExpertsPage() {
   const navigate = useNavigate();
-  const [experts, setExperts] = useState<Expert[]>(EXPERTS);
+  const [experts, setExperts] = useState<Expert[]>(EXPERTS.map(resolveExpertImages));
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<SchedulerServiceCategory | 'All'>('All');
   const [sort, setSort] = useState<SortOption>('featured');
@@ -133,7 +134,7 @@ export default function ExpertsPage() {
       <Box
         sx={{
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          py: { xs: 5, md: 6 },
+          py: { xs: 4.5, md: 5.5 },
           px: 2,
         }}
       >
@@ -241,7 +242,14 @@ export default function ExpertsPage() {
                         '&:hover': { backgroundColor: colors.lightBlueBg },
                       }}
                     >
-                      <ExpertAvatar name={expert.name} avatarUrl={expert.avatarUrl} size={42} fontSize={14} />
+                      <ExpertImage
+                        src={getExpertImageUrl(expert.slug, expert.imageUrl, expert.avatarUrl)}
+                        alt={expert.name}
+                        fallbackInitials={expert.name}
+                        variant="avatar"
+                        width={42}
+                        height={42}
+                      />
                       <Box sx={{ minWidth: 0, flex: 1 }}>
                         <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', color: colors.darkText, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {expert.name}

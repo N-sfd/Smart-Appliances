@@ -1,4 +1,5 @@
 import type { SchedulerServiceCategory } from './schedulerPrefill';
+import { getExpertImageUrl } from './expertImages';
 
 export interface ExpertService {
   name: string;
@@ -18,6 +19,7 @@ export interface Expert {
   slug: string;
   name: string;
   title: string;
+  category?: string;
   rating: number;
   reviewCount: number;
   jobsCompleted: string;
@@ -28,20 +30,22 @@ export interface Expert {
   services: ExpertService[];
   reviews: ExpertReview[];
   galleryCategories: string[];
+  imageUrl?: string;
   avatarUrl?: string;
   /** Overrides the default "jobs completed" suffix shown next to jobsCompleted (e.g. "service requests"). */
   jobsLabel?: string;
+  startingFeeLabel?: string;
 }
 
 const SERVICE_AREAS = ['Maryland', 'Washington DC', 'Virginia', 'Pennsylvania', 'West Virginia'];
 
 export const GALLERY_CATEGORIES = [
-  'Appliance repair',
-  'HVAC service',
-  'Plumbing service',
-  'Electrical installation',
-  'Smart home setup',
-  'Garage door service',
+  'Appliance Care',
+  'HVAC Services',
+  'Plumbing',
+  'Electrical',
+  'Smart Home',
+  'Garage Door',
 ];
 
 export const EXPERTS: Expert[] = [
@@ -49,11 +53,14 @@ export const EXPERTS: Expert[] = [
     slug: 'smart-appliances-team',
     name: 'Smart Appliances Team',
     title: 'Home Service Team',
-    avatarUrl: '/images/experts/team.svg',
+    category: 'All Services',
+    imageUrl: '/images/services/hero-technician.jpg',
+    avatarUrl: '/images/services/hero-technician.jpg',
     rating: 4.9,
     reviewCount: 128,
     jobsCompleted: '750+',
     jobsLabel: 'service requests',
+    startingFeeLabel: 'Service call from $89.00',
     responseTime: 'Usually responds within 30 minutes',
     serviceAreas: SERVICE_AREAS,
     specialties: ['Appliance Care', 'HVAC Services', 'Plumbing', 'Electrical', 'Smart Home', 'Garage Door'],
@@ -96,7 +103,9 @@ export const EXPERTS: Expert[] = [
     slug: 'hvac-repair-specialist',
     name: 'HVAC Comfort Expert',
     title: 'Heating, Cooling & Air Quality Services',
-    avatarUrl: '/images/experts/hvac-specialist.svg',
+    category: 'HVAC',
+    imageUrl: '/images/services/hvac-service.jpg',
+    avatarUrl: '/images/services/hvac-service.jpg',
     rating: 4.8,
     reviewCount: 74,
     jobsCompleted: '320+',
@@ -141,7 +150,9 @@ export const EXPERTS: Expert[] = [
     slug: 'appliance-repair-specialist',
     name: 'Appliance Care Expert',
     title: 'Kitchen & Laundry Appliance Services',
-    avatarUrl: '/images/experts/appliance-specialist.svg',
+    category: 'Appliance',
+    imageUrl: '/images/services/refrigerator-repair.jpg',
+    avatarUrl: '/images/services/refrigerator-repair.jpg',
     rating: 4.9,
     reviewCount: 96,
     jobsCompleted: '410+',
@@ -187,7 +198,9 @@ export const EXPERTS: Expert[] = [
     slug: 'plumbing-repair-specialist',
     name: 'Plumbing Service Expert',
     title: 'Drain, Disposal, Leak & Fixture Services',
-    avatarUrl: '/images/experts/plumbing-specialist.svg',
+    category: 'Plumbing',
+    imageUrl: '/images/services/plumbing-service.jpg',
+    avatarUrl: '/images/services/plumbing-service.jpg',
     rating: 4.8,
     reviewCount: 61,
     jobsCompleted: '260+',
@@ -232,7 +245,9 @@ export const EXPERTS: Expert[] = [
     slug: 'electrical-service-specialist',
     name: 'Electrical & Smart Home Expert',
     title: 'Electrical Installations & Connected Home Setup',
-    avatarUrl: '/images/experts/electrical-specialist.svg',
+    category: 'Electrical',
+    imageUrl: '/images/services/electrical/hero.jpg',
+    avatarUrl: '/images/services/electrical/hero.jpg',
     rating: 4.8,
     reviewCount: 58,
     jobsCompleted: '240+',
@@ -284,5 +299,16 @@ export const EXPERTS: Expert[] = [
 ];
 
 export function getExpertBySlug(slug: string): Expert | undefined {
-  return EXPERTS.find((e) => e.slug === slug);
+  const expert = EXPERTS.find((e) => e.slug === slug);
+  if (!expert) return undefined;
+  return {
+    ...expert,
+    imageUrl: getExpertImageUrl(slug, expert.imageUrl, expert.avatarUrl),
+    avatarUrl: getExpertImageUrl(slug, expert.avatarUrl, expert.imageUrl),
+  };
+}
+
+export function resolveExpertImages(expert: Expert): Expert {
+  const imageUrl = getExpertImageUrl(expert.slug, expert.imageUrl, expert.avatarUrl);
+  return { ...expert, imageUrl, avatarUrl: imageUrl };
 }

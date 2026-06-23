@@ -186,7 +186,8 @@ const SiteFooter: React.FC = () => {
                 onChange={(e) => { setEmail(e.target.value); setSubscribeStatus('idle'); }}
                 size="small"
                 sx={{
-                  flex: '1 1 180px',
+                  flex: '1 1 240px',
+                  minWidth: { xs: '100%', sm: 200 },
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '10px',
                     fontFamily: fonts.body,
@@ -199,6 +200,7 @@ const SiteFooter: React.FC = () => {
                 type="submit"
                 variant="contained"
                 sx={{
+                  flexShrink: 0,
                   backgroundColor: colors.primaryBlue,
                   color: '#fff',
                   fontFamily: fonts.body,
