@@ -39,9 +39,45 @@ export interface BookingRow {
   preferred_date?: string | null;
   preferred_time?: string | null;
 
+  // Optional starting-estimate fields — present only if the schema has these columns (see
+  // supabase/migrations/service_requests_pricing_columns.sql). insertBooking() retries without
+  // them if the columns don't exist yet, so booking submission never fails on their account.
+  estimated_base_fee?: number | null;
+  estimated_priority_fee?: number | null;
+  estimated_emergency_fee?: number | null;
+  estimated_total?: number | null;
+  quote_required?: boolean | null;
+
+  // Optional requested-expert fields — present only if the schema has these columns (see
+  // supabase/migrations/service_requests_expert_columns.sql). Same retry-without-them behavior.
+  expert_slug?: string | null;
+  expert_name?: string | null;
+
+  // Admin-assigned expert (distinct from the customer-requested expert_slug/expert_name
+  // above) — see supabase/migrations/admin_experts_membership.sql.
+  expert_id?: string | null;
+
+  membership_interest?: boolean | null;
+  selected_membership_plan?: string | null;
+  membership_status?: string | null;
+
   status: string;
   created_at?: string;
 }
+
+const PRICING_ESTIMATE_KEYS = [
+  'estimated_base_fee',
+  'estimated_priority_fee',
+  'estimated_emergency_fee',
+  'estimated_total',
+  'quote_required',
+] as const;
+
+const EXPERT_KEYS = ['expert_slug', 'expert_name'] as const;
+
+const MEMBERSHIP_KEYS = ['membership_interest', 'selected_membership_plan'] as const;
+
+const OPTIONAL_INSERT_KEYS = [...PRICING_ESTIMATE_KEYS, ...EXPERT_KEYS, ...MEMBERSHIP_KEYS] as const;
 
 export interface Customer {
   id?: string;
@@ -181,7 +217,25 @@ export async function insertBooking(
     .insert([rowWithCustomer])
     .select('id')
     .single();
+
   if (error) {
+    // If the optional pricing-estimate columns haven't been migrated yet, retry without them
+    // rather than failing the whole booking.
+    if (/column .* does not exist/i.test(error.message)) {
+      const fallbackRow = { ...rowWithCustomer };
+      for (const key of OPTIONAL_INSERT_KEYS) delete (fallbackRow as Record<string, unknown>)[key];
+      const { data: retryData, error: retryError } = await supabase
+        .from('service_requests')
+        .insert([fallbackRow])
+        .select('id')
+        .single();
+      if (retryError) {
+        console.error('[Booking] Error (retry without pricing columns)', retryError.message, retryError);
+        return { id: null, error: retryError.message };
+      }
+      console.log('[Booking] Success (without pricing columns)', retryData);
+      return { id: (retryData as { id: string } | null)?.id ?? null, error: null };
+    }
     console.error('[Booking] Error', error.message, error);
     return { id: null, error: error.message };
   }
@@ -434,14 +488,30 @@ export interface BookingStats {
   completed: number;
   cancelled: number;
   emergency: number;
+  newLeads: number;
+  emailSent: number;
+  emailPending: number;
+  membershipInterested: number;
+  expertRequestedCount: number;
 }
 
 export async function fetchBookingStats(): Promise<BookingStats> {
-  if (!isSupabaseConfigured() || !supabase) {
-    return { total: 0, newCount: 0, scheduled: 0, inProgress: 0, completed: 0, cancelled: 0, emergency: 0 };
-  }
-  const { data } = await supabase.from('service_requests').select('status, urgency');
-  const rows = (data ?? []) as { status: string; urgency: string | null }[];
+  const empty: BookingStats = {
+    total: 0, newCount: 0, scheduled: 0, inProgress: 0, completed: 0, cancelled: 0, emergency: 0,
+    newLeads: 0, emailSent: 0, emailPending: 0, membershipInterested: 0, expertRequestedCount: 0,
+  };
+  if (!isSupabaseConfigured() || !supabase) return empty;
+  const { data } = await supabase
+    .from('service_requests')
+    .select('status, urgency, admin_status, email_sent, membership_interest, expert_slug');
+  const rows = (data ?? []) as {
+    status: string;
+    urgency: string | null;
+    admin_status: string | null;
+    email_sent: boolean | null;
+    membership_interest: boolean | null;
+    expert_slug: string | null;
+  }[];
   return {
     total: rows.length,
     newCount: rows.filter((r) => r.status === 'New').length,
@@ -450,5 +520,10 @@ export async function fetchBookingStats(): Promise<BookingStats> {
     completed: rows.filter((r) => r.status === 'Completed').length,
     cancelled: rows.filter((r) => r.status === 'Cancelled').length,
     emergency: rows.filter((r) => r.urgency === 'Emergency').length,
+    newLeads: rows.filter((r) => r.admin_status === 'New Lead').length,
+    emailSent: rows.filter((r) => r.email_sent === true).length,
+    emailPending: rows.filter((r) => !r.email_sent).length,
+    membershipInterested: rows.filter((r) => r.membership_interest === true).length,
+    expertRequestedCount: rows.filter((r) => Boolean(r.expert_slug)).length,
   };
 }

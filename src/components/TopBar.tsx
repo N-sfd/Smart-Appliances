@@ -38,6 +38,8 @@ interface NavLink {
 const navLinks: NavLink[] = [
   { label: 'Services', path: '/services' },
   { label: 'Pricing', path: '/pricing' },
+  { label: 'Experts', path: '/experts' },
+  { label: 'Membership', path: '/membership' },
   { label: 'Areas', path: '/', hash: 'service-areas' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
@@ -196,7 +198,7 @@ const TopBar: React.FC = () => {
             <BrandLogo variant="header" onClick={() => { navigate('/'); setDrawerOpen(false); }} />
           </Box>
 
-          <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 0.25, alignItems: 'center', flexGrow: 1, justifyContent: 'flex-start', ml: { lg: 2.5, xl: 3.5 } }}>
+          <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: { lg: 3, xl: 4 }, alignItems: 'center', flexGrow: 1, justifyContent: 'flex-start', ml: { lg: 2.5, xl: 3.5 } }}>
             {navLinks.map((link) => {
               const active = isActive(link);
 

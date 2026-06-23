@@ -57,6 +57,26 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       }
     : { 'aria-label': 'Smart Appliances' };
 
+  if (variant === 'footer') {
+    return (
+      <Box sx={wrapperSx} {...interactiveProps}>
+        <Box
+          component="img"
+          src="/images/logo-full.png"
+          alt="Smart Appliances"
+          sx={{
+            display: 'block',
+            width: { xs: 168, sm: 188, md: 208 },
+            height: 'auto',
+            maxHeight: { xs: 68, sm: 76, md: 84 },
+            objectFit: 'contain',
+            objectPosition: 'left center',
+          }}
+        />
+      </Box>
+    );
+  }
+
   if (isHeader && flat) {
     return (
       <Box sx={wrapperSx} {...interactiveProps}>

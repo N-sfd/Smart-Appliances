@@ -346,7 +346,7 @@ const Home: React.FC = () => {
         sx={{
           position: 'relative',
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          pt: { xs: 5, md: 6 },
+          pt: { xs: 6, md: 7 },
           pb: { xs: 4, md: 5, lg: 5 },
           minHeight: { md: 610, lg: 640 },
           overflow: 'hidden',
@@ -438,23 +438,24 @@ const Home: React.FC = () => {
             }}
           >
             {/* Left: headline + CTAs — stays readable, does not overlap image subject */}
-            <Box sx={{ maxWidth: { md: '42%', lg: '38%' }, pb: { xs: 1, lg: 1.5 }, pt: 0, position: 'relative', zIndex: 2, ml: { md: -2.5, lg: -3.5 } }}>
+            <Box sx={{ maxWidth: { md: '42%', lg: '38%' }, pb: { xs: 1, lg: 1.5 }, pt: { xs: 1, md: 1.5 }, position: 'relative', zIndex: 2, ml: { md: -2.5, lg: -3.5 } }}>
               {/* Trust badge */}
               <Box
                 sx={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 0.75,
-                  backgroundColor: 'rgba(79,195,247,0.14)',
-                  border: '1px solid rgba(79,195,247,0.28)',
+                  backgroundColor: 'rgba(255,255,255,0.16)',
+                  border: '1px solid rgba(255,255,255,0.55)',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
                   borderRadius: '20px',
                   px: 1.5,
                   py: 0.45,
                   mb: 2,
                 }}
               >
-                <VerifiedIcon sx={{ color: '#4FC3F7', fontSize: 14 }} />
-                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.76rem', fontWeight: 600, color: '#BDE8FF' }}>
+                <VerifiedIcon sx={{ color: '#7FDBFF', fontSize: 14 }} />
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.76rem', fontWeight: 700, color: '#FFFFFF' }}>
                   Trusted Local Appliance Service
                 </Typography>
               </Box>
@@ -507,6 +508,24 @@ const Home: React.FC = () => {
                   Emergency Service
                 </Button>
               </Box>
+
+              {/* Not sure which service? */}
+              <Button
+                variant="text"
+                onClick={() => navigate('/match-expert')}
+                sx={{
+                  fontFamily: fonts.body,
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  textTransform: 'none',
+                  color: '#4FC3F7',
+                  px: 0,
+                  mb: 2.5,
+                  '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' },
+                }}
+              >
+                Not sure what you need? Match Me With an Expert →
+              </Button>
 
               {/* Trust row */}
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.5, md: 2.5 }, alignItems: 'center' }}>

@@ -8,6 +8,7 @@ import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { colors, fonts } from '../theme';
 import { fetchBookingByRequestNumber, BookingRow } from '../lib/supabaseBookings';
+import type { ServiceEstimate } from '../utils/pricing';
 
 interface ConfirmationState {
   requestNumber: string;
@@ -16,6 +17,8 @@ interface ConfirmationState {
   category: string;
   preferredDate: string;
   preferredTime: string;
+  estimate?: ServiceEstimate | null;
+  expertName?: string | null;
 }
 
 const formatDate = (iso: string) => {
@@ -50,6 +53,14 @@ const BookingConfirmationPage: React.FC = () => {
   const category = navState?.category ?? booking?.service_category ?? '';
   const preferredDate = navState?.preferredDate ?? booking?.preferred_date ?? '';
   const preferredTime = navState?.preferredTime ?? booking?.preferred_time ?? '';
+  const quoteRequired = navState?.estimate?.quoteRequired ?? booking?.quote_required ?? false;
+  const estimatedTotal = navState?.estimate?.estimatedTotal ?? booking?.estimated_total ?? null;
+  const estimateLabel = quoteRequired
+    ? 'Quote required'
+    : estimatedTotal != null
+      ? `$${estimatedTotal.toFixed(2)}`
+      : null;
+  const expertName = navState?.expertName ?? booking?.expert_name ?? '';
 
   if (loading) {
     return (
@@ -130,6 +141,8 @@ const BookingConfirmationPage: React.FC = () => {
               ...(category ? [['Category', category]] : []),
               ...(preferredDate ? [['Preferred Date', formatDate(preferredDate)]] : []),
               ...(preferredTime ? [['Preferred Time', preferredTime]] : []),
+              ...(expertName ? [['Requested Expert', expertName]] : []),
+              ...(estimateLabel ? [['Estimated Total', estimateLabel]] : []),
               ['Status', 'New — Pending review'],
             ].map(([label, value], idx, arr) => (
               <React.Fragment key={label}>
@@ -152,6 +165,12 @@ const BookingConfirmationPage: React.FC = () => {
               </React.Fragment>
             ))}
           </Box>
+
+          {estimateLabel && (
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, mb: 3, lineHeight: 1.6 }}>
+              Final pricing will be confirmed before work begins.
+            </Typography>
+          )}
 
           {/* Email note */}
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 3, p: 2, backgroundColor: '#FFFBEB', borderRadius: '10px', border: '1px solid #FDE68A', textAlign: 'left' }}>

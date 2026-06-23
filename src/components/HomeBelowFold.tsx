@@ -61,7 +61,6 @@ import {
   majorBrands,
 } from '../data/homePageData';
 
-const SiteFooter = lazy(() => import('./SiteFooter'));
 const ServiceAreaMap = lazy(() => import('./ServiceAreaMap'));
 
 const testimonials = [
@@ -1858,10 +1857,6 @@ const HomeBelowFold: React.FC = () => {
           </Box>
         </Container>
       </Box>
-
-      <Suspense fallback={null}>
-        <SiteFooter />
-      </Suspense>
 
       {/* Spacer so footer isn't hidden behind sticky bar on mobile */}
       <Box sx={{ display: { xs: 'block', md: 'none' }, height: 80 }} />

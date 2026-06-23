@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, TextField, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, CircularProgress, InputAdornment,
+  TableHead, TableRow, Paper, CircularProgress, InputAdornment, Button,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import { fetchCustomers, CustomerSummary } from '../../lib/supabaseBookings';
 import { colors, fonts } from '../../theme';
+import { exportCsv } from '../../utils/csvExport';
 
 const fmt = (iso?: string | null) => {
   if (!iso) return '—';
@@ -41,11 +42,27 @@ const AdminCustomersPage: React.FC = () => {
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
-        <PeopleOutlineIcon sx={{ color: colors.primaryBlue, fontSize: 28 }} />
-        <Typography variant="h4" sx={{ fontFamily: fonts.heading, color: colors.navy, fontWeight: 800 }}>
-          Customers
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5, mb: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <PeopleOutlineIcon sx={{ color: colors.primaryBlue, fontSize: 28 }} />
+          <Typography variant="h4" sx={{ fontFamily: fonts.heading, color: colors.navy, fontWeight: 800 }}>
+            Customers
+          </Typography>
+        </Box>
+        <Button
+          onClick={() => exportCsv('customers.csv', filtered, [
+            { header: 'Name', value: (c) => c.customer_name },
+            { header: 'Email', value: (c) => c.email },
+            { header: 'Phone', value: (c) => c.phone },
+            { header: 'ZIP', value: (c) => c.zip_code },
+            { header: 'Bookings', value: (c) => c.booking_count },
+            { header: 'Last Booking', value: (c) => c.last_booking },
+          ])}
+          variant="outlined"
+          sx={{ borderColor: colors.border, color: colors.darkText, fontFamily: fonts.body, fontWeight: 600, textTransform: 'none', borderRadius: '10px' }}
+        >
+          Export CSV
+        </Button>
       </Box>
       <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '0.9rem', mb: 3 }}>
         {filtered.length} customer{filtered.length !== 1 ? 's' : ''} (deduplicated by email)

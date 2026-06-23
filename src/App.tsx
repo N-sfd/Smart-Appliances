@@ -1,9 +1,10 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, CircularProgress } from '@mui/material';
 import { theme } from './theme';
 import TopBar from './components/TopBar';
+import SiteFooter from './components/SiteFooter';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -25,6 +26,9 @@ const PrivacyPolicyPage = lazy(() => import('./pages/LegalPage').then(m => ({ de
 const TermsOfServicePage = lazy(() => import('./pages/LegalPage').then(m => ({ default: m.TermsOfServicePage })));
 const AccessibilityPage = lazy(() => import('./pages/LegalPage').then(m => ({ default: m.AccessibilityPage })));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
+const SitemapPage = lazy(() => import('./pages/SitemapPage'));
+const MatchExpertPage = lazy(() => import('./pages/MatchExpertPage'));
+const MembershipPage = lazy(() => import('./pages/MembershipPage'));
 
 // Auth pages
 const LoginPage = lazy(() => import('./pages/LoginPage'));
@@ -38,6 +42,15 @@ const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage')
 const AdminBookingsPage = lazy(() => import('./pages/admin/AdminBookingsPage'));
 const AdminCustomersPage = lazy(() => import('./pages/admin/AdminCustomersPage'));
 const AdminServicesPage = lazy(() => import('./pages/admin/AdminServicesPage'));
+const AdminExpertsPage = lazy(() => import('./pages/admin/AdminExpertsPage'));
+const AdminExpertDetailPage = lazy(() => import('./pages/admin/AdminExpertDetailPage'));
+const AdminMembershipPage = lazy(() => import('./pages/admin/AdminMembershipPage'));
+const AdminReportsPage = lazy(() => import('./pages/admin/AdminReportsPage'));
+const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
+
+const ExpertsPage = lazy(() => import('./pages/ExpertsPage'));
+const ExpertProfilePage = lazy(() => import('./pages/ExpertProfilePage'));
 
 const PageFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
@@ -90,12 +103,24 @@ const AdminShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 function AppRoutes() {
+  const location = useLocation();
+  const showPublicChrome = !location.pathname.startsWith('/admin');
+
   return (
     <>
-      <TopBar />
-      <Box component="main" sx={{ paddingTop: { xs: '72px', md: '80px' } }}>
-        <Suspense fallback={<PageFallback />}>
-          <Routes>
+      {showPublicChrome && <TopBar />}
+      <Box
+        component="main"
+        sx={{
+          paddingTop: showPublicChrome ? { xs: '112px', md: '128px' } : 0,
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: showPublicChrome ? '100vh' : undefined,
+        }}
+      >
+        <Box sx={{ flex: 1 }}>
+          <Suspense fallback={<PageFallback />}>
+            <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<ServicesPage />} />
@@ -104,10 +129,13 @@ function AppRoutes() {
             <Route path="/services/smart-home" element={<ServiceCategoryPage slug="smart-home" />} />
             <Route path="/services/hvac" element={<ServiceCategoryPage slug="hvac" />} />
             <Route path="/services/electrical" element={<ServiceCategoryPage slug="electrical" />} />
+            <Route path="/services/garage-door" element={<Navigate to="/services/garage-door-repair" replace />} />
             <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
             <Route path="/scheduler" element={<SchedulerPage />} />
             <Route path="/scheduler/shs" element={<SchedulerPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/membership" element={<MembershipPage />} />
+            <Route path="/match-expert" element={<MatchExpertPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/book/regular" element={<RegularBookingPage />} />
@@ -116,7 +144,10 @@ function AppRoutes() {
             <Route path="/track-request" element={<TrackRequestPage />} />
             <Route path="/booking-confirmation/:requestNumber" element={<BookingConfirmationPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
+            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+            <Route path="/sitemap" element={<SitemapPage />} />
             <Route path="/accessibility" element={<AccessibilityPage />} />
             <Route path="/technician" element={<TechnicianDashboard />} />
 
@@ -157,9 +188,9 @@ function AppRoutes() {
               path="/admin/dashboard"
               element={
                 <AdminRoute>
-                  <AdminShell>
+                  <AdminLayout>
                     <AdminDashboardPage />
-                  </AdminShell>
+                  </AdminLayout>
                 </AdminRoute>
               }
             />
@@ -167,9 +198,9 @@ function AppRoutes() {
               path="/admin/bookings"
               element={
                 <AdminRoute>
-                  <AdminShell>
+                  <AdminLayout>
                     <AdminBookingsPage />
-                  </AdminShell>
+                  </AdminLayout>
                 </AdminRoute>
               }
             />
@@ -177,9 +208,9 @@ function AppRoutes() {
               path="/admin/customers"
               element={
                 <AdminRoute>
-                  <AdminShell>
+                  <AdminLayout>
                     <AdminCustomersPage />
-                  </AdminShell>
+                  </AdminLayout>
                 </AdminRoute>
               }
             />
@@ -188,17 +219,72 @@ function AppRoutes() {
               path="/admin/services"
               element={
                 <AdminRoute>
-                  <AdminShell>
+                  <AdminLayout>
                     <AdminServicesPage />
-                  </AdminShell>
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/experts"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminExpertsPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/experts/:expertId"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminExpertDetailPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/membership"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminMembershipPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/reports"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminReportsPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/settings"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminSettingsPage />
+                  </AdminLayout>
                 </AdminRoute>
               }
             />
 
+<Route path="/experts" element={<ExpertsPage />} />
+<Route path="/experts/:expertSlug" element={<ExpertProfilePage />} />
+
             {/* Legacy admin route */}
             <Route path="/admin" element={<AdminDashboard />} />
-          </Routes>
-        </Suspense>
+            </Routes>
+          </Suspense>
+        </Box>
+        {showPublicChrome && <SiteFooter />}
       </Box>
     </>
   );

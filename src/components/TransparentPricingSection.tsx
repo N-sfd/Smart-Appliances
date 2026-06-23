@@ -24,7 +24,7 @@ export const TRANSPARENT_PRICING_ITEMS = [
 ] as const;
 
 const TransparentPricingSection: React.FC = () => (
-  <Box sx={{ py: { xs: 5, md: 6 }, backgroundColor: colors.navy }}>
+  <Box sx={{ py: { xs: 6, md: 8 }, backgroundColor: colors.lightBlueBg }}>
     <Container maxWidth="lg">
       <Box sx={{ textAlign: 'center', mb: { xs: 3.5, md: 4 } }}>
         <Typography
@@ -32,13 +32,13 @@ const TransparentPricingSection: React.FC = () => (
             fontFamily: fonts.heading,
             fontWeight: 800,
             fontSize: { xs: '1.4rem', md: '1.7rem' },
-            color: '#fff',
+            color: colors.navy,
             mb: 0.5,
           }}
         >
           Transparent Pricing — No Surprises
         </Typography>
-        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: 'rgba(255,255,255,0.65)' }}>
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: '#64748B' }}>
           You&apos;ll always know the cost before any work begins.
         </Typography>
       </Box>
@@ -54,9 +54,10 @@ const TransparentPricingSection: React.FC = () => (
           <Box
             key={item.label}
             sx={{
-              backgroundColor: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E4E7EB',
               borderRadius: '18px',
+              boxShadow: '0 4px 16px rgba(10,37,64,0.06)',
               p: { xs: 3, md: 3.5 },
               textAlign: 'center',
             }}
@@ -78,13 +79,13 @@ const TransparentPricingSection: React.FC = () => (
                 fontFamily: fonts.body,
                 fontWeight: 700,
                 fontSize: '0.9rem',
-                color: '#fff',
+                color: colors.navy,
                 mb: 0.5,
               }}
             >
               {item.label}
             </Typography>
-            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: 'rgba(255,255,255,0.55)' }}>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: '#64748B' }}>
               {item.note}
             </Typography>
           </Box>

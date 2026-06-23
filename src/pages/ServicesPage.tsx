@@ -486,6 +486,23 @@ const ServicesPage: React.FC = () => {
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Button
               variant="contained"
+              onClick={() => navigate('/match-expert')}
+              sx={{
+                backgroundColor: '#4FC3F7',
+                color: '#071B41',
+                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                fontWeight: 700,
+                px: 4,
+                py: 1.5,
+                borderRadius: '10px',
+                textTransform: 'none',
+                '&:hover': { backgroundColor: '#FFFFFF', color: '#0B3D91' },
+              }}
+            >
+              Find My Expert
+            </Button>
+            <Button
+              variant="contained"
               onClick={() => navigate('/contact')}
               sx={{
                 backgroundColor: '#1A73E8',

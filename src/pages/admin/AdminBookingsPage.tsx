@@ -15,8 +15,23 @@ import {
   BOOKING_STATUSES, ADMIN_STATUSES,
   fetchBookingNotes, insertBookingNote, BookingNote,
 } from '../../lib/supabaseBookings';
+import { assignExpert } from '../../services/adminBookings';
+import { fetchActiveExpertsRaw } from '../../services/adminExperts';
+import { DbExpert } from '../../types/admin';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, fonts } from '../../theme';
+import { MATCH_EXPERT_SOURCE_TAG } from '../../data/expertMatchRules';
+import { EXPERTS, getExpertBySlug } from '../../data/experts';
+import { exportCsv } from '../../utils/csvExport';
+
+type LeadSource = 'Quick Form' | 'Scheduler' | 'Matching Expert';
+const LEAD_SOURCES: LeadSource[] = ['Quick Form', 'Scheduler', 'Matching Expert'];
+
+function getLeadSource(row: BookingRow): LeadSource {
+  if (row.issue_description?.includes(MATCH_EXPERT_SOURCE_TAG)) return 'Matching Expert';
+  if (row.admin_status === 'New Lead') return 'Quick Form';
+  return 'Scheduler';
+}
 
 const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
   New: { bg: '#E3F2FD', text: '#0B3D91' },
@@ -127,15 +142,28 @@ const NotesPanel: React.FC<{ bookingId: string }> = ({ bookingId }) => {
 interface RowDetailProps {
   row: BookingRow;
   onStatusChange: (id: string, adminStatus: string) => Promise<void>;
+  activeExperts: DbExpert[];
+  onAssignExpert: (id: string, expertId: string | null) => Promise<void>;
 }
 
-const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange }) => {
+const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange, activeExperts, onAssignExpert }) => {
   const [adminStatus, setAdminStatus] = useState(row.admin_status ?? row.status);
   const [customerMsg, setCustomerMsg] = useState(row.customer_message ?? '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [msgSaving, setMsgSaving] = useState(false);
   const [msgSaved, setMsgSaved] = useState(false);
+  const [expertSaving, setExpertSaving] = useState(false);
+  const [expertSaved, setExpertSaved] = useState(false);
+
+  const handleAssignExpert = async (expertId: string) => {
+    if (!row.id) return;
+    setExpertSaving(true);
+    await onAssignExpert(row.id, expertId || null);
+    setExpertSaving(false);
+    setExpertSaved(true);
+    setTimeout(() => setExpertSaved(false), 2000);
+  };
 
   const handleSaveStatus = async () => {
     if (!row.id) return;
@@ -207,6 +235,52 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange }) => {
             {[row.urgency, row.preferred_date, row.preferred_time].filter(Boolean).join(' · ') || '—'}
           </Typography>
         </Box>
+        {/* Pricing estimate */}
+        {(row.estimated_total != null || row.quote_required) && (
+          <Box>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Pricing Estimate
+            </Typography>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>
+              Service Call Fee: {row.estimated_base_fee != null ? `$${row.estimated_base_fee.toFixed(2)}` : '—'}
+            </Typography>
+            {(row.estimated_priority_fee || row.estimated_emergency_fee) ? (
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>
+                Priority/Emergency Fee: ${(row.estimated_priority_fee || row.estimated_emergency_fee || 0).toFixed(2)}
+              </Typography>
+            ) : null}
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', fontWeight: 700, color: colors.navy }}>
+              {row.quote_required ? 'Quote Required' : `Estimated Total: $${(row.estimated_total ?? 0).toFixed(2)}`}
+            </Typography>
+          </Box>
+        )}
+        {/* Requested expert (customer's original request) */}
+        {row.expert_name && (
+          <Box>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Requested Expert
+            </Typography>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>
+              {row.expert_name}
+            </Typography>
+            {row.expert_slug && getExpertBySlug(row.expert_slug)?.title && (
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText }}>
+                {getExpertBySlug(row.expert_slug)?.title}
+              </Typography>
+            )}
+          </Box>
+        )}
+        {/* Admin-assigned expert (final, overrides display priority) */}
+        {row.expert_id && (
+          <Box>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Assigned Expert
+            </Typography>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', fontWeight: 700, color: colors.primaryBlue }}>
+              {activeExperts.find((e) => e.id === row.expert_id)?.name ?? '—'}
+            </Typography>
+          </Box>
+        )}
       </Box>
 
       {row.issue_description && (
@@ -251,6 +325,29 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange }) => {
         >
           {saving ? <CircularProgress size={14} sx={{ color: '#fff' }} /> : saved ? 'Saved!' : 'Update Status'}
         </Button>
+
+        <FormControl size="small" sx={{ minWidth: 200 }} disabled={activeExperts.length === 0 || expertSaving}>
+          <InputLabel sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>Assign Expert</InputLabel>
+          <Select
+            value={row.expert_id ?? ''}
+            label="Assign Expert"
+            onChange={(e) => void handleAssignExpert(e.target.value)}
+            sx={{ borderRadius: '10px', fontFamily: fonts.body, fontSize: '0.85rem' }}
+          >
+            <MenuItem value="" sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>Unassigned</MenuItem>
+            {activeExperts.map((e) => (
+              <MenuItem key={e.id} value={e.id} sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>{e.name}</MenuItem>
+            ))}
+          </Select>
+          {activeExperts.length === 0 && (
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.7rem', color: colors.mutedText, mt: 0.5 }}>
+              Add experts in Admin → Experts to enable assignment.
+            </Typography>
+          )}
+        </FormControl>
+        {expertSaved && (
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.success, fontWeight: 700 }}>Saved!</Typography>
+        )}
       </Box>
 
       {/* Customer message */}
@@ -295,6 +392,9 @@ const AdminBookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [activeExperts, setActiveExperts] = useState<DbExpert[]>([]);
+
+  useEffect(() => { fetchActiveExpertsRaw().then(setActiveExperts); }, []);
 
   // Filters
   const [search, setSearch] = useState('');
@@ -304,6 +404,10 @@ const AdminBookingsPage: React.FC = () => {
   const [zipFilter, setZipFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [leadSourceFilter, setLeadSourceFilter] = useState('all');
+  const [expertFilter, setExpertFilter] = useState('all');
+  const [emailSentFilter, setEmailSentFilter] = useState('all');
+  const [membershipFilter, setMembershipFilter] = useState('all');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -322,9 +426,41 @@ const AdminBookingsPage: React.FC = () => {
 
   useEffect(() => { void load(); }, [load]);
 
+  const visibleBookings = bookings
+    .filter((b) => leadSourceFilter === 'all' || getLeadSource(b) === leadSourceFilter)
+    .filter((b) => expertFilter === 'all' || b.expert_name === expertFilter)
+    .filter((b) => emailSentFilter === 'all' || String(Boolean(b.email_sent)) === emailSentFilter)
+    .filter((b) => membershipFilter === 'all' || String(Boolean(b.membership_interest)) === membershipFilter);
+
+  const handleExport = () => {
+    exportCsv('bookings.csv', visibleBookings, [
+      { header: 'Request ID', value: (b) => b.request_number },
+      { header: 'Customer Name', value: (b) => b.customer_name },
+      { header: 'Email', value: (b) => b.email },
+      { header: 'Phone', value: (b) => b.phone },
+      { header: 'Service Category', value: (b) => b.service_category },
+      { header: 'Product/Service', value: (b) => b.product_name },
+      { header: 'Service Type', value: (b) => b.service_type },
+      { header: 'Urgency', value: (b) => b.urgency },
+      { header: 'Preferred Date', value: (b) => b.preferred_date },
+      { header: 'Preferred Time', value: (b) => b.preferred_time },
+      { header: 'Admin Status', value: (b) => b.admin_status ?? b.status },
+      { header: 'Email Sent', value: (b) => Boolean(b.email_sent) },
+      { header: 'Membership Interest', value: (b) => Boolean(b.membership_interest) },
+      { header: 'Requested Expert', value: (b) => b.expert_name },
+      { header: 'Assigned Expert', value: (b) => activeExperts.find((e) => e.id === b.expert_id)?.name ?? '' },
+      { header: 'Created Date', value: (b) => b.created_at },
+    ]);
+  };
+
   const handleStatusChange = async (id: string, adminStatus: string) => {
     await updateAdminStatus(id, adminStatus);
     setBookings((prev) => prev.map((b) => b.id === id ? { ...b, admin_status: adminStatus } : b));
+  };
+
+  const handleAssignExpert = async (id: string, expertId: string | null) => {
+    await assignExpert(id, expertId);
+    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, expert_id: expertId } : b));
   };
 
   const filterSelect = (label: string, value: string, onChange: (v: string) => void, options: string[]) => (
@@ -346,12 +482,23 @@ const AdminBookingsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
-      <Typography variant="h4" sx={{ fontFamily: fonts.heading, color: colors.navy, fontWeight: 800, mb: 0.5 }}>
-        Bookings
-      </Typography>
-      <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '0.9rem', mb: 3 }}>
-        {bookings.length} result{bookings.length !== 1 ? 's' : ''}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 1.5 }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontFamily: fonts.heading, color: colors.navy, fontWeight: 800, mb: 0.5 }}>
+            Bookings
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '0.9rem', mb: 3 }}>
+            {visibleBookings.length} result{visibleBookings.length !== 1 ? 's' : ''}
+          </Typography>
+        </Box>
+        <Button
+          onClick={handleExport}
+          variant="outlined"
+          sx={{ borderColor: colors.border, color: colors.darkText, fontFamily: fonts.body, fontWeight: 600, textTransform: 'none', borderRadius: '10px' }}
+        >
+          Export CSV
+        </Button>
+      </Box>
 
       {/* Filter row */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 3 }}>
@@ -375,6 +522,10 @@ const AdminBookingsPage: React.FC = () => {
         {filterSelect('Status', statusFilter, setStatusFilter, BOOKING_STATUSES)}
         {filterSelect('Category', categoryFilter, setCategoryFilter, SERVICE_CATEGORIES)}
         {filterSelect('Type', typeFilter, setTypeFilter, SERVICE_TYPES)}
+        {filterSelect('Lead Source', leadSourceFilter, setLeadSourceFilter, LEAD_SOURCES)}
+        {filterSelect('Expert', expertFilter, setExpertFilter, EXPERTS.map((e) => e.name))}
+        {filterSelect('Email Sent', emailSentFilter, setEmailSentFilter, ['true', 'false'])}
+        {filterSelect('Membership', membershipFilter, setMembershipFilter, ['true', 'false'])}
         <TextField
           placeholder="ZIP"
           value={zipFilter}
@@ -416,7 +567,7 @@ const AdminBookingsPage: React.FC = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress />
         </Box>
-      ) : bookings.length === 0 ? (
+      ) : visibleBookings.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText }}>No bookings match your filters.</Typography>
         </Box>
@@ -425,7 +576,7 @@ const AdminBookingsPage: React.FC = () => {
           <Table size="small">
             <TableHead>
               <TableRow sx={{ backgroundColor: '#F8FAFC' }}>
-                {['Request ID', 'Date', 'Customer', 'Service', 'ZIP', 'Urgency', 'Status', ''].map((h) => (
+                {['Request ID', 'Date', 'Customer', 'Service', 'ZIP', 'Urgency', 'Flags', 'Status', ''].map((h) => (
                   <TableCell key={h} sx={{ fontFamily: fonts.body, fontWeight: 700, color: colors.navy, fontSize: '0.75rem', py: 1.5 }}>
                     {h}
                   </TableCell>
@@ -433,9 +584,10 @@ const AdminBookingsPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {bookings.map((b) => {
+              {visibleBookings.map((b) => {
                 const statusStyle = STATUS_COLOR[b.status] ?? { bg: '#F5F5F5', text: '#333' };
                 const isExpanded = expandedId === b.id;
+                const leadSource = getLeadSource(b);
                 return (
                   <React.Fragment key={b.id}>
                     <TableRow
@@ -462,6 +614,13 @@ const AdminBookingsPage: React.FC = () => {
                       <TableCell sx={{ py: 1.5 }}>
                         <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>{b.product_name || b.service_type}</Typography>
                         <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText }}>{b.service_category} · {b.service_type}</Typography>
+                        {leadSource === 'Matching Expert' && (
+                          <Chip
+                            label="Matching Expert Lead"
+                            size="small"
+                            sx={{ mt: 0.5, backgroundColor: '#EDE9FE', color: '#6D28D9', fontFamily: fonts.body, fontWeight: 700, fontSize: '0.65rem', height: 20 }}
+                          />
+                        )}
                       </TableCell>
                       <TableCell sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.mutedText, py: 1.5 }}>
                         {b.zip_code}
@@ -480,6 +639,21 @@ const AdminBookingsPage: React.FC = () => {
                         ) : <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText }}>—</Typography>}
                       </TableCell>
                       <TableCell sx={{ py: 1.5 }}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          <Chip
+                            label={b.email_sent ? 'Email Sent' : 'Email Pending'}
+                            size="small"
+                            sx={{ backgroundColor: b.email_sent ? '#E8F5E9' : '#FFF3E0', color: b.email_sent ? '#1B5E20' : '#E65100', fontFamily: fonts.body, fontSize: '0.65rem', height: 20 }}
+                          />
+                          {b.membership_interest && (
+                            <Chip label="Membership" size="small" sx={{ backgroundColor: '#F3E5F5', color: '#4A148C', fontFamily: fonts.body, fontSize: '0.65rem', height: 20 }} />
+                          )}
+                          {(b.expert_id || b.expert_name) && (
+                            <Chip label={activeExperts.find((e) => e.id === b.expert_id)?.name ?? b.expert_name ?? 'Expert'} size="small" sx={{ backgroundColor: colors.lightBlueBg, color: colors.primaryBlue, fontFamily: fonts.body, fontSize: '0.65rem', height: 20 }} />
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ py: 1.5 }}>
                         <Chip
                           label={b.status}
                           size="small"
@@ -493,9 +667,9 @@ const AdminBookingsPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={8} sx={{ p: 0, border: 0 }}>
+                      <TableCell colSpan={9} sx={{ p: 0, border: 0 }}>
                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                          <RowDetail row={b} onStatusChange={handleStatusChange} />
+                          <RowDetail row={b} onStatusChange={handleStatusChange} activeExperts={activeExperts} onAssignExpert={handleAssignExpert} />
                         </Collapse>
                       </TableCell>
                     </TableRow>

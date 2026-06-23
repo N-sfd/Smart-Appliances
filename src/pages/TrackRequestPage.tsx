@@ -15,6 +15,7 @@ import {
   BookingRow,
   ADMIN_STATUS_STEPS,
 } from '../lib/supabaseBookings';
+import { fetchExpertById } from '../services/adminExperts';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -105,6 +106,17 @@ const StatusTimeline: React.FC<{ currentStatus: string }> = ({ currentStatus }) 
 
 const BookingCard: React.FC<{ b: BookingRow }> = ({ b }) => {
   const displayStatus = b.admin_status ?? b.status ?? 'New';
+  const estimateLabel = b.quote_required
+    ? 'Quote required'
+    : b.estimated_total != null
+      ? `$${b.estimated_total.toFixed(2)}`
+      : null;
+  const [assignedExpertName, setAssignedExpertName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!b.expert_id) { setAssignedExpertName(null); return; }
+    fetchExpertById(b.expert_id).then((e) => setAssignedExpertName(e?.name ?? null));
+  }, [b.expert_id]);
 
   return (
     <Box
@@ -138,6 +150,8 @@ const BookingCard: React.FC<{ b: BookingRow }> = ({ b }) => {
           ...(b.product_name ? [['Product / Service', b.product_name]] : []),
           ...(b.preferred_date ? [['Preferred Date', fmtDate(b.preferred_date)]] : []),
           ...(b.preferred_time ? [['Preferred Time', b.preferred_time]] : []),
+          ...(assignedExpertName ? [['Assigned Expert', assignedExpertName]] : b.expert_name ? [['Requested Expert', b.expert_name]] : []),
+          ...(estimateLabel ? [['Starting Estimate', estimateLabel]] : []),
           ['Submitted', fmtTimestamp(b.created_at)],
         ].map(([label, val]) => (
           <Box key={label}>
@@ -150,6 +164,12 @@ const BookingCard: React.FC<{ b: BookingRow }> = ({ b }) => {
           </Box>
         ))}
       </Box>
+
+      {estimateLabel && (
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, mb: 2, lineHeight: 1.6 }}>
+          Final pricing is confirmed after technician inspection.
+        </Typography>
+      )}
 
       {/* Customer message from admin */}
       {b.customer_message && (

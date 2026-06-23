@@ -55,6 +55,10 @@ import {
 } from '../data/schedulerPrefill';
 import { insertBooking, updateEmailSent } from '../lib/supabaseBookings';
 import { useAuth } from '../contexts/AuthContext';
+import ServicePricingSummary from '../components/booking/ServicePricingSummary';
+import { calculateServiceEstimate } from '../utils/pricing';
+import { getExpertBySlug } from '../data/experts';
+import { getMembershipPlanById } from '../data/membershipPlans';
 import {
   addLocalDays,
   formatLocalDateIso,
@@ -351,6 +355,10 @@ const SchedulerPage: React.FC = () => {
   const prefillZip = params.get('zipCode') ?? '';
   const prefill = useMemo(() => parseSchedulerPrefill(params), [params]);
   const paramPreferredDate = params.get('preferredDate');
+  const expertSlug = params.get('expert');
+  const requestedExpert = useMemo(() => (expertSlug ? getExpertBySlug(expertSlug) : undefined), [expertSlug]);
+  const membershipPlanId = params.get('membershipPlan');
+  const requestedPlan = useMemo(() => (membershipPlanId ? getMembershipPlanById(membershipPlanId) : undefined), [membershipPlanId]);
   const todayLocal = getTodayLocalDate();
 
   // Step — skip service-type picker when both type and category come from URL
@@ -610,6 +618,30 @@ const SchedulerPage: React.FC = () => {
     return parts.filter(Boolean).join(' • ');
   }, [category, serviceType, hvacUrgency]);
 
+  // ── Pricing summary inputs ────────────────────────────────────────────────
+  const pricingServiceTypeLabel = SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? null;
+  const pricingProductName =
+    prefill.productName || appliance || hvacService || plumbingIssue || electricalIssue || smartDevice || garageDoorService || null;
+  const pricingUrgency =
+    hvacUrgency || (serviceType === 'emergency' ? 'Emergency' : 'Regular');
+  const pricingSummary = (
+    <ServicePricingSummary
+      serviceCategory={category || null}
+      productName={pricingProductName}
+      serviceTypeLabel={pricingServiceTypeLabel}
+      urgency={pricingUrgency}
+    />
+  );
+  const reviewEstimate = useMemo(
+    () => calculateServiceEstimate({
+      serviceCategory: category || null,
+      productName: pricingProductName,
+      serviceType: pricingServiceTypeLabel,
+      urgency: pricingUrgency,
+    }),
+    [category, pricingProductName, pricingServiceTypeLabel, pricingUrgency],
+  );
+
   const resolvedCategoryDetail = useMemo(
     () =>
       resolvePrefilledCategoryDetail(
@@ -845,6 +877,15 @@ const SchedulerPage: React.FC = () => {
         preferred_date: resolvedPreferredDate,
         preferred_time: slotLabels.join('; ') || null,
         status: 'New',
+        estimated_base_fee: reviewEstimate?.baseFee ?? null,
+        estimated_priority_fee: reviewEstimate?.priorityFee ?? null,
+        estimated_emergency_fee: reviewEstimate?.emergencyFee ?? null,
+        estimated_total: reviewEstimate?.estimatedTotal ?? null,
+        quote_required: reviewEstimate?.quoteRequired ?? false,
+        expert_slug: requestedExpert?.slug ?? null,
+        expert_name: requestedExpert?.name ?? null,
+        membership_interest: Boolean(requestedPlan),
+        selected_membership_plan: requestedPlan?.name ?? null,
       });
 
       if (insertError) {
@@ -889,6 +930,8 @@ const SchedulerPage: React.FC = () => {
           category,
           preferredDate: resolvedPreferredDate ?? '',
           preferredTime: slotLabels.join('; ') || '',
+          estimate: reviewEstimate,
+          expertName: requestedExpert?.name ?? null,
         },
       });
     } catch (error) {
@@ -1008,6 +1051,39 @@ const SchedulerPage: React.FC = () => {
         />
       </Box>
 
+      {/* Selected expert */}
+      {requestedExpert && (
+        <Box
+          sx={{
+            backgroundColor: colors.lightBlueBg,
+            borderRadius: '14px',
+            border: `1px solid ${colors.border}`,
+            p: 2,
+            mb: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: fonts.body,
+              color: colors.mutedText,
+              fontSize: '0.7rem',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              mb: 0.5,
+            }}
+          >
+            Selected Expert
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.heading, color: colors.navy, fontWeight: 700, fontSize: '0.95rem' }}>
+            {requestedExpert.name}
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '0.78rem', mt: 0.5, lineHeight: 1.5 }}>
+            Requested expert is subject to availability.
+          </Typography>
+        </Box>
+      )}
+
       {/* Service summary */}
       {category && (
         <Box
@@ -1060,6 +1136,9 @@ const SchedulerPage: React.FC = () => {
         </Box>
       )}
 
+      {/* Pricing summary */}
+      <Box sx={{ mb: 2 }}>{pricingSummary}</Box>
+
       {/* Trust bullets */}
       <Box
         sx={{
@@ -1100,7 +1179,7 @@ const SchedulerPage: React.FC = () => {
   // ── Main render ───────────────────────────────────────────────────────────
   return (
     <Box
-      sx={{ minHeight: '100vh', backgroundColor: colors.background, py: { xs: 4, md: 6 } }}
+      sx={{ minHeight: '100vh', backgroundColor: colors.background, pt: { xs: 4, md: 6 }, pb: '72px' }}
     >
       <Container maxWidth="lg">
         {/* Page header */}
@@ -1152,7 +1231,9 @@ const SchedulerPage: React.FC = () => {
                 borderRadius: '20px',
                 border: `1px solid ${colors.border}`,
                 boxShadow: colors.cardShadow,
-                p: { xs: 3, md: 5 },
+                pt: { xs: 3, md: 5 },
+                pb: { xs: 4, md: 6 },
+                px: { xs: 3, md: 5 },
               }}
             >
               <Typography
@@ -1324,7 +1405,9 @@ const SchedulerPage: React.FC = () => {
                 borderRadius: '20px',
                 border: `1px solid ${colors.border}`,
                 boxShadow: colors.cardShadow,
-                p: { xs: 3, md: 4 },
+                pt: { xs: 3, md: 4 },
+                pb: { xs: 4, md: 5 },
+                px: { xs: 3, md: 4 },
                 minWidth: 0,
               }}
             >
@@ -2311,6 +2394,8 @@ const SchedulerPage: React.FC = () => {
                       ],
                       ['Category', category || '—'],
                       ['Service', serviceTitle],
+                      ...(requestedExpert ? [['Selected Expert', requestedExpert.name]] : []),
+                      ...(requestedPlan ? [['Selected Membership Plan', requestedPlan.name]] : []),
                       ...(brand ? [['Brand', brand]] : []),
                       ...(model ? [['Model', model]] : []),
                       ...(hvacSystemType ? [['System Type', hvacSystemType]] : []),
@@ -2367,6 +2452,54 @@ const SchedulerPage: React.FC = () => {
                       </React.Fragment>
                     ))}
                   </Box>
+
+                  {reviewEstimate && (
+                    <Box
+                      sx={{
+                        mt: 2,
+                        p: 2.5,
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: '14px',
+                        backgroundColor: '#fff',
+                      }}
+                    >
+                      <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.92rem', color: colors.navy, mb: 1.25 }}>
+                        Pricing Summary
+                      </Typography>
+                      <Box sx={{ display: 'grid', gap: 0.75 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText }}>Service Call Fee</Typography>
+                          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', fontWeight: 600, color: colors.navy }}>
+                            {reviewEstimate.quoteRequired ? '—' : `$${(reviewEstimate.baseFee ?? 0).toFixed(2)}`}
+                          </Typography>
+                        </Box>
+                        {reviewEstimate.priorityFee > 0 && (
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText }}>Same-Day Priority Fee</Typography>
+                            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', fontWeight: 600, color: colors.navy }}>${reviewEstimate.priorityFee.toFixed(2)}</Typography>
+                          </Box>
+                        )}
+                        {reviewEstimate.emergencyFee > 0 && (
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.emergency }}>Emergency Fee</Typography>
+                            <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', fontWeight: 600, color: colors.emergency }}>${reviewEstimate.emergencyFee.toFixed(2)}</Typography>
+                          </Box>
+                        )}
+                        <Divider sx={{ my: 0.5 }} />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.88rem', color: colors.navy }}>
+                            {reviewEstimate.quoteRequired ? 'Estimate' : 'Estimated Total'}
+                          </Typography>
+                          <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1rem', color: colors.primaryBlue }}>
+                            {reviewEstimate.quoteRequired ? 'Quote required' : `$${(reviewEstimate.estimatedTotal ?? 0).toFixed(2)}`}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mt: 1.5, lineHeight: 1.55 }}>
+                        Prices shown are starting estimates. Final pricing depends on diagnosis, parts, labor, accessibility, and service urgency.
+                      </Typography>
+                    </Box>
+                  )}
 
                   {issueDescription && (
                     <Box
