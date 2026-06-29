@@ -40,15 +40,15 @@ interface ContactInfo {
 const contactInfoItems: ContactInfo[] = [
   {
     icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 22 }} />,
-    label: '+1 (571) 276-4808',
-    href: 'tel:+15712764808',
+    label: '+1 (240) 576-0397',
+    href: 'tel:+12405760397',
     sublabel: 'Mon–Fri 8AM–6PM, Sat 9AM–4PM',
     iconBg: '#E8F1FF',
     value: 'phone',
   },
   {
     icon: <EmailIcon sx={{ color: '#1A73E8', fontSize: 22 }} />,
-    label: 'service@smartappliance.com',
+    label: 'service@smartappliances.co',
     sublabel: 'We respond within 2 hours',
     iconBg: '#E8F1FF',
     value: 'email',

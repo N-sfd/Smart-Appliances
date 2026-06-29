@@ -117,7 +117,7 @@ exports.handler = async (event) => {
             </p>
 
             <p style="margin:0;font-size:13px;color:#94A3B8;line-height:1.6;text-align:center;">
-              Questions? Call us at <a href="tel:3017830977" style="color:#1A73E8;font-weight:600;">301-783-0977</a>
+              Questions? Call us at <a href="tel:2405760397" style="color:#1A73E8;font-weight:600;">240-576-0397</a>
             </p>
           </td>
         </tr>

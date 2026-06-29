@@ -228,7 +228,7 @@ const NavigationBar: React.FC = () => {
             <Typography
               variant="body2"
               component="a"
-              href="tel:+15712764808"
+              href="tel:+12405760397"
               sx={{
                 fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                 color: '#1A73E8',
@@ -239,7 +239,7 @@ const NavigationBar: React.FC = () => {
                 '&:hover': { textDecoration: 'underline' },
               }}
             >
-              📞 +1 (571) 276-4808
+              📞 +1 (240) 576-0397
             </Typography>
             <Typography
               variant="body2"
@@ -248,7 +248,7 @@ const NavigationBar: React.FC = () => {
                 color: '#666666',
               }}
             >
-              ✉️ info@smartapplications.com
+              ✉️ service@smartappliances.co
             </Typography>
           </Box>
 

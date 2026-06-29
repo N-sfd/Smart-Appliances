@@ -31,8 +31,8 @@ const AdminSettingsPage: React.FC = () => (
     </Typography>
 
     <SettingsCard title="Business Contact">
-      <Row label="Business Phone" value="(301) 783-0977" />
-      <Row label="Support Email" value="support@smartappliances.com" />
+      <Row label="Business Phone" value="(240) 576-0397" />
+      <Row label="Support Email" value="service@smartappliances.co" />
       <Row label="Site URL" value="frabjous-queijadas-2649b4.netlify.app" />
     </SettingsCard>
 

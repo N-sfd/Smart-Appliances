@@ -1515,8 +1515,8 @@ const HomeBelowFold: React.FC = () => {
                       </Box>
                       <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: '#9A3412', mt: 1, pl: 3.25 }}>
                         Or call{' '}
-                        <Box component="a" href="tel:+15712764808" sx={{ color: '#EA580C', fontWeight: 700, textDecoration: 'none' }}>
-                          (571) 276-4808
+                        <Box component="a" href="tel:+12405760397" sx={{ color: '#EA580C', fontWeight: 700, textDecoration: 'none' }}>
+                          (240) 576-0397
                         </Box>{' '}
                         to check if we have nearby options.
                       </Typography>
@@ -1748,8 +1748,8 @@ const HomeBelowFold: React.FC = () => {
             <Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75, mb: 2.5 }}>
                 {[
-                  { icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Phone', value: '+1 (571) 276-4808', href: 'tel:+15712764808' },
-                  { icon: <EmailIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Email', value: 'service@smartappliance.com', href: 'mailto:service@smartappliance.com' },
+                  { icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Phone', value: '+1 (240) 576-0397', href: 'tel:+12405760397' },
+                  { icon: <EmailIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Email', value: 'service@smartappliances.co', href: 'mailto:service@smartappliances.co' },
                   { icon: <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Coverage', value: 'Maryland, DC & Northern Virginia', href: undefined },
                 ].map((item) => (
                   <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -1849,7 +1849,7 @@ const HomeBelowFold: React.FC = () => {
                   </Button>
                   <Typography sx={{ color: colors.mutedText, fontFamily: fonts.body, textAlign: 'center', fontSize: '0.82rem' }}>
                     Or call us directly at{' '}
-                    <Box component="a" href="tel:+15712764808" sx={{ color: colors.primaryBlue, fontWeight: 700, textDecoration: 'none' }}>+1 (571) 276-4808</Box>
+                    <Box component="a" href="tel:+12405760397" sx={{ color: colors.primaryBlue, fontWeight: 700, textDecoration: 'none' }}>+1 (240) 576-0397</Box>
                   </Typography>
                 </Box>
               )}
@@ -1887,7 +1887,7 @@ const HomeBelowFold: React.FC = () => {
       >
         <Box
           component="a"
-          href="tel:+15712764808"
+          href="tel:+12405760397"
           sx={{
             flex: 1,
             display: 'flex',

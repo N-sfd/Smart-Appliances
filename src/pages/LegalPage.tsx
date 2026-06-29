@@ -28,7 +28,7 @@ export const PrivacyPolicyPage: React.FC = () => (
     </p>
     <p>
       We do not sell personal information. For questions about how your data is handled, contact us at{' '}
-      <a href="mailto:service@smartappliance.com">service@smartappliance.com</a>.
+      <a href="mailto:service@smartappliances.co">service@smartappliances.co</a>.
     </p>
   </LegalPage>
 );
@@ -50,8 +50,8 @@ export const AccessibilityPage: React.FC = () => (
     <p>
       Smart Appliances is committed to making our website usable for all customers. If you experience difficulty
       accessing content or booking service online, please call{' '}
-      <a href="tel:+15712764808">(571) 276-4808</a> or email{' '}
-      <a href="mailto:service@smartappliance.com">service@smartappliance.com</a> for assistance.
+      <a href="tel:+12405760397">(240) 576-0397</a> or email{' '}
+      <a href="mailto:service@smartappliances.co">service@smartappliances.co</a> for assistance.
     </p>
   </LegalPage>
 );

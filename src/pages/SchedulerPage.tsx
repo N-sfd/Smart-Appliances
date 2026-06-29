@@ -1155,10 +1155,10 @@ const SchedulerPage: React.FC = () => {
           Questions? Call{' '}
           <Box
             component="a"
-            href="tel:+15712764808"
+            href="tel:+12405760397"
             sx={{ color: colors.primaryBlue, fontWeight: 700, textDecoration: 'none' }}
           >
-            (571) 276-4808
+            (240) 576-0397
           </Box>
         </Typography>
       </Box>
@@ -2004,10 +2004,10 @@ const SchedulerPage: React.FC = () => {
                             ⚠️ We can't confirm service in that area. Call{' '}
                             <Box
                               component="a"
-                              href="tel:+15712764808"
+                              href="tel:+12405760397"
                               sx={{ color: '#92400E', fontWeight: 700 }}
                             >
-                              (571) 276-4808
+                              (240) 576-0397
                             </Box>{' '}
                             to check availability.
                           </Typography>

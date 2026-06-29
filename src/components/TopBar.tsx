@@ -302,7 +302,7 @@ const TopBar: React.FC = () => {
           >
             <Button
               component="a"
-              href="tel:+15712764808"
+              href="tel:+12405760397"
               startIcon={<Phone sx={{ fontSize: '1rem !important' }} />}
               sx={{
                 display: { xs: 'none', sm: 'inline-flex' },
@@ -337,7 +337,7 @@ const TopBar: React.FC = () => {
                 },
               }}
             >
-              (571) 276-4808
+              (240) 576-0397
             </Button>
 
             {/* Auth buttons or user avatar — desktop */}
@@ -402,8 +402,8 @@ const TopBar: React.FC = () => {
 
             <IconButton
               component="a"
-              href="tel:+15712764808"
-              aria-label="Call (571) 276-4808"
+              href="tel:+12405760397"
+              aria-label="Call (240) 576-0397"
               sx={{
                 display: { xs: 'inline-flex', sm: 'none' },
                 alignItems: 'center',
@@ -616,12 +616,12 @@ const TopBar: React.FC = () => {
           )}
           <Box
             component="a"
-            href="tel:+15712764808"
+            href="tel:+12405760397"
             sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center', mt: 0.5, textDecoration: 'none' }}
           >
             <Phone sx={{ color: colors.primaryBlue, fontSize: '1rem' }} />
             <Box component="span" sx={{ color: colors.navy, fontFamily: fonts.body, fontSize: '0.9rem', fontWeight: 700 }}>
-              (571) 276-4808
+              (240) 576-0397
             </Box>
           </Box>
         </Box>
