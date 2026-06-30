@@ -1,9 +1,19 @@
-export const SERVICE_AREA_ZIP_MIN = 20001;
-export const SERVICE_AREA_ZIP_MAX = 21930;
+import { isZipInServiceArea } from '../utils/serviceAreas';
 
-export const SERVICE_AREA_REGION_LABEL = 'Washington DC & Maryland Metro';
+/** Full regional service area, used inline in sentences (no leading "Serving"). */
+export const SERVICE_AREA_REGION_LABEL =
+  'Maryland, Virginia, West Virginia, Pennsylvania, Delaware, and Washington DC';
 
-export const SERVICE_AREA_ZIP_HINT = `Service area: ZIP ${SERVICE_AREA_ZIP_MIN}–${SERVICE_AREA_ZIP_MAX}`;
+/** Compact form for tight UI spots (chips, pills, helper text). */
+export const SERVICE_AREA_REGION_LABEL_SHORT = 'MD, VA, WV, PA, DE & DC';
+
+/** Standalone sentence form for section intros / coverage statements. */
+export const SERVICE_AREA_SERVING_SENTENCE = `Serving ${SERVICE_AREA_REGION_LABEL}.`;
+
+/** Label shown on the embedded service-area map. */
+export const SERVICE_AREA_MAP_LABEL = 'MD, VA, WV, PA, DE & DC Service Region';
+
+export const SERVICE_AREA_ZIP_HINT = `Service area: ${SERVICE_AREA_REGION_LABEL_SHORT}`;
 
 /** Strip non-digits and cap at 5 characters for ZIP inputs */
 export function normalizeZipInput(value: string): string {
@@ -14,14 +24,17 @@ export function isValidUsZip(zip: string): boolean {
   return /^\d{5}$/.test(zip.trim());
 }
 
+/**
+ * Broad pass/fail check across the regional service area (MD, VA, WV, PA, DE, DC).
+ * This is intentionally generous — see src/utils/serviceAreas.ts for the
+ * underlying ZIP-range data and its limitations.
+ */
 export function isInServiceArea(zip: string): boolean {
-  if (!isValidUsZip(zip)) return false;
-  const num = parseInt(zip.trim(), 10);
-  return num >= SERVICE_AREA_ZIP_MIN && num <= SERVICE_AREA_ZIP_MAX;
+  return isZipInServiceArea(zip);
 }
 
-/** States we serve in the DC metro service area */
-export type MetroServiceState = 'MD' | 'DC' | 'VA' | 'PA' | 'WV';
+/** States we serve across the regional service area */
+export type MetroServiceState = 'MD' | 'DC' | 'VA' | 'PA' | 'WV' | 'DE';
 
 const METRO_STATE_LABELS: Record<MetroServiceState, string> = {
   MD: 'Maryland',
@@ -29,9 +42,15 @@ const METRO_STATE_LABELS: Record<MetroServiceState, string> = {
   VA: 'Virginia',
   PA: 'Pennsylvania',
   WV: 'West Virginia',
+  DE: 'Delaware',
 };
 
-/** 3-digit ZIP prefix → state for our service area (20001–21930) */
+/**
+ * 3-digit ZIP prefix → state, for state inference / mismatch checks.
+ * Kept separate from the broad serviceZipRanges check in src/utils/serviceAreas.ts
+ * so existing curated DC/MD/VA prefixes (which intentionally overlap at the
+ * 200–205 boundary) keep resolving exactly as before.
+ */
 const ZIP_PREFIX_TO_STATE: Record<string, MetroServiceState> = {
   '200': 'DC',
   '201': 'VA',
@@ -52,6 +71,11 @@ const ZIP_PREFIX_TO_STATE: Record<string, MetroServiceState> = {
   '218': 'MD',
   '219': 'MD',
 };
+
+for (let prefix = 220; prefix <= 246; prefix += 1) ZIP_PREFIX_TO_STATE[String(prefix)] = 'VA';
+for (let prefix = 247; prefix <= 268; prefix += 1) ZIP_PREFIX_TO_STATE[String(prefix)] = 'WV';
+for (let prefix = 150; prefix <= 196; prefix += 1) ZIP_PREFIX_TO_STATE[String(prefix)] = 'PA';
+for (let prefix = 197; prefix <= 199; prefix += 1) ZIP_PREFIX_TO_STATE[String(prefix)] = 'DE';
 
 export function getMetroStateLabel(state: MetroServiceState): string {
   return METRO_STATE_LABELS[state];
@@ -98,7 +122,7 @@ export function validateZipCode(
       isValidFormat: false,
       isInServiceArea: false,
       isValid: false,
-      message: 'ZIP code is required',
+      message: 'Please enter your ZIP code.',
     };
   }
 
@@ -107,7 +131,7 @@ export function validateZipCode(
       isValidFormat: false,
       isInServiceArea: false,
       isValid: false,
-      message: 'Enter a valid 5-digit ZIP code',
+      message: 'Please enter a valid 5-digit ZIP code.',
     };
   }
 
@@ -118,7 +142,7 @@ export function validateZipCode(
       isValidFormat: true,
       isInServiceArea: false,
       isValid: false,
-      message: `We don't currently service ZIP ${normalized}. We cover ${SERVICE_AREA_REGION_LABEL} (${SERVICE_AREA_ZIP_MIN}–${SERVICE_AREA_ZIP_MAX}).`,
+      message: 'This ZIP may be outside our current service area. Please call us to confirm availability.',
     };
   }
 
@@ -141,7 +165,7 @@ export function getZipFieldHelperText(
   const result = validateZipCode(zip, options);
   if (result.message) return result.message;
 
-  if (result.isInServiceArea) return 'Great news — we service your area.';
+  if (result.isInServiceArea) return `Great news — ZIP ${zip.trim()} is within our regional service area.`;
 
   return SERVICE_AREA_ZIP_HINT;
 }
@@ -178,6 +202,20 @@ export const SERVICE_AREA_ZIP_OPTIONS: ServiceAreaZipOption[] = [
   { zip: '20170', city: 'Herndon', state: 'VA' },
   { zip: '20190', city: 'Reston', state: 'VA' },
   { zip: '20110', city: 'Manassas', state: 'VA' },
+  { zip: '22201', city: 'Arlington', state: 'VA' },
+  { zip: '22314', city: 'Alexandria', state: 'VA' },
+  { zip: '22030', city: 'Fairfax', state: 'VA' },
+  { zip: '22191', city: 'Woodbridge', state: 'VA' },
+  { zip: '25401', city: 'Martinsburg', state: 'WV' },
+  { zip: '25414', city: 'Charles Town', state: 'WV' },
+  { zip: '25425', city: 'Harpers Ferry', state: 'WV' },
+  { zip: '17201', city: 'Chambersburg', state: 'PA' },
+  { zip: '17401', city: 'York', state: 'PA' },
+  { zip: '17101', city: 'Harrisburg', state: 'PA' },
+  { zip: '19103', city: 'Philadelphia', state: 'PA' },
+  { zip: '19801', city: 'Wilmington', state: 'DE' },
+  { zip: '19711', city: 'Newark', state: 'DE' },
+  { zip: '19901', city: 'Dover', state: 'DE' },
 ];
 
 /** Match a ZIP to a curated dropdown row, or the closest same-prefix option in our service area. */
@@ -207,7 +245,9 @@ export function getSchedulerZipSelectOptions(zip: string): ServiceAreaZipOption[
 }
 
 export const serviceAreaNeighborhoods = [
+  // Washington DC
   'Washington DC',
+  // Maryland
   'Baltimore',
   'Silver Spring',
   'Rockville',
@@ -219,6 +259,26 @@ export const serviceAreaNeighborhoods = [
   'Towson',
   'Hagerstown',
   'Waldorf',
+  // Virginia
+  'Arlington',
+  'Alexandria',
+  'Fairfax',
+  'Leesburg',
+  'Manassas',
+  'Woodbridge',
+  // West Virginia
+  'Martinsburg',
+  'Charles Town',
+  'Harpers Ferry',
+  // Pennsylvania
+  'Chambersburg',
+  'York',
+  'Harrisburg',
+  'Philadelphia',
+  // Delaware
+  'Wilmington',
+  'Newark',
+  'Dover',
 ];
 
 export interface ServiceAreaMapPin {

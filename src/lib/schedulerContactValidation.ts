@@ -3,7 +3,7 @@ import { isPastLocalDate } from './localDate';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const SERVICE_AREA_STATES = ['MD', 'DC', 'VA', 'PA', 'WV'] as const;
+export const SERVICE_AREA_STATES = ['MD', 'DC', 'VA', 'PA', 'WV', 'DE'] as const;
 export type ServiceAreaState = typeof SERVICE_AREA_STATES[number];
 
 export function validateFullName(name: string): string | null {
@@ -42,11 +42,13 @@ const STATE_NAME_VALUES = new Set([
   'washington dc',
   'pennsylvania',
   'west virginia',
+  'delaware',
   'md',
   'va',
   'dc',
   'pa',
   'wv',
+  'de',
 ]);
 
 export function validateCityField(city: string): string | null {

@@ -464,7 +464,7 @@ export default function ExpertProfilePage() {
                 />
                 {zipValidation.isInServiceArea && (
                   <Typography sx={{ fontFamily: fonts.body, fontSize: '12px', color: colors.success, mt: 0.75 }}>
-                    Great news — we service ZIP {zip}.
+                    Great news — ZIP {zip} is within our regional service area.
                   </Typography>
                 )}
               </Box>

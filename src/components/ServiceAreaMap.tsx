@@ -5,6 +5,7 @@ import { fonts } from '../theme';
 import {
   SERVICE_AREA_MAP_EMBED_URL,
   SERVICE_AREA_REGION_LABEL,
+  SERVICE_AREA_MAP_LABEL,
   serviceAreaMapPins,
 } from '../data/serviceAreas';
 
@@ -104,7 +105,7 @@ const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({ height = { xs: 230, sm:
           lineHeight: 1.2,
         }}
       >
-        {SERVICE_AREA_REGION_LABEL}
+        {SERVICE_AREA_MAP_LABEL}
       </Typography>
     </Box>
   </Box>

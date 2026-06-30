@@ -530,7 +530,7 @@ const Home: React.FC = () => {
               {/* Trust row */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 0.5 }}>
                 <Typography sx={{ fontFamily: fonts.body, fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.88)', maxWidth: 420 }}>
-                  Licensed &amp; insured technicians serving DC &amp; Maryland Metro.
+                  Licensed &amp; insured technicians serving MD, VA, WV, PA, DE, and Washington DC.
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.5, md: 2.5 }, alignItems: 'center' }}>
                 {['Licensed & Insured', 'Same-Day Service', 'Certified Technicians'].map((item) => (

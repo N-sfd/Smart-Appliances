@@ -70,11 +70,11 @@ export const faqs = [
 ];
 
 export const serviceCoverageItems = [
-  { label: 'Appliance repair', icon: 'appliance' as const },
-  { label: 'Appliance installation', icon: 'install' as const },
-  { label: 'HVAC service', icon: 'hvac' as const },
-  { label: 'Plumbing service', icon: 'plumbing' as const },
-  { label: 'Emergency priority', icon: 'emergency' as const },
+  { label: 'Appliance Care', icon: 'appliance' as const },
+  { label: 'Installations', icon: 'install' as const },
+  { label: 'HVAC Service', icon: 'hvac' as const },
+  { label: 'Plumbing Service', icon: 'plumbing' as const },
+  { label: 'Same-Day / Emergency Priority', icon: 'emergency' as const },
 ];
 
 export const majorBrands: { name: string; logo: string }[] = [

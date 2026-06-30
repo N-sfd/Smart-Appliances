@@ -53,6 +53,7 @@ import {
   validateZipCode,
   serviceAreaNeighborhoods,
   SERVICE_AREA_REGION_LABEL,
+  SERVICE_AREA_REGION_LABEL_SHORT,
 } from '../data/serviceAreas';
 import {
   tabCategoryMap,
@@ -182,9 +183,9 @@ const HomeBelowFold: React.FC = () => {
 
   const areaZipHelperText = useMemo(() => {
     if (areaZipTouched && !areaZip) return 'Please enter your ZIP code.';
-    if (areaZip.length < 5) return `Service area: ${SERVICE_AREA_REGION_LABEL}`;
-    if (areaZipInCoverage) return 'Great news — we service your area.';
-    return 'This ZIP may be outside our current service area. Please call us to confirm.';
+    if (areaZip.length < 5) return `Service area: ${SERVICE_AREA_REGION_LABEL_SHORT}`;
+    if (areaZipInCoverage) return `Great news — ZIP ${areaZip} is within our regional service area.`;
+    return 'This ZIP may be outside our current service area. Please call us to confirm availability.';
   }, [areaZip, areaZipTouched, areaZipInCoverage]);
 
   const areaZipFieldError = (areaZipTouched && !areaZip) || (areaZip.length === 5 && !areaZipInCoverage);
@@ -1369,15 +1370,25 @@ const HomeBelowFold: React.FC = () => {
                   alignItems: 'center',
                   gap: 1,
                   mb: { xs: 2, md: 3.5 },
-                  p: { xs: 1.25, md: 2.25 },
+                  p: { xs: 1.25, md: 1.5 },
                   borderRadius: '10px',
                   backgroundColor: '#EAF5FF',
                   border: '1px solid #BFDBFE',
+                  width: '100%',
                 }}
               >
                 <GppGoodIcon sx={{ fontSize: 18, color: '#1A73E8', flexShrink: 0 }} />
-                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.84rem', color: '#0B3D91', fontWeight: 600, lineHeight: 1.45 }}>
-                  Licensed &amp; insured service team serving Washington DC &amp; Maryland Metro.
+                <Typography
+                  sx={{
+                    fontFamily: fonts.body,
+                    fontSize: { xs: '0.84rem', md: '0.8rem' },
+                    color: '#0B3D91',
+                    fontWeight: 600,
+                    lineHeight: 1.45,
+                    whiteSpace: { xs: 'normal', md: 'nowrap' },
+                  }}
+                >
+                  Licensed &amp; insured service team serving MD, VA, WV, PA, DE &amp; DC.
                 </Typography>
               </Box>
 
@@ -1575,7 +1586,7 @@ const HomeBelowFold: React.FC = () => {
                   fontSize: '0.85rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.04em',
-                  mb: { xs: 1.5, md: 2 },
+                  mb: 1.5,
                   mt: { xs: 0.5, md: 1.5 },
                 }}
               >
@@ -1637,7 +1648,7 @@ const HomeBelowFold: React.FC = () => {
                 Service Coverage
               </Typography>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, mb: 2, flexGrow: 1, justifyContent: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2.5 }}>
                 {serviceCoverageItems.map((item) => {
                   const Icon = SERVICE_COVERAGE_ICONS[item.icon];
                   return (
@@ -1662,7 +1673,6 @@ const HomeBelowFold: React.FC = () => {
                           fontSize: '0.95rem',
                           fontWeight: 600,
                           color: colors.darkText,
-                          textTransform: 'capitalize',
                         }}
                       >
                         {item.label}
@@ -1823,7 +1833,7 @@ const HomeBelowFold: React.FC = () => {
                 {[
                   { icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Phone', value: '+1 (240) 576-0397', href: 'tel:+12405760397' },
                   { icon: <EmailIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Email', value: 'service@smartappliances.co', href: 'mailto:service@smartappliances.co' },
-                  { icon: <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Coverage', value: 'Maryland, DC & Northern Virginia', href: undefined },
+                  { icon: <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Coverage', value: SERVICE_AREA_REGION_LABEL_SHORT, href: undefined },
                 ].map((item) => (
                   <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Box sx={{ width: 36, height: 36, borderRadius: '9px', backgroundColor: '#E8F1FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

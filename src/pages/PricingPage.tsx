@@ -125,7 +125,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Do you service my ZIP code?',
-    a: `We currently service ${SERVICE_AREA_REGION_LABEL} and surrounding areas across Maryland, Washington DC, Virginia, Pennsylvania, and West Virginia. Enter your ZIP in the estimator to confirm coverage.`,
+    a: `Online scheduling is available for selected ZIP codes across ${SERVICE_AREA_REGION_LABEL}. Enter your ZIP in the estimator to confirm coverage in your specific area.`,
   },
   {
     q: 'Can the service call fee be applied toward the repair?',
@@ -963,7 +963,7 @@ const PricingPage: React.FC = () => {
                   >
                     <CheckCircleOutlineIcon sx={{ color: '#15803D', fontSize: 20 }} />
                     <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', fontWeight: 600, color: '#15803D' }}>
-                      ZIP {estZip} is in our service area.
+                      ZIP {estZip} is within our regional service area.
                     </Typography>
                   </Box>
                 )}
@@ -979,7 +979,7 @@ const PricingPage: React.FC = () => {
                     }}
                   >
                     <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', fontWeight: 600, color: colors.emergency }}>
-                      This ZIP may be outside our current coverage. Please call us.
+                      This ZIP may be outside our current service area. Please call us to confirm.
                     </Typography>
                   </Box>
                 )}
