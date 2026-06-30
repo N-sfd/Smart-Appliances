@@ -120,11 +120,19 @@ const TopBar: React.FC = () => {
   };
 
   const scrollToSection = (id: string) => {
+    const snap = (behavior: ScrollBehavior) => document.getElementById(id)?.scrollIntoView({ behavior });
+    const run = () => {
+      snap('smooth');
+      // Sections above use content-visibility:auto with a fixed placeholder height, so they
+      // can resize once the browser reveals them mid-scroll, leaving the smooth-scroll target
+      // misaligned. Re-snap once the reveal + scroll animation has settled.
+      setTimeout(() => snap('auto'), 650);
+    };
     if (location.pathname !== '/') {
       navigate('/');
-      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 400);
+      setTimeout(run, 400);
     } else {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      run();
     }
   };
 

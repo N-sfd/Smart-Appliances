@@ -1330,6 +1330,8 @@ const HomeBelowFold: React.FC = () => {
                 borderRadius: '24px',
                 boxShadow: '0 18px 40px rgba(10, 37, 64, 0.08)',
                 p: { xs: '28px', md: '32px' },
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
               <Typography
@@ -1561,7 +1563,7 @@ const HomeBelowFold: React.FC = () => {
                 </Box>
               )}
 
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mt: 'auto' }}>
                 {serviceAreaNeighborhoods.map((area) => (
                   <Box
                     key={area}

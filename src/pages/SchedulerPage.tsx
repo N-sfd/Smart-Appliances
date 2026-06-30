@@ -1390,6 +1390,7 @@ const SchedulerPage: React.FC = () => {
             <Box
               sx={{
                 flex: 1,
+                width: { xs: '100%', md: 'auto' },
                 backgroundColor: '#fff',
                 borderRadius: '20px',
                 border: `1px solid ${colors.border}`,
