@@ -9,10 +9,10 @@ import {
 } from '../data/serviceAreas';
 
 interface ServiceAreaMapProps {
-  height?: number | { xs: number; md: number };
+  height?: number | { xs: number; sm?: number; md: number };
 }
 
-const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({ height = { xs: 220, md: 280 } }) => (
+const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({ height = { xs: 230, sm: 250, md: 280 } }) => (
   <Box
     sx={{
       position: 'relative',

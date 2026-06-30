@@ -1321,7 +1321,7 @@ const HomeBelowFold: React.FC = () => {
               display: 'grid',
               gridTemplateColumns: { xs: '1fr', md: '55% 45%' },
               gap: { xs: 3, md: '28px' },
-              alignItems: 'start',
+              alignItems: 'stretch',
             }}
           >
             {/* Left — ZIP checker + neighborhoods */}
@@ -1332,8 +1332,10 @@ const HomeBelowFold: React.FC = () => {
                 borderRadius: '24px',
                 boxShadow: '0 18px 40px rgba(10, 37, 64, 0.08)',
                 p: { xs: '28px', md: '32px' },
+                height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
+                justifyContent: 'flex-start',
               }}
             >
               <Typography
@@ -1355,7 +1357,7 @@ const HomeBelowFold: React.FC = () => {
                   color: colors.darkText,
                   fontSize: { xs: '0.94rem', md: '1rem' },
                   lineHeight: 1.75,
-                  mb: 3,
+                  mb: { xs: 2.5, md: 3.5 },
                 }}
               >
                 Enter your ZIP to confirm availability across {SERVICE_AREA_REGION_LABEL}.
@@ -1366,8 +1368,8 @@ const HomeBelowFold: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  mb: 2,
-                  p: 1.25,
+                  mb: { xs: 2, md: 3.5 },
+                  p: { xs: 1.25, md: 2.25 },
                   borderRadius: '10px',
                   backgroundColor: '#EAF5FF',
                   border: '1px solid #BFDBFE',
@@ -1384,7 +1386,7 @@ const HomeBelowFold: React.FC = () => {
                   display: 'flex',
                   flexDirection: { xs: 'column', sm: 'row' },
                   gap: 1.5,
-                  mb: 3,
+                  mb: { xs: 3, md: 4 },
                 }}
               >
                 <TextField
@@ -1565,7 +1567,21 @@ const HomeBelowFold: React.FC = () => {
                 </Box>
               )}
 
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mt: 0.5 }}>
+              <Typography
+                sx={{
+                  fontFamily: fonts.heading,
+                  fontWeight: 700,
+                  color: '#0B3D91',
+                  fontSize: '0.85rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  mb: { xs: 1.5, md: 2 },
+                  mt: { xs: 0.5, md: 1.5 },
+                }}
+              >
+                Popular service areas
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.25, md: 1.75 } }}>
                 {serviceAreaNeighborhoods.map((area) => (
                   <Box
                     key={area}
@@ -1578,7 +1594,7 @@ const HomeBelowFold: React.FC = () => {
                       color: '#0B3D91',
                       borderRadius: '999px',
                       px: '14px',
-                      py: '8px',
+                      py: { xs: '8px', md: '10px' },
                       fontFamily: fonts.body,
                       fontSize: '0.86rem',
                       fontWeight: 600,
@@ -1604,6 +1620,7 @@ const HomeBelowFold: React.FC = () => {
                 borderRadius: '24px',
                 boxShadow: '0 18px 40px rgba(10, 37, 64, 0.08)',
                 p: { xs: '28px', md: '32px' },
+                height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
               }}
@@ -1614,13 +1631,13 @@ const HomeBelowFold: React.FC = () => {
                   fontWeight: 800,
                   color: '#0B3D91',
                   fontSize: { xs: '1.25rem', md: '1.35rem' },
-                  mb: 2.5,
+                  mb: 2,
                 }}
               >
                 Service Coverage
               </Typography>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 3, flexGrow: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, mb: 2, flexGrow: 1, justifyContent: 'center' }}>
                 {serviceCoverageItems.map((item) => {
                   const Icon = SERVICE_COVERAGE_ICONS[item.icon];
                   return (
@@ -1655,8 +1672,8 @@ const HomeBelowFold: React.FC = () => {
                 })}
               </Box>
 
-              <Suspense fallback={<Box sx={{ height: { xs: 220, md: 280 } }} aria-hidden />}>
-                <ServiceAreaMap height={{ xs: 220, md: 280 }} />
+              <Suspense fallback={<Box sx={{ height: { xs: 230, sm: 250, md: 264 } }} aria-hidden />}>
+                <ServiceAreaMap height={{ xs: 230, sm: 250, md: 264 }} />
               </Suspense>
             </Box>
           </Box>
