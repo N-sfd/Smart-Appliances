@@ -35,6 +35,10 @@ import StarIcon from '@mui/icons-material/Star';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import SearchIcon from '@mui/icons-material/Search';
 import BuildIcon from '@mui/icons-material/Build';
+import AcUnitOutlinedIcon from '@mui/icons-material/AcUnitOutlined';
+import PlumbingOutlinedIcon from '@mui/icons-material/PlumbingOutlined';
+import LocalLaundryServiceOutlinedIcon from '@mui/icons-material/LocalLaundryServiceOutlined';
+import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { serviceCategories } from '../data/services';
 import { popularServices } from '../data/popularServices';
@@ -60,6 +64,17 @@ import {
   serviceCoverageItems,
   majorBrands,
 } from '../data/homePageData';
+
+const SERVICE_COVERAGE_ICONS = {
+  appliance: LocalLaundryServiceOutlinedIcon,
+  install: HomeRepairServiceIcon,
+  hvac: AcUnitOutlinedIcon,
+  plumbing: PlumbingOutlinedIcon,
+  emergency: BoltOutlinedIcon,
+} as const;
+
+const BUSINESS_PHONE_DISPLAY = '+1 (240) 576-0397';
+const BUSINESS_PHONE_HREF = 'tel:+12405760397';
 
 const ServiceAreaMap = lazy(() => import('./ServiceAreaMap'));
 
@@ -165,12 +180,13 @@ const HomeBelowFold: React.FC = () => {
 
   const areaZipValidation = validateZipCode(areaZip);
   const areaZipInCoverage = areaZipValidation.isInServiceArea;
+  const showZipSuccess = areaZip.length === 5 && areaZipValidation.isValid && areaZipInCoverage;
 
   const areaZipHelperText = useMemo(() => {
-    if (areaZipTouched && areaZipInCoverage) return ' ';
+    if (showZipSuccess) return ' ';
     if (!areaZipTouched && areaZip.length < 5) return ' ';
     return getZipFieldHelperText(areaZip, areaZipTouched || areaZip.length === 5);
-  }, [areaZip, areaZipTouched, areaZipInCoverage]);
+  }, [areaZip, areaZipTouched, showZipSuccess]);
 
   const handleAreaZipCheck = () => {
     setAreaZipTouched(true);
@@ -618,7 +634,7 @@ const HomeBelowFold: React.FC = () => {
                     '&:hover': { backgroundColor: '#7C3AED' },
                   }}
                 >
-                  Check Availability
+                  Schedule Service
                 </Button>
               </Box>
             </Card>
@@ -1344,6 +1360,24 @@ const HomeBelowFold: React.FC = () => {
               <Box
                 sx={{
                   display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: 2,
+                  p: 1.25,
+                  borderRadius: '10px',
+                  backgroundColor: '#EAF5FF',
+                  border: '1px solid #BFDBFE',
+                }}
+              >
+                <GppGoodIcon sx={{ fontSize: 18, color: '#1A73E8', flexShrink: 0 }} />
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.84rem', color: '#0B3D91', fontWeight: 600, lineHeight: 1.45 }}>
+                  Licensed &amp; insured technicians serving DC &amp; Maryland Metro.
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
                   flexDirection: { xs: 'column', sm: 'row' },
                   gap: 1.5,
                   mb: 3,
@@ -1354,7 +1388,9 @@ const HomeBelowFold: React.FC = () => {
                   value={areaZip}
                   onChange={(e) => {
                     setAreaZip(normalizeZipInput(e.target.value));
-                    setAreaZipTouched(false);
+                    if (normalizeZipInput(e.target.value).length < 5) {
+                      setAreaZipTouched(false);
+                    }
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleAreaZipCheck();
@@ -1397,35 +1433,35 @@ const HomeBelowFold: React.FC = () => {
                     '&:hover': { backgroundColor: '#0B3D91' },
                   }}
                 >
-                  Check Availability
+                  Schedule Service
                 </Button>
               </Box>
 
-              {/* In-area success card */}
-              {areaZipTouched && areaZipValidation.isValid && areaZipInCoverage && (
+              {showZipSuccess && (
                 <Box
                   sx={{
                     mb: 2,
-                    p: 2.25,
-                    borderRadius: '14px',
+                    p: 1.75,
+                    borderRadius: '12px',
                     backgroundColor: '#F0FDF4',
                     border: '1px solid #86EFAC',
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <CheckCircleOutlineIcon sx={{ fontSize: 20, color: '#15803D', flexShrink: 0 }} />
-                    <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.95rem', color: '#14532D' }}>
-                      Great news! We have technicians available in ZIP {areaZip} today.
-                    </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25, mb: 1.5 }}>
+                    <CheckCircleOutlineIcon sx={{ fontSize: 20, color: '#15803D', flexShrink: 0, mt: 0.1 }} />
+                    <Box>
+                      <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.92rem', color: '#14532D', mb: 0.35 }}>
+                        We serve your area! Schedule your repair today.
+                      </Typography>
+                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.8rem', color: '#166534' }}>
+                        Technicians are available near ZIP {areaZip}.
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: '#166534', mb: 1.5, pl: 3.75 }}>
-                    Same-day and next-day slots are available — secure yours before they fill up.
-                  </Typography>
                   <Button
                     variant="contained"
                     onClick={() => navigate(`/scheduler?zipCode=${areaZip}`)}
                     sx={{
-                      ml: 3.75,
                       backgroundColor: '#16A34A',
                       color: '#fff',
                       fontFamily: fonts.body,
@@ -1438,7 +1474,7 @@ const HomeBelowFold: React.FC = () => {
                       '&:hover': { backgroundColor: '#15803D' },
                     }}
                   >
-                    Book Now →
+                    Find My Technician
                   </Button>
                 </Box>
               )}
@@ -1515,8 +1551,8 @@ const HomeBelowFold: React.FC = () => {
                       </Box>
                       <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: '#9A3412', mt: 1, pl: 3.25 }}>
                         Or call{' '}
-                        <Box component="a" href="tel:+12405760397" sx={{ color: '#EA580C', fontWeight: 700, textDecoration: 'none' }}>
-                          (240) 576-0397
+                        <Box component="a" href={BUSINESS_PHONE_HREF} sx={{ color: '#EA580C', fontWeight: 700, textDecoration: 'none' }}>
+                          {BUSINESS_PHONE_DISPLAY}
                         </Box>{' '}
                         to check if we have nearby options.
                       </Typography>
@@ -1581,22 +1617,38 @@ const HomeBelowFold: React.FC = () => {
               </Typography>
 
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 3, flexGrow: 1 }}>
-                {serviceCoverageItems.map((item) => (
-                  <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-                    <CheckCircleOutlineIcon sx={{ fontSize: 18, color: '#1A73E8', flexShrink: 0 }} />
-                    <Typography
-                      sx={{
-                        fontFamily: fonts.body,
-                        fontSize: '0.95rem',
-                        fontWeight: 600,
-                        color: colors.darkText,
-                        textTransform: 'capitalize',
-                      }}
-                    >
-                      {item}
-                    </Typography>
-                  </Box>
-                ))}
+                {serviceCoverageItems.map((item) => {
+                  const Icon = SERVICE_COVERAGE_ICONS[item.icon];
+                  return (
+                    <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                      <Box
+                        sx={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: '10px',
+                          backgroundColor: '#EAF5FF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Icon sx={{ fontSize: 20, color: '#1A73E8' }} />
+                      </Box>
+                      <Typography
+                        sx={{
+                          fontFamily: fonts.body,
+                          fontSize: '0.95rem',
+                          fontWeight: 600,
+                          color: colors.darkText,
+                          textTransform: 'capitalize',
+                        }}
+                      >
+                        {item.label}
+                      </Typography>
+                    </Box>
+                  );
+                })}
               </Box>
 
               <Suspense fallback={<Box sx={{ height: { xs: 220, md: 280 } }} aria-hidden />}>

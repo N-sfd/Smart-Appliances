@@ -222,8 +222,9 @@ export async function insertBooking(
 
   if (error) {
     // If the optional pricing-estimate columns haven't been migrated yet, retry without them
-    // rather than failing the whole booking.
-    if (/column .* does not exist/i.test(error.message)) {
+    // rather than failing the whole booking. Postgres and PostgREST phrase this differently
+    // ("column ... does not exist" vs "Could not find the '...' column ... in the schema cache").
+    if (/column .* does not exist/i.test(error.message) || /could not find the .* column/i.test(error.message)) {
       const fallbackRow = { ...rowWithCustomer };
       for (const key of OPTIONAL_INSERT_KEYS) delete (fallbackRow as Record<string, unknown>)[key];
       const { data: retryData, error: retryError } = await supabase

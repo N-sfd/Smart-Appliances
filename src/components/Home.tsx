@@ -528,7 +528,11 @@ const Home: React.FC = () => {
               </Button>
 
               {/* Trust row */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.5, md: 2.5 }, alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 0.5 }}>
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.88)', maxWidth: 420 }}>
+                  Licensed &amp; insured technicians serving DC &amp; Maryland Metro.
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.5, md: 2.5 }, alignItems: 'center' }}>
                 {['Licensed & Insured', 'Same-Day Service', 'Certified Technicians'].map((item) => (
                   <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
                     <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#4FC3F7' }} />
@@ -537,6 +541,7 @@ const Home: React.FC = () => {
                     </Typography>
                   </Box>
                 ))}
+                </Box>
               </Box>
             </Box>
           </Box>

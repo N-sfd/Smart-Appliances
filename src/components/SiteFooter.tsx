@@ -258,8 +258,8 @@ const SiteFooter: React.FC = () => {
               <Box component="a" href="mailto:service@smartappliances.co" sx={{ ...footerLinkSx, mb: 0 }}>
                 service@smartappliances.co
               </Box>
-              <Box component="a" href="tel:2405760397" sx={{ ...footerLinkSx, mb: 0 }}>
-                240-576-0397
+              <Box component="a" href="tel:+12405760397" sx={{ ...footerLinkSx, mb: 0 }}>
+                +1 (240) 576-0397
               </Box>
             </Box>
           </Box>

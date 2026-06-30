@@ -337,7 +337,7 @@ const TopBar: React.FC = () => {
                 },
               }}
             >
-              (240) 576-0397
+              +1 (240) 576-0397
             </Button>
 
             {/* Auth buttons or user avatar — desktop */}
@@ -403,7 +403,7 @@ const TopBar: React.FC = () => {
             <IconButton
               component="a"
               href="tel:+12405760397"
-              aria-label="Call (240) 576-0397"
+              aria-label="Call +1 (240) 576-0397"
               sx={{
                 display: { xs: 'inline-flex', sm: 'none' },
                 alignItems: 'center',
@@ -621,7 +621,7 @@ const TopBar: React.FC = () => {
           >
             <Phone sx={{ color: colors.primaryBlue, fontSize: '1rem' }} />
             <Box component="span" sx={{ color: colors.navy, fontFamily: fonts.body, fontSize: '0.9rem', fontWeight: 700 }}>
-              (240) 576-0397
+              +1 (240) 576-0397
             </Box>
           </Box>
         </Box>

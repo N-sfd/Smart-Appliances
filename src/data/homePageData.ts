@@ -70,11 +70,11 @@ export const faqs = [
 ];
 
 export const serviceCoverageItems = [
-  'Appliance repair',
-  'Appliance installation',
-  'HVAC service',
-  'Plumbing service',
-  'Emergency priority',
+  { label: 'Appliance repair', icon: 'appliance' as const },
+  { label: 'Appliance installation', icon: 'install' as const },
+  { label: 'HVAC service', icon: 'hvac' as const },
+  { label: 'Plumbing service', icon: 'plumbing' as const },
+  { label: 'Emergency priority', icon: 'emergency' as const },
 ];
 
 export const majorBrands: { name: string; logo: string }[] = [
