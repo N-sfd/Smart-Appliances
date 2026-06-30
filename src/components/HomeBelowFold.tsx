@@ -51,8 +51,6 @@ import ServiceGridCard from './ServiceGridCard';
 import {
   normalizeZipInput,
   validateZipCode,
-  getZipFieldHelperText,
-  isZipFieldError,
   serviceAreaNeighborhoods,
   SERVICE_AREA_REGION_LABEL,
 } from '../data/serviceAreas';
@@ -183,13 +181,17 @@ const HomeBelowFold: React.FC = () => {
   const showZipSuccess = areaZip.length === 5 && areaZipValidation.isValid && areaZipInCoverage;
 
   const areaZipHelperText = useMemo(() => {
-    if (showZipSuccess) return ' ';
-    if (!areaZipTouched && areaZip.length < 5) return ' ';
-    return getZipFieldHelperText(areaZip, areaZipTouched || areaZip.length === 5);
-  }, [areaZip, areaZipTouched, showZipSuccess]);
+    if (areaZipTouched && !areaZip) return 'Please enter your ZIP code.';
+    if (areaZip.length < 5) return `Service area: ${SERVICE_AREA_REGION_LABEL}`;
+    if (areaZipInCoverage) return 'Great news — we service your area.';
+    return 'This ZIP may be outside our current service area. Please call us to confirm.';
+  }, [areaZip, areaZipTouched, areaZipInCoverage]);
+
+  const areaZipFieldError = (areaZipTouched && !areaZip) || (areaZip.length === 5 && !areaZipInCoverage);
 
   const handleAreaZipCheck = () => {
     setAreaZipTouched(true);
+    if (!areaZip) return;
     if (!areaZipValidation.isValid) return;
     navigate(`/scheduler?${new URLSearchParams({ zipCode: areaZip }).toString()}`);
   };
@@ -1309,7 +1311,7 @@ const HomeBelowFold: React.FC = () => {
       </Box>
 
       {/* ── Service Areas ── */}
-      <Box className="home-deferred-section" id="service-areas" sx={{ py: { xs: 7, md: 9 }, backgroundColor: colors.sectionBg, scrollMarginTop: '80px' }}>
+      <Box className="home-deferred-section" id="service-areas" sx={{ py: { xs: 4.5, md: 7 }, backgroundColor: colors.sectionBg, scrollMarginTop: '80px' }}>
         <Container
           maxWidth={false}
           sx={{ maxWidth: '1180px', mx: 'auto', px: { xs: 2, sm: 3 } }}
@@ -1319,7 +1321,7 @@ const HomeBelowFold: React.FC = () => {
               display: 'grid',
               gridTemplateColumns: { xs: '1fr', md: '55% 45%' },
               gap: { xs: 3, md: '28px' },
-              alignItems: 'stretch',
+              alignItems: 'start',
             }}
           >
             {/* Left — ZIP checker + neighborhoods */}
@@ -1373,7 +1375,7 @@ const HomeBelowFold: React.FC = () => {
               >
                 <GppGoodIcon sx={{ fontSize: 18, color: '#1A73E8', flexShrink: 0 }} />
                 <Typography sx={{ fontFamily: fonts.body, fontSize: '0.84rem', color: '#0B3D91', fontWeight: 600, lineHeight: 1.45 }}>
-                  Licensed &amp; insured technicians serving DC &amp; Maryland Metro.
+                  Licensed &amp; insured service team serving Washington DC &amp; Maryland Metro.
                 </Typography>
               </Box>
 
@@ -1398,13 +1400,13 @@ const HomeBelowFold: React.FC = () => {
                     if (e.key === 'Enter') handleAreaZipCheck();
                   }}
                   fullWidth
-                  error={isZipFieldError(areaZip, areaZipTouched)}
-                  helperText={areaZipHelperText || ' '}
+                  error={areaZipFieldError}
+                  helperText={areaZipHelperText}
                   inputProps={{ inputMode: 'numeric', maxLength: 5 }}
                   sx={{
                     flex: 1,
                     '& .MuiOutlinedInput-root': {
-                      height: '52px',
+                      height: '56px',
                       borderRadius: '14px',
                       fontFamily: fonts.body,
                       fontSize: '1rem',
@@ -1420,8 +1422,8 @@ const HomeBelowFold: React.FC = () => {
                   variant="contained"
                   onClick={handleAreaZipCheck}
                   sx={{
-                    height: '52px',
-                    minWidth: { xs: '100%', sm: 180 },
+                    height: '56px',
+                    minWidth: { xs: '100%', sm: 230 },
                     flexShrink: 0,
                     backgroundColor: '#1A73E8',
                     color: '#FFFFFF',
@@ -1563,7 +1565,7 @@ const HomeBelowFold: React.FC = () => {
                 </Box>
               )}
 
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mt: 'auto' }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mt: 0.5 }}>
                 {serviceAreaNeighborhoods.map((area) => (
                   <Box
                     key={area}
