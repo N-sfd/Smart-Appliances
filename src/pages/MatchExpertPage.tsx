@@ -204,7 +204,7 @@ const MatchExpertPage: React.FC = () => {
       return;
     }
 
-    fetch('/.netlify/functions/send-booking-email', {
+    fetch('/api/send-booking-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

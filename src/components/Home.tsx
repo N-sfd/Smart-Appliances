@@ -142,7 +142,7 @@ const Home: React.FC = () => {
     }
 
     // Fire-and-forget email — booking success is never blocked by this
-    fetch('/.netlify/functions/send-booking-email', {
+    fetch('/api/send-booking-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ requestNumber: reqNum, customerName: name, email, service: svc.label, preferredDate: '', preferredTime: '' }),

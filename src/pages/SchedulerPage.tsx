@@ -887,7 +887,7 @@ const SchedulerPage: React.FC = () => {
       console.log('[Booking] Success', { bookingId, reqNum });
 
       // Fire-and-forget email — booking navigation is never blocked by this
-      fetch('/.netlify/functions/send-booking-email', {
+      fetch('/api/send-booking-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
