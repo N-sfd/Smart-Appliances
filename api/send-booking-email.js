@@ -1,48 +1,43 @@
 // Vercel Function: send-booking-email
 // RESEND_API_KEY is set in Vercel project environment variables — NEVER expose it in React frontend.
+//
+// Sends two independent emails per booking: an admin notification (to ADMIN_EMAIL) and a
+// customer confirmation (to the booking's email). Each is attempted and reported separately —
+// a failure in one never blocks or falsely reports success for the other.
+//
+// PRODUCTION NOTE: onboarding@resend.dev (Resend's shared test sender) can only deliver to the
+// email address of the Resend account owner. Sending a customer confirmation to any other
+// address (e.g. a customer's Gmail) will fail with something like "You can only send testing
+// emails to your own email address." To send to arbitrary customers:
+//   1. Buy/use a real domain.
+//   2. Add the domain in Resend and add the required DNS records.
+//   3. Wait until the domain shows as verified in Resend.
+//   4. Set FROM_EMAIL to an address on that domain, e.g. FROM_EMAIL=Smart Appliances MD <noreply@yourdomain.com>
+//   5. Redeploy.
 
-module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method Not Allowed' });
-    return;
-  }
+const escapeHtml = (value) =>
+  String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[ch]));
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn('[send-booking-email] RESEND_API_KEY missing — skipping email');
-    res.status(200).json({ success: true, skipped: true });
-    return;
-  }
+const formatPreferredDate = (dateStr) => {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return dateStr;
+  const [year, month, day] = parts;
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
 
-  const fromEmail = process.env.FROM_EMAIL || 'noreply@smartappliancesmd.com';
+const isResendTestDomainError = (message) =>
+  /only send testing emails|verify a domain|own email address/i.test(message ?? '');
 
-  const body = req.body ?? {};
-  const { requestNumber, customerName, email, service, preferredDate, preferredTime } = body;
-
-  if (!email || !requestNumber) {
-    res.status(400).json({ error: 'Missing required fields' });
-    return;
-  }
-
-  const siteUrl = process.env.SITE_URL || 'https://smartappliancesmd.com';
-  const trackLink = `${siteUrl}/track-request`;
-
-  const formatPreferredDate = (dateStr) => {
-    if (!dateStr) return '';
-    const parts = dateStr.split('-').map(Number);
-    if (parts.length !== 3 || parts.some(Number.isNaN)) return dateStr;
-    const [year, month, day] = parts;
-    return new Date(year, month - 1, day).toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
-  const formattedDate = formatPreferredDate(preferredDate);
-
-  const htmlBody = `
+function buildCustomerHtml({ requestNumber, customerName, service, formattedDate, preferredTime, trackLink }) {
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -131,7 +126,46 @@ module.exports = async (req, res) => {
   </table>
 </body>
 </html>`;
+}
 
+function buildAdminHtml({ requestNumber, customerName, email, phone, service, formattedDate, preferredTime, adminLink }) {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<body style="margin:0;padding:0;background:#F1F5F9;font-family:Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:100%;">
+        <tr>
+          <td style="background:#0B3D91;padding:24px 32px;">
+            <p style="margin:0;color:#fff;font-size:18px;font-weight:800;">New Booking Request</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px;">
+            <p style="margin:0 0 16px;font-size:14px;color:#0F172A;">A new service request was just submitted.</p>
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;border-radius:12px;border:1px solid #E2E8F0;">
+              <tr><td style="padding:10px 16px;font-size:13px;color:#64748B;width:40%;">Request ID</td><td style="padding:10px 16px;font-size:13px;color:#0F172A;font-weight:700;">${requestNumber}</td></tr>
+              <tr><td style="padding:10px 16px;font-size:13px;color:#64748B;">Customer</td><td style="padding:10px 16px;font-size:13px;color:#0F172A;">${customerName || '—'}</td></tr>
+              <tr><td style="padding:10px 16px;font-size:13px;color:#64748B;">Email</td><td style="padding:10px 16px;font-size:13px;color:#0F172A;">${email}</td></tr>
+              ${phone ? `<tr><td style="padding:10px 16px;font-size:13px;color:#64748B;">Phone</td><td style="padding:10px 16px;font-size:13px;color:#0F172A;">${phone}</td></tr>` : ''}
+              ${service ? `<tr><td style="padding:10px 16px;font-size:13px;color:#64748B;">Service</td><td style="padding:10px 16px;font-size:13px;color:#0F172A;">${service}</td></tr>` : ''}
+              ${formattedDate ? `<tr><td style="padding:10px 16px;font-size:13px;color:#64748B;">Preferred Date</td><td style="padding:10px 16px;font-size:13px;color:#0F172A;">${formattedDate}</td></tr>` : ''}
+              ${preferredTime ? `<tr><td style="padding:10px 16px;font-size:13px;color:#64748B;">Time Slot</td><td style="padding:10px 16px;font-size:13px;color:#0F172A;">${preferredTime}</td></tr>` : ''}
+            </table>
+            <a href="${adminLink}" style="display:block;background:#0B3D91;color:#fff;text-decoration:none;text-align:center;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;margin-top:20px;">
+              View in Admin Dashboard
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+async function sendViaResend(apiKey, { from, to, subject, html }) {
   try {
     const apiRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -139,24 +173,111 @@ module.exports = async (req, res) => {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: `Smart Appliances MD <${fromEmail}>`,
-        to: [email],
-        subject: `Booking Confirmed – ${requestNumber}`,
-        html: htmlBody,
-      }),
+      body: JSON.stringify({ from, to: [to], subject, html }),
     });
-
     if (!apiRes.ok) {
       const errText = await apiRes.text();
-      console.error('[send-booking-email] Resend API error:', apiRes.status, errText);
-      res.status(500).json({ error: 'Failed to send email' });
-      return;
+      return { sent: false, error: `${apiRes.status} ${errText}` };
     }
-
-    res.status(200).json({ success: true });
+    return { sent: true, error: null };
   } catch (err) {
-    console.error('[send-booking-email] Unexpected error:', err);
-    res.status(500).json({ error: 'Internal error' });
+    return { sent: false, error: err.message ?? 'Unknown error' };
   }
+}
+
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method Not Allowed' });
+    return;
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[send-booking-email] RESEND_API_KEY missing — skipping admin and customer emails');
+    res.status(200).json({
+      success: false,
+      adminEmailSent: false,
+      customerEmailSent: false,
+      skippedReason: 'RESEND_API_KEY missing',
+    });
+    return;
+  }
+
+  const fromEmail = process.env.FROM_EMAIL || 'noreply@smartappliancesmd.com';
+  const adminEmail = process.env.ADMIN_EMAIL;
+
+  const body = req.body ?? {};
+  const { requestNumber, customerName, email, phone, service, preferredDate, preferredTime } = body;
+
+  if (!email || !requestNumber) {
+    res.status(400).json({ error: 'Missing required fields' });
+    return;
+  }
+
+  const siteUrl = process.env.SITE_URL || 'https://smartappliancesmd.com';
+  const trackLink = `${siteUrl}/track-request`;
+  const adminLink = `${siteUrl}/admin/bookings`;
+  const formattedDate = formatPreferredDate(preferredDate);
+
+  const safe = {
+    requestNumber: escapeHtml(requestNumber),
+    customerName: escapeHtml(customerName),
+    email: escapeHtml(email),
+    phone: escapeHtml(phone),
+    service: escapeHtml(service),
+    formattedDate: escapeHtml(formattedDate),
+    preferredTime: escapeHtml(preferredTime),
+  };
+
+  const customerHtml = buildCustomerHtml({ ...safe, trackLink });
+  const adminHtml = buildAdminHtml({ ...safe, adminLink });
+
+  const tasks = [];
+
+  tasks.push(
+    adminEmail
+      ? sendViaResend(apiKey, {
+          from: `Smart Appliances MD <${fromEmail}>`,
+          to: adminEmail,
+          subject: `New Booking Request – ${requestNumber}`,
+          html: adminHtml,
+        })
+      : Promise.resolve({ sent: false, error: 'ADMIN_EMAIL not configured — set ADMIN_EMAIL env var to receive booking notifications' }),
+  );
+
+  tasks.push(
+    sendViaResend(apiKey, {
+      from: `Smart Appliances MD <${fromEmail}>`,
+      to: email,
+      subject: `Booking Confirmed – ${requestNumber}`,
+      html: customerHtml,
+    }),
+  );
+
+  const [adminResult, customerResult] = await Promise.all(tasks);
+
+  if (adminResult.error) {
+    console.error('[send-booking-email] Admin email failed:', adminResult.error);
+  } else {
+    console.log('[send-booking-email] Admin email sent for', requestNumber);
+  }
+
+  if (customerResult.error) {
+    console.error('[send-booking-email] Customer email failed:', customerResult.error);
+    if (isResendTestDomainError(customerResult.error)) {
+      console.warn(
+        '[send-booking-email] If customer email fails with Resend test-domain restriction, verify a custom domain in Resend and update FROM_EMAIL.',
+      );
+    }
+  } else {
+    console.log('[send-booking-email] Customer email sent for', requestNumber);
+  }
+
+  res.status(200).json({
+    success: adminResult.sent || customerResult.sent,
+    adminEmailSent: adminResult.sent,
+    customerEmailSent: customerResult.sent,
+    adminEmailError: adminResult.error,
+    customerEmailError: customerResult.error,
+  });
 };

@@ -19,6 +19,7 @@ interface ConfirmationState {
   preferredTime: string;
   estimate?: ServiceEstimate | null;
   expertName?: string | null;
+  customerEmailSent?: boolean;
 }
 
 const formatDate = (iso: string) => {
@@ -61,6 +62,7 @@ const BookingConfirmationPage: React.FC = () => {
       ? `$${estimatedTotal.toFixed(2)}`
       : null;
   const expertName = navState?.expertName ?? booking?.expert_name ?? '';
+  const customerEmailSent = navState?.customerEmailSent ?? Boolean(booking?.email_sent);
 
   if (loading) {
     return (
@@ -176,7 +178,9 @@ const BookingConfirmationPage: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 3, p: 2, backgroundColor: '#FFFBEB', borderRadius: '10px', border: '1px solid #FDE68A', textAlign: 'left' }}>
             <CalendarTodayIcon sx={{ fontSize: 16, color: '#92400E', flexShrink: 0, mt: 0.3 }} />
             <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: '#92400E', lineHeight: 1.6 }}>
-              A confirmation email has been sent to your email address. Check your inbox (and spam folder).
+              {customerEmailSent
+                ? 'A confirmation email has been sent to your email address. Check your inbox (and spam folder).'
+                : 'Your request was received. We will contact you shortly.'}
             </Typography>
           </Box>
 

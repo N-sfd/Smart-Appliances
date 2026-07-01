@@ -886,29 +886,52 @@ const SchedulerPage: React.FC = () => {
 
       console.log('[Booking] Success', { bookingId, reqNum });
 
-      // Fire-and-forget email — booking navigation is never blocked by this
-      fetch('/api/send-booking-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          requestNumber: reqNum,
-          customerName: name,
-          email,
-          service: displayServiceTitle,
-          preferredDate: resolvedPreferredDate ?? '',
-          preferredTime: slotLabel || '',
-        }),
-      })
-        .then(async (r) => {
-          if (!r.ok) return;
+      // Booking is already saved — email delivery is awaited (with a timeout) only so the
+      // confirmation page can accurately say whether the customer email actually sent, per
+      // the Resend test-domain restriction (onboarding@resend.dev can only send to the Resend
+      // account's own email address).
+      let customerEmailSent = false;
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+        const r = await fetch('/api/send-booking-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            requestNumber: reqNum,
+            customerName: name,
+            email,
+            phone,
+            service: displayServiceTitle,
+            preferredDate: resolvedPreferredDate ?? '',
+            preferredTime: slotLabel || '',
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+        if (r.ok) {
           const json = await r.json().catch(() => ({}));
-          if (json.skipped) {
-            console.warn('[Booking] Email skipped because RESEND_API_KEY is missing');
-            return;
+          if (json.skippedReason) {
+            console.warn('[Booking] Email skipped:', json.skippedReason);
           }
-          if (json.success && bookingId) updateEmailSent(bookingId);
-        })
-        .catch((err) => console.warn('[Booking] Email send failed (non-blocking):', err));
+          if (json.adminEmailError) {
+            console.error('[Booking] Admin email failed:', json.adminEmailError);
+          }
+          if (json.customerEmailError) {
+            console.error('[Booking] Customer email failed:', json.customerEmailError);
+          }
+          customerEmailSent = Boolean(json.customerEmailSent);
+          if (bookingId) {
+            await updateEmailSent(bookingId, {
+              adminEmailSent: Boolean(json.adminEmailSent),
+              customerEmailSent,
+              customerEmailError: json.customerEmailError ?? null,
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('[Booking] Email send failed (non-blocking):', err);
+      }
 
       navigate(`/booking-confirmation/${reqNum}`, {
         replace: true,
@@ -921,6 +944,7 @@ const SchedulerPage: React.FC = () => {
           preferredTime: slotLabel || '',
           estimate: reviewEstimate,
           expertName: requestedExpert?.name ?? null,
+          customerEmailSent,
         },
       });
     } catch (error) {
@@ -2381,7 +2405,7 @@ const SchedulerPage: React.FC = () => {
                       ['Category', category || '—'],
                       ['Service', displayServiceTitle],
                       ...(requestedExpert ? [['Selected Expert', requestedExpert.name]] : []),
-                      ...(requestedPlan ? [['Selected Membership Plan', requestedPlan.name]] : []),
+                      ...(requestedPlan ? [['Selected Smart Care Plan', requestedPlan.name]] : []),
                       ...(brand ? [['Brand', brand]] : []),
                       ...(model ? [['Model', model]] : []),
                       ...(hvacSystemType ? [['System Type', hvacSystemType]] : []),

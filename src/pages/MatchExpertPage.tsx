@@ -211,6 +211,7 @@ const MatchExpertPage: React.FC = () => {
         requestNumber: reqNum,
         customerName: fullName,
         email,
+        phone,
         service: match.productName,
         preferredDate: '',
         preferredTime: '',
@@ -219,8 +220,15 @@ const MatchExpertPage: React.FC = () => {
       .then(async (r) => {
         if (!r.ok) return;
         const json = await r.json().catch(() => ({}));
-        if (json.skipped) return;
-        if (json.success && bookingId) updateEmailSent(bookingId);
+        if (json.skippedReason) return;
+        if (json.customerEmailError) console.error('[MatchExpert] Customer email failed:', json.customerEmailError);
+        if (bookingId) {
+          updateEmailSent(bookingId, {
+            adminEmailSent: Boolean(json.adminEmailSent),
+            customerEmailSent: Boolean(json.customerEmailSent),
+            customerEmailError: json.customerEmailError ?? null,
+          });
+        }
       })
       .catch((err) => console.warn('[MatchExpert] Email send failed (non-blocking):', err));
 

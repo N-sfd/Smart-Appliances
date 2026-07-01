@@ -430,12 +430,35 @@ export async function updateCustomerMessage(
 
 // ── Mark email sent ───────────────────────────────────────────────────────────
 
-export async function updateEmailSent(id: string): Promise<void> {
+// email_sent means "customer confirmation email sent" — never set it true just
+// because the admin notification email succeeded. adminEmailSent/customerEmailError
+// are best-effort: written only if supabase/migrations/service_requests_email_status_columns.sql
+// has been applied; falls back to just email_sent otherwise so this never breaks the app.
+export async function updateEmailSent(
+  id: string,
+  info?: { adminEmailSent?: boolean; customerEmailSent?: boolean; customerEmailError?: string | null },
+): Promise<void> {
   if (!isSupabaseConfigured() || !supabase) return;
-  await supabase
+  const customerEmailSent = info?.customerEmailSent ?? true;
+  const now = new Date().toISOString();
+
+  const { error } = await supabase
     .from('service_requests')
-    .update({ email_sent: true, updated_at: new Date().toISOString() })
+    .update({
+      email_sent: customerEmailSent,
+      admin_email_sent: info?.adminEmailSent ?? null,
+      customer_email_sent: customerEmailSent,
+      email_error: info?.customerEmailError ?? null,
+      updated_at: now,
+    })
     .eq('id', id);
+
+  if (error && (/column .* does not exist/i.test(error.message) || /could not find the .* column/i.test(error.message))) {
+    await supabase
+      .from('service_requests')
+      .update({ email_sent: customerEmailSent, updated_at: now })
+      .eq('id', id);
+  }
 }
 
 // ── Tracking: fetch by request number ─────────────────────────────────────────

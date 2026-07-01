@@ -145,16 +145,23 @@ const Home: React.FC = () => {
     fetch('/api/send-booking-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ requestNumber: reqNum, customerName: name, email, service: svc.label, preferredDate: '', preferredTime: '' }),
+      body: JSON.stringify({ requestNumber: reqNum, customerName: name, email, phone, service: svc.label, preferredDate: '', preferredTime: '' }),
     })
       .then(async (r) => {
         if (!r.ok) return;
         const json = await r.json().catch(() => ({}));
-        if (json.skipped) {
-          console.warn('[Booking] Email skipped because RESEND_API_KEY is missing');
+        if (json.skippedReason) {
+          console.warn('[Booking] Email skipped:', json.skippedReason);
           return;
         }
-        if (json.success && bookingId) updateEmailSent(bookingId);
+        if (json.customerEmailError) console.error('[Booking] Customer email failed:', json.customerEmailError);
+        if (bookingId) {
+          updateEmailSent(bookingId, {
+            adminEmailSent: Boolean(json.adminEmailSent),
+            customerEmailSent: Boolean(json.customerEmailSent),
+            customerEmailError: json.customerEmailError ?? null,
+          });
+        }
       })
       .catch((err) => console.warn('[Booking] Email send failed (non-blocking):', err));
 

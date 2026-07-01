@@ -3,19 +3,24 @@ import {
   Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
   Chip, IconButton, CircularProgress, Collapse, Button, InputAdornment,
-  Divider,
+  Divider, Menu, Dialog, DialogTitle, DialogContent, DialogActions,
+  Snackbar, Alert,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
 import SendIcon from '@mui/icons-material/Send';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {
   fetchAllBookings, updateAdminStatus, updateCustomerMessage, BookingRow,
   BOOKING_STATUSES, ADMIN_STATUSES,
   fetchBookingNotes, insertBookingNote, BookingNote,
 } from '../../lib/supabaseBookings';
-import { assignExpert } from '../../services/adminBookings';
+import { assignExpert, cancelServiceRequest, deleteServiceRequest } from '../../services/adminBookings';
 import { fetchActiveExpertsRaw } from '../../services/adminExperts';
 import { DbExpert } from '../../types/admin';
 import { useAuth } from '../../contexts/AuthContext';
@@ -425,6 +430,18 @@ const AdminBookingsPage: React.FC = () => {
   const [emailSentFilter, setEmailSentFilter] = useState('all');
   const [membershipFilter, setMembershipFilter] = useState('all');
 
+  // Row actions menu + cancel/delete dialogs
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const [menuRow, setMenuRow] = useState<BookingRow | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<BookingRow | null>(null);
+  const [cancelSaving, setCancelSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<BookingRow | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteSaving, setDeleteSaving] = useState(false);
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+    open: false, message: '', severity: 'success',
+  });
+
   const load = useCallback(async () => {
     setLoading(true);
     const rows = await fetchAllBookings({
@@ -504,6 +521,63 @@ const AdminBookingsPage: React.FC = () => {
   const handleAssignExpert = async (id: string, expertId: string | null) => {
     await assignExpert(id, expertId);
     setBookings((prev) => prev.map((b) => b.id === id ? { ...b, expert_id: expertId } : b));
+  };
+
+  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>, row: BookingRow) => {
+    e.stopPropagation();
+    setMenuAnchorEl(e.currentTarget);
+    setMenuRow(row);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuRow(null);
+  };
+
+  const handleViewDetails = (row: BookingRow) => {
+    setExpandedId((prev) => (prev === row.id ? null : (row.id ?? null)));
+    handleMenuClose();
+  };
+
+  const handleOpenCancelDialog = (row: BookingRow) => {
+    setCancelTarget(row);
+    handleMenuClose();
+  };
+
+  const handleOpenDeleteDialog = (row: BookingRow) => {
+    setDeleteTarget(row);
+    setDeleteConfirmText('');
+    handleMenuClose();
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!cancelTarget?.id) return;
+    setCancelSaving(true);
+    const { error } = await cancelServiceRequest(cancelTarget.id);
+    setCancelSaving(false);
+    if (error) {
+      setSnackbar({ open: true, message: `Failed to cancel request: ${error}`, severity: 'error' });
+      return;
+    }
+    setBookings((prev) => prev.map((b) => (
+      b.id === cancelTarget.id ? { ...b, admin_status: 'Cancelled', status: 'Cancelled' } : b
+    )));
+    setCancelTarget(null);
+    setSnackbar({ open: true, message: 'Request cancelled successfully.', severity: 'success' });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget?.id) return;
+    setDeleteSaving(true);
+    const { error } = await deleteServiceRequest(deleteTarget.id);
+    setDeleteSaving(false);
+    if (error) {
+      setSnackbar({ open: true, message: `Failed to delete request: ${error}`, severity: 'error' });
+      return;
+    }
+    setBookings((prev) => prev.filter((b) => b.id !== deleteTarget.id));
+    setDeleteTarget(null);
+    setSnackbar({ open: true, message: 'Request deleted successfully.', severity: 'success' });
   };
 
   const filterSelect = (label: string, value: string, onChange: (v: string) => void, options: string[]) => (
@@ -640,7 +714,7 @@ const AdminBookingsPage: React.FC = () => {
           <Table size="small">
             <TableHead>
               <TableRow sx={{ backgroundColor: '#F8FAFC' }}>
-                {['Request ID', 'Date', 'Customer', 'Service', 'ZIP', 'Urgency', 'Flags', 'Status', ''].map((h) => (
+                {['Request ID', 'Date', 'Customer', 'Service', 'ZIP', 'Urgency', 'Flags', 'Status', 'Actions'].map((h) => (
                   <TableCell key={h} sx={{ fontFamily: fonts.body, fontWeight: 700, color: colors.navy, fontSize: '0.75rem', py: 1.5 }}>
                     {h}
                   </TableCell>
@@ -724,10 +798,15 @@ const AdminBookingsPage: React.FC = () => {
                           sx={{ backgroundColor: statusStyle.bg, color: statusStyle.text, fontFamily: fonts.body, fontWeight: 700, fontSize: '0.72rem' }}
                         />
                       </TableCell>
-                      <TableCell sx={{ py: 1.5 }}>
-                        <IconButton size="small">
-                          {isExpanded ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
-                        </IconButton>
+                      <TableCell sx={{ py: 1.5 }} onClick={(e) => e.stopPropagation()}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                          <IconButton size="small" onClick={() => setExpandedId(isExpanded ? null : (b.id ?? null))}>
+                            {isExpanded ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+                          </IconButton>
+                          <IconButton size="small" onClick={(e) => handleMenuOpen(e, b)}>
+                            <MoreVertIcon sx={{ fontSize: 18 }} />
+                          </IconButton>
+                        </Box>
                       </TableCell>
                     </TableRow>
                     <TableRow>
@@ -744,6 +823,102 @@ const AdminBookingsPage: React.FC = () => {
           </Table>
         </TableContainer>
       )}
+
+      {/* Row actions menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem onClick={() => menuRow && handleViewDetails(menuRow)} sx={{ fontFamily: fonts.body, fontSize: '0.85rem' }}>
+          <VisibilityOutlinedIcon sx={{ fontSize: 18, mr: 1, color: colors.mutedText }} /> View Details
+        </MenuItem>
+        <MenuItem
+          onClick={() => menuRow && handleOpenCancelDialog(menuRow)}
+          disabled={menuRow?.status === 'Cancelled'}
+          sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: '#B45309' }}
+        >
+          <BlockOutlinedIcon sx={{ fontSize: 18, mr: 1 }} /> Cancel Request
+        </MenuItem>
+        <MenuItem onClick={() => menuRow && handleOpenDeleteDialog(menuRow)} sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: '#B71C1C' }}>
+          <DeleteOutlineIcon sx={{ fontSize: 18, mr: 1 }} /> Delete Request
+        </MenuItem>
+      </Menu>
+
+      {/* Cancel confirmation dialog */}
+      <Dialog open={Boolean(cancelTarget)} onClose={() => setCancelTarget(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontFamily: fonts.heading, color: colors.navy, fontWeight: 700 }}>Cancel Request?</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', color: colors.darkText, lineHeight: 1.6 }}>
+            Are you sure you want to cancel this request? The request will remain in records but status will be changed to Cancelled.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setCancelTarget(null)} sx={{ fontFamily: fonts.body, textTransform: 'none' }}>
+            Keep Request
+          </Button>
+          <Button
+            onClick={() => void handleConfirmCancel()}
+            disabled={cancelSaving}
+            variant="contained"
+            sx={{
+              backgroundColor: '#B45309', color: '#fff', fontFamily: fonts.body,
+              fontWeight: 700, textTransform: 'none', borderRadius: '8px',
+              '&:hover': { backgroundColor: '#92400E' },
+            }}
+          >
+            {cancelSaving ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : 'Cancel Request'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete confirmation dialog — protected admin action */}
+      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontFamily: fonts.heading, color: '#B71C1C', fontWeight: 700 }}>Delete Request?</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', color: colors.darkText, lineHeight: 1.6, mb: 2 }}>
+            This will permanently delete the request from admin records. This action cannot be undone.
+          </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.mutedText, mb: 1 }}>
+            Type <strong>DELETE</strong> to confirm.
+          </Typography>
+          <TextField
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+            placeholder="DELETE"
+            size="small"
+            fullWidth
+            autoFocus
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontFamily: fonts.body } }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setDeleteTarget(null)} sx={{ fontFamily: fonts.body, textTransform: 'none' }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => void handleConfirmDelete()}
+            disabled={deleteSaving || deleteConfirmText.trim().toUpperCase() !== 'DELETE'}
+            variant="contained"
+            color="error"
+            sx={{ fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '8px' }}
+          >
+            {deleteSaving ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : 'Delete Permanently'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ fontFamily: fonts.body }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
