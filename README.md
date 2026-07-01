@@ -1,146 +1,123 @@
-# Smart Applications
+# Smart Appliances
 
-A modern React application built with Material-UI (MUI) for smart appliance solutions and professional repair services.
+Smart Appliances is a modern home-service booking platform for appliance care, HVAC, plumbing, electrical, smart home, garage door, and emergency service requests.
 
-## Features
+## Live Demo
 
-- **Modern Design**: Clean and professional interface using Material-UI components
-- **Responsive Layout**: Optimized for desktop, tablet, and mobile devices
-- **Custom Theme**: Branded color scheme with custom typography
-- **Component-Based Architecture**: Modular components for easy maintenance and scalability
+- Vercel: [https://project-i8icw-ebon.vercel.app/](https://project-i8icw-ebon.vercel.app/)
+- Netlify: [https://frabjous-queijadas-2649b4.netlify.app/](https://frabjous-queijadas-2649b4.netlify.app/)
 
-## Color Scheme
+## Core Features
 
-- **Primary Dark Blue**: #022F49
-- **Light Blue**: #22B1FB
-- **Light Gray**: #D9D9D9
-- **White**: #FFFFFF
-- **Black**: #000000
+- Online service booking scheduler
+- Service category and problem selection
+- Pricing estimator
+- ZIP/service-area validation
+- Service request tracking
+- Booking confirmation page
+- Admin dashboard
+- Admin bookings management
+- Expert profiles
+- Smart Care membership page
+- Service areas page
+- Email notification workflow
+- Supabase database integration
+- Render/Vercel/Netlify deployment support
 
-## Typography
+## Public Pages
 
-- **Body Text**: DM Sans (Google Fonts)
-- **Headings**: Wasted Vindey (Google Fonts)
+- Home
+- Our Services
+- Pricing
+- Experts
+- Smart Care
+- Service Areas
+- About Us
+- Contact Us
+- Scheduler
+- Track Request
 
-## Components
+## Admin Features
 
-### TopBar
-- Company logo and branding
-- Contact information (phone, email, location)
-- Professional dark blue background
+- Admin dashboard
+- View bookings
+- Update request status
+- Cancel/delete booking option
+- Customer details
+- Expert assignment (if available)
+- Membership leads (if available)
+- Reports/settings (future-ready)
 
-### NavigationBar
-- Main navigation menu
-- Links to: Home, About Us, Appliances, Repair Services, Contact Us
-- Light gray background with hover effects
+## Tech Stack
 
-### Home
-- Hero section with gradient background
-- Services overview with interactive cards
-- Call-to-action buttons
+- React
+- TypeScript
+- Material UI
+- React Router
+- Supabase
+- Resend
+- Render backend/API (if used)
+- Vercel
+- Netlify
+- Create React App
 
-## Getting Started
+## Environment Variables
 
-### Prerequisites
+Copy `.env.local.example` to `.env.local` and fill in your own values. These are examples only — never commit real keys.
 
-- Node.js (version 14 or higher)
-- npm or yarn package manager
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd smart-applications
+```env
+REACT_APP_SUPABASE_URL=
+REACT_APP_SUPABASE_ANON_KEY=
+RESEND_API_KEY=
+FROM_EMAIL=
+ADMIN_EMAIL=
 ```
 
-2. Install dependencies:
+**Do not commit `.env` files or secret keys.**
+
+## Local Setup
+
 ```bash
 npm install
-```
-
-3. Start the development server:
-```bash
 npm start
+npm run build
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Deployment Notes
 
-### Available Scripts
+- Vercel deployment uses `vercel.json`.
+- Netlify deployment uses `netlify.toml`.
+- The Netlify AI Agent should not be used for this project.
+- Recommended workflow: make changes locally → test → push to GitHub → deploy.
 
-- `npm start` - Runs the app in development mode
-- `npm test` - Launches the test runner
-- `npm run build` - Builds the app for production
-- `npm run eject` - Ejects from Create React App (one-way operation)
+## Database
 
-## Project Structure
+Supabase stores service requests, profiles, bookings, and admin/customer data, along with optional expert and membership fields.
 
-```
-src/
-├── components/
-│   ├── TopBar.tsx          # Top navigation bar with contact info
-│   ├── NavigationBar.tsx   # Main navigation menu
-│   └── Home.tsx           # Home page component
-├── theme.ts               # MUI theme configuration
-├── App.tsx               # Main application component
-├── index.tsx             # Application entry point
-└── index.css             # Global styles and font imports
-```
+## Email Workflow
 
-## Technologies Used
+Bookings trigger an admin notification email and a customer confirmation email, sent and reported independently. If using a Resend test domain, customer emails may require a verified domain before they can be sent to all recipients.
 
-- **React 18** - JavaScript library for building user interfaces
-- **TypeScript** - Typed JavaScript for better development experience
-- **Material-UI (MUI)** - React component library for faster UI development
-- **Emotion** - CSS-in-JS library for styling
-- **Create React App** - React application boilerplate
+## Service Areas
 
-## Customization
+Serving MD, VA, WV, PA, DE, and Washington DC.
 
-### Adding New Components
+## Contact
 
-1. Create a new component file in the `src/components/` directory
-2. Follow the existing component structure and naming conventions
-3. Import and use the component in `App.tsx` or other components
+- Email: [service@smartappliances.co](mailto:service@smartappliances.co)
+- Phone: +1 (240) 576-0397
 
-### Modifying the Theme
+## Roadmap
 
-Edit `src/theme.ts` to customize:
-- Color palette
-- Typography settings
-- Component default styles
-- Spacing and breakpoints
-
-### Styling
-
-The project uses Material-UI's `sx` prop for styling. This provides:
-- Type-safe styling
-- Theme integration
-- Responsive design utilities
-- Consistent design tokens
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+- Stripe payments
+- Verified customer reviews
+- Technician assignment workflow
+- Customer portal improvements
+- SEO service pages
+- Google Analytics/Search Console
+- Custom domain
+- Production Resend domain verification
 
 ## License
 
 This project is licensed under the MIT License.
-
-## Contact
-
-For questions or support, please contact:
-- Email: info@smartapplications.com
-- Phone: +1 (555) 123-4567
-- Location: New York, NY
