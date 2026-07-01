@@ -115,6 +115,9 @@ const HomeBelowFold: React.FC = () => {
   const [contactEmail, setContactEmail] = useState('');
   const [contactMessage, setContactMessage] = useState('');
   const [contactSent, setContactSent] = useState(false);
+  const [contactNameTouched, setContactNameTouched] = useState(false);
+  const [contactEmailTouched, setContactEmailTouched] = useState(false);
+  const [contactMessageTouched, setContactMessageTouched] = useState(false);
   const [areaZip, setAreaZip] = useState('');
   const [areaZipTouched, setAreaZipTouched] = useState(false);
   const [notifyEmail, setNotifyEmail] = useState('');
@@ -197,8 +200,16 @@ const HomeBelowFold: React.FC = () => {
     navigate(`/scheduler?${new URLSearchParams({ zipCode: areaZip }).toString()}`);
   };
 
+  const CONTACT_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const contactEmailValid = CONTACT_EMAIL_RE.test(contactEmail);
+  const contactFormValid =
+    contactName.trim().length > 0 && contactEmailValid && contactMessage.trim().length > 0;
+
   const handleContactSubmit = () => {
-    if (contactName && contactEmail && contactMessage) setContactSent(true);
+    setContactNameTouched(true);
+    setContactEmailTouched(true);
+    setContactMessageTouched(true);
+    if (contactFormValid) setContactSent(true);
   };
 
   return (
@@ -1825,10 +1836,29 @@ const HomeBelowFold: React.FC = () => {
             ))}
           </Box>
 
-          {/* Two-column grid */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: { xs: 4, md: 5 } }}>
-            {/* Left: compact contact info + map */}
-            <Box>
+          {/* Two-column grid — equal-height cards */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              gap: { xs: 3, md: 4 },
+              alignItems: 'stretch',
+            }}
+          >
+            {/* Left: contact info + hours + map */}
+            <Box
+              sx={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E4E7EB',
+                borderRadius: '20px',
+                boxShadow: '0 4px 20px rgba(10,37,64,0.07)',
+                p: { xs: '24px', md: '28px' },
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Contact items */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75, mb: 2.5 }}>
                 {[
                   { icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Phone', value: '+1 (240) 576-0397', href: 'tel:+12405760397' },
@@ -1840,15 +1870,15 @@ const HomeBelowFold: React.FC = () => {
                       {item.icon}
                     </Box>
                     <Box>
-                      <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.78rem', color: colors.mutedText, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.75rem', color: colors.mutedText, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {item.label}
                       </Typography>
                       {item.href ? (
-                        <Box component="a" href={item.href} sx={{ fontFamily: fonts.body, fontSize: '0.88rem', color: colors.navy, fontWeight: 600, textDecoration: 'none', '&:hover': { color: colors.primaryBlue } }}>
+                        <Box component="a" href={item.href} sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: colors.navy, fontWeight: 600, textDecoration: 'none', '&:hover': { color: colors.primaryBlue } }}>
                           {item.value}
                         </Box>
                       ) : (
-                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', color: colors.navy, fontWeight: 600 }}>{item.value}</Typography>
+                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: colors.navy, fontWeight: 600 }}>{item.value}</Typography>
                       )}
                     </Box>
                   </Box>
@@ -1856,10 +1886,10 @@ const HomeBelowFold: React.FC = () => {
               </Box>
 
               {/* Hours */}
-              <Box sx={{ backgroundColor: '#F5F7FA', borderRadius: '14px', border: '1px solid #E4E7EB', p: 2.25, mb: 2.5 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.25 }}>
+              <Box sx={{ backgroundColor: '#F5F7FA', borderRadius: '12px', border: '1px solid #E4E7EB', p: 2, mb: 2.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
                   <AccessTimeIcon sx={{ color: '#1A73E8', fontSize: 16 }} />
-                  <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.84rem', color: colors.navy }}>Service Hours</Typography>
+                  <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.82rem', color: colors.navy }}>Service Hours</Typography>
                 </Box>
                 {[
                   { day: 'Mon – Fri', hours: '8:00 AM – 6:00 PM' },
@@ -1867,72 +1897,143 @@ const HomeBelowFold: React.FC = () => {
                   { day: 'Sunday', hours: 'Emergency Only' },
                 ].map((row) => (
                   <Box key={row.day} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '0.82rem' }}>{row.day}</Typography>
-                    <Typography sx={{ fontFamily: fonts.body, color: colors.navy, fontWeight: 600, fontSize: '0.82rem' }}>{row.hours}</Typography>
+                    <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '0.8rem' }}>{row.day}</Typography>
+                    <Typography sx={{ fontFamily: fonts.body, color: row.hours === 'Emergency Only' ? '#D97706' : colors.navy, fontWeight: 600, fontSize: '0.8rem' }}>{row.hours}</Typography>
                   </Box>
                 ))}
               </Box>
 
               {/* Map */}
-              <Box sx={{ borderRadius: '16px', overflow: 'hidden', border: `1px solid ${colors.border}` }}>
-                <Suspense fallback={<Box sx={{ height: 220, backgroundColor: '#F0F4FF' }} aria-hidden />}>
-                  <ServiceAreaMap height={{ xs: 220, md: 240 }} />
+              <Box sx={{ borderRadius: '14px', overflow: 'hidden', border: `1px solid ${colors.border}` }}>
+                <Suspense fallback={<Box sx={{ height: 240, backgroundColor: '#EAF1FF' }} aria-hidden />}>
+                  <ServiceAreaMap height={{ xs: 220, sm: 240, md: 240 }} />
                 </Suspense>
               </Box>
             </Box>
 
-            {/* Right: form */}
-            <Box>
-              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.1rem', color: colors.navy, mb: 2.5 }}>
+            {/* Right: message form */}
+            <Box
+              sx={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E4E7EB',
+                borderRadius: '20px',
+                boxShadow: '0 4px 20px rgba(10,37,64,0.07)',
+                p: { xs: '24px', md: '28px' },
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.2rem', color: colors.navy, mb: 0.5 }}>
                 Send Us a Message
               </Typography>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText, mb: 2.5 }}>
+                We typically respond within a few hours during business hours.
+              </Typography>
+
               {contactSent ? (
-                <Box sx={{ backgroundColor: '#E8F5E9', border: '1px solid #A5D6A7', borderRadius: '14px', p: 4, textAlign: 'center' }}>
-                  <CheckCircleOutlineIcon sx={{ color: '#2E7D32', fontSize: 48, mb: 2 }} />
-                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, color: '#2E7D32', mb: 0.75 }}>Message Sent!</Typography>
-                  <Typography sx={{ fontFamily: fonts.body, color: '#388E3C', fontSize: '0.9rem' }}>
-                    Thank you — we'll get back to you shortly.
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#F0FDF4',
+                    border: '1px solid #86EFAC',
+                    borderRadius: '14px',
+                    p: 4,
+                    textAlign: 'center',
+                  }}
+                >
+                  <CheckCircleOutlineIcon sx={{ color: '#15803D', fontSize: 48, mb: 2 }} />
+                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.1rem', color: '#14532D', mb: 0.75 }}>Message Sent!</Typography>
+                  <Typography sx={{ fontFamily: fonts.body, color: '#166534', fontSize: '0.9rem' }}>
+                    Thank you — we&apos;ll get back to you shortly.
                   </Typography>
                 </Box>
               ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flexGrow: 1 }}>
                   <TextField
                     label="Your Name"
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
+                    onBlur={() => setContactNameTouched(true)}
                     fullWidth
-                    size="small"
-                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body } }}
+                    error={contactNameTouched && !contactName.trim()}
+                    helperText={contactNameTouched && !contactName.trim() ? 'Name is required.' : ''}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '10px',
+                        fontFamily: fonts.body,
+                        backgroundColor: '#FAFBFC',
+                      },
+                    }}
                   />
                   <TextField
                     label="Email Address"
                     type="email"
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
+                    onBlur={() => setContactEmailTouched(true)}
                     fullWidth
-                    size="small"
-                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body } }}
+                    error={contactEmailTouched && !contactEmailValid}
+                    helperText={contactEmailTouched && !contactEmailValid ? 'Please enter a valid email address.' : ''}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '10px',
+                        fontFamily: fonts.body,
+                        backgroundColor: '#FAFBFC',
+                      },
+                    }}
                   />
                   <TextField
                     label="Message"
                     value={contactMessage}
                     onChange={(e) => setContactMessage(e.target.value)}
+                    onBlur={() => setContactMessageTouched(true)}
                     fullWidth
                     multiline
-                    minRows={5}
-                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', fontFamily: fonts.body } }}
+                    minRows={6}
+                    error={contactMessageTouched && !contactMessage.trim()}
+                    helperText={contactMessageTouched && !contactMessage.trim() ? 'Message is required.' : ''}
+                    sx={{
+                      flexGrow: 1,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '10px',
+                        fontFamily: fonts.body,
+                        backgroundColor: '#FAFBFC',
+                        alignItems: 'flex-start',
+                      },
+                    }}
                   />
                   <Button
                     variant="contained"
                     onClick={handleContactSubmit}
-                    disabled={!contactName || !contactEmail || !contactMessage}
-                    sx={{ background: '#1A73E8', color: '#fff', fontFamily: fonts.body, fontWeight: 700, py: 1.4, borderRadius: '10px', textTransform: 'none', '&:hover': { background: '#0B3D91' } }}
+                    disabled={!contactFormValid}
+                    sx={{
+                      backgroundColor: '#1A73E8',
+                      color: '#fff',
+                      fontFamily: fonts.body,
+                      fontWeight: 700,
+                      py: 1.5,
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      fontSize: '0.95rem',
+                      '&:hover': { backgroundColor: '#0B3D91' },
+                      '&.Mui-disabled': {
+                        backgroundColor: 'rgba(26,115,232,0.32)',
+                        color: 'rgba(255,255,255,0.75)',
+                      },
+                    }}
                   >
                     Send Message
                   </Button>
                   <Typography sx={{ color: colors.mutedText, fontFamily: fonts.body, textAlign: 'center', fontSize: '0.82rem' }}>
                     Or call us directly at{' '}
-                    <Box component="a" href="tel:+12405760397" sx={{ color: colors.primaryBlue, fontWeight: 700, textDecoration: 'none' }}>+1 (240) 576-0397</Box>
+                    <Box component="a" href="tel:+12405760397" sx={{ color: colors.primaryBlue, fontWeight: 700, textDecoration: 'none' }}>
+                      +1 (240) 576-0397
+                    </Box>
                   </Typography>
                 </Box>
               )}

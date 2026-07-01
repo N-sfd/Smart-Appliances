@@ -370,8 +370,8 @@ const Home: React.FC = () => {
             aria-hidden
             width={HERO_TECHNICIAN_WIDTH}
             height={HERO_TECHNICIAN_HEIGHT}
-            loading="lazy"
-            decoding="async"
+            loading="eager"
+            decoding="sync"
             sx={{
               position: 'absolute',
               inset: 0,
@@ -564,8 +564,8 @@ const Home: React.FC = () => {
                 alt="Certified appliance repair technician giving thumbs up"
                 width={HERO_TECHNICIAN_WIDTH}
                 height={HERO_TECHNICIAN_HEIGHT}
-                loading="lazy"
-                decoding="async"
+                loading="eager"
+                decoding="sync"
                 sx={{
                   position: 'absolute',
                   inset: 0,
