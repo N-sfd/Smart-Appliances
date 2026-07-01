@@ -14,7 +14,7 @@ interface MembershipPlanCardProps {
 const MembershipPlanCard: React.FC<MembershipPlanCardProps> = ({ plan, onChoose }) => (
   <Box
     component="article"
-    aria-label={`${plan.name} membership plan`}
+    aria-label={`${plan.name} Smart Care plan`}
     sx={{
       position: 'relative',
       height: '100%',

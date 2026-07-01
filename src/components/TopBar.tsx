@@ -29,20 +29,23 @@ import {
 } from '../data/serviceNavItems';
 
 interface NavLink {
+  key: string;
   label: string;
   path: string;
   hash?: string;
   cat?: string;
 }
 
+// `key` is the stable identifier used for active-state/dropdown logic — `label` is
+// display-only copy, so relabeling the nav never risks breaking route matching.
 const navLinks: NavLink[] = [
-  { label: 'Services', path: '/services' },
-  { label: 'Pricing', path: '/pricing' },
-  { label: 'Experts', path: '/experts' },
-  { label: 'Membership', path: '/membership' },
-  { label: 'Areas', path: '/', hash: 'service-areas' },
-  { label: 'About', path: '/about' },
-  { label: 'Contact', path: '/contact' },
+  { key: 'services', label: 'Our Services', path: '/services' },
+  { key: 'pricing', label: 'Pricing', path: '/pricing' },
+  { key: 'experts', label: 'Experts', path: '/experts' },
+  { key: 'membership', label: 'Smart Care', path: '/membership' },
+  { key: 'areas', label: 'Service Areas', path: '/', hash: 'service-areas' },
+  { key: 'about', label: 'About Us', path: '/about' },
+  { key: 'contact', label: 'Contact Us', path: '/contact' },
 ];
 
 const TopBar: React.FC = () => {
@@ -111,7 +114,7 @@ const TopBar: React.FC = () => {
   };
 
   const isActive = (link: NavLink): boolean => {
-    if (link.label === 'Services') return isServicesSection;
+    if (link.key === 'services') return isServicesSection;
     if (link.hash) return false;
     if (link.path === '/') return location.pathname === '/';
     if (!location.pathname.startsWith(link.path)) return false;
@@ -137,7 +140,7 @@ const TopBar: React.FC = () => {
   };
 
   const handleNavClick = (link: NavLink) => {
-    if (link.label === 'Services') {
+    if (link.key === 'services') {
       navigate('/services');
       setDrawerOpen(false);
       return;
@@ -161,9 +164,9 @@ const TopBar: React.FC = () => {
     color: active ? colors.primaryBlue : colors.darkText,
     fontFamily: fonts.heading,
     fontWeight: active ? 700 : 600,
-    fontSize: '0.88rem',
+    fontSize: { lg: '0.82rem', xl: '0.88rem' },
     textTransform: 'none' as const,
-    px: 0.9,
+    px: 0.7,
     py: 0.85,
     minWidth: 'auto',
     whiteSpace: 'nowrap' as const,
@@ -206,14 +209,14 @@ const TopBar: React.FC = () => {
             <BrandLogo variant="header" onClick={() => { navigate('/'); setDrawerOpen(false); }} />
           </Box>
 
-          <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: { lg: 3, xl: 4 }, alignItems: 'center', flexGrow: 1, justifyContent: 'flex-start', ml: { lg: 2.5, xl: 3.5 } }}>
+          <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: { lg: 1.75, xl: 3 }, alignItems: 'center', flexGrow: 1, justifyContent: 'flex-start', ml: { lg: 1.5, xl: 3 } }}>
             {navLinks.map((link) => {
               const active = isActive(link);
 
-              if (link.label === 'Services') {
+              if (link.key === 'services') {
                 return (
                   <Box
-                    key={link.label}
+                    key={link.key}
                     ref={servicesMenuRef}
                     sx={{ position: 'relative' }}
                     onMouseEnter={openServicesMenu}
@@ -289,7 +292,7 @@ const TopBar: React.FC = () => {
 
               return (
                 <Button
-                  key={link.label}
+                  key={link.key}
                   onClick={() => handleNavClick(link)}
                   disableRipple
                   sx={navButtonSx(active)}
@@ -477,9 +480,9 @@ const TopBar: React.FC = () => {
           {navLinks.map((link) => {
             const active = isActive(link);
 
-            if (link.label === 'Services') {
+            if (link.key === 'services') {
               return (
-                <React.Fragment key={link.label}>
+                <React.Fragment key={link.key}>
                   <ListItem disablePadding>
                     <ListItemButton
                       onClick={() => setServicesDrawerOpen((open) => !open)}
@@ -558,7 +561,7 @@ const TopBar: React.FC = () => {
             }
 
             return (
-              <ListItem key={link.label} disablePadding>
+              <ListItem key={link.key} disablePadding>
                 <ListItemButton
                   onClick={() => handleNavClick(link)}
                   sx={{

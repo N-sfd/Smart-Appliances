@@ -483,11 +483,11 @@ const MembershipPage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* Membership vs one-time service */}
+      {/* Smart Care vs one-time service */}
       <Box sx={{ py: sectionPy }}>
         <Container maxWidth="md">
           <Typography component="h2" sx={{ ...sectionTitleSx, textAlign: 'center', mb: 4 }}>
-            Membership vs. One-Time Service
+            Smart Care vs. One-Time Service
           </Typography>
           <Box
             sx={{

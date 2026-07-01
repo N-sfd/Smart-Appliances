@@ -4,6 +4,7 @@ import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import BoltIcon from '@mui/icons-material/Bolt';
 import SensorsIcon from '@mui/icons-material/Sensors';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import type { SvgIconComponent } from '@mui/icons-material';
 import { serviceCategories } from './services';
 
@@ -36,12 +37,13 @@ export const ELECTRICAL_SERVICE_IDS = new Set(
 
 /** Header Services dropdown — category list only (no individual repair services) */
 export const serviceNavItems: ServiceNavItem[] = [
-  { id: 'home-appliances', label: 'Home Appliances', path: '/services/home-appliances', icon: KitchenIcon },
+  { id: 'home-appliances', label: 'Appliance Care', path: '/services/home-appliances', icon: KitchenIcon },
   { id: 'hvac-services', label: 'HVAC Services', path: '/services/hvac-support', icon: AcUnitIcon },
   { id: 'plumbing-services', label: 'Plumbing Services', path: '/services/plumbing', icon: WaterDropIcon },
   { id: 'electrical-services', label: 'Electrical Services', path: '/services/electrical', icon: BoltIcon },
-  { id: 'smart-home-setup', label: 'Smart Home Setup', path: '/services/smart-thermostat-setup', icon: SensorsIcon },
-  { id: 'garage-door-repair', label: 'Garage Door Repair', path: '/services/garage-door-repair', icon: WarehouseIcon },
+  { id: 'smart-home-setup', label: 'Smart Home Services', path: '/services/smart-thermostat-setup', icon: SensorsIcon },
+  { id: 'garage-door-repair', label: 'Garage Door Services', path: '/services/garage-door-repair', icon: WarehouseIcon },
+  { id: 'emergency-service', label: 'Emergency Service', path: '/emergency-service', icon: WarningAmberIcon },
 ];
 
 export const serviceNavPath = (item: ServiceNavItem): string => item.path;

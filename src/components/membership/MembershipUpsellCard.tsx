@@ -125,7 +125,7 @@ const MembershipUpsellCard: React.FC<MembershipUpsellCardProps> = ({
               '&:hover': { backgroundColor: colors.navy },
             }}
           >
-            View Membership Plans
+            View Smart Care Plans
           </Button>
         </Box>
       </Box>
@@ -185,7 +185,7 @@ const MembershipUpsellCard: React.FC<MembershipUpsellCardProps> = ({
           '&:hover': { textDecoration: 'underline' },
         }}
       >
-        View membership plans
+        View Smart Care plans
       </Link>
     </Box>
   );

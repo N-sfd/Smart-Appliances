@@ -23,10 +23,10 @@ const companyLinks: FooterLink[] = [
   { label: 'About Us', path: '/about' },
   { label: 'How It Works', path: '/how-it-works' },
   { label: 'Pricing', path: '/pricing' },
-  { label: 'Membership', path: '/membership' },
+  { label: 'Smart Care', path: '/membership' },
   { label: 'Experts', path: '/experts' },
-  { label: 'Areas', path: '/areas' },
-  { label: 'Contact', path: '/contact' },
+  { label: 'Service Areas', path: '/areas' },
+  { label: 'Contact Us', path: '/contact' },
 ];
 
 const serviceLinks: FooterLink[] = [
