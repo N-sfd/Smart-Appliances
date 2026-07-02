@@ -38,16 +38,16 @@ upscaled images).
 - **Spec**: 4:3 or 1:1, min 800px wide, single appliance/system or
   close-up technician task shot, consistent lighting across the set.
 
-## 3. Experts — circular profile avatars (NEW paths, files not yet added)
+## 3. Experts — circular profile avatars (added: unique AI-generated portraits)
 
 | Expert | Target path |
 |---|---|
-| Smart Appliances Team | `public/images/experts/smart-appliances-team.webp` |
-| HVAC Comfort Expert | `public/images/experts/hvac-comfort-expert.webp` |
-| Appliance Care Expert | `public/images/experts/appliance-care-expert.webp` |
-| Plumbing Service Expert | `public/images/experts/plumbing-service-expert.webp` |
-| Electrical & Smart Home Expert | `public/images/experts/electrical-smart-home-expert.webp` |
-| Garage Door Expert | `public/images/experts/garage-door-expert.webp` |
+| Smart Appliances Team | `public/images/experts/smart-appliances-team.png` |
+| HVAC Comfort Expert | `public/images/experts/hvac-comfort-expert.png` |
+| Appliance Care Expert | `public/images/experts/appliance-care-expert.png` |
+| Plumbing Service Expert | `public/images/experts/plumbing-service-expert.png` |
+| Electrical & Smart Home Expert | `public/images/experts/electrical-smart-home-expert.png` |
+| Garage Door Expert | `public/images/experts/garage-door-expert.png` |
 
 - **Why new paths**: two pairs of these previously shared the exact same
   stock photo (two "different" experts with one face) — not a good look for

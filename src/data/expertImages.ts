@@ -1,21 +1,21 @@
-/** Professional technician photos suited for circular expert avatars. */
+/** Unique professional technician portraits, one per expert (face-centered for circular avatars). */
 export const EXPERT_IMAGE_BY_SLUG: Record<string, string> = {
-  'smart-appliances-team': '/images/services/appliances/technician-default.webp',
-  'hvac-repair-specialist': '/images/services/hvac/emergency-hvac-service.png',
-  'appliance-repair-specialist': '/images/services/appliances/technician-default.webp',
-  'plumbing-repair-specialist': '/images/services/hero-technician.jpg',
-  'electrical-service-specialist': '/images/services/smart-home/hero-installer.webp',
-  'garage-door-specialist': '/images/services/hero-technician.jpg',
+  'smart-appliances-team': '/images/experts/smart-appliances-team.png',
+  'hvac-repair-specialist': '/images/experts/hvac-comfort-expert.png',
+  'appliance-repair-specialist': '/images/experts/appliance-care-expert.png',
+  'plumbing-repair-specialist': '/images/experts/plumbing-service-expert.png',
+  'electrical-service-specialist': '/images/experts/electrical-smart-home-expert.png',
+  'garage-door-specialist': '/images/experts/garage-door-expert.png',
 };
 
-/** Fine-tune circular crop so faces stay centered (not feet/hands). */
+/** Fine-tune circular crop so faces stay centered. Portraits are head-and-shoulders framed. */
 export const EXPERT_AVATAR_OBJECT_POSITION: Record<string, string> = {
-  'smart-appliances-team': 'center 18%',
-  'hvac-repair-specialist': '62% 28%',
-  'appliance-repair-specialist': 'center 18%',
-  'plumbing-repair-specialist': '42% 22%',
-  'electrical-service-specialist': 'center 22%',
-  'garage-door-specialist': '42% 22%',
+  'smart-appliances-team': 'center 25%',
+  'hvac-repair-specialist': 'center 30%',
+  'appliance-repair-specialist': 'center 28%',
+  'plumbing-repair-specialist': 'center 25%',
+  'electrical-service-specialist': 'center 30%',
+  'garage-door-specialist': 'center 28%',
 };
 
 export const GALLERY_CATEGORY_IMAGES: Record<string, string> = {
@@ -61,7 +61,7 @@ export function getExpertImageUrl(slug: string, ...candidates: (string | null | 
     if (isBlockedAvatarPath(candidate)) continue;
     return candidate;
   }
-  return EXPERT_IMAGE_BY_SLUG[slug] ?? '/images/services/appliances/technician-default.webp';
+  return EXPERT_IMAGE_BY_SLUG[slug] ?? '/images/experts/smart-appliances-team.png';
 }
 
 export function getExpertAvatarObjectPosition(slug: string): string {
