@@ -30,6 +30,27 @@ const SITEMAP_SECTIONS = [
     ],
   },
   {
+    title: 'Popular Repairs',
+    links: [
+      { label: 'Refrigerator Service', path: '/services/refrigerator-service' },
+      { label: 'Washer & Dryer Service', path: '/services/washer-dryer-service' },
+      { label: 'Dishwasher Service', path: '/services/dishwasher-service' },
+      { label: 'Oven & Stove Service', path: '/services/oven-stove-service' },
+      { label: 'Microwave Service', path: '/services/microwave-service' },
+      { label: 'AC Service', path: '/services/ac-service' },
+      { label: 'Heating & Furnace Service', path: '/services/heating-furnace-service' },
+      { label: 'Garbage Disposal Service', path: '/services/garbage-disposal-service' },
+      { label: 'Drain Cleaning', path: '/services/drain-cleaning' },
+      { label: 'Light Fixture Installation', path: '/services/light-fixture-installation' },
+      { label: 'Video Doorbell Installation', path: '/services/video-doorbell-installation' },
+      { label: 'Garage Door Service', path: '/services/garage-door-repair' },
+      { label: 'Water Heater Service', path: '/services/water-heater-service' },
+      { label: 'Leak Repair', path: '/services/leak-repair' },
+      { label: 'Breaker & Panel Service', path: '/services/breaker-panel-inspection' },
+      { label: 'Smart Thermostat Installation', path: '/services/smart-thermostat-setup' },
+    ],
+  },
+  {
     title: 'Account & Legal',
     links: [
       { label: 'My Bookings', path: '/my-bookings' },

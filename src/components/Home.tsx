@@ -29,6 +29,7 @@ import {
   validateUsPhone,
 } from '../lib/schedulerContactValidation';
 import { insertBooking, updateEmailSent } from '../lib/supabaseBookings';
+import { useSeo } from '../hooks/useSeo';
 
 const HomeBelowFold = lazy(() => import('./HomeBelowFold'));
 
@@ -73,6 +74,12 @@ const formatPhone = (raw: string): string => {
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+
+  useSeo({
+    title: 'Smart Appliances | Appliance, HVAC & Home Service Booking',
+    description: 'Book appliance care, HVAC, plumbing, electrical, smart home, garage door, and emergency services across MD, VA, WV, PA, DE, and Washington DC.',
+    path: '/',
+  });
 
   // Service dropdown
   const [selectedService, setSelectedService] = useState('');

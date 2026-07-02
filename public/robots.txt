@@ -1,3 +1,10 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /my-bookings
+Disallow: /profile
+Disallow: /technician
+Disallow: /booking-confirmation
+
+# TODO: replace with the real production domain once a custom domain is connected (see docs/custom-domain-setup.md)
+Sitemap: https://www.smartappliances.com/sitemap.xml

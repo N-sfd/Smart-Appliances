@@ -37,6 +37,7 @@ import {
   LucideIcon,
 } from 'lucide-react';
 import { colors, fonts, primaryButtonSx, secondaryButtonSx } from '../theme';
+import { useSeo } from '../hooks/useSeo';
 import ServiceAreaMap from '../components/ServiceAreaMap';
 import TransparentPricingSection from '../components/TransparentPricingSection';
 import { getServiceDisplayName } from '../utils/serviceDisplayNames';
@@ -139,6 +140,13 @@ const FAQ_ITEMS = [
 
 const PricingPage: React.FC = () => {
   const navigate = useNavigate();
+
+  useSeo({
+    title: 'Transparent Home Service Pricing | Smart Appliances',
+    description: 'Book appliance care, HVAC, plumbing, electrical, smart home, garage door, and emergency services across MD, VA, WV, PA, DE, and Washington DC.',
+    path: '/pricing',
+  });
+
   const [activeTab, setActiveTab] = useState<PricingCategoryId>('appliances');
   const estimatorRef = useRef<HTMLDivElement>(null);
 

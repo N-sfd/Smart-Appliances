@@ -27,6 +27,7 @@ import ExpertCard from '../components/experts/ExpertCard';
 import ExpertAvatar from '../components/experts/ExpertAvatar';
 import ExpertMatchBanner from '../components/experts/ExpertMatchBanner';
 import { fetchActiveExpertsWithDetails } from '../services/adminExperts';
+import { useSeo } from '../hooks/useSeo';
 
 const TRUST_BADGES = [
   { label: 'Verified Service Team', icon: VerifiedOutlinedIcon },
@@ -96,6 +97,13 @@ const matchesCategory = (expert: Expert, category: SchedulerServiceCategory | 'A
 
 export default function ExpertsPage() {
   const navigate = useNavigate();
+
+  useSeo({
+    title: 'Home Service Experts | Smart Appliances',
+    description: 'Book appliance care, HVAC, plumbing, electrical, smart home, garage door, and emergency services across MD, VA, WV, PA, DE, and Washington DC.',
+    path: '/experts',
+  });
+
   const [experts, setExperts] = useState<Expert[]>(EXPERTS.map(resolveExpertImages));
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<SchedulerServiceCategory | 'All'>('All');

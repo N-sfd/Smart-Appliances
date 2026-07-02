@@ -10,8 +10,44 @@
       name="description"
       content="Smart Appliances — fast, trusted appliance repair, installation, HVAC, plumbing, electrical, smart home setup, and 24/7 emergency service."
     />
+    <!-- TODO: replace https://www.smartappliances.com with the real production domain once a custom domain is connected (see docs/custom-domain-setup.md) -->
+    <link rel="canonical" href="https://www.smartappliances.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Smart Appliances" />
+    <meta property="og:title" content="Smart Appliances — Appliance Repair & Home Services" />
+    <meta
+      property="og:description"
+      content="Smart Appliances — fast, trusted appliance repair, installation, HVAC, plumbing, electrical, smart home setup, and 24/7 emergency service."
+    />
+    <meta property="og:url" content="https://www.smartappliances.com/" />
+    <meta property="og:image" content="%PUBLIC_URL%/images/services/hero-appliance-technician.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Smart Appliances — Appliance Repair & Home Services" />
+    <meta
+      name="twitter:description"
+      content="Smart Appliances — fast, trusted appliance repair, installation, HVAC, plumbing, electrical, smart home setup, and 24/7 emergency service."
+    />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/images/logo-mark.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HomeAndConstructionBusiness",
+        "name": "Smart Appliances",
+        "email": "service@smartappliances.co",
+        "telephone": "+1-240-576-0397",
+        "url": "https://www.smartappliances.com/",
+        "areaServed": [
+          { "@type": "State", "name": "Maryland" },
+          { "@type": "State", "name": "Virginia" },
+          { "@type": "State", "name": "West Virginia" },
+          { "@type": "State", "name": "Pennsylvania" },
+          { "@type": "State", "name": "Delaware" },
+          { "@type": "AdministrativeArea", "name": "Washington DC" }
+        ],
+        "priceRange": "$$"
+      }
+    </script>
     <!-- Preload hero image so it is ready when React mounts (avoids post-hydration LCP pop) -->
     <link
       rel="preload"
@@ -25,6 +61,24 @@
       html, body { background-color: #071B41; margin: 0; }
     </style>
     <title>Smart Appliances — Appliance Repair & Home Services</title>
+
+    <!--
+      Google Search Console — verify ownership, then uncomment:
+      <meta name="google-site-verification" content="REPLACE_WITH_YOUR_VERIFICATION_CODE" />
+    -->
+
+    <!--
+      Google Analytics (GA4) — create a property at analytics.google.com, then
+      replace G-XXXXXXXXXX below and uncomment both tags:
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+      </script>
+    -->
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

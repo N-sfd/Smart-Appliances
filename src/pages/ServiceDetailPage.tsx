@@ -20,11 +20,25 @@ import { HOME_APPLIANCE_SERVICE_IDS, ELECTRICAL_SERVICE_IDS } from '../data/serv
 import ServiceCategoryPage from './ServiceCategoryPage';
 import { SERVICE_CATEGORY_PAGE_MAP } from '../data/serviceCategoryPages';
 import { inferCategoryFromProductName } from '../data/schedulerPrefill';
+import { SEO_SERVICE_LANDING_SLUGS } from '../data/serviceLandingPages';
 
 const GarageDoorRepairPage = lazy(() => import('./GarageDoorRepairPage'));
+const ServiceLandingPage = lazy(() => import('./ServiceLandingPage'));
 
 const font = "'Inter', 'DM Sans', Arial, sans-serif";
 const heading = "'Plus Jakarta Sans', 'Inter', sans-serif";
+
+/** Old SEO landing page slugs → their current canonical slug. Keeps old links/bookmarks working. */
+const LEGACY_SEO_SLUG_REDIRECTS: Record<string, string> = {
+  'refrigerator-repair': 'refrigerator-service',
+  'washer-dryer': 'washer-dryer-service',
+  'dishwasher-repair': 'dishwasher-service',
+  'oven-stove-repair': 'oven-stove-service',
+  'microwave-repair': 'microwave-service',
+  'ac-repair': 'ac-service',
+  'heating-furnace-repair': 'heating-furnace-service',
+  'garage-door-service': 'garage-door-repair',
+};
 
 const HUB_TO_SLUG: Record<string, keyof typeof SERVICE_CATEGORY_PAGE_MAP> = {
   plumbing: 'plumbing',
@@ -49,8 +63,20 @@ const ServiceDetailPage: React.FC = () => {
     return null;
   }
 
+  if (serviceId in LEGACY_SEO_SLUG_REDIRECTS) {
+    return <Navigate to={`/services/${LEGACY_SEO_SLUG_REDIRECTS[serviceId]}`} replace />;
+  }
+
   if (serviceId in SERVICE_CATEGORY_PAGE_MAP) {
     return <ServiceCategoryPage slug={serviceId as keyof typeof SERVICE_CATEGORY_PAGE_MAP} />;
+  }
+
+  if (SEO_SERVICE_LANDING_SLUGS.has(serviceId)) {
+    return (
+      <Suspense fallback={<Box sx={{ minHeight: '50vh' }} />}>
+        <ServiceLandingPage slug={serviceId} />
+      </Suspense>
+    );
   }
 
   const hubSlug = HUB_TO_SLUG[serviceId];

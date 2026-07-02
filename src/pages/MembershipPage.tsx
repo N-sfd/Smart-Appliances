@@ -24,6 +24,7 @@ import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
 import ElectricBoltOutlinedIcon from '@mui/icons-material/ElectricBoltOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import GarageOutlinedIcon from '@mui/icons-material/GarageOutlined';
+import { useSeo } from '../hooks/useSeo';
 import { colors, fonts, primaryButtonSx, secondaryButtonSx } from '../theme';
 import {
   MEMBERSHIP_PLANS,
@@ -88,6 +89,13 @@ const sectionPy = { xs: 6, md: 9 };
 
 const MembershipPage: React.FC = () => {
   const navigate = useNavigate();
+
+  useSeo({
+    title: 'Smart Care Membership | Smart Appliances',
+    description: 'Book appliance care, HVAC, plumbing, electrical, smart home, garage door, and emergency services across MD, VA, WV, PA, DE, and Washington DC.',
+    path: '/membership',
+  });
+
   const plansRef = useRef<HTMLDivElement>(null);
 
   const scrollToPlans = () => {

@@ -18,6 +18,8 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import StableImage from '../components/StableImage';
+import { ABOUT_MISSION_IMAGE_WIDTH, ABOUT_MISSION_IMAGE_HEIGHT } from '../constants/imageDimensions';
 
 interface OfferItem {
   icon: React.ReactNode;
@@ -122,7 +124,7 @@ const AboutPage: React.FC = () => {
               fontSize: '0.85rem',
             }}
           >
-            About SmartAppliance
+            About Smart Appliances
           </Typography>
           <Typography
             variant="h1"
@@ -148,7 +150,7 @@ const AboutPage: React.FC = () => {
               margin: '0 auto',
             }}
           >
-            SmartAppliance helps customers book reliable appliance repair and home service support through a simple
+            Smart Appliances helps customers book reliable appliance repair and home service support through a simple
             digital experience.
           </Typography>
         </Container>
@@ -195,14 +197,25 @@ const AboutPage: React.FC = () => {
               </Typography>
             </Box>
 
-            {/* Right: 2x2 stat cards */}
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 2,
-              }}
-            >
+            {/* Right: team photo + 2x2 stat cards */}
+            <Box>
+              <StableImage
+                src="/images/services/hero-technician.jpg"
+                alt="Smart Appliances technician preparing for a home service appointment"
+                intrinsicWidth={ABOUT_MISSION_IMAGE_WIDTH}
+                intrinsicHeight={ABOUT_MISSION_IMAGE_HEIGHT}
+                displayWidth="100%"
+                displayHeight={{ xs: 220, md: 260 }}
+                sx={{ objectFit: 'cover', borderRadius: '16px' }}
+              />
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: 2,
+                  mt: 2,
+                }}
+              >
               {statCards.map((stat) => (
                 <Box
                   key={stat.label}
@@ -234,6 +247,7 @@ const AboutPage: React.FC = () => {
                   </Typography>
                 </Box>
               ))}
+              </Box>
             </Box>
           </Box>
         </Container>

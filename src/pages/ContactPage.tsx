@@ -23,6 +23,8 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import { serviceCategories } from '../data/services';
 import { primaryButtonSx, radii } from '../theme';
+import StableImage from '../components/StableImage';
+import { CONTACT_IMAGE_WIDTH, CONTACT_IMAGE_HEIGHT } from '../constants/imageDimensions';
 
 const contactInputSx = {
   '& .MuiOutlinedInput-root': { borderRadius: radii.xl },
@@ -149,7 +151,7 @@ const ContactPage: React.FC = () => {
               mb: 2,
             }}
           >
-            Contact SmartAppliance
+            Contact Smart Appliances
           </Typography>
           <Typography
             variant="body1"
@@ -177,6 +179,17 @@ const ContactPage: React.FC = () => {
           >
             {/* Left: contact info */}
             <Box>
+              <Box sx={{ mb: 3 }}>
+                <StableImage
+                  src="/images/services/smart-home/hero-installer.webp"
+                  alt="Smart Appliances support technician ready to help with your service request"
+                  intrinsicWidth={CONTACT_IMAGE_WIDTH}
+                  intrinsicHeight={CONTACT_IMAGE_HEIGHT}
+                  displayWidth="100%"
+                  displayHeight={{ xs: 200, md: 240 }}
+                  sx={{ objectFit: 'cover', borderRadius: '16px' }}
+                />
+              </Box>
               <Typography
                 variant="h4"
                 sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 4 }}

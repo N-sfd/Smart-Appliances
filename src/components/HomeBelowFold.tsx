@@ -40,12 +40,15 @@ import PlumbingOutlinedIcon from '@mui/icons-material/PlumbingOutlined';
 import LocalLaundryServiceOutlinedIcon from '@mui/icons-material/LocalLaundryServiceOutlined';
 import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import ReplayIcon from '@mui/icons-material/Replay';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import { serviceCategories } from '../data/services';
 import { popularServices } from '../data/popularServices';
 import { SERVICE_TYPE_IMAGE_MAP, CATEGORY_IMAGE_MAP, DEFAULT_SERVICE_IMAGE } from '../data/serviceImages';
 import { colors, fonts, radii } from '../theme';
-import { BRAND_LOGO_SLOT_WIDTH, BRAND_LOGO_SLOT_HEIGHT, BRAND_LOGO_DISPLAY_WIDTH, BRAND_LOGO_DISPLAY_HEIGHT, SERVICE_CARD_IMAGE_WIDTH, SERVICE_CARD_IMAGE_HEIGHT } from '../constants/imageDimensions';
-import StableImage from './StableImage';
+import { SERVICE_CARD_IMAGE_WIDTH, SERVICE_CARD_IMAGE_HEIGHT } from '../constants/imageDimensions';
 import ServiceCategoryTabs, { ServiceCategoryTab } from './ServiceCategoryTabs';
 import ServiceGridCard from './ServiceGridCard';
 import {
@@ -61,7 +64,7 @@ import {
   howItWorks,
   faqs,
   serviceCoverageItems,
-  majorBrands,
+  BRANDS_WE_SERVICE,
 } from '../data/homePageData';
 
 const SERVICE_COVERAGE_ICONS = {
@@ -96,6 +99,13 @@ const testimonials = [
     rating: 5,
     text: "Used them twice — once for my dryer and once for an HVAC check. Both times on time, professional, and fairly priced. Won't use anyone else.",
   },
+];
+
+const serviceGuaranteeItems = [
+  { icon: <ChatBubbleOutlineIcon sx={{ fontSize: 26, color: colors.primaryBlue }} />, title: 'Clear Communication', description: 'You will know what to expect before, during, and after your service.' },
+  { icon: <ReplayIcon sx={{ fontSize: 26, color: colors.primaryBlue }} />, title: 'Service Follow-Up', description: 'Reach out within the follow-up period if an issue related to the completed service comes up.' },
+  { icon: <TrackChangesIcon sx={{ fontSize: 26, color: colors.primaryBlue }} />, title: 'Request ID Tracking', description: 'Every booking gets a Request ID so you can track status and history at any time.' },
+  { icon: <SupportAgentIcon sx={{ fontSize: 26, color: colors.primaryBlue }} />, title: 'Professional Support', description: 'Our team reviews follow-up requests promptly and keeps you informed at each step.' },
 ];
 
 const trustItems = [
@@ -1005,6 +1015,106 @@ const HomeBelowFold: React.FC = () => {
         </Container>
       </Box>
 
+      {/* ── 30-Day Service Follow-Up ── */}
+      <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#FFFFFF' }}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: fonts.heading,
+              fontWeight: 800,
+              color: colors.navy,
+              textAlign: 'center',
+              fontSize: { xs: '1.75rem', md: '2rem' },
+              mb: 1,
+              letterSpacing: '-0.3px',
+            }}
+          >
+            30-Day Service Follow-Up
+          </Typography>
+          <Box sx={{ width: 56, height: 4, borderRadius: '2px', background: 'linear-gradient(90deg, #1A73E8, #4FC3F7)', mx: 'auto', mt: 1.5, mb: 3 }} />
+          <Typography
+            sx={{
+              fontFamily: fonts.body,
+              fontSize: { xs: '0.95rem', md: '1rem' },
+              color: colors.mutedText,
+              maxWidth: 720,
+              mx: 'auto',
+              textAlign: 'center',
+              lineHeight: 1.75,
+              mb: { xs: 5, md: 6 },
+            }}
+          >
+            We stand behind completed eligible services. If an issue related to the completed service occurs within the follow-up period, contact us and our team will review it promptly. Warranty terms may vary by service type, parts, and technician assessment.
+          </Typography>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+              gap: { xs: 2.5, md: '28px' },
+              mb: { xs: 4, md: 5 },
+            }}
+          >
+            {serviceGuaranteeItems.map((item) => (
+              <Box
+                key={item.title}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  backgroundColor: colors.sectionBg,
+                  border: '1px solid #E4E7EB',
+                  borderRadius: '16px',
+                  p: '22px',
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    flexShrink: 0,
+                    borderRadius: '12px',
+                    backgroundColor: '#EAF5FF',
+                    border: '1px solid #D6E8FF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {item.icon}
+                </Box>
+                <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.95rem', color: colors.navy, lineHeight: 1.3 }}>
+                  {item.title}
+                </Typography>
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.84rem', color: '#4B5563', lineHeight: 1.65, m: 0 }}>
+                  {item.description}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Button
+              onClick={() => navigate('/scheduler')}
+              variant="contained"
+              sx={{
+                backgroundColor: colors.primaryBlue,
+                color: '#fff',
+                fontFamily: fonts.body,
+                fontWeight: 700,
+                textTransform: 'none',
+                borderRadius: '12px',
+                px: 4,
+                py: 1.25,
+                '&:hover': { backgroundColor: colors.navy },
+              }}
+            >
+              Schedule Service
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+
       {/* ── How It Works ── */}
       <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: colors.sectionBg }}>
         <Container maxWidth="lg">
@@ -1143,82 +1253,74 @@ const HomeBelowFold: React.FC = () => {
                 mb: 1.5,
               }}
             >
-              We Service All Major Appliance Brands
+              Brands We Service
             </Typography>
             <Typography
               sx={{
                 fontFamily: fonts.body,
                 fontSize: { xs: '0.95rem', md: '1rem' },
                 color: colors.mutedText,
-                maxWidth: 540,
+                maxWidth: 560,
                 mx: 'auto',
                 lineHeight: 1.75,
               }}
             >
-              Our certified technicians are trained to diagnose and repair appliances from the industry's most trusted brands.
+              We service many major appliance and home-system brands. If you do not see your brand listed, contact us and we will confirm availability.
             </Typography>
           </Box>
 
-          {/* Brand marquee — white card strip */}
+          {/* Brand pills — text-only badges, no logo assets required */}
           <Box
             sx={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              border: '1px solid #E4E7EB',
-              boxShadow: '0 4px 20px rgba(10, 37, 64, 0.06)',
-              position: 'relative',
-              overflow: 'hidden',
-              py: { xs: 2.5, md: 3 },
-              '&::before, &::after': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                width: { xs: 48, md: 100 },
-                zIndex: 1,
-                pointerEvents: 'none',
-              },
-              '&::before': {
-                left: 0,
-                background: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255,255,255,0.9) 45%, transparent 100%)',
-              },
-              '&::after': {
-                right: 0,
-                background: 'linear-gradient(270deg, #FFFFFF 0%, rgba(255,255,255,0.9) 45%, transparent 100%)',
-              },
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: { xs: 1, md: 1.25 },
+              mb: 4,
             }}
           >
-            <Box className="brand-marquee-track" sx={{ gap: { xs: 5, md: 7 }, alignItems: 'center' }}>
-              {[...majorBrands, ...majorBrands].map((brand, index) => (
-                <Box
-                  key={`${brand.name}-${index}`}
-                  sx={{
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    px: { xs: 1, md: 1.5 },
-                  }}
-                >
-                  <StableImage
-                    src={brand.logo}
-                    alt={`${brand.name} appliance repair`}
-                    intrinsicWidth={BRAND_LOGO_SLOT_WIDTH}
-                    intrinsicHeight={BRAND_LOGO_SLOT_HEIGHT}
-                    displayWidth={BRAND_LOGO_DISPLAY_WIDTH}
-                    displayHeight={BRAND_LOGO_DISPLAY_HEIGHT}
-                    sx={{
-                      opacity: 0.65,
-                      transition: 'opacity 0.25s ease, transform 0.25s ease',
-                      '&:hover': {
-                        opacity: 1,
-                        transform: 'scale(1.06)',
-                      },
-                    }}
-                  />
-                </Box>
-              ))}
-            </Box>
+            {BRANDS_WE_SERVICE.map((brand) => (
+              <Chip
+                key={brand}
+                label={brand}
+                sx={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E4E7EB',
+                  color: colors.navy,
+                  fontFamily: fonts.body,
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  px: 1.5,
+                  py: 2.5,
+                  boxShadow: '0 2px 10px rgba(10, 37, 64, 0.04)',
+                  transition: 'box-shadow 0.22s ease, transform 0.22s ease',
+                  '&:hover': {
+                    boxShadow: '0 10px 28px rgba(11,94,215,0.10)',
+                    transform: 'translateY(-2px)',
+                  },
+                }}
+              />
+            ))}
+          </Box>
+
+          <Box sx={{ textAlign: 'center', mb: 5 }}>
+            <Button
+              onClick={() => navigate('/scheduler')}
+              variant="contained"
+              sx={{
+                backgroundColor: colors.primaryBlue,
+                color: '#fff',
+                fontFamily: fonts.body,
+                fontWeight: 700,
+                textTransform: 'none',
+                borderRadius: '12px',
+                px: 4,
+                py: 1.25,
+                '&:hover': { backgroundColor: colors.navy },
+              }}
+            >
+              Book a Service
+            </Button>
           </Box>
 
           {/* Bottom trust note */}

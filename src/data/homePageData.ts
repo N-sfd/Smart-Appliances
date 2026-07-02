@@ -77,17 +77,8 @@ export const serviceCoverageItems = [
   { label: 'Same-Day / Emergency Priority', icon: 'emergency' as const },
 ];
 
-export const majorBrands: { name: string; logo: string }[] = [
-  { name: 'Samsung', logo: '/images/brands/samsung.svg' },
-  { name: 'LG', logo: '/images/brands/lg.svg' },
-  { name: 'Whirlpool', logo: '/images/brands/whirlpool.svg' },
-  { name: 'Bosch', logo: '/images/brands/bosch.svg' },
-  { name: 'GE', logo: '/images/brands/ge.svg' },
-  { name: 'Maytag', logo: '/images/brands/maytag.svg' },
-  { name: 'Frigidaire', logo: '/images/brands/frigidaire.svg' },
-  { name: 'KitchenAid', logo: '/images/brands/kitchenaid.svg' },
-  { name: 'Electrolux', logo: '/images/brands/electrolux.svg' },
-  { name: 'Amana', logo: '/images/brands/amana.svg' },
-  { name: 'Speed Queen', logo: '/images/brands/speed-queen.svg' },
-  { name: 'Hotpoint', logo: '/images/brands/hotpoint.svg' },
+// Text-only — avoids any trademark/logo-licensing question while still naming the brands served.
+export const BRANDS_WE_SERVICE: string[] = [
+  'Samsung', 'LG', 'Whirlpool', 'GE', 'Maytag', 'Frigidaire', 'Bosch',
+  'KitchenAid', 'Electrolux', 'Amana', 'Kenmore', 'Sub-Zero', 'Viking', 'Wolf',
 ];

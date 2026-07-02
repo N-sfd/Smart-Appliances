@@ -27,6 +27,8 @@ export const GALLERY_CATEGORY_IMAGES: Record<string, string> = {
   'Garage Door': '/images/services/garage-door/hero.jpg',
 };
 
+/** Old placeholder icon avatars (team.svg, hvac-specialist.svg, etc.) — never use these, but real
+ *  photos placed at /images/experts/<slug>.webp are fine and should pass through. */
 const LEGACY_SVG_PREFIX = '/images/experts/';
 
 /** Lifestyle/stock images that crop poorly in circular avatars — never use for profiles. */
@@ -49,7 +51,7 @@ export function getExpertInitials(name: string): string {
 }
 
 function isBlockedAvatarPath(path: string): boolean {
-  return path.startsWith(LEGACY_SVG_PREFIX) || BLOCKED_AVATAR_PATHS.has(path);
+  return (path.startsWith(LEGACY_SVG_PREFIX) && path.endsWith('.svg')) || BLOCKED_AVATAR_PATHS.has(path);
 }
 
 /** Resolve a usable image URL — ignores legacy SVG and poor avatar crops. */
