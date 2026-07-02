@@ -191,7 +191,7 @@ export default function ExpertProfilePage() {
               The expert you&apos;re looking for isn&apos;t available. Browse all experts to find the right match.
             </Typography>
             <Button variant="contained" component={RouterLink} to="/experts">
-              Browse All Experts
+              Browse All Service Professionals
             </Button>
           </Box>
         </Container>
@@ -215,7 +215,7 @@ export default function ExpertProfilePage() {
         {/* BREADCRUMB */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, flexWrap: 'wrap' }}>
           <Typography component={RouterLink} to="/experts" sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText, textDecoration: 'none', '&:hover': { color: colors.primaryBlue } }}>
-            Experts
+            Service Professionals
           </Typography>
           {breadcrumbCategory && (
             <>

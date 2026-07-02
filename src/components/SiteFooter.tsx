@@ -24,7 +24,7 @@ const companyLinks: FooterLink[] = [
   { label: 'How It Works', path: '/how-it-works' },
   { label: 'Pricing', path: '/pricing' },
   { label: 'Smart Care', path: '/membership' },
-  { label: 'Experts', path: '/experts' },
+  { label: 'Service Professionals', path: '/experts' },
   { label: 'Service Areas', path: '/areas' },
   { label: 'Contact Us', path: '/contact' },
 ];

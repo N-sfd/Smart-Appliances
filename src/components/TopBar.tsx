@@ -40,10 +40,10 @@ interface NavLink {
 // display-only copy, so relabeling the nav never risks breaking route matching.
 const navLinks: NavLink[] = [
   { key: 'services', label: 'Our Services', path: '/services' },
-  { key: 'pricing', label: 'Pricing', path: '/pricing' },
-  { key: 'experts', label: 'Experts', path: '/experts' },
+  { key: 'experts', label: 'Service Professionals', path: '/experts' },
   { key: 'membership', label: 'Smart Care', path: '/membership' },
   { key: 'areas', label: 'Service Areas', path: '/', hash: 'service-areas' },
+  { key: 'pricing', label: 'Pricing', path: '/pricing' },
   { key: 'about', label: 'About Us', path: '/about' },
   { key: 'contact', label: 'Contact Us', path: '/contact' },
 ];
@@ -164,9 +164,9 @@ const TopBar: React.FC = () => {
     color: active ? colors.primaryBlue : colors.darkText,
     fontFamily: fonts.heading,
     fontWeight: active ? 700 : 600,
-    fontSize: { lg: '0.82rem', xl: '0.88rem' },
+    fontSize: { lg: '0.78rem', xl: '0.88rem' },
     textTransform: 'none' as const,
-    px: 0.7,
+    px: 0.5,
     py: 0.85,
     minWidth: 'auto',
     whiteSpace: 'nowrap' as const,
@@ -205,11 +205,11 @@ const TopBar: React.FC = () => {
             overflow: 'visible',
           }}
         >
-          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: { xs: 2, md: 3.5, lg: 4.5 } }}>
+          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: { xs: 2, md: 2.5, lg: 2.5 } }}>
             <BrandLogo variant="header" onClick={() => { navigate('/'); setDrawerOpen(false); }} />
           </Box>
 
-          <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: { lg: 1.75, xl: 3 }, alignItems: 'center', flexGrow: 1, justifyContent: 'flex-start', ml: { lg: 1.5, xl: 3 } }}>
+          <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: { lg: 0.9, xl: 2.25 }, alignItems: 'center', flexGrow: 1, justifyContent: 'flex-start', ml: { lg: 0.5, xl: 2 } }}>
             {navLinks.map((link) => {
               const active = isActive(link);
 
@@ -307,7 +307,7 @@ const TopBar: React.FC = () => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: { xs: 0.75, sm: 1 },
+              gap: { xs: 0.75, sm: 1, lg: 0.6 },
               flexShrink: 0,
             }}
           >
@@ -330,7 +330,7 @@ const TopBar: React.FC = () => {
                 backgroundColor: '#EEF4FF',
                 border: `2px solid #C5DCFA`,
                 borderRadius: '50px',
-                px: 2,
+                px: { xs: 2, lg: 1.5 },
                 py: 0,
                 whiteSpace: 'nowrap',
                 transition: 'all 0.3s ease-in-out',
@@ -366,7 +366,7 @@ const TopBar: React.FC = () => {
                     textTransform: 'none',
                     border: `1.5px solid ${colors.border}`,
                     borderRadius: '50px',
-                    px: 2,
+                    px: { xs: 2, lg: 1.5 },
                     whiteSpace: 'nowrap',
                     '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg },
                   }}
@@ -385,7 +385,7 @@ const TopBar: React.FC = () => {
                     fontSize: '0.85rem',
                     textTransform: 'none',
                     borderRadius: '50px',
-                    px: 2.25,
+                    px: { xs: 2.25, lg: 1.75 },
                     whiteSpace: 'nowrap',
                     '&:hover': { backgroundColor: colors.navy },
                   }}
