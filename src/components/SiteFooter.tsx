@@ -39,6 +39,17 @@ const serviceLinks: FooterLink[] = [
   { label: 'Emergency Service', path: '/scheduler?serviceType=E' },
 ];
 
+const resourceLinks: FooterLink[] = [
+  { label: 'Help Center', path: '/resources' },
+  { label: 'Articles', path: '/resources/articles' },
+  { label: 'Videos', path: '/resources/videos' },
+  { label: 'Appliance Care', path: '/resources/articles?category=appliance-care' },
+  { label: 'HVAC Tips', path: '/resources/articles?category=hvac-energy' },
+  { label: 'Electrical Safety', path: '/resources/articles?category=electrical-safety' },
+  { label: 'Maintenance Guides', path: '/resources/articles?category=maintenance' },
+  { label: 'FAQ', path: '/#faqs' },
+];
+
 const popularServiceLinks: FooterLink[] = [
   { label: 'Refrigerator Service', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Refrigerator+Repair' },
   { label: 'Washer & Dryer Service', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Washer+Dryer+Repair' },
@@ -148,7 +159,7 @@ const SiteFooter: React.FC = () => {
           pb: { xs: 3, md: 4 },
         }}
       >
-        {/* Multi-column footer: Company | Services | Popular Services | Legal | Stay Connected */}
+        {/* Multi-column footer: Company | Services | Popular Services | Resources | Legal | Stay Connected */}
         <Box
           sx={{
             display: 'grid',
@@ -156,9 +167,9 @@ const SiteFooter: React.FC = () => {
               xs: '1fr',
               sm: 'repeat(2, minmax(0, 1fr))',
               md: 'repeat(3, minmax(0, 1fr))',
-              lg: 'repeat(4, minmax(0, 1fr)) minmax(280px, 1.4fr)',
+              lg: 'repeat(7, minmax(0, 1fr))',
             },
-            columnGap: { xs: 0, sm: 4, lg: 5 },
+            columnGap: { xs: 0, sm: 4, lg: 4 },
             rowGap: { xs: 4, sm: 5 },
             alignItems: 'start',
           }}
@@ -166,10 +177,11 @@ const SiteFooter: React.FC = () => {
           <FooterColumn title="Company" links={companyLinks} />
           <FooterColumn title="Services" links={serviceLinks} />
           <FooterColumn title="Popular Services" links={popularServiceLinks} />
+          <FooterColumn title="Resources" links={resourceLinks} />
           <FooterColumn title="Legal" links={legalLinks} />
 
           {/* Stay Connected */}
-          <Box>
+          <Box sx={{ gridColumn: { lg: 'span 2' } }}>
             <Typography component="h3" sx={FOOTER_HEADING}>
               Stay Connected
             </Typography>

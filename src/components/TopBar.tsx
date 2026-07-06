@@ -44,6 +44,7 @@ const navLinks: NavLink[] = [
   { key: 'membership', label: 'Smart Care', path: '/membership' },
   { key: 'areas', label: 'Service Areas', path: '/', hash: 'service-areas' },
   { key: 'pricing', label: 'Pricing', path: '/pricing' },
+  { key: 'resources', label: 'Resources', path: '/resources' },
   { key: 'about', label: 'About Us', path: '/about' },
   { key: 'contact', label: 'Contact Us', path: '/contact' },
 ];

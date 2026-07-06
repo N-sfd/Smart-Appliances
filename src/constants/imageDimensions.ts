@@ -32,7 +32,3 @@ export const SERVICE_CARD_IMAGE_HEIGHT = 180;
 /** About Us — Our Mission section photo */
 export const ABOUT_MISSION_IMAGE_WIDTH = 640;
 export const ABOUT_MISSION_IMAGE_HEIGHT = 480;
-
-/** Contact Us — support photo */
-export const CONTACT_IMAGE_WIDTH = 640;
-export const CONTACT_IMAGE_HEIGHT = 480;

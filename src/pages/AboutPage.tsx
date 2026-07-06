@@ -20,6 +20,7 @@ import EngineeringIcon from '@mui/icons-material/Engineering';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import StableImage from '../components/StableImage';
 import { ABOUT_MISSION_IMAGE_WIDTH, ABOUT_MISSION_IMAGE_HEIGHT } from '../constants/imageDimensions';
+import HeroIllustration from '../components/illustrations/HeroIllustration';
 
 interface OfferItem {
   icon: React.ReactNode;
@@ -106,53 +107,66 @@ const AboutPage: React.FC = () => {
       <Box
         sx={{
           backgroundColor: '#0B3D91',
-          py: { xs: 8, md: 12 },
-          textAlign: 'center',
+          py: { xs: 8, md: 10 },
           px: 2,
         }}
       >
-        <Container maxWidth="md">
-          <Typography
-            variant="overline"
+        <Container maxWidth="lg">
+          <Box
             sx={{
-              color: '#1A73E8',
-              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-              fontWeight: 700,
-              letterSpacing: 3,
-              display: 'block',
-              mb: 2,
-              fontSize: '0.85rem',
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'center',
+              gap: { xs: 4, md: 6 },
             }}
           >
-            About Smart Appliances
-          </Typography>
-          <Typography
-            variant="h1"
-            sx={{
-              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-              fontWeight: 700,
-              color: '#FFFFFF',
-              fontSize: { xs: '2rem', sm: '2.8rem', md: '3.4rem' },
-              lineHeight: 1.2,
-              mb: 3,
-            }}
-          >
-            Bringing Professional Home Service to Your Doorstep
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-              color: '#A8D8F0',
-              fontSize: { xs: '1rem', md: '1.15rem' },
-              lineHeight: 1.8,
-              maxWidth: '680px',
-              margin: '0 auto',
-            }}
-          >
-            Smart Appliances helps customers book reliable appliance repair and home service support through a simple
-            digital experience.
-          </Typography>
+            <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
+              <Typography
+                variant="overline"
+                sx={{
+                  color: '#1A73E8',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                  fontWeight: 700,
+                  letterSpacing: 3,
+                  display: 'block',
+                  mb: 2,
+                  fontSize: '0.85rem',
+                }}
+              >
+                About Smart Appliances
+              </Typography>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  fontSize: { xs: '2rem', sm: '2.6rem', md: '3rem' },
+                  lineHeight: 1.2,
+                  mb: 3,
+                }}
+              >
+                Bringing Professional Home Service to Your Doorstep
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                  color: '#A8D8F0',
+                  fontSize: { xs: '1rem', md: '1.15rem' },
+                  lineHeight: 1.8,
+                  maxWidth: '560px',
+                  mx: { xs: 'auto', md: 0 },
+                }}
+              >
+                Smart Appliances helps customers book reliable appliance repair and home service support through a simple
+                digital experience.
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 360, md: 'none' }, display: { xs: 'none', sm: 'block' } }}>
+              <HeroIllustration variant="about" title="Smart Appliances team of technicians serving local homes" />
+            </Box>
+          </Box>
         </Container>
       </Box>
 

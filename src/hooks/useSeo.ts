@@ -13,6 +13,21 @@ export interface SeoServiceSchema {
   priceFrom?: string;
 }
 
+export interface SeoBreadcrumb {
+  name: string;
+  /** Site-relative path, e.g. "/resources" */
+  path: string;
+}
+
+export interface SeoArticleSchema {
+  headline: string;
+  description: string;
+  /** ISO date, e.g. "2026-03-05" */
+  datePublished: string;
+  dateModified?: string;
+  image?: string;
+}
+
 export interface SeoOptions {
   title: string;
   description: string;
@@ -22,6 +37,10 @@ export interface SeoOptions {
   faqs?: SeoFaqItem[];
   /** Adds a schema.org Service structured-data block for this page */
   service?: SeoServiceSchema;
+  /** Adds a schema.org BreadcrumbList structured-data block for this page */
+  breadcrumbs?: SeoBreadcrumb[];
+  /** Adds a schema.org Article structured-data block for this page */
+  article?: SeoArticleSchema;
 }
 
 // TODO: replace with the real production domain once a custom domain is connected (see docs/custom-domain-setup.md)
@@ -63,7 +82,7 @@ function appendJsonLd(payload: Record<string, unknown>): HTMLScriptElement {
   return script;
 }
 
-export function useSeo({ title, description, path, image, faqs, service }: SeoOptions): void {
+export function useSeo({ title, description, path, image, faqs, service, breadcrumbs, article }: SeoOptions): void {
   useEffect(() => {
     const prevTitle = document.title;
     const descriptionEl = document.head.querySelector<HTMLMetaElement>('meta[name="description"]');
@@ -107,6 +126,34 @@ export function useSeo({ title, description, path, image, faqs, service }: SeoOp
       }));
     }
 
+    if (breadcrumbs && breadcrumbs.length > 0) {
+      scripts.push(appendJsonLd({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs.map((crumb, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: crumb.name,
+          item: `${SITE_URL}${crumb.path}`,
+        })),
+      }));
+    }
+
+    if (article) {
+      scripts.push(appendJsonLd({
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: article.headline,
+        description: article.description,
+        datePublished: article.datePublished,
+        dateModified: article.dateModified ?? article.datePublished,
+        image: `${SITE_URL}${article.image ?? image ?? DEFAULT_OG_IMAGE}`,
+        author: { '@type': 'Organization', name: 'Smart Appliances' },
+        publisher: { '@type': 'Organization', name: 'Smart Appliances' },
+        mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}${path}` },
+      }));
+    }
+
     return () => {
       document.title = prevTitle;
       if (prevDescription !== null) {
@@ -114,5 +161,5 @@ export function useSeo({ title, description, path, image, faqs, service }: SeoOp
       }
       scripts.forEach((s) => document.head.removeChild(s));
     };
-  }, [title, description, path, image, faqs, service]);
+  }, [title, description, path, image, faqs, service, breadcrumbs, article]);
 }

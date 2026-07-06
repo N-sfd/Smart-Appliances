@@ -23,8 +23,8 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import { serviceCategories } from '../data/services';
 import { primaryButtonSx, radii } from '../theme';
-import StableImage from '../components/StableImage';
-import { CONTACT_IMAGE_WIDTH, CONTACT_IMAGE_HEIGHT } from '../constants/imageDimensions';
+import HeroIllustration from '../components/illustrations/HeroIllustration';
+import ServiceAreaMap from '../components/ServiceAreaMap';
 
 const contactInputSx = {
   '& .MuiOutlinedInput-root': { borderRadius: radii.xl },
@@ -135,35 +135,48 @@ const ContactPage: React.FC = () => {
       <Box
         sx={{
           backgroundColor: '#0B3D91',
-          py: { xs: 8, md: 10 },
-          textAlign: 'center',
+          py: { xs: 8, md: 9 },
           px: 2,
         }}
       >
-        <Container maxWidth="md">
-          <Typography
-            variant="h1"
+        <Container maxWidth="lg">
+          <Box
             sx={{
-              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-              fontWeight: 700,
-              color: '#FFFFFF',
-              fontSize: { xs: '2rem', sm: '2.6rem', md: '3rem' },
-              mb: 2,
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'center',
+              gap: { xs: 4, md: 6 },
             }}
           >
-            Contact Smart Appliances
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-              color: '#A8D8F0',
-              fontSize: { xs: '1rem', md: '1.1rem' },
-              lineHeight: 1.8,
-            }}
-          >
-            We're here to help. Reach out and our team will respond quickly.
-          </Typography>
+            <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  fontSize: { xs: '2rem', sm: '2.6rem', md: '3rem' },
+                  mb: 2,
+                }}
+              >
+                Contact Smart Appliances
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                  color: '#A8D8F0',
+                  fontSize: { xs: '1rem', md: '1.1rem' },
+                  lineHeight: 1.8,
+                }}
+              >
+                We're here to help. Reach out and our team will respond quickly.
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 340, md: 'none' }, display: { xs: 'none', sm: 'block' } }}>
+              <HeroIllustration variant="contact" title="Smart Appliances support team ready to help by phone or chat" />
+            </Box>
+          </Box>
         </Container>
       </Box>
 
@@ -174,22 +187,12 @@ const ContactPage: React.FC = () => {
             sx={{
               display: 'grid',
               gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              alignItems: 'start',
               gap: { xs: 4, md: 6 },
             }}
           >
             {/* Left: contact info */}
-            <Box>
-              <Box sx={{ mb: 3 }}>
-                <StableImage
-                  src="/images/services/smart-home/hero-installer.webp"
-                  alt="Smart Appliances support technician ready to help with your service request"
-                  intrinsicWidth={CONTACT_IMAGE_WIDTH}
-                  intrinsicHeight={CONTACT_IMAGE_HEIGHT}
-                  displayWidth="100%"
-                  displayHeight={{ xs: 200, md: 240 }}
-                  sx={{ objectFit: 'cover', borderRadius: '16px' }}
-                />
-              </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography
                 variant="h4"
                 sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 4 }}
@@ -273,6 +276,17 @@ const ContactPage: React.FC = () => {
                     </Typography>
                   </Box>
                 ))}
+              </Box>
+
+              {/* Service area map */}
+              <Box sx={{ mt: 3 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', fontWeight: 700, mb: 1.5 }}
+                >
+                  Our Service Area
+                </Typography>
+                <ServiceAreaMap height={{ xs: 220, md: 260 }} />
               </Box>
             </Box>
 
@@ -408,6 +422,33 @@ const ContactPage: React.FC = () => {
                     >
                       Send Message
                     </Button>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      mt: 3,
+                      pt: 3,
+                      borderTop: '1px solid #EEF0F3',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 2,
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    {[
+                      { icon: <AccessTimeIcon sx={{ fontSize: 18, color: '#1A73E8' }} />, label: 'We respond within 2 hours' },
+                      { icon: <CheckCircleIcon sx={{ fontSize: 18, color: '#1A73E8' }} />, label: 'No spam — service-related replies only' },
+                    ].map((item) => (
+                      <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {item.icon}
+                        <Typography
+                          variant="body2"
+                          sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#666666', fontSize: '0.85rem' }}
+                        >
+                          {item.label}
+                        </Typography>
+                      </Box>
+                    ))}
                   </Box>
                 </>
               )}

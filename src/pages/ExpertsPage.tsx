@@ -232,7 +232,7 @@ export default function ExpertsPage() {
                 }}
               >
                 <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.05rem', color: colors.navy, mb: 1.75 }}>
-                  Recommended Experts
+                  Recommended Service Professionals
                 </Typography>
                 <Box sx={{ display: 'grid', gap: 1.25 }}>
                   {recommendedExperts.map((expert) => (
@@ -382,7 +382,7 @@ export default function ExpertsPage() {
           <Typography
             sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '1.5rem', md: '1.85rem' }, color: colors.navy, textAlign: 'center', mb: 4 }}
           >
-            Why Choose Smart Appliances Experts?
+            Why Choose Smart Appliances Service Professionals?
           </Typography>
           <Box
             sx={{

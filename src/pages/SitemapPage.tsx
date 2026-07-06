@@ -51,6 +51,26 @@ const SITEMAP_SECTIONS = [
     ],
   },
   {
+    title: 'Help Center',
+    links: [
+      { label: 'Help Center', path: '/resources' },
+      { label: 'Articles', path: '/resources/articles' },
+      { label: 'Videos', path: '/resources/videos' },
+      { label: 'Why Is My Refrigerator Not Cooling?', path: '/resources/refrigerator-not-cooling' },
+      { label: 'Why Is My Washing Machine Making Noise?', path: '/resources/washer-making-noise' },
+      { label: 'Why Is My Dryer Taking Too Long to Dry Clothes?', path: '/resources/dryer-taking-too-long' },
+      { label: 'Why Is My Dishwasher Not Draining?', path: '/resources/dishwasher-not-draining' },
+      { label: 'What Causes Freezer Frost Buildup?', path: '/resources/freezer-frost-buildup' },
+      { label: 'Should You Repair or Replace Your Appliance?', path: '/resources/appliance-repair-or-replace' },
+      { label: 'Electrical Safety: DIY or Pro?', path: '/resources/electrical-safety-diy-or-pro' },
+      { label: 'Simple Ways to Lower Your Heating Bill', path: '/resources/lower-heating-bill' },
+      { label: 'How Often Should You Replace Your HVAC Filter?', path: '/resources/hvac-filter-guide' },
+      { label: 'Simple Ways to Prevent Common Plumbing Leaks', path: '/resources/prevent-plumbing-leaks' },
+      { label: 'Is a Smart Thermostat Worth It?', path: '/resources/smart-thermostat-benefits' },
+      { label: 'Essential Garage Door Maintenance Tips', path: '/resources/garage-door-maintenance' },
+    ],
+  },
+  {
     title: 'Account & Legal',
     links: [
       { label: 'My Bookings', path: '/my-bookings' },

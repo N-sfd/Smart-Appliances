@@ -41,6 +41,7 @@ import {
 import MembershipPlanCard from '../components/membership/MembershipPlanCard';
 import MembershipComparisonTable from '../components/membership/MembershipComparisonTable';
 import MembershipFaq from '../components/membership/MembershipFaq';
+import HeroIllustration from '../components/illustrations/HeroIllustration';
 
 const TRUST_BADGES = [
   { label: 'Priority Scheduling', icon: BoltOutlinedIcon },
@@ -198,8 +199,11 @@ const MembershipPage: React.FC = () => {
               </Box>
             </Box>
 
-            {/* Right — benefits card */}
+            {/* Right — hero image + benefits card */}
             <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 420, md: 'none' } }}>
+              <Box sx={{ mb: 2.5, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
+                <HeroIllustration variant="membership" title="Smart Care membership protecting a home with priority technician support" />
+              </Box>
               <Box
                 sx={{
                   backgroundColor: '#fff',

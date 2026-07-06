@@ -59,6 +59,7 @@ import {
   formatStartingPrice,
   type PriceEstimate,
 } from '../data/pricingData';
+import HeroIllustration from '../components/illustrations/HeroIllustration';
 
 const CATEGORY_ICONS: Record<PricingCategoryId, LucideIcon> = {
   appliances: Refrigerator,
@@ -323,8 +324,11 @@ const PricingPage: React.FC = () => {
               </Box>
             </Box>
 
-            {/* Right — trust summary card */}
+            {/* Right — hero image + trust summary card */}
             <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 420, md: 'none' } }}>
+              <Box sx={{ mb: 2.5, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
+                <HeroIllustration variant="pricing" title="Transparent service pricing with a technician estimate before work begins" />
+              </Box>
               <Box
                 sx={{
                   backgroundColor: '#fff',

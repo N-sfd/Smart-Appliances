@@ -51,6 +51,11 @@ const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
 const ExpertsPage = lazy(() => import('./pages/ExpertsPage'));
 const ExpertProfilePage = lazy(() => import('./pages/ExpertProfilePage'));
 
+const ResourcesPage = lazy(() => import('./pages/ResourcesPage'));
+const ResourceArticlesPage = lazy(() => import('./pages/ResourceArticlesPage'));
+const ResourceVideosPage = lazy(() => import('./pages/ResourceVideosPage'));
+const ResourceArticleDetailPage = lazy(() => import('./pages/ResourceArticleDetailPage'));
+
 const PageFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
     <CircularProgress />
@@ -277,6 +282,11 @@ function AppRoutes() {
 
 <Route path="/experts" element={<ExpertsPage />} />
 <Route path="/experts/:expertSlug" element={<ExpertProfilePage />} />
+
+<Route path="/resources" element={<ResourcesPage />} />
+<Route path="/resources/articles" element={<ResourceArticlesPage />} />
+<Route path="/resources/videos" element={<ResourceVideosPage />} />
+<Route path="/resources/:articleSlug" element={<ResourceArticleDetailPage />} />
 
             {/* /admin now resolves to the real Supabase-backed admin dashboard */}
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />

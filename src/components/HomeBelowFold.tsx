@@ -44,6 +44,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ReplayIcon from '@mui/icons-material/Replay';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import HomeResourcesSection from './HomeResourcesSection';
 import { serviceCategories } from '../data/services';
 import { popularServices } from '../data/popularServices';
 import { SERVICE_TYPE_IMAGE_MAP, CATEGORY_IMAGE_MAP, DEFAULT_SERVICE_IMAGE } from '../data/serviceImages';
@@ -1423,6 +1424,8 @@ const HomeBelowFold: React.FC = () => {
           </Box>
         </Container>
       </Box>
+
+      <HomeResourcesSection />
 
       {/* ── Service Areas ── */}
       <Box className="home-deferred-section" id="service-areas" sx={{ py: { xs: 4.5, md: 7 }, backgroundColor: colors.sectionBg, scrollMarginTop: '80px' }}>
