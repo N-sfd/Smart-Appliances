@@ -47,6 +47,7 @@ export default function ResourceArticleDetailPage() {
         headline: article.title,
         description: article.excerpt,
         datePublished: article.publishedAt,
+        dateModified: article.updatedAt ?? article.publishedAt,
         image: article.image,
       }
       : undefined,
@@ -111,6 +112,9 @@ export default function ResourceArticleDetailPage() {
           <Typography component="h1" sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '1.75rem', md: '2.15rem' }, color: colors.navy, lineHeight: 1.2, mb: 1.5 }}>
             {article.title}
           </Typography>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', fontWeight: 700, color: colors.navy, mb: 0.75 }}>
+            By Smart Appliances Editorial Team
+          </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <AccessTimeIcon sx={{ fontSize: 15, color: colors.mutedText }} />
@@ -118,7 +122,11 @@ export default function ResourceArticleDetailPage() {
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <CalendarTodayIcon sx={{ fontSize: 14, color: colors.mutedText }} />
-              <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>{formatDate(article.publishedAt)}</Typography>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>Published {formatDate(article.publishedAt)}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <CalendarTodayIcon sx={{ fontSize: 14, color: colors.mutedText }} />
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>Updated {formatDate(article.updatedAt ?? article.publishedAt)}</Typography>
             </Box>
           </Box>
         </Box>
@@ -127,6 +135,7 @@ export default function ResourceArticleDetailPage() {
           src={article.image}
           alt={article.imageAlt}
           icon={category?.icon ?? ClipboardList}
+          articleSlug={article.slug}
           illustrationVariant={article.category}
           aspectRatio="16 / 8"
           borderRadius="18px"

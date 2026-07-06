@@ -165,9 +165,11 @@ const TopBar: React.FC = () => {
     color: active ? colors.primaryBlue : colors.darkText,
     fontFamily: fonts.heading,
     fontWeight: active ? 700 : 600,
-    fontSize: { lg: '0.78rem', xl: '0.88rem' },
+    fontSize: '0.7rem',
+    '@media (min-width:1280px)': { fontSize: '0.78rem' },
+    '@media (min-width:1536px)': { fontSize: '0.88rem' },
     textTransform: 'none' as const,
-    px: 0.5,
+    px: 0.35,
     py: 0.85,
     minWidth: 'auto',
     whiteSpace: 'nowrap' as const,
@@ -210,7 +212,19 @@ const TopBar: React.FC = () => {
             <BrandLogo variant="header" onClick={() => { navigate('/'); setDrawerOpen(false); }} />
           </Box>
 
-          <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: { lg: 0.9, xl: 2.25 }, alignItems: 'center', flexGrow: 1, justifyContent: 'flex-start', ml: { lg: 0.5, xl: 2 } }}>
+          <Box
+            sx={{
+              display: 'none',
+              '@media (min-width:1024px)': { display: 'flex' },
+              gap: 0.15,
+              '@media (min-width:1280px)': { gap: 0.9 },
+              '@media (min-width:1536px)': { gap: 2.25, ml: 2 },
+              alignItems: 'center',
+              flexGrow: 1,
+              justifyContent: 'flex-start',
+              ml: 0.25,
+            }}
+          >
             {navLinks.map((link) => {
               const active = isActive(link);
 
@@ -308,7 +322,8 @@ const TopBar: React.FC = () => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: { xs: 0.75, sm: 1, lg: 0.6 },
+              gap: { xs: 0.75, sm: 1 },
+              '@media (min-width:1024px)': { gap: 0.5 },
               flexShrink: 0,
             }}
           >
@@ -317,7 +332,10 @@ const TopBar: React.FC = () => {
               href="tel:+12405760397"
               startIcon={<Phone sx={{ fontSize: '1rem !important' }} />}
               sx={{
-                display: { xs: 'none', sm: 'inline-flex' },
+                display: 'none',
+                '@media (min-width:600px)': { display: 'inline-flex' },
+                '@media (min-width:1024px)': { display: 'none' },
+                '@media (min-width:1280px)': { display: 'inline-flex' },
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: 44,
@@ -351,6 +369,35 @@ const TopBar: React.FC = () => {
             >
               +1 (240) 576-0397
             </Button>
+
+            <IconButton
+              component="a"
+              href="tel:+12405760397"
+              aria-label="Call +1 (240) 576-0397"
+              sx={{
+                display: 'inline-flex',
+                '@media (min-width:600px)': { display: 'none' },
+                '@media (min-width:1024px)': { display: 'inline-flex' },
+                '@media (min-width:1280px)': { display: 'none' },
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 44,
+                height: 44,
+                color: colors.navy,
+                backgroundColor: '#EEF4FF',
+                border: `2px solid #C5DCFA`,
+                borderRadius: '50px',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  backgroundColor: colors.lightBlueBg,
+                  borderColor: colors.primaryBlue,
+                  color: colors.primaryBlue,
+                  transform: 'translateY(-2px)',
+                },
+              }}
+            >
+              <Phone sx={{ fontSize: '1.15rem' }} />
+            </IconButton>
 
             {/* Auth buttons or user avatar — desktop */}
             {!user ? (
@@ -413,35 +460,10 @@ const TopBar: React.FC = () => {
             )}
 
             <IconButton
-              component="a"
-              href="tel:+12405760397"
-              aria-label="Call +1 (240) 576-0397"
-              sx={{
-                display: { xs: 'inline-flex', sm: 'none' },
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 44,
-                height: 44,
-                color: colors.navy,
-                backgroundColor: '#EEF4FF',
-                border: `2px solid #C5DCFA`,
-                borderRadius: '50px',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  backgroundColor: colors.lightBlueBg,
-                  borderColor: colors.primaryBlue,
-                  color: colors.primaryBlue,
-                  transform: 'translateY(-2px)',
-                },
-              }}
-            >
-              <Phone sx={{ fontSize: '1.15rem' }} />
-            </IconButton>
-
-            <IconButton
               onClick={() => setDrawerOpen(true)}
               sx={{
-                display: { xs: 'inline-flex', lg: 'none' },
+                display: 'inline-flex',
+                '@media (min-width:1024px)': { display: 'none' },
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: 44,

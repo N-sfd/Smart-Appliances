@@ -2,6 +2,7 @@ import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Typography, Chip } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { ClipboardList } from 'lucide-react';
 import { colors, fonts } from '../../theme';
 import type { ResourceArticle } from '../../data/resourceArticles';
@@ -43,6 +44,7 @@ export default function ResourceArticleCard({ article, variant = 'default' }: Pr
         src={article.image}
         alt={article.imageAlt}
         icon={category?.icon ?? ClipboardList}
+        articleSlug={article.slug}
         illustrationVariant={article.category}
         aspectRatio="16 / 10"
         borderRadius="0"
@@ -73,6 +75,10 @@ export default function ResourceArticleCard({ article, variant = 'default' }: Pr
             color: colors.navy,
             lineHeight: 1.3,
             mb: 0.75,
+            display: '-webkit-box',
+            WebkitLineClamp: isFeatured ? 3 : 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
           }}
         >
           {article.title}
@@ -93,7 +99,7 @@ export default function ResourceArticleCard({ article, variant = 'default' }: Pr
         >
           {article.excerpt}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mb: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
             <AccessTimeIcon sx={{ fontSize: 13, color: colors.mutedText }} />
             <Typography sx={{ fontFamily: fonts.body, fontSize: '11.5px', color: colors.mutedText }}>
@@ -103,6 +109,12 @@ export default function ResourceArticleCard({ article, variant = 'default' }: Pr
           <Typography sx={{ fontFamily: fonts.body, fontSize: '11.5px', color: colors.mutedText }}>
             · {formatDate(article.publishedAt)}
           </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+          <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '12.5px', color: colors.primaryBlue }}>
+            Read Article
+          </Typography>
+          <ArrowForwardIcon sx={{ fontSize: 13, color: colors.primaryBlue }} />
         </Box>
       </Box>
     </Box>

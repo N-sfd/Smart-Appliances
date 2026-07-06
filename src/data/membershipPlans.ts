@@ -107,7 +107,7 @@ export const MEMBERSHIP_COMPARISON_FEATURES: MembershipComparisonFeature[] = [
 ];
 
 export const HERO_BENEFITS = [
-  'Save up to 20% on eligible repair labor',
+  'Member savings on eligible service labor',
   'Priority scheduling when available',
   'Seasonal maintenance reminders',
   'Easy online request tracking',

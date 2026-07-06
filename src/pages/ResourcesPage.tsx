@@ -8,11 +8,11 @@ import { colors, fonts } from '../theme';
 import { useSeo } from '../hooks/useSeo';
 import { RESOURCE_CATEGORIES } from '../data/resourceCategories';
 import { RESOURCE_ARTICLES, getArticlesByCategory, getFeaturedArticles } from '../data/resourceArticles';
-import { VIDEO_TOPIC_PLACEHOLDERS, getEnabledVideos } from '../data/resourceVideos';
+import { getEnabledVideos } from '../data/resourceVideos';
 import ResourceCategoryCard from '../components/resources/ResourceCategoryCard';
 import ResourceArticleCard from '../components/resources/ResourceArticleCard';
 import VideoCard from '../components/resources/VideoCard';
-import VideoCategoryPlaceholderCard from '../components/resources/VideoCategoryPlaceholderCard';
+import VideosComingSoonPanel from '../components/resources/VideosComingSoonPanel';
 import HeroIllustration from '../components/illustrations/HeroIllustration';
 
 export default function ResourcesPage() {
@@ -29,7 +29,7 @@ export default function ResourcesPage() {
   });
 
   const featuredArticles = getFeaturedArticles();
-  const featuredVideo = getEnabledVideos()[0];
+  const enabledVideos = getEnabledVideos();
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
@@ -37,7 +37,7 @@ export default function ResourcesPage() {
       <Box
         sx={{
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          py: { xs: 5, md: 7 },
+          py: { xs: 4, md: 4.5 },
           px: 2,
         }}
       >
@@ -47,19 +47,20 @@ export default function ResourcesPage() {
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
               alignItems: 'center',
-              gap: { xs: 4, md: 6 },
+              justifyContent: 'space-between',
+              gap: { xs: 3, md: 4 },
             }}
           >
-            <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
+            <Box sx={{ flex: '1 1 auto', minWidth: 0, textAlign: { xs: 'center', md: 'left' } }}>
               <Typography
                 component="h1"
                 sx={{
                   fontFamily: fonts.heading,
                   fontWeight: 800,
-                  fontSize: { xs: '2rem', md: '2.6rem' },
+                  fontSize: { xs: '1.75rem', md: '2.15rem' },
                   color: '#fff',
                   lineHeight: 1.15,
-                  mb: 1.5,
+                  mb: 1.25,
                 }}
               >
                 Smart Appliances Help Center
@@ -67,24 +68,24 @@ export default function ResourcesPage() {
               <Typography
                 sx={{
                   fontFamily: fonts.body,
-                  fontSize: { xs: '0.95rem', md: '1.1rem' },
+                  fontSize: { xs: '0.9rem', md: '1rem' },
                   color: '#E2E8F0',
-                  maxWidth: 520,
+                  maxWidth: 480,
                   mx: { xs: 'auto', md: 0 },
-                  mb: 3.5,
-                  lineHeight: 1.7,
+                  mb: 2.5,
+                  lineHeight: 1.6,
                 }}
               >
                 Practical appliance care, home maintenance, safety guidance, troubleshooting tips, and expert advice.
               </Typography>
 
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: { xs: 'center', md: 'flex-start' } }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, justifyContent: { xs: 'center', md: 'flex-start' } }}>
                 <Button
                   variant="contained"
                   startIcon={<ArticleOutlinedIcon />}
                   component={RouterLink}
                   to="/resources/articles"
-                  sx={{ backgroundColor: '#fff', color: '#0B2D6B', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 3, '&:hover': { backgroundColor: '#E2E8F0' } }}
+                  sx={{ backgroundColor: '#fff', color: '#0B2D6B', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 2.5, '&:hover': { backgroundColor: '#E2E8F0' } }}
                 >
                   Browse Articles
                 </Button>
@@ -93,7 +94,7 @@ export default function ResourcesPage() {
                   startIcon={<OndemandVideoOutlinedIcon />}
                   component={RouterLink}
                   to="/resources/videos"
-                  sx={{ borderColor: '#E2E8F0', color: '#E2E8F0', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 3, '&:hover': { borderColor: '#fff', backgroundColor: 'rgba(255,255,255,0.08)' } }}
+                  sx={{ borderColor: '#E2E8F0', color: '#E2E8F0', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 2.5, '&:hover': { borderColor: '#fff', backgroundColor: 'rgba(255,255,255,0.08)' } }}
                 >
                   Watch Helpful Videos
                 </Button>
@@ -101,14 +102,14 @@ export default function ResourcesPage() {
                   variant="outlined"
                   startIcon={<CalendarMonthIcon />}
                   onClick={() => navigate('/scheduler')}
-                  sx={{ borderColor: '#E2E8F0', color: '#E2E8F0', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 3, '&:hover': { borderColor: '#fff', backgroundColor: 'rgba(255,255,255,0.08)' } }}
+                  sx={{ borderColor: '#E2E8F0', color: '#E2E8F0', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 2.5, '&:hover': { borderColor: '#fff', backgroundColor: 'rgba(255,255,255,0.08)' } }}
                 >
                   Book a Service
                 </Button>
               </Box>
             </Box>
 
-            <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 340, md: 'none' }, display: { xs: 'none', sm: 'block' } }}>
+            <Box sx={{ flex: '0 0 auto', width: { xs: 180, sm: 200, md: 190 }, display: { xs: 'none', sm: 'block' } }}>
               <HeroIllustration variant="resources" title="Homeowner researching appliance and home maintenance guidance" />
             </Box>
           </Box>
@@ -181,25 +182,27 @@ export default function ResourcesPage() {
           <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.mutedText, textAlign: 'center', mb: 4 }}>
             Short how-to videos across appliance care, HVAC, plumbing, electrical safety, smart home, and garage door topics.
           </Typography>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2.5, mb: 4 }}>
-            {featuredVideo && <VideoCard video={featuredVideo} />}
-            {VIDEO_TOPIC_PLACEHOLDERS
-              .filter((t) => t.category !== featuredVideo?.category)
-              .slice(0, featuredVideo ? 2 : 3)
-              .map((topic) => (
-                <VideoCategoryPlaceholderCard key={topic.category} topic={topic} />
-              ))}
-          </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <Button
-              variant="outlined"
-              component={RouterLink}
-              to="/resources/videos"
-              sx={{ borderColor: colors.border, color: colors.navy, fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 3.5, '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg } }}
-            >
-              Browse All Videos
-            </Button>
-          </Box>
+          {enabledVideos.length > 0 ? (
+            <>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2.5, mb: 4 }}>
+                {enabledVideos.slice(0, 3).map((video) => (
+                  <VideoCard key={video.id} video={video} />
+                ))}
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
+                <Button
+                  variant="outlined"
+                  component={RouterLink}
+                  to="/resources/videos"
+                  sx={{ borderColor: colors.border, color: colors.navy, fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 3.5, '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg } }}
+                >
+                  Browse All Videos
+                </Button>
+              </Box>
+            </>
+          ) : (
+            <VideosComingSoonPanel />
+          )}
         </Container>
       </Box>
     </Box>

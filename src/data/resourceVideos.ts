@@ -96,23 +96,3 @@ export function getEnabledVideos(): ResourceVideo[] {
 export function getEnabledVideosByCategory(category: ResourceCategoryId): ResourceVideo[] {
   return getEnabledVideos().filter((v) => v.category === category);
 }
-
-export interface VideoTopicPlaceholder {
-  category: ResourceCategoryId;
-  title: string;
-  description: string;
-}
-
-/**
- * Topic categories shown in the video library even before real videos are
- * enabled, so the section reads as "coming soon" rather than empty/broken.
- * Remove an entry here once real enabled videos exist for that category.
- */
-export const VIDEO_TOPIC_PLACEHOLDERS: VideoTopicPlaceholder[] = [
-  { category: 'appliance-care', title: 'Appliance Basics', description: 'Short how-to videos on refrigerator, washer, dryer, and dishwasher care.' },
-  { category: 'hvac-energy', title: 'HVAC Tips', description: 'Filter changes, thermostat setup, and seasonal maintenance walkthroughs.' },
-  { category: 'plumbing', title: 'Plumbing Help', description: 'Common leak fixes, drain care, and when to shut off your water main.' },
-  { category: 'electrical-safety', title: 'Electrical Safety', description: 'Warning signs to recognize and safe habits around outlets and panels.' },
-  { category: 'smart-home', title: 'Smart Home Setup', description: 'Pairing and configuring smart thermostats, doorbells, and cameras.' },
-  { category: 'garage-door', title: 'Garage Door Maintenance', description: 'Roller, track, and spring care to keep your garage door running safely.' },
-];

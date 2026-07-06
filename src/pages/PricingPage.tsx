@@ -260,7 +260,7 @@ const PricingPage: React.FC = () => {
       {/* Hero */}
       <Box
         sx={{
-          py: { xs: 5, md: 6 },
+          py: { xs: 6, md: 9 },
           px: 2,
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
         }}
@@ -268,14 +268,14 @@ const PricingPage: React.FC = () => {
         <Container maxWidth="lg">
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 0.9fr' },
               alignItems: 'center',
-              gap: { xs: 4, md: 6 },
+              gap: { xs: 4, md: 7 },
             }}
           >
             {/* Left — copy */}
-            <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
+            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
               <Typography
                 variant="h1"
                 sx={{
@@ -319,14 +319,14 @@ const PricingPage: React.FC = () => {
                     '&:hover': { background: 'rgba(255,255,255,0.1)', borderColor: '#fff' },
                   }}
                 >
-                  Calculate Estimate
+                  Get an Estimate
                 </Button>
               </Box>
             </Box>
 
-            {/* Right — hero image + trust summary card */}
-            <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 420, md: 'none' } }}>
-              <Box sx={{ mb: 2.5, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
+            {/* Right — hero image + trust summary card, treated as one visual column */}
+            <Box sx={{ width: '100%', maxWidth: { xs: 420, md: 'none' }, mx: { xs: 'auto', md: 0 } }}>
+              <Box sx={{ mb: 2, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
                 <HeroIllustration variant="pricing" title="Transparent service pricing with a technician estimate before work begins" />
               </Box>
               <Box
@@ -334,27 +334,40 @@ const PricingPage: React.FC = () => {
                   backgroundColor: '#fff',
                   borderRadius: '20px',
                   p: { xs: 3, md: 3.5 },
-                  boxShadow: '0 24px 56px rgba(0,0,0,0.28)',
+                  boxShadow: '0 20px 48px rgba(0,0,0,0.24)',
                 }}
               >
                 <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.1rem', color: colors.navy, mb: 2 }}>
                   Typical Service Visit
                 </Typography>
-                <Box sx={{ display: 'grid', gap: 1.5 }}>
+                <Box component="ul" sx={{ display: 'grid', gap: 1.5, m: 0, p: 0, listStyle: 'none' }}>
                   {[
-                    'Service call from $79–$149',
+                    'Service calls typically start from $79',
                     'Same-day priority available',
                     'Final price confirmed before work begins',
                     'Request ID tracking included',
                   ].map((row) => (
-                    <Box key={row} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                      <CheckCircleOutlineIcon sx={{ fontSize: 19, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} />
+                    <Box component="li" key={row} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <CheckCircleOutlineIcon sx={{ fontSize: 19, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} aria-hidden="true" />
                       <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.darkText, lineHeight: 1.5 }}>
                         {row}
                       </Typography>
                     </Box>
                   ))}
                 </Box>
+                <Typography
+                  sx={{
+                    fontFamily: fonts.body,
+                    fontSize: '0.75rem',
+                    color: colors.mutedText,
+                    lineHeight: 1.55,
+                    mt: 2,
+                    pt: 1.5,
+                    borderTop: `1px solid ${colors.border}`,
+                  }}
+                >
+                  Starting prices vary by service type, location, urgency, parts, and on-site assessment.
+                </Typography>
               </Box>
             </Box>
           </Box>

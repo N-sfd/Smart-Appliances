@@ -130,10 +130,10 @@ embedded map (`SERVICE_AREA_MAP_EMBED_URL`), not a static graphic.
   placeholders only, all `enabled: false`. A video should only be flipped to
   `enabled: true` after confirming it is relevant, publicly embeddable, from
   a reputable/attributable source, and not simply because a link was
-  suggested somewhere — see the comments in that file. Until then,
-  `VIDEO_TOPIC_PLACEHOLDERS` (same file) drives a "Coming Soon" card per
-  category on `/resources`, `/resources/videos`, and the homepage Resources
-  section, so the video area never looks empty.
+  suggested somewhere — see the comments in that file. Until at least one
+  video is enabled, `/resources`, `/resources/videos`, and the homepage
+  Resources section show a single `VideosComingSoonPanel` instead of
+  per-category placeholder cards.
 
 ## 9. Resources — category cards, hero sections, and hero pages (NEW, vector illustrations)
 

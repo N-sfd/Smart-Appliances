@@ -38,31 +38,43 @@ export default function ResourceCategoryCard({ category, articleCount }: Props) 
       <Box sx={{ width: '100%', aspectRatio: '16 / 9', flexShrink: 0 }}>
         <TopicIllustration variant={category.id} title={category.label} />
       </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2.5, flexGrow: 1 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, p: 2, flexGrow: 1 }}>
         <Box
           sx={{
-            width: 40,
-            height: 40,
+            width: 38,
+            height: 38,
             borderRadius: '50%',
             backgroundColor: colors.lightBlueBg,
             color: colors.primaryBlue,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            mt: '-32px',
+            mt: '-30px',
             border: '3px solid #fff',
             boxShadow: '0 2px 8px rgba(10,37,64,0.12)',
           }}
         >
-          <Icon size={19} strokeWidth={1.8} />
+          <Icon size={18} strokeWidth={1.8} />
         </Box>
         <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1rem', color: colors.navy }}>
           {category.label}
         </Typography>
-        <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText, lineHeight: 1.55, flexGrow: 1 }}>
+        <Typography
+          sx={{
+            fontFamily: fonts.body,
+            fontSize: '13px',
+            color: colors.mutedText,
+            lineHeight: 1.55,
+            flexGrow: 1,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
           {category.description}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
           <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '12.5px', color: colors.primaryBlue }}>
             {countLabel}
           </Typography>

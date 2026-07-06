@@ -147,6 +147,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           width: displayWidth,
           height: displayHeight,
           maxWidth: isHeader ? { xs: 260, sm: 300, md: 340, lg: 360 } : undefined,
+          ...(isHeader && {
+            '@media (min-width:1024px) and (max-width:1199.98px)': { maxWidth: 230 },
+          }),
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',

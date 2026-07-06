@@ -4,15 +4,13 @@ import { Box, Typography, Container, Button } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { colors, fonts } from '../theme';
 import { getFeaturedArticles } from '../data/resourceArticles';
-import { getEnabledVideos, VIDEO_TOPIC_PLACEHOLDERS } from '../data/resourceVideos';
+import { getEnabledVideos } from '../data/resourceVideos';
 import ResourceArticleCard from './resources/ResourceArticleCard';
 import VideoCard from './resources/VideoCard';
-import VideoCategoryPlaceholderCard from './resources/VideoCategoryPlaceholderCard';
 
 const HomeResourcesSection: React.FC = () => {
-  const featuredArticles = useMemo(() => getFeaturedArticles().slice(0, 3), []);
   const featuredVideo = useMemo(() => getEnabledVideos()[0], []);
-  const featuredVideoTopic = useMemo(() => VIDEO_TOPIC_PLACEHOLDERS[0], []);
+  const featuredArticles = useMemo(() => getFeaturedArticles().slice(0, featuredVideo ? 3 : 4), [featuredVideo]);
 
   return (
     <Box
@@ -54,7 +52,11 @@ const HomeResourcesSection: React.FC = () => {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' },
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              lg: featuredVideo ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)',
+            },
             gap: 2.5,
             mb: 4,
           }}
@@ -63,13 +65,7 @@ const HomeResourcesSection: React.FC = () => {
             <ResourceArticleCard key={article.slug} article={article} />
           ))}
 
-          {featuredVideo ? (
-            <VideoCard video={featuredVideo} />
-          ) : (
-            <Box component={RouterLink} to="/resources/videos" sx={{ textDecoration: 'none', display: 'block' }}>
-              <VideoCategoryPlaceholderCard topic={featuredVideoTopic} />
-            </Box>
-          )}
+          {featuredVideo && <VideoCard video={featuredVideo} />}
         </Box>
 
         <Box sx={{ textAlign: 'center' }}>

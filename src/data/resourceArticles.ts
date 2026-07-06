@@ -18,6 +18,8 @@ export interface ResourceArticle {
   readingTime: string;
   /** ISO date */
   publishedAt: string;
+  /** ISO date — defaults to publishedAt when the guide has not been revised since it went live. */
+  updatedAt?: string;
   featured?: boolean;
   /** Shown as a prominent warning banner near the top of the article when present. */
   safetyNotice?: string;
