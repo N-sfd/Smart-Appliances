@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
 import { colors, fonts } from '../../theme';
-import { getRelatedArticles, type ResourceArticle } from '../../data/resourceArticles';
+import { getArticleBookingHref, getRelatedArticles, type ResourceArticle } from '../../data/resourceArticles';
 
 interface Props {
   article: ResourceArticle;
@@ -11,9 +11,7 @@ interface Props {
 export default function ResourceServiceCta({ article }: Props) {
   const navigate = useNavigate();
 
-  const bookHref = article.serviceCategory
-    ? `/scheduler?serviceType=R&serviceCategory=${encodeURIComponent(article.serviceCategory)}&productName=${encodeURIComponent(article.schedulerProductName)}`
-    : '/scheduler';
+  const bookHref = getArticleBookingHref(article);
 
   const relatedGuide = getRelatedArticles(article)[0];
 

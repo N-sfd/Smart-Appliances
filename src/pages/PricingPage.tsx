@@ -260,7 +260,7 @@ const PricingPage: React.FC = () => {
       {/* Hero */}
       <Box
         sx={{
-          py: { xs: 6, md: 9 },
+          py: { xs: 5, md: 7 },
           px: 2,
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
         }}
@@ -325,8 +325,8 @@ const PricingPage: React.FC = () => {
             </Box>
 
             {/* Right — hero image + trust summary card, treated as one visual column */}
-            <Box sx={{ width: '100%', maxWidth: { xs: 420, md: 'none' }, mx: { xs: 'auto', md: 0 } }}>
-              <Box sx={{ mb: 2, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
+            <Box sx={{ width: '100%', maxWidth: { xs: 420, md: 460 }, mx: { xs: 'auto', md: 0 } }}>
+              <Box sx={{ mb: 1.5, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
                 <HeroIllustration variant="pricing" title="Transparent service pricing with a technician estimate before work begins" />
               </Box>
               <Box

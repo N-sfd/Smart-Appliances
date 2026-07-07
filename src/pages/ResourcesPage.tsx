@@ -37,7 +37,7 @@ export default function ResourcesPage() {
       <Box
         sx={{
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          py: { xs: 4, md: 4.5 },
+          py: { xs: 5, md: 8 },
           px: 2,
         }}
       >
@@ -57,7 +57,7 @@ export default function ResourcesPage() {
                 sx={{
                   fontFamily: fonts.heading,
                   fontWeight: 800,
-                  fontSize: { xs: '1.75rem', md: '2.15rem' },
+                  fontSize: { xs: '1.85rem', md: '2.3rem' },
                   color: '#fff',
                   lineHeight: 1.15,
                   mb: 1.25,
@@ -70,7 +70,7 @@ export default function ResourcesPage() {
                   fontFamily: fonts.body,
                   fontSize: { xs: '0.9rem', md: '1rem' },
                   color: '#E2E8F0',
-                  maxWidth: 480,
+                  maxWidth: 520,
                   mx: { xs: 'auto', md: 0 },
                   mb: 2.5,
                   lineHeight: 1.6,
@@ -109,7 +109,7 @@ export default function ResourcesPage() {
               </Box>
             </Box>
 
-            <Box sx={{ flex: '0 0 auto', width: { xs: 180, sm: 200, md: 190 }, display: { xs: 'none', sm: 'block' } }}>
+            <Box sx={{ flex: '0 0 auto', width: { xs: 200, sm: 260, md: 360 }, maxWidth: '40%', display: { xs: 'none', sm: 'block' } }}>
               <HeroIllustration variant="resources" title="Homeowner researching appliance and home maintenance guidance" />
             </Box>
           </Box>

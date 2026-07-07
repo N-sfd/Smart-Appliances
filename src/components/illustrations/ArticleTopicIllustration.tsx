@@ -210,4 +210,67 @@ const ARTICLE_SCENES: Record<string, () => React.ReactNode> = {
       ))}
     </g>
   ),
+  'smart-thermostat-benefits': () => (
+    <g>
+      <rect x="0" y="205" width="400" height="45" fill="#D6E8FF" />
+      {/* wall plate */}
+      <rect x="140" y="55" width="120" height="150" rx="14" fill={WHITE} opacity="0.5" />
+      {/* thermostat body */}
+      <circle cx="200" cy="125" r="62" fill={WHITE} stroke={NAVY} strokeWidth="3" />
+      <circle cx="200" cy="125" r="46" fill="#EAF3FF" stroke={BLUE} strokeWidth="3" />
+      <text x="200" y="135" textAnchor="middle" fontSize="26" fontWeight="800" fill={NAVY} fontFamily="Arial, sans-serif">72°</text>
+      <line x1="200" y1="79" x2="200" y2="67" stroke={BLUE} strokeWidth="4" strokeLinecap="round" />
+      {/* wifi arcs */}
+      <path d="M200 40 q30 -22 60 0" fill="none" stroke={SKY} strokeWidth="4" strokeLinecap="round" />
+      <path d="M212 50 q14 -10 28 0" fill="none" stroke={SKY} strokeWidth="4" strokeLinecap="round" />
+      <circle cx="200" cy="58" r="4" fill={SKY} />
+      {/* phone / app accent */}
+      <g transform="translate(310,150)">
+        <rect x="-24" y="-45" width="48" height="90" rx="10" fill={WHITE} stroke={NAVY} strokeWidth="3" />
+        <rect x="-16" y="-34" width="32" height="52" rx="4" fill="#EAF3FF" />
+        <circle cx="0" cy="-34" r="8" fill={GREEN} />
+        <path d="M-6 -34 l4 4 l8 -9" fill="none" stroke={WHITE} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="-10" y1="-8" x2="10" y2="-8" stroke={BLUE} strokeWidth="3" strokeLinecap="round" />
+        <line x1="-10" y1="4" x2="4" y2="4" stroke={BLUE} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+      </g>
+      {/* schedule accent */}
+      <g transform="translate(90,150)">
+        <circle cx="0" cy="0" r="24" fill={WHITE} stroke={AMBER} strokeWidth="3" />
+        <line x1="0" y1="0" x2="0" y2="-13" stroke={AMBER} strokeWidth="3" strokeLinecap="round" />
+        <line x1="0" y1="0" x2="9" y2="4" stroke={AMBER} strokeWidth="3" strokeLinecap="round" />
+      </g>
+    </g>
+  ),
+  'electrical-safety-diy-or-pro': () => (
+    <g>
+      <rect x="0" y="205" width="400" height="45" fill="#D6E8FF" />
+      {/* outlet plate */}
+      <rect x="70" y="60" width="140" height="150" rx="12" fill={WHITE} stroke={NAVY} strokeWidth="3" />
+      <rect x="98" y="95" width="18" height="26" rx="4" fill="#EEF2F6" stroke={SLATE} strokeWidth="2.5" />
+      <rect x="134" y="95" width="18" height="26" rx="4" fill="#EEF2F6" stroke={SLATE} strokeWidth="2.5" />
+      <circle cx="140" cy="150" r="9" fill="none" stroke={SLATE} strokeWidth="2.5" />
+      {/* spark burst at outlet */}
+      {[0, 1, 2, 3, 4].map((i) => {
+        const angle = (i * Math.PI) / 2.6 - Math.PI / 5;
+        const x1 = 210 + Math.cos(angle) * 10;
+        const y1 = 95 + Math.sin(angle) * 10;
+        const x2 = 210 + Math.cos(angle) * 26;
+        const y2 = 95 + Math.sin(angle) * 26;
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={AMBER} strokeWidth="3" strokeLinecap="round" />;
+      })}
+      <circle cx="210" cy="95" r="6" fill={AMBER} />
+      {/* warning triangle */}
+      <g transform="translate(305,150)">
+        <path d="M0 -38 L34 30 H-34 Z" fill="#FEF2F2" stroke="#DC2626" strokeWidth="5" strokeLinejoin="round" />
+        <rect x="-3.5" y="-16" width="7" height="24" rx="3.5" fill="#DC2626" />
+        <circle cx="0" cy="16" r="4" fill="#DC2626" />
+      </g>
+      {/* breaker switches accent */}
+      <g transform="translate(90,205)">
+        {[0, 1, 2].map((i) => (
+          <rect key={i} x={i * 24} y={-24} width="16" height="24" rx="3" fill={i === 1 ? '#DC2626' : '#EAF3FF'} stroke={NAVY} strokeWidth="2" />
+        ))}
+      </g>
+    </g>
+  ),
 };

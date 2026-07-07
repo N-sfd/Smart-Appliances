@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Box, Typography, Container, Button } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -9,13 +9,15 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { ClipboardList } from 'lucide-react';
 import { colors, fonts } from '../theme';
 import { useSeo } from '../hooks/useSeo';
-import { getResourceArticle, getRelatedArticles, GENERAL_DISCLAIMER } from '../data/resourceArticles';
+import { getResourceArticle, getRelatedArticles, getArticleBookingHref, GENERAL_DISCLAIMER } from '../data/resourceArticles';
 import { getResourceCategory } from '../data/resourceCategories';
+import { getArticleRelatedVideo } from '../data/articleRelatedVideos';
 import ResourceImage from '../components/resources/ResourceImage';
 import ResourceBreadcrumbs from '../components/resources/ResourceBreadcrumbs';
 import ResourceArticleCard from '../components/resources/ResourceArticleCard';
 import ResourceServiceCta from '../components/resources/ResourceServiceCta';
 import ArticleInlineImage from '../components/resources/ArticleInlineImage';
+import RelatedVideoCard from '../components/resources/RelatedVideoCard';
 
 const formatDate = (iso: string): string =>
   new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -25,10 +27,12 @@ const slugifyHeading = (heading: string): string =>
 
 export default function ResourceArticleDetailPage() {
   const { articleSlug } = useParams<{ articleSlug: string }>();
+  const navigate = useNavigate();
   const article = getResourceArticle(articleSlug ?? '');
 
   const category = article ? getResourceCategory(article.category) : undefined;
   const relatedArticles = article ? getRelatedArticles(article) : [];
+  const relatedVideo = article ? getArticleRelatedVideo(article.slug) : undefined;
 
   useSeo({
     title: article ? `${article.title} | Smart Appliances Help Center` : 'Article Not Found | Smart Appliances',
@@ -73,9 +77,11 @@ export default function ResourceArticleDetailPage() {
     );
   }
 
+  const bookHref = getArticleBookingHref(article);
+
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
-      <Container maxWidth="md" sx={{ py: { xs: 3, md: 5 } }}>
+      <Container maxWidth={false} sx={{ maxWidth: '1240px', mx: 'auto', px: { xs: 2, sm: 3, md: 5 }, py: { xs: 3, md: 5 } }}>
         <Box sx={{ mb: 2.5 }}>
           <ResourceBreadcrumbs
             items={[
@@ -86,199 +92,281 @@ export default function ResourceArticleDetailPage() {
           />
         </Box>
 
-        {/* HERO */}
-        <Box sx={{ mb: 3 }}>
-          {category && (
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) 320px' },
+            gap: { xs: 4, md: 5 },
+            alignItems: 'start',
+          }}
+        >
+          {/* MAIN ARTICLE COLUMN */}
+          <Box component="article" sx={{ minWidth: 0 }}>
+            {/* HERO */}
             <Box
-              component={RouterLink}
-              to={`/resources/articles?category=${category.id}`}
+              component="header"
               sx={{
-                display: 'inline-block',
-                mb: 1.5,
-                px: 1.5,
-                py: 0.5,
-                borderRadius: '8px',
-                backgroundColor: colors.lightBlueBg,
-                color: colors.primaryBlue,
-                fontFamily: fonts.body,
-                fontWeight: 700,
-                fontSize: '12px',
-                textDecoration: 'none',
+                mb: 3.5,
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: '1.1fr 0.9fr' },
+                gap: { xs: 2.5, md: 4 },
+                alignItems: 'center',
+                minHeight: { sm: '320px', md: '400px' },
               }}
             >
-              {category.label}
-            </Box>
-          )}
-          <Typography component="h1" sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '1.75rem', md: '2.15rem' }, color: colors.navy, lineHeight: 1.2, mb: 1.5 }}>
-            {article.title}
-          </Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', fontWeight: 700, color: colors.navy, mb: 0.75 }}>
-            By Smart Appliances Editorial Team
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <AccessTimeIcon sx={{ fontSize: 15, color: colors.mutedText }} />
-              <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>{article.readingTime}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <CalendarTodayIcon sx={{ fontSize: 14, color: colors.mutedText }} />
-              <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>Published {formatDate(article.publishedAt)}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <CalendarTodayIcon sx={{ fontSize: 14, color: colors.mutedText }} />
-              <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>Updated {formatDate(article.updatedAt ?? article.publishedAt)}</Typography>
-            </Box>
-          </Box>
-        </Box>
+              <Box>
+                {category && (
+                  <Box
+                    component={RouterLink}
+                    to={`/resources/articles?category=${category.id}`}
+                    sx={{
+                      display: 'inline-block',
+                      mb: 1.5,
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: '8px',
+                      backgroundColor: colors.lightBlueBg,
+                      color: colors.primaryBlue,
+                      fontFamily: fonts.body,
+                      fontWeight: 700,
+                      fontSize: '12px',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    {category.label}
+                  </Box>
+                )}
+                <Typography component="h1" sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '1.75rem', md: '2.15rem' }, color: colors.navy, lineHeight: 1.2, mb: 1.25 }}>
+                  {article.title}
+                </Typography>
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '14.5px', color: colors.darkText, lineHeight: 1.6, mb: 1.75, maxWidth: 480 }}>
+                  {article.excerpt}
+                </Typography>
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', fontWeight: 700, color: colors.navy, mb: 0.75 }}>
+                  By Smart Appliances Editorial Team
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <AccessTimeIcon sx={{ fontSize: 15, color: colors.mutedText }} />
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>{article.readingTime}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <CalendarTodayIcon sx={{ fontSize: 14, color: colors.mutedText }} />
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>Published {formatDate(article.publishedAt)}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <CalendarTodayIcon sx={{ fontSize: 14, color: colors.mutedText }} />
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText }}>Updated {formatDate(article.updatedAt ?? article.publishedAt)}</Typography>
+                  </Box>
+                </Box>
+              </Box>
 
-        <ResourceImage
-          src={article.image}
-          alt={article.imageAlt}
-          icon={category?.icon ?? ClipboardList}
-          articleSlug={article.slug}
-          illustrationVariant={article.category}
-          aspectRatio="16 / 8"
-          borderRadius="18px"
-          sx={{ mb: 3.5 }}
-        />
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <ResourceImage
+                  src={article.image}
+                  alt={article.imageAlt}
+                  icon={category?.icon ?? ClipboardList}
+                  articleSlug={article.slug}
+                  illustrationVariant={article.category}
+                  borderRadius="20px"
+                  sx={{ aspectRatio: 'auto', height: { sm: '320px', md: '380px' } }}
+                />
+              </Box>
+            </Box>
 
-        {article.safetyNotice && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 1.25,
-              p: 2,
-              mb: 3.5,
-              borderRadius: '14px',
-              backgroundColor: '#FEF2F2',
-              border: '1px solid #FCA5A5',
-            }}
-          >
-            <WarningAmberIcon sx={{ color: '#DC2626', fontSize: 22, mt: '2px', flexShrink: 0 }} />
-            <Typography sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: '#7F1D1D', lineHeight: 1.6, fontWeight: 600 }}>
-              {article.safetyNotice}
-            </Typography>
-          </Box>
-        )}
-
-        <Typography sx={{ fontFamily: fonts.body, fontSize: '15.5px', color: colors.darkText, lineHeight: 1.75, mb: 3.5 }}>
-          {article.intro}
-        </Typography>
-
-        {/* TABLE OF CONTENTS */}
-        <Box sx={{ mb: 4, p: 2.25, borderRadius: '14px', backgroundColor: '#fff', border: `1px solid ${colors.border}` }}>
-          <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.85rem', color: colors.navy, mb: 1, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-            In this guide
-          </Typography>
-          <Box component="ol" sx={{ m: 0, pl: 2.5 }}>
-            {article.sections.map((section) => (
-              <Box component="li" key={section.heading} sx={{ mb: 0.5 }}>
-                <Typography
-                  component="a"
-                  href={`#${slugifyHeading(section.heading)}`}
-                  sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: colors.primaryBlue, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-                >
-                  {section.heading}
+            {article.safetyNotice && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1.25,
+                  p: 2,
+                  mb: 3.5,
+                  borderRadius: '14px',
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FCA5A5',
+                }}
+              >
+                <WarningAmberIcon sx={{ color: '#DC2626', fontSize: 22, mt: '2px', flexShrink: 0 }} />
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: '#7F1D1D', lineHeight: 1.6, fontWeight: 600 }}>
+                  {article.safetyNotice}
                 </Typography>
               </Box>
+            )}
+
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '15.5px', color: colors.darkText, lineHeight: 1.75, mb: 3.5 }}>
+              {article.intro}
+            </Typography>
+
+            {/* TABLE OF CONTENTS */}
+            <Box sx={{ mb: 4, p: 2.25, borderRadius: '14px', backgroundColor: '#fff', border: `1px solid ${colors.border}` }}>
+              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.85rem', color: colors.navy, mb: 1, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                In this guide
+              </Typography>
+              <Box component="ol" sx={{ m: 0, pl: 2.5 }}>
+                {article.sections.map((section) => (
+                  <Box component="li" key={section.heading} sx={{ mb: 0.5 }}>
+                    <Typography
+                      component="a"
+                      href={`#${slugifyHeading(section.heading)}`}
+                      sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: colors.primaryBlue, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                    >
+                      {section.heading}
+                    </Typography>
+                  </Box>
+                ))}
+                <Box component="li">
+                  <Typography component="a" href="#when-to-call-a-professional" sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: colors.primaryBlue, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                    When to Call a Professional
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* SECTIONS */}
+            {article.sections.map((section, index) => (
+              <React.Fragment key={section.heading}>
+                <Box component="section" id={slugifyHeading(section.heading)} sx={{ mb: 3.5, scrollMarginTop: '96px' }}>
+                  <Typography component="h2" sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.2rem', color: colors.navy, mb: 1.25 }}>
+                    {section.heading}
+                  </Typography>
+                  {section.paragraphs.map((p, i) => (
+                    <Typography key={i} sx={{ fontFamily: fonts.body, fontSize: '14.5px', color: colors.darkText, lineHeight: 1.75, mb: 1.25 }}>
+                      {p}
+                    </Typography>
+                  ))}
+                  {section.bullets && (
+                    <Box sx={{ mt: 1 }}>
+                      {section.bullets.map((bullet) => (
+                        <Box key={bullet} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 0.75 }}>
+                          <CheckCircleIcon sx={{ color: colors.primaryBlue, fontSize: 17, mt: '2px', flexShrink: 0 }} />
+                          <Typography sx={{ fontFamily: fonts.body, fontSize: '14px', color: colors.darkText, lineHeight: 1.6 }}>
+                            {bullet}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
+                </Box>
+                {index === 0 && (
+                  <ArticleInlineImage
+                    variant="inspection"
+                    align="right"
+                    alt={`Closely inspecting the issue described in ${article.title}`}
+                    caption="A closer, careful look is often all it takes to confirm what's really going on."
+                  />
+                )}
+                {index === Math.floor((article.sections.length - 1) / 2) && article.sections.length > 2 && (
+                  <ArticleInlineImage
+                    variant="decision"
+                    align="left"
+                    alt="Homeowner deciding whether to continue or call a professional"
+                    caption="Still unsure? It's always fine to have a professional confirm what you're seeing before you continue."
+                  />
+                )}
+              </React.Fragment>
             ))}
-            <Box component="li">
-              <Typography component="a" href="#when-to-call-a-professional" sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: colors.primaryBlue, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+
+            {/* WHEN TO CALL A PROFESSIONAL */}
+            <Box
+              component="section"
+              id="when-to-call-a-professional"
+              sx={{ mb: 4, p: 2.5, borderRadius: '16px', backgroundColor: colors.lightBlueBg, border: `1px solid ${colors.border}`, scrollMarginTop: '96px' }}
+            >
+              <Typography component="h2" sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.1rem', color: colors.navy, mb: 1.5 }}>
                 When to Call a Professional
               </Typography>
-            </Box>
-          </Box>
-        </Box>
-
-        {/* SECTIONS */}
-        {article.sections.map((section, index) => (
-          <React.Fragment key={section.heading}>
-            <Box component="section" id={slugifyHeading(section.heading)} sx={{ mb: 3.5, scrollMarginTop: '96px' }}>
-              <Typography component="h2" sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.2rem', color: colors.navy, mb: 1.25 }}>
-                {section.heading}
-              </Typography>
-              {section.paragraphs.map((p, i) => (
-                <Typography key={i} sx={{ fontFamily: fonts.body, fontSize: '14.5px', color: colors.darkText, lineHeight: 1.75, mb: 1.25 }}>
-                  {p}
-                </Typography>
+              {article.whenToCallPro.map((item) => (
+                <Box key={item} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 0.75 }}>
+                  <WarningAmberIcon sx={{ color: colors.warningOrange, fontSize: 17, mt: '2px', flexShrink: 0 }} />
+                  <Typography sx={{ fontFamily: fonts.body, fontSize: '14px', color: colors.darkText, lineHeight: 1.6 }}>
+                    {item}
+                  </Typography>
+                </Box>
               ))}
-              {section.bullets && (
-                <Box sx={{ mt: 1 }}>
-                  {section.bullets.map((bullet) => (
-                    <Box key={bullet} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 0.75 }}>
-                      <CheckCircleIcon sx={{ color: colors.primaryBlue, fontSize: 17, mt: '2px', flexShrink: 0 }} />
-                      <Typography sx={{ fontFamily: fonts.body, fontSize: '14px', color: colors.darkText, lineHeight: 1.6 }}>
-                        {bullet}
-                      </Typography>
-                    </Box>
+            </Box>
+
+            {/* CTA */}
+            <Box sx={{ mb: 5 }}>
+              <ResourceServiceCta article={article} />
+            </Box>
+
+            {/* RELATED ARTICLES */}
+            {relatedArticles.length > 0 && (
+              <Box sx={{ mb: 4 }}>
+                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.2rem', color: colors.navy, mb: 2 }}>
+                  Related articles
+                </Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 2 }}>
+                  {relatedArticles.map((related) => (
+                    <ResourceArticleCard key={related.slug} article={related} />
                   ))}
                 </Box>
-              )}
-            </Box>
-            {index === 0 && (
-              <ArticleInlineImage
-                variant="inspection"
-                align="right"
-                alt={`Closely inspecting the issue described in ${article.title}`}
-                caption="A closer, careful look is often all it takes to confirm what's really going on."
-              />
+              </Box>
             )}
-            {index === Math.floor((article.sections.length - 1) / 2) && article.sections.length > 2 && (
-              <ArticleInlineImage
-                variant="decision"
-                align="left"
-                alt="Homeowner deciding whether to continue or call a professional"
-                caption="Still unsure? It's always fine to have a professional confirm what you're seeing before you continue."
-              />
-            )}
-          </React.Fragment>
-        ))}
 
-        {/* WHEN TO CALL A PROFESSIONAL */}
-        <Box
-          component="section"
-          id="when-to-call-a-professional"
-          sx={{ mb: 4, p: 2.5, borderRadius: '16px', backgroundColor: colors.lightBlueBg, border: `1px solid ${colors.border}`, scrollMarginTop: '96px' }}
-        >
-          <Typography component="h2" sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.1rem', color: colors.navy, mb: 1.5 }}>
-            When to Call a Professional
-          </Typography>
-          {article.whenToCallPro.map((item) => (
-            <Box key={item} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 0.75 }}>
-              <WarningAmberIcon sx={{ color: colors.warningOrange, fontSize: 17, mt: '2px', flexShrink: 0 }} />
-              <Typography sx={{ fontFamily: fonts.body, fontSize: '14px', color: colors.darkText, lineHeight: 1.6 }}>
-                {item}
+            {/* DISCLAIMER */}
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, p: 2, borderRadius: '12px', backgroundColor: '#F1F5F9' }}>
+              <InfoOutlinedIcon sx={{ fontSize: 16, color: colors.mutedText, mt: '2px', flexShrink: 0 }} />
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '12px', color: colors.mutedText, lineHeight: 1.6 }}>
+                {GENERAL_DISCLAIMER}
               </Typography>
             </Box>
-          ))}
-        </Box>
+          </Box>
 
-        {/* CTA */}
-        <Box sx={{ mb: 5 }}>
-          <ResourceServiceCta article={article} />
-        </Box>
+          {/* SIDEBAR */}
+          <Box
+            component="aside"
+            aria-label="Related resources"
+            sx={{
+              position: { md: 'sticky' },
+              top: { md: '110px' },
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
+              minWidth: 0,
+            }}
+          >
+            <RelatedVideoCard
+              title={relatedVideo?.title ?? `${category?.label ?? 'Related'} Video Guide`}
+              description={relatedVideo?.description ?? 'A short video guide for this topic is coming soon.'}
+              category={category?.label ?? ''}
+              youtubeId={relatedVideo?.youtubeId}
+              sourceName={relatedVideo?.sourceName}
+            />
 
-        {/* RELATED ARTICLES */}
-        {relatedArticles.length > 0 && (
-          <Box sx={{ mb: 4 }}>
-            <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.2rem', color: colors.navy, mb: 2 }}>
-              Related articles
-            </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: `repeat(${relatedArticles.length}, 1fr)` }, gap: 2 }}>
-              {relatedArticles.map((related) => (
-                <ResourceArticleCard key={related.slug} article={related} />
-              ))}
+            <Box
+              sx={{
+                borderRadius: '18px',
+                backgroundColor: colors.navy,
+                color: '#fff',
+                p: 2.25,
+              }}
+            >
+              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1rem', mb: 0.75 }}>
+                Still Need Help?
+              </Typography>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '12.5px', color: '#E2E8F0', lineHeight: 1.55, mb: 1.75 }}>
+                Book a professional service visit and receive a request ID for tracking.
+              </Typography>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => navigate(bookHref)}
+                sx={{
+                  backgroundColor: '#fff',
+                  color: colors.navy,
+                  fontFamily: fonts.body,
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  borderRadius: '12px',
+                  '&:hover': { backgroundColor: '#E2E8F0' },
+                }}
+              >
+                {article.ctaLabel}
+              </Button>
             </Box>
           </Box>
-        )}
-
-        {/* DISCLAIMER */}
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, p: 2, borderRadius: '12px', backgroundColor: '#F1F5F9' }}>
-          <InfoOutlinedIcon sx={{ fontSize: 16, color: colors.mutedText, mt: '2px', flexShrink: 0 }} />
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '12px', color: colors.mutedText, lineHeight: 1.6 }}>
-            {GENERAL_DISCLAIMER}
-          </Typography>
         </Box>
       </Container>
     </Box>

@@ -685,3 +685,10 @@ export function getRelatedArticles(article: ResourceArticle): ResourceArticle[] 
     .map((slug) => getResourceArticle(slug))
     .filter((a): a is ResourceArticle => Boolean(a));
 }
+
+/** Scheduler booking URL for an article's CTA — prefilled with its service category and product name when known. */
+export function getArticleBookingHref(article: ResourceArticle): string {
+  return article.serviceCategory
+    ? `/scheduler?serviceType=R&serviceCategory=${encodeURIComponent(article.serviceCategory)}&productName=${encodeURIComponent(article.schedulerProductName)}`
+    : '/scheduler';
+}

@@ -8,6 +8,7 @@ import { RESOURCE_CATEGORIES, ResourceCategoryId } from '../data/resourceCategor
 import { RESOURCE_ARTICLES, getFeaturedArticles } from '../data/resourceArticles';
 import ResourceArticleCard from '../components/resources/ResourceArticleCard';
 import ResourceBreadcrumbs from '../components/resources/ResourceBreadcrumbs';
+import RelatedVideoCard from '../components/resources/RelatedVideoCard';
 
 const PAGE_SIZE = 6;
 
@@ -18,14 +19,20 @@ export default function ResourceArticlesPage() {
   const [search, setSearch] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
+  const activeCategoryForSeo = RESOURCE_CATEGORIES.find((c) => c.id === categoryParam) ?? null;
+
   useSeo({
-    title: 'Appliance Care & Home Maintenance Tips | Smart Appliances',
-    description: 'Explore appliance troubleshooting, HVAC energy-saving advice, electrical safety, plumbing maintenance, smart home guides, and garage door care.',
+    title: activeCategoryForSeo
+      ? `${activeCategoryForSeo.label} | Smart Appliances Help Center`
+      : 'Appliance Care & Home Maintenance Tips | Smart Appliances',
+    description: activeCategoryForSeo?.description
+      ?? 'Explore appliance troubleshooting, HVAC energy-saving advice, electrical safety, plumbing maintenance, smart home guides, and garage door care.',
     path: '/resources/articles',
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Help Center', path: '/resources' },
       { name: 'Articles', path: '/resources/articles' },
+      ...(activeCategoryForSeo ? [{ name: activeCategoryForSeo.label, path: `/resources/articles?category=${activeCategoryForSeo.id}` }] : []),
     ],
   });
 
@@ -35,7 +42,14 @@ export default function ResourceArticlesPage() {
     else setSearchParams({});
   };
 
-  const featured = useMemo(() => getFeaturedArticles()[0], []);
+  const featured = useMemo(() => {
+    const featuredArticles = getFeaturedArticles();
+    if (categoryParam) {
+      return featuredArticles.find((a) => a.category === categoryParam)
+        ?? RESOURCE_ARTICLES.find((a) => a.category === categoryParam);
+    }
+    return featuredArticles[0];
+  }, [categoryParam]);
 
   const recentArticles = useMemo(
     () => [...RESOURCE_ARTICLES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
@@ -64,7 +78,8 @@ export default function ResourceArticlesPage() {
           <ResourceBreadcrumbs
             items={[
               { label: 'Help Center', path: '/resources' },
-              { label: 'Articles' },
+              activeCategory ? { label: 'Articles', path: '/resources/articles' } : { label: 'Articles' },
+              ...(activeCategory ? [{ label: activeCategory.label }] : []),
             ]}
           />
         </Box>
@@ -73,10 +88,12 @@ export default function ResourceArticlesPage() {
           component="h1"
           sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '1.75rem', md: '2.1rem' }, color: colors.navy, mb: 1 }}
         >
-          Help Center Articles
+          {activeCategory ? activeCategory.label : 'Help Center Articles'}
         </Typography>
         <Typography sx={{ fontFamily: fonts.body, fontSize: '0.95rem', color: colors.mutedText, mb: 3.5, maxWidth: 640 }}>
-          Search or filter our library of original appliance, HVAC, plumbing, electrical, smart home, and garage door guides.
+          {activeCategory
+            ? activeCategory.description
+            : 'Search or filter our library of original appliance, HVAC, plumbing, electrical, smart home, and garage door guides.'}
         </Typography>
 
         {/* SEARCH + FILTERS */}
@@ -132,12 +149,28 @@ export default function ResourceArticlesPage() {
         </Box>
 
         {/* FEATURED ARTICLE */}
-        {!categoryParam && !search && featured && (
+        {!search && featured && (
           <Box sx={{ mb: 5 }}>
             <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: colors.mutedText, mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Featured Article
             </Typography>
-            <ResourceArticleCard article={featured} variant="featured" />
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: '1fr 300px' },
+                gap: 2.5,
+                alignItems: 'stretch',
+              }}
+            >
+              <ResourceArticleCard article={featured} variant="featured" />
+              {activeCategory && (
+                <RelatedVideoCard
+                  title={`${activeCategory.label} Video Guide`}
+                  description={activeCategory.description}
+                  category={activeCategory.label}
+                />
+              )}
+            </Box>
           </Box>
         )}
 
@@ -154,7 +187,7 @@ export default function ResourceArticlesPage() {
           </Box>
         ) : (
           <>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2.5 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2.5, alignItems: 'stretch' }}>
               {visibleArticles.map((article) => (
                 <ResourceArticleCard key={article.slug} article={article} />
               ))}
