@@ -6,6 +6,7 @@ import { colors, fonts } from '../theme';
 import { useSeo } from '../hooks/useSeo';
 import { RESOURCE_CATEGORIES, ResourceCategoryId } from '../data/resourceCategories';
 import { RESOURCE_ARTICLES, getFeaturedArticles } from '../data/resourceArticles';
+import { getEnabledVideosByCategory } from '../data/resourceVideos';
 import ResourceArticleCard from '../components/resources/ResourceArticleCard';
 import ResourceBreadcrumbs from '../components/resources/ResourceBreadcrumbs';
 import RelatedVideoCard from '../components/resources/RelatedVideoCard';
@@ -70,6 +71,7 @@ export default function ResourceArticlesPage() {
 
   const visibleArticles = filteredArticles.slice(0, visibleCount);
   const activeCategory = RESOURCE_CATEGORIES.find((c) => c.id === categoryParam) ?? null;
+  const activeCategoryVideo = activeCategory ? getEnabledVideosByCategory(activeCategory.id)[0] : undefined;
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
@@ -165,9 +167,13 @@ export default function ResourceArticlesPage() {
               <ResourceArticleCard article={featured} variant="featured" />
               {activeCategory && (
                 <RelatedVideoCard
-                  title={`${activeCategory.label} Video Guide`}
-                  description={activeCategory.description}
+                  title={activeCategoryVideo?.title ?? `${activeCategory.label} Video Guide`}
+                  description={activeCategoryVideo?.description ?? activeCategory.description}
                   category={activeCategory.label}
+                  youtubeId={activeCategoryVideo?.youtubeId}
+                  sourceName={activeCategoryVideo?.sourceName}
+                  sourceUrl={activeCategoryVideo?.sourceUrl}
+                  fallbackImage={activeCategoryVideo?.thumbnail}
                 />
               )}
             </Box>

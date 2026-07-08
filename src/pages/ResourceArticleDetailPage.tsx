@@ -335,6 +335,7 @@ export default function ResourceArticleDetailPage() {
               category={category?.label ?? ''}
               youtubeId={enabledVideo?.youtubeId}
               sourceName={enabledVideo?.sourceName}
+              sourceUrl={enabledVideo?.sourceUrl}
               fallbackImage={enabledVideo?.thumbnail}
             />
 

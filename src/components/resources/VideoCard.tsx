@@ -45,30 +45,34 @@ export default function VideoCard({ video }: Props) {
         <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: colors.navy, mb: 0.5 }}>
           {video.title}
         </Typography>
-        <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText, lineHeight: 1.55, mb: video.sourceUrl ? 1 : 0 }}>
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '13px', color: colors.mutedText, lineHeight: 1.55, mb: 1 }}>
           {video.description}
         </Typography>
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '10.5px', fontStyle: 'italic', color: colors.mutedText, mb: video.sourceUrl ? 0.5 : 0 }}>
+          Helpful video from an external source — not produced by Smart Appliances.
+        </Typography>
         {video.sourceUrl && (
-          <Box
-            component="a"
-            href={video.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.5,
-              fontFamily: fonts.body,
-              fontSize: '12px',
-              fontWeight: 600,
-              color: colors.primaryBlue,
-              textDecoration: 'none',
-              '&:hover': { textDecoration: 'underline' },
-            }}
-          >
-            {video.sourceName ? `Watch on ${video.sourceName}` : 'Watch on YouTube'}
-            <OpenInNewIcon sx={{ fontSize: 13 }} />
-          </Box>
+          <Typography className="video-source" sx={{ fontFamily: fonts.body, fontSize: '12px', color: colors.mutedText }}>
+            Video source:{' '}
+            <Box
+              component="a"
+              href={video.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.4,
+                fontWeight: 600,
+                color: colors.primaryBlue,
+                textDecoration: 'none',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              {video.sourceName ?? 'YouTube'}
+              <OpenInNewIcon sx={{ fontSize: 12 }} />
+            </Box>
+          </Typography>
         )}
       </Box>
     </Box>

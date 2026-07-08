@@ -11,6 +11,7 @@ interface RelatedVideoCardProps {
   youtubeId?: string;
   thumbnail?: string;
   sourceName?: string;
+  sourceUrl?: string;
   fallbackImage?: string;
 }
 
@@ -25,6 +26,7 @@ export default function RelatedVideoCard({
   category,
   youtubeId,
   sourceName,
+  sourceUrl,
   fallbackImage,
 }: RelatedVideoCardProps) {
   return (
@@ -35,9 +37,12 @@ export default function RelatedVideoCard({
         backgroundColor: '#fff',
         overflow: 'hidden',
         boxShadow: '0 4px 16px rgba(10,37,64,0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
       }}
     >
-      <Box sx={{ p: 2.25, pb: 1.5 }}>
+      <Box sx={{ p: 2.25, pb: 1.5, flexShrink: 0 }}>
         {category && (
           <Chip
             label={category}
@@ -61,96 +66,117 @@ export default function RelatedVideoCard({
         </Typography>
       </Box>
 
-      {youtubeId ? (
-        <Box sx={{ px: 2.25, pb: 2.25 }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {youtubeId ? (
+          <Box sx={{ px: 2.25, pb: 2.25 }}>
+            <Box
+              sx={{
+                position: 'relative',
+                width: '100%',
+                aspectRatio: '16 / 9',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                backgroundColor: '#0A0A0A',
+              }}
+            >
+              <Box
+                component="iframe"
+                src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
+                title={`${title} — video guide`}
+                loading="lazy"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+              />
+            </Box>
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '10.5px', fontStyle: 'italic', color: colors.mutedText, mt: 0.75 }}>
+              Helpful video from an external source — not produced by Smart Appliances.
+            </Typography>
+            {sourceName && (
+              <Typography className="video-source" sx={{ fontFamily: fonts.body, fontSize: '11px', color: colors.mutedText, mt: 0.25 }}>
+                Video source:{' '}
+                {sourceUrl ? (
+                  <Box
+                    component="a"
+                    href={sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    sx={{ color: colors.primaryBlue, fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                  >
+                    {sourceName}
+                  </Box>
+                ) : sourceName}
+              </Typography>
+            )}
+          </Box>
+        ) : (
           <Box
             sx={{
-              position: 'relative',
-              width: '100%',
-              aspectRatio: '16 / 9',
+              mx: 2.25,
+              mb: 2.25,
               borderRadius: '12px',
+              textAlign: 'center',
+              py: { xs: 3, md: 3.5 },
+              px: 2,
+              minHeight: 200,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
               overflow: 'hidden',
-              backgroundColor: '#0A0A0A',
+              backgroundImage: fallbackImage
+                ? `linear-gradient(rgba(232,241,255,0.88), rgba(220,235,255,0.9)), url(${fallbackImage})`
+                : `linear-gradient(135deg, ${colors.lightBlueBg} 0%, #DCEBFF 100%)`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
             }}
           >
             <Box
-              component="iframe"
-              src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
-              title={`${title} — video guide`}
-              loading="lazy"
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
-            />
-          </Box>
-          {sourceName && (
-            <Typography sx={{ fontFamily: fonts.body, fontSize: '11px', color: colors.mutedText, mt: 0.75 }}>
-              Video: {sourceName}
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                backgroundColor: '#fff',
+                color: colors.primaryBlue,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 1.25,
+                boxShadow: '0 4px 12px rgba(10,37,64,0.12)',
+              }}
+            >
+              <OndemandVideoOutlinedIcon sx={{ fontSize: 21 }} />
+            </Box>
+            <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.88rem', color: colors.navy, mb: 0.5 }}>
+              Related Video Guide — Coming Soon
             </Typography>
-          )}
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            mx: 2.25,
-            mb: 2.25,
-            borderRadius: '12px',
-            textAlign: 'center',
-            py: 3,
-            px: 2,
-            position: 'relative',
-            overflow: 'hidden',
-            backgroundImage: fallbackImage
-              ? `linear-gradient(rgba(232,241,255,0.88), rgba(220,235,255,0.9)), url(${fallbackImage})`
-              : `linear-gradient(135deg, ${colors.lightBlueBg} 0%, #DCEBFF 100%)`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <Box
-            sx={{
-              width: 44,
-              height: 44,
-              borderRadius: '50%',
-              backgroundColor: '#fff',
-              color: colors.primaryBlue,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mx: 'auto',
-              mb: 1.25,
-              boxShadow: '0 4px 12px rgba(10,37,64,0.12)',
-            }}
-          >
-            <OndemandVideoOutlinedIcon sx={{ fontSize: 21 }} />
+            <Typography sx={{ fontFamily: fonts.body, fontSize: '12px', color: colors.mutedText, lineHeight: 1.5, mb: 1.5 }}>
+              A short video guide for this topic is coming soon.
+            </Typography>
+            <Button
+              component={RouterLink}
+              to="/resources/videos"
+              variant="outlined"
+              size="small"
+              sx={{
+                borderColor: colors.primaryBlue,
+                color: colors.primaryBlue,
+                backgroundColor: '#fff',
+                fontFamily: fonts.body,
+                fontWeight: 700,
+                textTransform: 'none',
+                fontSize: '12.5px',
+                borderRadius: '10px',
+                '&:hover': { backgroundColor: colors.lightBlueBg },
+              }}
+            >
+              Browse Helpful Videos
+            </Button>
           </Box>
-          <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.88rem', color: colors.navy, mb: 0.5 }}>
-            Related Video Guide — Coming Soon
-          </Typography>
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '12px', color: colors.mutedText, lineHeight: 1.5, mb: 1.5 }}>
-            A short video guide for this topic is coming soon.
-          </Typography>
-          <Button
-            component={RouterLink}
-            to="/resources/videos"
-            variant="outlined"
-            size="small"
-            sx={{
-              borderColor: colors.primaryBlue,
-              color: colors.primaryBlue,
-              backgroundColor: '#fff',
-              fontFamily: fonts.body,
-              fontWeight: 700,
-              textTransform: 'none',
-              fontSize: '12.5px',
-              borderRadius: '10px',
-              '&:hover': { backgroundColor: colors.lightBlueBg },
-            }}
-          >
-            Browse Helpful Videos
-          </Button>
-        </Box>
-      )}
+        )}
+      </Box>
     </Box>
   );
 }

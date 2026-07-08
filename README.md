@@ -57,12 +57,20 @@ Resource videos are data-driven and optional, defined in
 `src/data/resourceVideos.ts`. Only videos with `enabled: true` **and** a
 `youtubeId` render — embedded via `youtube-nocookie.com`, lazy-loaded, never
 autoplaying, inside a responsive 16:9 (or 9:16 for `portrait`) frame. If no
-approved videos exist for a given context, the site shows a professional
-"Helpful Videos Coming Soon" panel (or a compact "Related Video Guide —
-Coming Soon" card in article sidebars) instead of a broken embed or a fake
-play button. A video should only be flipped to `enabled: true` after it's
-confirmed relevant, publicly embeddable, and from a reputable, attributable
-source — never just because a link was suggested somewhere.
+approved video exists for a given context (category, article, or overall),
+the site shows a professional "Helpful Videos Coming Soon" panel (or a
+compact "Related Video Guide — Coming Soon" card in article sidebars)
+instead of a broken embed or a fake play button.
+
+The site currently embeds a small set of reviewed, approved videos from
+reputable external creators (This Old House, Lowe's Home Improvement,
+RepairClinic.com, Ace Hardware, Electrical Safety Foundation International).
+These are not Smart Appliances-owned content — every embed carries a "Helpful
+video from an external source" note plus a "Video source: <channel>" link
+back to the original YouTube video, per `sourceName`/`sourceUrl` on that
+video's entry. A new video should only be flipped to `enabled: true` after
+it's confirmed relevant, publicly embeddable, and from a reputable,
+attributable source — never just because a link was suggested somewhere.
 
 ## Hero Layout System
 
