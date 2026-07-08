@@ -17,6 +17,7 @@ export const SERVICE_ISSUE_CHIPS: Record<string, string[]> = {
   'toilet-repair': ['Running toilet', "Won't flush", 'Leaking at base', 'Clogged'],
   'water-heater-service': ['No hot water', 'Insufficient hot water', 'Leak at tank', 'Strange sounds'],
   'garbage-disposal-repair': ['Humming not working', 'Leaking under sink', 'Jammed blades', "Won't turn on"],
+  'freezer-repair': ['Not freezing', 'Frost buildup', 'Too warm', 'Door seal leak'],
   'emergency-plumbing': ['Burst pipe', 'Major water leak', 'Sewage backup', 'Flooding'],
   'ac-repair': ['No cooling', 'Warm air blowing', 'Refrigerant leak', 'Loud noise'],
   'heating-furnace-repair': ['No heat', 'Burner not igniting', 'Short cycling', 'Unusual smell'],

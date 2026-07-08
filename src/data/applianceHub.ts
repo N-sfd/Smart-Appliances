@@ -2,14 +2,15 @@ const APPLIANCES = '/images/services/appliances';
 
 export const APPLIANCE_SERVICE_IMAGES: Record<string, string> = {
   'refrigerator-repair': `${APPLIANCES}/refrigerator-repair.webp`,
-  'washer-dryer': `${APPLIANCES}/washer-dryer.webp`,
-  'washer-repair': `${APPLIANCES}/washer-dryer.webp`,
-  'dryer-repair': `${APPLIANCES}/washer-dryer.webp`,
+  'washer-dryer': `${APPLIANCES}/washer-dryer.png`,
+  'washer-repair': `${APPLIANCES}/washer-dryer.png`,
+  'dryer-repair': `${APPLIANCES}/washer-dryer.png`,
   'dishwasher-repair': '/images/services/dishwasher-repair.webp',
   'oven-stove-repair': '/images/services/oven-stove-repair.webp',
   'cooktop-repair': `${APPLIANCES}/cooktop-repair.webp`,
   'microwave-repair': `${APPLIANCES}/microwave-repair.webp`,
-  'garbage-disposal-repair': `${APPLIANCES}/garbage-disposal-repair.webp`,
+  'garbage-disposal-repair': `${APPLIANCES}/garbage-disposal-repair.png`,
+  'freezer-repair': `${APPLIANCES}/freezer-repair.png`,
   'ice-maker-repair': `${APPLIANCES}/refrigerator-repair.webp`,
 };
 

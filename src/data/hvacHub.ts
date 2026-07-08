@@ -8,7 +8,7 @@ const HVAC = '/images/services/hvac';
 export const HVAC_SERVICE_IMAGES: Record<string, string> = {
   'ac-repair': `${HVAC}/ac-repair.webp`,
   'heating-furnace-repair': `${HVAC}/heating-furnace-repair.webp`,
-  'thermostat-installation': `${HVAC}/thermostat-installation.webp`,
+  'thermostat-installation': `${HVAC}/thermostat-installation.png`,
   'hvac-maintenance': `${HVAC}/hvac-maintenance.webp`,
   'duct-cleaning': `${HVAC}/duct-cleaning.webp`,
   'emergency-hvac-service': `${HVAC}/emergency-hvac-service.webp`,

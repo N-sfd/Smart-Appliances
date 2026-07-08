@@ -77,7 +77,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
       { image: `${APPLIANCES}/refrigerator-repair.webp`, label: 'Cooling system diagnostics' },
       { image: `${APPLIANCES}/technician-default.webp`, label: 'Certified appliance technicians' },
       { image: `${BASE}/hero-appliance-technician.webp`, label: 'Parts and repair service' },
-      { image: `${APPLIANCES}/washer-dryer.webp`, label: 'Full-home appliance coverage' },
+      { image: `${APPLIANCES}/washer-dryer.png`, label: 'Full-home appliance coverage' },
     ],
     howItWorks: STANDARD_HOW_IT_WORKS,
     testimonials: [
@@ -114,7 +114,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
     metaDescription: 'Washing machine and dryer repair for spin, drain, heat, and startup problems. Background-checked technicians, upfront pricing, same-day appointments often available.',
     heroTitle: 'Washer & dryer repair, done in one visit',
     heroSubtitle: "Won't spin, drain, start, or heat — plus leaks and error codes — fixed by background-checked, insured technicians.",
-    heroImage: `${APPLIANCES}/washer-dryer.webp`,
+    heroImage: `${APPLIANCES}/washer-dryer.png`,
     ratingLabel: '4.9 · 2,000+ Reviews',
     startingPriceLabel: 'Diagnostic visit from $89',
     ctaButtonLabel: 'Book Washer & Dryer Service',
@@ -131,7 +131,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
     techGalleryTitle: 'Professional technicians, every visit',
     techGallerySubtitle: 'Background-checked, insured pros ready to handle any washer or dryer issue.',
     techGallery: [
-      { image: `${APPLIANCES}/washer-dryer.webp`, label: 'Washer & dryer diagnostics' },
+      { image: `${APPLIANCES}/washer-dryer.png`, label: 'Washer & dryer diagnostics' },
       { image: `${APPLIANCES}/technician-default.webp`, label: 'Certified appliance technicians' },
       { image: `${BASE}/hero-appliance-technician.webp`, label: 'Parts and repair service' },
       { image: `${APPLIANCES}/dryer-repair.webp`, label: 'Dryer heating & vent checks' },
@@ -150,7 +150,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
       'Full spin, drain, and heat cycle test after repair',
       'Walkthrough and test before job completion',
     ],
-    whatToExpectImage: `${APPLIANCES}/washer-dryer.webp`,
+    whatToExpectImage: `${APPLIANCES}/washer-dryer.png`,
     faqs: [
       { question: 'How much does washer or dryer repair cost?', answer: 'Cost varies by issue — belts, motors, heating elements, and pumps each have different parts and labor. You get an upfront estimate before any work begins.' },
       { question: 'Can you repair all washer and dryer brands?', answer: 'Yes, our technicians service all major brands including Samsung, LG, Whirlpool, Maytag, GE, and more.' },
@@ -191,7 +191,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
       { image: `${BASE}/dishwasher-repair.webp`, label: 'Dishwasher diagnostics' },
       { image: `${APPLIANCES}/technician-default.webp`, label: 'Certified appliance technicians' },
       { image: `${BASE}/hero-appliance-technician.webp`, label: 'Parts and repair service' },
-      { image: `${APPLIANCES}/washer-dryer.webp`, label: 'Full-home appliance coverage' },
+      { image: `${APPLIANCES}/washer-dryer.png`, label: 'Full-home appliance coverage' },
     ],
     howItWorks: STANDARD_HOW_IT_WORKS,
     testimonials: [
@@ -305,7 +305,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
       { image: `${APPLIANCES}/microwave-repair.webp`, label: 'Microwave diagnostics' },
       { image: `${APPLIANCES}/technician-default.webp`, label: 'Certified appliance technicians' },
       { image: `${BASE}/hero-appliance-technician.webp`, label: 'Parts and repair service' },
-      { image: `${APPLIANCES}/washer-dryer.webp`, label: 'Full-home appliance coverage' },
+      { image: `${APPLIANCES}/washer-dryer.png`, label: 'Full-home appliance coverage' },
     ],
     howItWorks: STANDARD_HOW_IT_WORKS,
     testimonials: [
@@ -776,7 +776,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
     metaDescription: 'Garbage disposal repair and installation for jams, leaks, humming motors, and units that won’t turn on. Licensed plumbers, upfront pricing, same-day appointments often available.',
     heroTitle: 'Garbage disposal service, fixed fast',
     heroSubtitle: 'Jams, leaks, humming motors, and units that won’t turn on — fixed by licensed, insured plumbing technicians.',
-    heroImage: `${APPLIANCES}/garbage-disposal-repair.webp`,
+    heroImage: `${APPLIANCES}/garbage-disposal-repair.png`,
     ratingLabel: '4.9 · 2,000+ Reviews',
     startingPriceLabel: 'Diagnostic visit from $99',
     ctaButtonLabel: 'Book Garbage Disposal Service',
@@ -798,7 +798,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
     techGalleryTitle: 'Professional plumbing technicians, every visit',
     techGallerySubtitle: 'Background-checked, insured pros ready to handle any disposal issue.',
     techGallery: [
-      { image: `${APPLIANCES}/garbage-disposal-repair.webp`, label: 'Disposal diagnostics' },
+      { image: `${APPLIANCES}/garbage-disposal-repair.png`, label: 'Disposal diagnostics' },
       { image: `${PLUMBING}/drain-cleaning.webp`, label: 'Drain & plumbing service' },
       { image: `${PLUMBING}/leak-repair.webp`, label: 'Leak detection & repair' },
       { image: `${PLUMBING}/trust-technician.webp`, label: 'Licensed, insured plumbers' },
@@ -817,7 +817,7 @@ export const SERVICE_LANDING_PAGES: Record<string, ServiceLandingPageConfig> = {
       'Full leak and seal check under the sink',
       'Walkthrough and test before job completion',
     ],
-    whatToExpectImage: `${APPLIANCES}/garbage-disposal-repair.webp`,
+    whatToExpectImage: `${APPLIANCES}/garbage-disposal-repair.png`,
     faqs: [
       { question: 'How much does garbage disposal repair cost?', answer: 'Cost depends on the issue — clearing a jam is typically less involved than replacing a motor or seal. You get an upfront estimate before any work begins.' },
       { question: 'Why is my disposal humming but not working?', answer: 'A humming disposal usually means the motor is running but the flywheel is jammed — often by utensils, bones, or fibrous food scraps.' },

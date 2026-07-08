@@ -128,10 +128,20 @@ export const SERVICE_TYPE_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     title: 'Microwave',
     desc: 'Repair and installation for heating, display, turntable, and over-the-range mounting.',
   },
+  'cooktop-repair': {
+    image: APPLIANCE_SERVICE_IMAGES['cooktop-repair'],
+    title: 'Cooktop',
+    desc: 'Repair for electric, gas, and induction cooktops — burners, ignition, elements, and controls.',
+  },
   'garbage-disposal-repair': {
     image: APPLIANCE_SERVICE_IMAGES['garbage-disposal-repair'],
     title: 'Garbage Disposal',
     desc: 'Quick repair for jams, leaks, and disposal failures.',
+  },
+  'freezer-repair': {
+    image: APPLIANCE_SERVICE_IMAGES['freezer-repair'],
+    title: 'Freezer',
+    desc: 'Repair for freezers not freezing, frost buildup, temperature, and door seal issues.',
   },
   'ice-maker-repair': {
     image: APPLIANCE_SERVICE_IMAGES['refrigerator-repair'],

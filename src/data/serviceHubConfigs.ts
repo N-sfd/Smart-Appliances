@@ -43,7 +43,7 @@ export const homeApplianceIconCards: HubIconCard[] = [
   { id: 'oven-stove', label: 'Oven', Icon: Flame, serviceIds: ['oven-stove-repair'] },
   { id: 'cooktop', label: 'Cooktop', Icon: ChefHat, serviceIds: ['cooktop-repair'] },
   { id: 'microwave', label: 'Microwave', Icon: Zap, serviceIds: ['microwave-repair'] },
-  { id: 'freezer', label: 'Freezer', Icon: Snowflake, serviceIds: ['refrigerator-repair'] },
+  { id: 'freezer', label: 'Freezer', Icon: Snowflake, serviceIds: ['freezer-repair'] },
   { id: 'garbage-disposal', label: 'Garbage Disposal', Icon: ChefHat, serviceIds: ['garbage-disposal-repair'] },
 ];
 
