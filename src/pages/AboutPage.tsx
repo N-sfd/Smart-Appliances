@@ -21,7 +21,8 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import StableImage from '../components/StableImage';
 import { ABOUT_MISSION_IMAGE_WIDTH, ABOUT_MISSION_IMAGE_HEIGHT } from '../constants/imageDimensions';
-import HeroIllustration from '../components/illustrations/HeroIllustration';
+import PageHero from '../components/common/PageHero';
+import { PAGE_HERO_PHOTOS } from '../data/pageHeroImages';
 
 interface OfferItem {
   icon: React.ReactNode;
@@ -111,117 +112,39 @@ const AboutPage: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
-      {/* ── Hero Banner ── */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          py: { xs: 5, md: 7 },
-          px: 2,
-        }}
-      >
-        <Container maxWidth={false} sx={{ maxWidth: '1180px', mx: 'auto', width: '100%' }}>
+      <PageHero
+        eyebrow="About Smart Appliances"
+        title="Trusted Home Service Support Across the Region"
+        subtitle="Smart Appliances helps customers schedule appliance, HVAC, plumbing, electrical, smart home, and garage door services with clear communication and convenient request tracking."
+        belowSubtitle={
           <Box
+            component="ul"
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(340px, 0.85fr)' },
-              alignItems: 'center',
-              gap: { xs: 4, md: 6 },
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, auto)' },
+              gap: 1,
+              justifyContent: { xs: 'center', md: 'flex-start' },
+              p: 0,
+              m: 0,
+              listStyle: 'none',
             }}
           >
-            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-              <Typography
-                variant="overline"
-                sx={{
-                  color: '#4FC3F7',
-                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                  fontWeight: 700,
-                  letterSpacing: 3,
-                  display: 'block',
-                  mb: 1.5,
-                  fontSize: '0.8rem',
-                }}
-              >
-                About Smart Appliances
-              </Typography>
-              <Typography
-                variant="h1"
-                sx={{
-                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
-                  fontWeight: 700,
-                  color: '#FFFFFF',
-                  fontSize: { xs: '1.85rem', md: '2.4rem' },
-                  lineHeight: 1.15,
-                  mb: 1.5,
-                }}
-              >
-                Trusted Home Service Support Across the Region
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                  color: 'rgba(255,255,255,0.78)',
-                  fontSize: { xs: '0.95rem', md: '1.05rem' },
-                  lineHeight: 1.7,
-                  maxWidth: 580,
-                  mx: { xs: 'auto', md: 0 },
-                  mb: 2.5,
-                }}
-              >
-                Smart Appliances helps customers schedule appliance, HVAC, plumbing, electrical, smart home, and
-                garage door services with clear communication and convenient request tracking.
-              </Typography>
-
-              <Box
-                component="ul"
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, auto)' },
-                  gap: 1,
-                  justifyContent: { xs: 'center', md: 'flex-start' },
-                  mb: 3,
-                  p: 0,
-                  listStyle: 'none',
-                }}
-              >
-                {ABOUT_TRUST_POINTS.map((point) => (
-                  <Box component="li" key={point} sx={{ display: 'flex', alignItems: 'center', gap: 0.75, justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                    <CheckCircleOutlineIcon sx={{ fontSize: 17, color: '#4FC3F7', flexShrink: 0 }} aria-hidden="true" />
-                    <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem', color: '#FFFFFF' }}>
-                      {point}
-                    </Typography>
-                  </Box>
-                ))}
+            {ABOUT_TRUST_POINTS.map((point) => (
+              <Box component="li" key={point} sx={{ display: 'flex', alignItems: 'center', gap: 0.75, justifyContent: { xs: 'center', md: 'flex-start' } }}>
+                <CheckCircleOutlineIcon sx={{ fontSize: 17, color: '#4FC3F7', flexShrink: 0 }} aria-hidden="true" />
+                <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem', color: '#FFFFFF' }}>
+                  {point}
+                </Typography>
               </Box>
-
-              <Button
-                variant="contained"
-                onClick={() => navigate('/book/regular')}
-                sx={{
-                  backgroundColor: '#1A73E8',
-                  color: '#FFFFFF',
-                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                  fontWeight: 700,
-                  px: 3.5,
-                  py: 1.25,
-                  borderRadius: '14px',
-                  textTransform: 'none',
-                  fontSize: '0.95rem',
-                  '&:hover': { backgroundColor: '#FFFFFF', color: '#0B3D91' },
-                }}
-              >
-                Book a Service
-              </Button>
-            </Box>
-
-            <Box sx={{ width: '100%', maxWidth: { xs: 420, md: 460 }, mx: { xs: 'auto', md: 0 }, display: { xs: 'none', sm: 'block' } }}>
-              <Box sx={{ borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)' }}>
-                <HeroIllustration variant="about" title="Smart Appliances team of technicians serving local homes" />
-              </Box>
-            </Box>
+            ))}
           </Box>
-        </Container>
-      </Box>
+        }
+        primaryAction={{ label: 'Book a Service', onClick: () => navigate('/book/regular') }}
+        imageSrc={PAGE_HERO_PHOTOS.about.src}
+        imageAlt={PAGE_HERO_PHOTOS.about.alt}
+        imageAspectRatio={PAGE_HERO_PHOTOS.about.aspectRatio}
+        imageObjectPosition={PAGE_HERO_PHOTOS.about.objectPosition}
+      />
 
       {/* ── Our Mission ── */}
       <Box sx={{ py: { xs: 8, md: 10 }, backgroundColor: '#FFFFFF' }}>

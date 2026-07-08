@@ -5,7 +5,6 @@ import {
   Typography,
   Container,
   Button,
-  Chip,
 } from '@mui/material';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
@@ -41,7 +40,7 @@ import {
 import MembershipPlanCard from '../components/membership/MembershipPlanCard';
 import MembershipComparisonTable from '../components/membership/MembershipComparisonTable';
 import MembershipFaq from '../components/membership/MembershipFaq';
-import HeroIllustration from '../components/illustrations/HeroIllustration';
+import PageHero from '../components/common/PageHero';
 
 const TRUST_BADGES = [
   { label: 'Priority Scheduling', icon: BoltOutlinedIcon },
@@ -114,143 +113,33 @@ const MembershipPage: React.FC = () => {
 
   return (
     <Box sx={{ backgroundColor: colors.background, pb: 2 }}>
-      {/* Hero */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          py: { xs: 5, md: 7 },
-          px: 2,
-        }}
-      >
-        <Container maxWidth={false} sx={{ maxWidth: '1180px', mx: 'auto', width: '100%' }}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(340px, 0.85fr)' },
-              alignItems: 'center',
-              gap: { xs: 4, md: 6 },
-            }}
-          >
-            {/* Left — copy */}
-            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-              <ShieldOutlinedIcon
-                sx={{ fontSize: 36, color: colors.skyBlue, mb: 1.5, display: { xs: 'inline-block', md: 'block' } }}
-              />
-              <Typography
-                component="h1"
-                sx={{
-                  fontFamily: fonts.heading,
-                  fontWeight: 800,
-                  fontSize: { xs: '1.8rem', md: '2.4rem' },
-                  color: colors.white,
-                  lineHeight: 1.15,
-                  mb: 1.5,
-                }}
-              >
-                Protect Your Home with Smart Care
-              </Typography>
-              <Typography
-                sx={{
-                  fontFamily: fonts.body,
-                  fontSize: { xs: '0.95rem', md: '1.05rem' },
-                  color: 'rgba(255,255,255,0.78)',
-                  lineHeight: 1.7,
-                  maxWidth: 580,
-                  mx: { xs: 'auto', md: 0 },
-                  mb: 2.5,
-                }}
-              >
-                Priority scheduling, repair savings, seasonal reminders, and member-only service
-                benefits for your appliances and home systems.
-              </Typography>
-
-              <Box
-                component="ul"
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1,
-                  justifyContent: { xs: 'center', md: 'flex-start' },
-                  mb: 3,
-                  p: 0,
-                  listStyle: 'none',
-                }}
-              >
-                {TRUST_BADGES.map(({ label, icon: Icon }) => (
-                  <Box component="li" key={label} sx={{ display: 'inline-flex' }}>
-                    <Chip
-                      icon={<Icon sx={{ fontSize: 16, color: '#fff !important' }} />}
-                      label={label}
-                      sx={{
-                        backgroundColor: 'rgba(255,255,255,0.12)',
-                        color: '#fff',
-                        fontFamily: fonts.body,
-                        fontWeight: 600,
-                        fontSize: '12.5px',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                      }}
-                    />
-                  </Box>
-                ))}
-              </Box>
-
-              <Box sx={{ display: 'flex', gap: 1.5, justifyContent: { xs: 'center', md: 'flex-start' }, flexWrap: 'wrap' }}>
-                <Button
-                  variant="contained"
-                  onClick={scrollToPlans}
-                  sx={{ ...primaryButtonSx, px: 3.5, py: 1.25 }}
-                >
-                  Join Smart Care
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={scrollToComparison}
-                  sx={{
-                    ...secondaryButtonSx,
-                    background: 'transparent',
-                    borderColor: 'rgba(255,255,255,0.5)',
-                    color: colors.white,
-                    px: 3.5,
-                    py: 1.25,
-                    '&:hover': { background: 'rgba(255,255,255,0.08)', borderColor: colors.white },
-                  }}
-                >
-                  Explore Plans
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Right — hero image + benefits card, treated as one visual column */}
-            <Box sx={{ width: '100%', maxWidth: { xs: 420, md: 460 }, mx: { xs: 'auto', md: 0 } }}>
-              <Box sx={{ mb: 2, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
-                <HeroIllustration variant="membership" title="Smart Care membership protecting a home with priority technician support" />
-              </Box>
-              <Box
-                sx={{
-                  backgroundColor: '#fff',
-                  borderRadius: '20px',
-                  p: { xs: 3, md: 3.5 },
-                  boxShadow: '0 20px 48px rgba(0,0,0,0.24)',
-                }}
-              >
-                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.1rem', color: colors.navy, mb: 2 }}>
-                  Smart Care Benefits
-                </Typography>
-                <Box component="ul" sx={{ display: 'grid', gap: 1.5, m: 0, p: 0, listStyle: 'none' }}>
-                  {HERO_BENEFITS.map((benefit) => (
-                    <Box component="li" key={benefit} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                      <CheckCircleOutlineIcon sx={{ fontSize: 19, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} aria-hidden="true" />
-                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.darkText, lineHeight: 1.5 }}>
-                        {benefit}
-                      </Typography>
-                    </Box>
-                  ))}
+      <PageHero
+        title="Protect Your Home with Smart Care"
+        subtitle="Priority scheduling, repair savings, seasonal reminders, and member-only service benefits for your appliances and home systems."
+        badges={TRUST_BADGES.map(({ label, icon: Icon }) => ({
+          label,
+          icon: <Icon sx={{ fontSize: 16 }} />,
+        }))}
+        primaryAction={{ label: 'Join Smart Care', onClick: scrollToPlans }}
+        secondaryAction={{ label: 'Explore Plans', onClick: scrollToComparison }}
+        illustration="membership"
+        imageAlt="Smart Care membership protecting a home with priority technician support"
+        infoCard={{
+          title: 'Smart Care Benefits',
+          children: (
+            <Box component="ul" sx={{ display: 'grid', gap: 1.5, m: 0, p: 0, listStyle: 'none' }}>
+              {HERO_BENEFITS.map((benefit) => (
+                <Box component="li" key={benefit} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                  <CheckCircleOutlineIcon sx={{ fontSize: 19, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} aria-hidden="true" />
+                  <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.darkText, lineHeight: 1.5 }}>
+                    {benefit}
+                  </Typography>
                 </Box>
-              </Box>
+              ))}
             </Box>
-          </Box>
-        </Container>
-      </Box>
+          ),
+        }}
+      />
 
       {/* Why Smart Care */}
       <Box sx={{ py: sectionPy }}>

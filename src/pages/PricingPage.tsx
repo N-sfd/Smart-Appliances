@@ -59,7 +59,7 @@ import {
   formatStartingPrice,
   type PriceEstimate,
 } from '../data/pricingData';
-import HeroIllustration from '../components/illustrations/HeroIllustration';
+import PageHero from '../components/common/PageHero';
 
 const CATEGORY_ICONS: Record<PricingCategoryId, LucideIcon> = {
   appliances: Refrigerator,
@@ -257,122 +257,49 @@ const PricingPage: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
-      {/* Hero */}
-      <Box
-        sx={{
-          py: { xs: 5, md: 7 },
-          px: 2,
-          background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-        }}
-      >
-        <Container maxWidth={false} sx={{ maxWidth: '1180px', mx: 'auto', width: '100%' }}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(340px, 0.85fr)' },
-              alignItems: 'center',
-              gap: { xs: 4, md: 6 },
-            }}
-          >
-            {/* Left — copy */}
-            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-              <Typography
-                variant="h1"
-                sx={{
-                  fontFamily: fonts.heading,
-                  fontWeight: 800,
-                  color: '#FFFFFF',
-                  fontSize: { xs: '1.85rem', md: '2.4rem' },
-                  mb: 1.5,
-                  lineHeight: 1.15,
-                }}
-              >
-                Clear, Upfront Home Service Pricing
-              </Typography>
+      <PageHero
+        title="Clear, Upfront Home Service Pricing"
+        subtitle="See starting service call fees and estimated costs for appliance, HVAC, plumbing, electrical, smart home, and garage door services before you book."
+        primaryAction={{ label: 'Book a Service', onClick: () => navigate('/scheduler') }}
+        secondaryAction={{ label: 'Get an Estimate', onClick: scrollToEstimator }}
+        illustration="pricing"
+        imageAlt="Transparent service pricing with a technician estimate before work begins"
+        infoCard={{
+          title: 'Typical Service Visit',
+          children: (
+            <>
+              <Box component="ul" sx={{ display: 'grid', gap: 1.5, m: 0, p: 0, listStyle: 'none' }}>
+                {[
+                  'Service calls typically start from $79',
+                  'Same-day priority available',
+                  'Final price confirmed before work begins',
+                  'Request ID tracking included',
+                ].map((row) => (
+                  <Box component="li" key={row} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                    <CheckCircleOutlineIcon sx={{ fontSize: 19, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} aria-hidden="true" />
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.darkText, lineHeight: 1.5 }}>
+                      {row}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
               <Typography
                 sx={{
                   fontFamily: fonts.body,
-                  color: 'rgba(255,255,255,0.85)',
-                  fontSize: { xs: '0.95rem', md: '1.05rem' },
-                  lineHeight: 1.7,
-                  maxWidth: 580,
-                  mx: { xs: 'auto', md: 0 },
-                  mb: 3,
+                  fontSize: '0.75rem',
+                  color: colors.mutedText,
+                  lineHeight: 1.55,
+                  mt: 2,
+                  pt: 1.5,
+                  borderTop: `1px solid ${colors.border}`,
                 }}
               >
-                See starting service call fees and estimated costs for appliance, HVAC, plumbing,
-                electrical, smart home, and garage door services before you book.
+                Starting prices vary by service type, location, urgency, parts, and on-site assessment.
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1.5, justifyContent: { xs: 'center', md: 'flex-start' }, flexWrap: 'wrap' }}>
-                <Button onClick={() => navigate('/scheduler')} sx={{ ...primaryButtonSx, px: 3.5, py: 1.25 }}>
-                  Book a Service
-                </Button>
-                <Button
-                  onClick={scrollToEstimator}
-                  sx={{
-                    ...secondaryButtonSx,
-                    background: 'transparent',
-                    borderColor: 'rgba(255,255,255,0.5)',
-                    color: '#FFFFFF',
-                    px: 3.5,
-                    py: 1.25,
-                    '&:hover': { background: 'rgba(255,255,255,0.1)', borderColor: '#fff' },
-                  }}
-                >
-                  Get an Estimate
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Right — hero image + trust summary card, treated as one visual column */}
-            <Box sx={{ width: '100%', maxWidth: { xs: 420, md: 460 }, mx: { xs: 'auto', md: 0 } }}>
-              <Box sx={{ mb: 2, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
-                <HeroIllustration variant="pricing" title="Transparent service pricing with a technician estimate before work begins" />
-              </Box>
-              <Box
-                sx={{
-                  backgroundColor: '#fff',
-                  borderRadius: '20px',
-                  p: { xs: 3, md: 3.5 },
-                  boxShadow: '0 20px 48px rgba(0,0,0,0.24)',
-                }}
-              >
-                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.1rem', color: colors.navy, mb: 2 }}>
-                  Typical Service Visit
-                </Typography>
-                <Box component="ul" sx={{ display: 'grid', gap: 1.5, m: 0, p: 0, listStyle: 'none' }}>
-                  {[
-                    'Service calls typically start from $79',
-                    'Same-day priority available',
-                    'Final price confirmed before work begins',
-                    'Request ID tracking included',
-                  ].map((row) => (
-                    <Box component="li" key={row} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                      <CheckCircleOutlineIcon sx={{ fontSize: 19, color: colors.primaryBlue, mt: '1px', flexShrink: 0 }} aria-hidden="true" />
-                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.darkText, lineHeight: 1.5 }}>
-                        {row}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-                <Typography
-                  sx={{
-                    fontFamily: fonts.body,
-                    fontSize: '0.75rem',
-                    color: colors.mutedText,
-                    lineHeight: 1.55,
-                    mt: 2,
-                    pt: 1.5,
-                    borderTop: `1px solid ${colors.border}`,
-                  }}
-                >
-                  Starting prices vary by service type, location, urgency, parts, and on-site assessment.
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        </Container>
-      </Box>
+            </>
+          ),
+        }}
+      />
 
       <TransparentPricingSection />
 

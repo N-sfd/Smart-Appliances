@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
@@ -7,16 +7,23 @@ import {
   Button,
   TextField,
   FormControl,
-  InputLabel,
+  FormLabel,
   Select,
   MenuItem,
   SelectChangeEvent,
   Card,
   CardContent,
   Alert,
+  AlertTitle,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
+  Checkbox,
+  CircularProgress,
 } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckIcon from '@mui/icons-material/Check';
 import { serviceCategories, urgencyOptions, ServiceRequest } from '../data/services';
 import { getServiceImage } from '../data/serviceImages';
 import {
@@ -32,9 +39,18 @@ interface EmergencyBookingState {
   serviceType?: string;
 }
 
+const NAVY = '#0B3D91';
+const RED = '#EF4444';
+const RED_DARK = '#DC2626';
+const PAGE_BG = '#F5F7FB';
+const BORDER = '#E4E7EB';
+const MUTED = '#64748B';
+
+type YesNo = '' | 'Yes' | 'No';
+
 const STEPS = [
   { num: 1, label: 'Emergency Details' },
-  { num: 2, label: 'Contact Info' },
+  { num: 2, label: 'Contact Information' },
 ] as const;
 
 const EmergencyBookingPage: React.FC = () => {
@@ -51,6 +67,10 @@ const EmergencyBookingPage: React.FC = () => {
   const [serviceTypeId, setServiceTypeId] = useState(initServiceId);
   const [urgencyLevel, setUrgencyLevel] = useState(urgencyOptions[0]);
   const [issueDesc, setIssueDesc] = useState('');
+  const [happeningNow, setHappeningNow] = useState<YesNo>('');
+  const [activeHazard, setActiveHazard] = useState<YesNo>('');
+  const [immediateDanger, setImmediateDanger] = useState<YesNo>('');
+  const [acknowledged, setAcknowledged] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -60,30 +80,17 @@ const EmergencyBookingPage: React.FC = () => {
   const [zipCode, setZipCode] = useState('');
   const [zipTouched, setZipTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [requestId, setRequestId] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [stepBlockedHint, setStepBlockedHint] = useState('');
-  const formRef = useRef<HTMLDivElement>(null);
-  const issueDescRef = useRef<HTMLTextAreaElement>(null);
+  const [showStepErrors, setShowStepErrors] = useState(false);
 
   const selectedCategory = serviceCategories.find((c) => c.id === categoryId) ?? serviceCategories[0];
   const zipValidation = validateZipCode(zipCode);
-  const canAccessStep = (targetStep: number) => targetStep === 1 || issueDesc.trim().length > 0;
 
-  const goToStep = (targetStep: number) => {
-    if (canAccessStep(targetStep)) {
-      setStepBlockedHint('');
-      setStep(targetStep);
-      return;
-    }
-    setStepBlockedHint('Please describe the emergency before continuing to contact info.');
-    issueDescRef.current?.focus();
-    issueDescRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
-
-  useEffect(() => {
-    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [step]);
+  const descMissing = !issueDesc.trim();
+  const ackMissing = !acknowledged;
+  const step1Valid = !descMissing && !ackMissing;
 
   const handleCategoryChange = (e: SelectChangeEvent<string>) => {
     const cat = serviceCategories.find((c) => c.id === e.target.value) ?? serviceCategories[0];
@@ -91,12 +98,29 @@ const EmergencyBookingPage: React.FC = () => {
     setServiceTypeId(cat.services[0].id);
   };
 
+  const handleContinue = () => {
+    if (!step1Valid) {
+      setShowStepErrors(true);
+      return;
+    }
+    setShowStepErrors(false);
+    setStep(2);
+  };
+
   const handleSubmit = async () => {
     setSubmitError('');
     setIsSubmitting(true);
 
+    const newId = `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const triageNotes = [
+      `Happening now: ${happeningNow || 'Not specified'}`,
+      `Active water/smoke/sparks/burning smell: ${activeHazard || 'Not specified'}`,
+      `Anyone in immediate danger: ${immediateDanger || 'Not specified'}`,
+      `Acknowledged non-emergency-service notice: ${acknowledged ? 'Yes' : 'No'}`,
+    ].join(' | ');
+
     const request: ServiceRequest = {
-      id: `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      id: newId,
       customerName: name,
       email,
       phone,
@@ -115,7 +139,7 @@ const EmergencyBookingPage: React.FC = () => {
       estimatedDuration: null,
       safetyNotes: 'Turn off the appliance immediately. If you smell gas or see smoke, evacuate and call 911.',
       hasSafetyConcern: true,
-      applianceStillRunning: null,
+      applianceStillRunning: happeningNow === 'Yes' ? true : happeningNow === 'No' ? false : null,
       issueStartDate: null,
       preferredDate: null,
       preferredTime: null,
@@ -126,7 +150,7 @@ const EmergencyBookingPage: React.FC = () => {
       applianceBrand: null,
       applianceModel: null,
       imageUrl: null,
-      notes: null,
+      notes: triageNotes,
       emergencyBadge: true,
       assignedTechnicianId: null,
       technicianStatus: null,
@@ -137,6 +161,7 @@ const EmergencyBookingPage: React.FC = () => {
 
     try {
       await saveServiceRequest(request);
+      setRequestId(newId);
       setSubmitted(true);
     } catch (error) {
       console.error('Emergency booking error:', error);
@@ -148,252 +173,314 @@ const EmergencyBookingPage: React.FC = () => {
 
   if (submitted) {
     return (
-      <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF8F8', py: 6 }}>
+      <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: PAGE_BG, py: 6 }}>
         <Container maxWidth="sm">
-          <Card sx={{ borderRadius: '20px', border: '2px solid #EF4444', boxShadow: 'none', textAlign: 'center', p: 4 }}>
-            <CheckCircleIcon sx={{ fontSize: 72, color: '#EF4444', mb: 2 }} />
-            <Typography variant="h4" sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 1.5 }}>
-              Emergency Request Sent!
+          <Card sx={{ borderRadius: '20px', border: `1px solid ${BORDER}`, boxShadow: '0 18px 40px rgba(10,37,64,0.10)', textAlign: 'center', p: { xs: 3, md: 4 } }}>
+            <CheckCircleIcon sx={{ fontSize: 64, color: '#16A34A', mb: 2 }} />
+            <Typography variant="h5" sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", fontWeight: 800, color: NAVY, mb: 1 }}>
+              Emergency Request Received
             </Typography>
-            <Typography variant="body1" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', mb: 1.5 }}>
-              Your emergency request has been received. Our team will contact you within minutes.
+            <Typography variant="body1" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#1A1A1A', mb: 2 }}>
+              Our team will review your request and reach out as soon as possible.
             </Typography>
-            <Typography variant="body2" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#EA580C', fontWeight: 600, mb: 3 }}>
-              For life-threatening emergencies, call 911 immediately.
-            </Typography>
-            <Button
-              variant="contained"
-              onClick={() => navigate('/')}
-              sx={{
-                backgroundColor: '#EF4444',
-                color: '#FFFFFF',
-                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                fontWeight: 700,
-                px: 4,
-                py: 1.5,
-                borderRadius: '10px',
-                textTransform: 'none',
-                '&:hover': { backgroundColor: '#EA580C' },
-              }}
-            >
-              Back to Home
-            </Button>
+            {requestId ? (
+              <Box sx={{ backgroundColor: PAGE_BG, border: `1px solid ${BORDER}`, borderRadius: '12px', py: 1.5, px: 2, mb: 2.5 }}>
+                <Typography sx={{ fontSize: '0.8rem', color: MUTED, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  Your request ID
+                </Typography>
+                <Typography sx={{ fontFamily: "'Inter', monospace", fontWeight: 700, color: NAVY, fontSize: '1.05rem', wordBreak: 'break-all' }}>
+                  {requestId}
+                </Typography>
+                <Typography sx={{ fontSize: '0.8rem', color: MUTED, mt: 0.5 }}>
+                  Keep this ID to track your request.
+                </Typography>
+              </Box>
+            ) : null}
+            <Alert severity="error" sx={{ textAlign: 'left', borderRadius: '10px', mb: 3 }}>
+              For life-threatening emergencies, call <strong>911</strong> immediately.
+            </Alert>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, justifyContent: 'center' }}>
+              <Button
+                variant="outlined"
+                onClick={() => navigate('/track-request')}
+                sx={{ borderColor: NAVY, color: NAVY, fontWeight: 700, px: 3, py: 1.25, borderRadius: '10px', textTransform: 'none' }}
+              >
+                Track Request
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => navigate('/')}
+                sx={{ backgroundColor: NAVY, color: '#FFFFFF', fontWeight: 700, px: 3, py: 1.25, borderRadius: '10px', textTransform: 'none', '&:hover': { backgroundColor: '#092E6E' } }}
+              >
+                Back to Home
+              </Button>
+            </Box>
           </Card>
         </Container>
       </Box>
     );
   }
 
+  const labelSx = { fontSize: '0.875rem', fontWeight: 700, color: NAVY, mb: 0.75 } as const;
+  const helperSx = { fontSize: '0.8rem', color: MUTED, mb: 1 } as const;
+
+  const TriageQuestion = ({
+    legend,
+    value,
+    onChange,
+    danger,
+  }: {
+    legend: string;
+    value: YesNo;
+    onChange: (v: YesNo) => void;
+    danger?: boolean;
+  }) => (
+    <FormControl component="fieldset" sx={{ display: 'block' }}>
+      <FormLabel component="legend" sx={{ fontSize: '0.875rem', fontWeight: 600, color: '#1A1A1A', '&.Mui-focused': { color: NAVY } }}>
+        {legend}
+      </FormLabel>
+      <RadioGroup row value={value} onChange={(e) => onChange(e.target.value as YesNo)} sx={{ mt: 0.5 }}>
+        <FormControlLabel value="Yes" control={<Radio size="small" sx={{ color: danger ? RED : NAVY, '&.Mui-checked': { color: danger ? RED : NAVY } }} />} label="Yes" />
+        <FormControlLabel value="No" control={<Radio size="small" sx={{ color: NAVY, '&.Mui-checked': { color: NAVY } }} />} label="No" />
+      </RadioGroup>
+    </FormControl>
+  );
+
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundColor: '#FFF8F8',
+        backgroundColor: PAGE_BG,
         backgroundImage:
-          'linear-gradient(180deg, rgba(255,248,248,0.90) 0%, rgba(255,248,248,0.94) 100%), url(/images/services/emergency-bg.png)',
+          'linear-gradient(180deg, rgba(245,247,251,0.94) 0%, rgba(245,247,251,0.97) 100%), url(/images/services/emergency-bg.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
         backgroundRepeat: 'no-repeat',
-        py: 6,
+        py: { xs: 4, md: 6 },
       }}
     >
-      <Container maxWidth="md">
+      <Container maxWidth="md" sx={{ maxWidth: { md: 980 } }}>
         {/* Header */}
-        <Box sx={{ textAlign: 'center', mb: 5 }}>
-          <WarningAmberIcon sx={{ fontSize: 52, color: '#EF4444', mb: 2 }} />
+        <Box sx={{ textAlign: 'center', mb: 3, maxWidth: 680, mx: 'auto' }}>
           <Typography
-            variant="h3"
-            sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 1 }}
+            component="h1"
+            sx={{
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              fontWeight: 800,
+              color: NAVY,
+              fontSize: { xs: '2.15rem', md: '3rem' },
+              lineHeight: 1.1,
+              mb: 1,
+            }}
           >
             Emergency Service Request
           </Typography>
-          <Typography variant="body1" sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: '#666666', mb: 2 }}>
-            For urgent issues that require immediate attention.
+          <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: MUTED, fontSize: { xs: '1rem', md: '1.15rem' } }}>
+            For urgent home-service issues that need prompt attention.
           </Typography>
-          <Alert
-            severity="error"
-            icon={<WarningAmberIcon />}
-            sx={{ borderRadius: '10px', backgroundColor: '#FFEBEE', border: '1px solid #FFCDD2', maxWidth: '500px', margin: '0 auto' }}
-          >
-            If you smell gas, see smoke, or have a life-threatening emergency — call 911 immediately.
-          </Alert>
         </Box>
 
-        {/* Step indicators */}
-        <Box
+        {/* Critical safety alert */}
+        <Alert
+          severity="error"
+          icon={<WarningAmberIcon />}
           sx={{
-            display: 'flex',
+            maxWidth: 720,
+            mx: 'auto',
+            mb: 3,
+            borderRadius: '12px',
+            border: `1px solid ${RED}`,
+            backgroundColor: '#FEF2F2',
             alignItems: 'flex-start',
-            justifyContent: 'center',
-            mb: stepBlockedHint ? 1.5 : 5,
-            px: { xs: 0, sm: 1 },
+            '& .MuiAlert-message': { textAlign: 'left' },
           }}
         >
-          {STEPS.map((s, index) => {
-            const isActive = step === s.num;
-            const isComplete = step > s.num;
-            const isHighlighted = isActive || isComplete;
-            const canNavigate = canAccessStep(s.num);
-            return (
-              <React.Fragment key={s.num}>
-                <Button
-                  type="button"
-                  onClick={() => goToStep(s.num)}
-                  aria-label={`Step ${s.num}: ${s.label}`}
-                  aria-current={isActive ? 'step' : undefined}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 0.75,
-                    minWidth: { xs: 88, sm: 120, md: 140 },
-                    flex: index === STEPS.length - 1 ? '0 0 auto' : undefined,
-                    p: 0,
-                    minHeight: 0,
-                    textTransform: 'none',
-                    borderRadius: '12px',
-                    color: 'inherit',
-                    cursor: 'pointer',
-                    opacity: !canNavigate && !isActive ? 0.65 : 1,
-                    '&:hover': {
-                      backgroundColor: 'rgba(239,68,68,0.06)',
-                    },
-                  }}
-                >
+          <AlertTitle sx={{ fontWeight: 800, color: RED_DARK, mb: 0.5 }}>Immediate danger?</AlertTitle>
+          Call <strong>911</strong> immediately if you smell gas, see smoke or fire, notice electrical arcing, or believe
+          anyone is in immediate danger.
+          <Box component="span" sx={{ display: 'block', mt: 0.75, fontSize: '0.85rem', color: MUTED }}>
+            Smart Appliances is not an emergency response service.
+          </Box>
+        </Alert>
+
+        {/* Compact progress card */}
+        <Card
+          sx={{
+            maxWidth: 820,
+            mx: 'auto',
+            mb: 3,
+            borderRadius: '14px',
+            border: `1px solid ${BORDER}`,
+            boxShadow: '0 6px 18px rgba(10,37,64,0.06)',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 1.5, sm: 2.5 }, py: 2, px: { xs: 2, sm: 3 } }}>
+            {STEPS.map((s, index) => {
+              const isActive = step === s.num;
+              const isComplete = step > s.num;
+              const canNavigate = s.num === 1 || step1Valid;
+              const onClick = () => {
+                if (s.num === 1) {
+                  setStep(1);
+                } else {
+                  handleContinue();
+                }
+              };
+              return (
+                <React.Fragment key={s.num}>
                   <Box
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Step ${s.num}: ${s.label}`}
+                    aria-current={isActive ? 'step' : undefined}
+                    onClick={onClick}
+                    onKeyDown={(e: React.KeyboardEvent) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onClick();
+                      }
+                    }}
                     sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                      fontWeight: 700,
-                      fontSize: '0.95rem',
-                      backgroundColor: isHighlighted ? '#EF4444' : '#E4E7EB',
-                      color: isHighlighted ? '#FFFFFF' : '#999999',
-                      boxShadow: isActive ? '0 0 0 4px rgba(239,68,68,0.18)' : 'none',
-                      transition: 'background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease',
-                      transform: isActive ? 'scale(1.05)' : 'none',
+                      gap: 1,
+                      cursor: 'pointer',
+                      borderRadius: '10px',
+                      p: 0.5,
+                      outline: 'none',
+                      opacity: canNavigate || isActive ? 1 : 0.6,
+                      '&:focus-visible': { boxShadow: `0 0 0 3px rgba(11,61,145,0.3)` },
                     }}
                   >
-                    {s.num}
+                    <Box
+                      sx={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: '50%',
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        backgroundColor: isActive ? RED : isComplete ? '#16A34A' : '#E4E7EB',
+                        color: isActive || isComplete ? '#FFFFFF' : '#94A3B8',
+                        transition: 'background-color 0.2s ease',
+                      }}
+                    >
+                      {isComplete ? <CheckIcon sx={{ fontSize: 18 }} /> : s.num}
+                    </Box>
+                    <Typography
+                      sx={{
+                        fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                        fontWeight: isActive ? 800 : 600,
+                        fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                        color: isActive ? RED : isComplete ? '#16A34A' : MUTED,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {s.label}
+                    </Typography>
                   </Box>
-                  <Typography
-                    sx={{
-                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                      fontWeight: isActive ? 700 : 500,
-                      fontSize: { xs: '11px', sm: '12px', md: '13px' },
-                      color: isActive ? '#EF4444' : '#64748B',
-                      textAlign: 'center',
-                      lineHeight: 1.25,
-                    }}
-                  >
-                    {s.label}
-                  </Typography>
-                </Button>
-                {index < STEPS.length - 1 && (
-                  <Box
-                    sx={{
-                      flex: 1,
-                      height: 2,
-                      backgroundColor: step > s.num ? '#EF4444' : '#E4E7EB',
-                      mt: '20px',
-                      mx: { xs: 0.5, sm: 1 },
-                      minWidth: { xs: 32, sm: 48 },
-                      transition: 'background-color 0.2s ease',
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </Box>
-        {stepBlockedHint ? (
-          <Alert severity="warning" sx={{ maxWidth: 520, mx: 'auto', mb: 3, borderRadius: '10px' }}>
-            {stepBlockedHint}
-          </Alert>
-        ) : null}
+                  {index < STEPS.length - 1 && (
+                    <Box
+                      sx={{
+                        width: { xs: 28, sm: 56 },
+                        height: 4,
+                        borderRadius: 2,
+                        backgroundColor: step > s.num ? '#16A34A' : '#E4E7EB',
+                        transition: 'background-color 0.2s ease',
+                      }}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </Box>
+        </Card>
 
-        <Card
-          ref={formRef}
-          sx={{ borderRadius: '20px', border: '2px solid #FFE5E5', boxShadow: 'none', backgroundColor: '#FFFFFF' }}
-        >
-          <CardContent sx={{ p: { xs: 3, md: 5 } }}>
+        {/* Intake card */}
+        <Card sx={{ maxWidth: 820, mx: 'auto', borderRadius: '18px', border: `1px solid ${BORDER}`, boxShadow: '0 18px 40px rgba(10,37,64,0.08)', backgroundColor: '#FFFFFF' }}>
+          <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
             {step === 1 && (
               <Box>
-                <Typography variant="h5" sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 3 }}>
-                  Step 1: Describe Your Emergency
+                <Typography sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", fontWeight: 800, color: NAVY, fontSize: '1.4rem', mb: 0.5 }}>
+                  Tell us what happened
+                </Typography>
+                <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: MUTED, fontSize: '0.95rem', mb: 3 }}>
+                  Provide enough detail so our team can understand the urgency and determine the appropriate next step.
                 </Typography>
 
                 {/* Dynamic service image banner */}
                 {(() => {
                   const info = getServiceImage(serviceTypeId, categoryId);
                   return (
-                    <Box sx={{ mb: 3, borderRadius: '20px', border: '2px solid #FFE5E5', overflow: 'hidden', boxShadow: '0 12px 30px rgba(239,68,68,0.08)', transition: 'all 0.3s ease' }}>
-                      <Box component="img" src={info.image} alt={info.title} sx={{ width: '100%', height: 200, objectFit: 'cover', display: 'block', transition: 'opacity 0.3s ease' }} />
-                      <Box sx={{ p: '16px 18px', backgroundColor: '#FFF8F8' }}>
-                        <Typography sx={{ fontSize: '20px', fontWeight: 700, color: '#0B3D91', lineHeight: 1.2 }}>{info.title}</Typography>
-                        <Typography sx={{ fontSize: '14px', color: '#64748B', mt: '4px', lineHeight: 1.5 }}>{info.desc}</Typography>
+                    <Box sx={{ mb: 3, borderRadius: '14px', border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
+                      <Box component="img" src={info.image} alt={info.title} sx={{ width: '100%', height: 150, objectFit: 'cover', display: 'block' }} />
+                      <Box sx={{ p: '12px 16px', backgroundColor: PAGE_BG }}>
+                        <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: NAVY, lineHeight: 1.2 }}>{info.title}</Typography>
+                        <Typography sx={{ fontSize: '0.85rem', color: MUTED, mt: '2px', lineHeight: 1.5 }}>{info.desc}</Typography>
                       </Box>
                     </Box>
                   );
                 })()}
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Urgency Level *</InputLabel>
-                    <Select
-                      value={urgencyLevel}
-                      onChange={(e: SelectChangeEvent<string>) => setUrgencyLevel(e.target.value)}
-                      label="Urgency Level *"
-                    >
-                      {urgencyOptions.map((opt) => (
-                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl fullWidth>
-                    <InputLabel>Service Category</InputLabel>
-                    <Select value={categoryId} onChange={handleCategoryChange} label="Service Category">
-                      {serviceCategories.map((cat) => (
-                        <MenuItem key={cat.id} value={cat.id}>{cat.title}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl fullWidth>
-                    <InputLabel>Specific Issue</InputLabel>
-                    <Select
-                      value={serviceTypeId}
-                      onChange={(e: SelectChangeEvent<string>) => setServiceTypeId(e.target.value)}
-                      label="Specific Issue"
-                    >
-                      {selectedCategory.services.map((s) => (
-                        <MenuItem key={s.id} value={s.id}>{s.label}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: '#1A1A1A' }}>
-                      Describe the Emergency *
+                  <Box>
+                    <Typography sx={labelSx}>Urgency Level *</Typography>
+                    <FormControl fullWidth>
+                      <Select value={urgencyLevel} onChange={(e: SelectChangeEvent<string>) => setUrgencyLevel(e.target.value)}>
+                        {urgencyOptions.map((opt) => (
+                          <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                    <Box>
+                      <Typography sx={labelSx}>Emergency Category *</Typography>
+                      <FormControl fullWidth>
+                        <Select value={categoryId} onChange={handleCategoryChange}>
+                          {serviceCategories.map((cat) => (
+                            <MenuItem key={cat.id} value={cat.id}>{cat.title}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    <Box>
+                      <Typography sx={labelSx}>Specific Issue *</Typography>
+                      <FormControl fullWidth>
+                        <Select value={serviceTypeId} onChange={(e: SelectChangeEvent<string>) => setServiceTypeId(e.target.value)}>
+                          {selectedCategory.services.map((s) => (
+                            <MenuItem key={s.id} value={s.id}>{s.label}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Box>
+
+                  <Box>
+                    <Typography component="label" htmlFor="emergency-desc" sx={labelSx}>
+                      Describe the urgent issue *
                     </Typography>
+                    <Typography sx={helperSx}>Include what you see, hear, smell, or what stopped working.</Typography>
                     <Box
+                      id="emergency-desc"
                       component="textarea"
-                      ref={issueDescRef}
                       value={issueDesc}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                        setIssueDesc(e.target.value);
-                        if (e.target.value.trim()) setStepBlockedHint('');
-                      }}
-                      placeholder="Please describe what's happening in as much detail as possible."
+                      aria-describedby="emergency-desc-error"
+                      aria-invalid={showStepErrors && descMissing}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setIssueDesc(e.target.value)}
+                      placeholder="Example: Water is leaking under the kitchen sink and spreading across the floor."
                       sx={{
                         width: '100%',
-                        minHeight: '120px',
-                        padding: '16px',
-                        border: '1px solid #E4E7EB',
-                        borderRadius: '16px',
+                        minHeight: '150px',
+                        padding: '14px 16px',
+                        border: `1px solid ${showStepErrors && descMissing ? RED : BORDER}`,
+                        borderRadius: '12px',
                         fontSize: '16px',
                         lineHeight: 1.5,
                         color: '#1A1A1A',
@@ -402,30 +489,81 @@ const EmergencyBookingPage: React.FC = () => {
                         fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                         outline: 'none',
                         boxSizing: 'border-box',
-                        '&:focus': { borderColor: '#EF4444', boxShadow: '0 0 0 4px rgba(239,68,68,0.12)' },
+                        '&:focus': { borderColor: NAVY, boxShadow: `0 0 0 4px rgba(11,61,145,0.12)` },
                         '&::placeholder': { color: '#9AA5B1' },
                       }}
                     />
+                    {showStepErrors && descMissing ? (
+                      <Typography id="emergency-desc-error" role="alert" sx={{ color: RED_DARK, fontSize: '0.8rem', mt: 0.75, fontWeight: 600 }}>
+                        Please describe the urgent issue before continuing.
+                      </Typography>
+                    ) : null}
+                  </Box>
+
+                  {/* Urgency triage */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, p: 2, borderRadius: '12px', backgroundColor: PAGE_BG, border: `1px solid ${BORDER}` }}>
+                    <TriageQuestion legend="Is the issue happening right now?" value={happeningNow} onChange={setHappeningNow} />
+                    <TriageQuestion legend="Is there active water, smoke, sparks, or a burning smell?" value={activeHazard} onChange={setActiveHazard} danger />
+                    <TriageQuestion legend="Is anyone in immediate danger?" value={immediateDanger} onChange={setImmediateDanger} danger />
+                  </Box>
+
+                  {immediateDanger === 'Yes' ? (
+                    <Alert severity="error" sx={{ borderRadius: '12px', border: `1px solid ${RED}` }}>
+                      <AlertTitle sx={{ fontWeight: 800 }}>Please call 911 now</AlertTitle>
+                      If anyone is in immediate danger, call <strong>911</strong> right away. Smart Appliances cannot
+                      respond to life-threatening emergencies.
+                    </Alert>
+                  ) : null}
+
+                  <Box>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={acknowledged}
+                          onChange={(e) => setAcknowledged(e.target.checked)}
+                          sx={{ color: showStepErrors && ackMissing ? RED : NAVY, '&.Mui-checked': { color: NAVY } }}
+                        />
+                      }
+                      label={
+                        <Typography sx={{ fontSize: '0.9rem', color: '#1A1A1A' }}>
+                          I understand Smart Appliances is not an emergency response service.
+                        </Typography>
+                      }
+                    />
+                    {showStepErrors && ackMissing ? (
+                      <Typography role="alert" sx={{ color: RED_DARK, fontSize: '0.8rem', fontWeight: 600, ml: 0.5 }}>
+                        Please acknowledge this notice before continuing.
+                      </Typography>
+                    ) : null}
                   </Box>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: 'space-between', gap: 1.5, mt: 4 }}>
+                  <Button
+                    onClick={() => navigate('/services')}
+                    variant="outlined"
+                    fullWidth
+                    sx={{ borderColor: NAVY, color: NAVY, textTransform: 'none', borderRadius: '10px', px: 3, py: 1.35, fontWeight: 700, maxWidth: { sm: 220 } }}
+                  >
+                    Back to Services
+                  </Button>
                   <Button
                     variant="contained"
-                    disabled={!issueDesc.trim()}
-                    onClick={() => goToStep(2)}
+                    onClick={handleContinue}
+                    fullWidth
                     sx={{
-                      backgroundColor: '#EF4444',
+                      backgroundColor: RED,
                       color: '#FFFFFF',
-                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                       fontWeight: 700,
-                      px: 4,
-                      py: 1.5,
+                      px: 3,
+                      py: 1.35,
                       borderRadius: '10px',
                       textTransform: 'none',
-                      '&:hover': { backgroundColor: '#EA580C' },
+                      maxWidth: { sm: 320 },
+                      '&:hover': { backgroundColor: RED_DARK },
                     }}
                   >
-                    Next: Contact Info
+                    Continue to Contact Information
                   </Button>
                 </Box>
               </Box>
@@ -433,15 +571,18 @@ const EmergencyBookingPage: React.FC = () => {
 
             {step === 2 && (
               <Box>
-                <Typography variant="h5" sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 3 }}>
-                  Step 2: Your Contact & Location
+                <Typography sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", fontWeight: 800, color: NAVY, fontSize: '1.4rem', mb: 0.5 }}>
+                  Contact information
+                </Typography>
+                <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", color: MUTED, fontSize: '0.95rem', mb: 3 }}>
+                  Share how to reach you and where the issue is located so our team can respond quickly.
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                   <TextField label="Full Name *" value={name} onChange={(e) => setName(e.target.value)} fullWidth required />
                   <TextField label="Phone *" value={phone} onChange={(e) => setPhone(e.target.value)} fullWidth required />
                   <TextField label="Email *" type="email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth required />
                   <TextField label="Street Address *" value={address} onChange={(e) => setAddress(e.target.value)} fullWidth required />
-                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2 }}>
                     <TextField label="City" value={city} onChange={(e) => setCity(e.target.value)} fullWidth />
                     <TextField label="State" value={stateVal} onChange={(e) => setStateVal(e.target.value)} fullWidth />
                     <TextField
@@ -458,35 +599,52 @@ const EmergencyBookingPage: React.FC = () => {
                   </Box>
                 </Box>
                 {submitError ? (
-                  <Alert severity="error" sx={{ mt: 2 }}>{submitError}</Alert>
+                  <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>{submitError}</Alert>
                 ) : null}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-                  <Button onClick={() => goToStep(1)} variant="outlined" sx={{ borderColor: '#0B3D91', color: '#0B3D91', textTransform: 'none', borderRadius: '10px', px: 3, py: 1.25 }}>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: 'space-between', gap: 1.5, mt: 4 }}>
+                  <Button
+                    onClick={() => setStep(1)}
+                    variant="outlined"
+                    fullWidth
+                    sx={{ borderColor: NAVY, color: NAVY, textTransform: 'none', borderRadius: '10px', px: 3, py: 1.35, fontWeight: 700, maxWidth: { sm: 200 } }}
+                  >
                     Back
                   </Button>
                   <Button
                     variant="contained"
                     disabled={!name || !phone || !email || !address || !zipValidation.isValid || isSubmitting}
                     onClick={handleSubmit}
+                    fullWidth
+                    startIcon={isSubmitting ? <CircularProgress size={18} sx={{ color: '#FFFFFF' }} /> : undefined}
                     sx={{
-                      backgroundColor: '#EF4444',
+                      backgroundColor: RED,
                       color: '#FFFFFF',
-                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
                       fontWeight: 700,
-                      px: 4,
-                      py: 1.5,
+                      px: 3,
+                      py: 1.35,
                       borderRadius: '10px',
                       textTransform: 'none',
-                      '&:hover': { backgroundColor: '#EA580C' },
+                      maxWidth: { sm: 320 },
+                      '&:hover': { backgroundColor: RED_DARK },
+                      '&.Mui-disabled': { backgroundColor: '#F2A9A9', color: '#FFFFFF' },
                     }}
                   >
-                    {isSubmitting ? 'Submitting…' : 'Submit Emergency Request'}
+                    {isSubmitting ? 'Submitting Request…' : 'Submit Emergency Request'}
                   </Button>
                 </Box>
               </Box>
             )}
           </CardContent>
         </Card>
+
+        {/* Response expectation note */}
+        <Box sx={{ maxWidth: 820, mx: 'auto', mt: 3, px: 1, textAlign: 'center' }}>
+          <Typography sx={{ fontSize: '0.85rem', color: MUTED, lineHeight: 1.6 }}>
+            Submitting this form does not guarantee immediate dispatch. Availability depends on service area, technician
+            availability, and the nature of the issue. After submission, you will receive a request ID for tracking.
+            Same-day or emergency priority fees may apply.
+          </Typography>
+        </Box>
       </Container>
     </Box>
   );

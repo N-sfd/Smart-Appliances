@@ -13,7 +13,7 @@ import ResourceCategoryCard from '../components/resources/ResourceCategoryCard';
 import ResourceArticleCard from '../components/resources/ResourceArticleCard';
 import VideoCard from '../components/resources/VideoCard';
 import VideosComingSoonPanel from '../components/resources/VideosComingSoonPanel';
-import HeroIllustration from '../components/illustrations/HeroIllustration';
+import PageHero from '../components/common/PageHero';
 
 export default function ResourcesPage() {
   const navigate = useNavigate();
@@ -33,88 +33,15 @@ export default function ResourcesPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
-      {/* HERO */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          py: { xs: 5, md: 8 },
-          px: 2,
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: { xs: 3, md: 4 },
-            }}
-          >
-            <Box sx={{ flex: '1 1 auto', minWidth: 0, textAlign: { xs: 'center', md: 'left' } }}>
-              <Typography
-                component="h1"
-                sx={{
-                  fontFamily: fonts.heading,
-                  fontWeight: 800,
-                  fontSize: { xs: '1.85rem', md: '2.3rem' },
-                  color: '#fff',
-                  lineHeight: 1.15,
-                  mb: 1.25,
-                }}
-              >
-                Smart Appliances Help Center
-              </Typography>
-              <Typography
-                sx={{
-                  fontFamily: fonts.body,
-                  fontSize: { xs: '0.9rem', md: '1rem' },
-                  color: '#E2E8F0',
-                  maxWidth: 520,
-                  mx: { xs: 'auto', md: 0 },
-                  mb: 2.5,
-                  lineHeight: 1.6,
-                }}
-              >
-                Practical appliance care, home maintenance, safety guidance, troubleshooting tips, and expert advice.
-              </Typography>
-
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                <Button
-                  variant="contained"
-                  startIcon={<ArticleOutlinedIcon />}
-                  component={RouterLink}
-                  to="/resources/articles"
-                  sx={{ backgroundColor: '#fff', color: '#0B2D6B', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 2.5, '&:hover': { backgroundColor: '#E2E8F0' } }}
-                >
-                  Browse Articles
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<OndemandVideoOutlinedIcon />}
-                  component={RouterLink}
-                  to="/resources/videos"
-                  sx={{ borderColor: '#E2E8F0', color: '#E2E8F0', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 2.5, '&:hover': { borderColor: '#fff', backgroundColor: 'rgba(255,255,255,0.08)' } }}
-                >
-                  Watch Helpful Videos
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<CalendarMonthIcon />}
-                  onClick={() => navigate('/scheduler')}
-                  sx={{ borderColor: '#E2E8F0', color: '#E2E8F0', fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 2.5, '&:hover': { borderColor: '#fff', backgroundColor: 'rgba(255,255,255,0.08)' } }}
-                >
-                  Book a Service
-                </Button>
-              </Box>
-            </Box>
-
-            <Box sx={{ flex: '0 0 auto', width: { xs: 200, sm: 260, md: 360 }, maxWidth: '40%', display: { xs: 'none', sm: 'block' } }}>
-              <HeroIllustration variant="resources" title="Homeowner researching appliance and home maintenance guidance" />
-            </Box>
-          </Box>
-        </Container>
-      </Box>
+      <PageHero
+        title="Smart Appliances Help Center"
+        subtitle="Practical appliance care, home maintenance, safety guidance, troubleshooting tips, and expert advice."
+        primaryAction={{ label: 'Browse Articles', href: '/resources/articles', startIcon: <ArticleOutlinedIcon /> }}
+        secondaryAction={{ label: 'Watch Helpful Videos', href: '/resources/videos', startIcon: <OndemandVideoOutlinedIcon /> }}
+        tertiaryAction={{ label: 'Book a Service', onClick: () => navigate('/scheduler'), startIcon: <CalendarMonthIcon /> }}
+        illustration="resources"
+        imageAlt="Homeowner researching appliance and home maintenance guidance"
+      />
 
       {/* CATEGORY CARDS */}
       <Container maxWidth="lg" sx={{ py: { xs: 5, md: 7 } }}>

@@ -26,6 +26,8 @@ import { SchedulerServiceCategory } from '../data/schedulerPrefill';
 import ExpertCard from '../components/experts/ExpertCard';
 import ExpertAvatar from '../components/experts/ExpertAvatar';
 import ExpertMatchBanner from '../components/experts/ExpertMatchBanner';
+import PageHero from '../components/common/PageHero';
+import { PAGE_HERO_PHOTOS } from '../data/pageHeroImages';
 import { fetchActiveExpertsWithDetails } from '../services/adminExperts';
 import { useSeo } from '../hooks/useSeo';
 
@@ -139,142 +141,71 @@ export default function ExpertsPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
-      {/* HERO */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
-          py: { xs: 4.5, md: 5.5 },
-          px: 2,
-        }}
-      >
-        <Container maxWidth="lg">
+      <PageHero
+        title="Find the Right Home Service Expert"
+        subtitle="Browse Smart Appliances experts for appliance care, HVAC, plumbing, electrical, smart home, and garage door services."
+        badges={TRUST_BADGES.map(({ label, icon: Icon }) => ({
+          label,
+          icon: <Icon sx={{ fontSize: 16 }} />,
+        }))}
+        primaryAction={{ label: 'Match Me With an Expert', onClick: () => navigate('/match-expert') }}
+        secondaryAction={{ label: 'Book a Service', onClick: () => navigate('/scheduler') }}
+        imageSrc={PAGE_HERO_PHOTOS.experts.src}
+        imageAlt={PAGE_HERO_PHOTOS.experts.alt}
+        imageAspectRatio={PAGE_HERO_PHOTOS.experts.aspectRatio}
+        imageObjectPosition={PAGE_HERO_PHOTOS.experts.objectPosition}
+        stackImageWithVisual
+        visual={
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              alignItems: 'center',
-              gap: { xs: 4, md: 6 },
+              backgroundColor: '#fff',
+              borderRadius: '18px',
+              p: { xs: 2.5, md: 3 },
+              boxShadow: '0 20px 48px rgba(0,0,0,0.24)',
             }}
           >
-            {/* LEFT — copy */}
-            <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
-              <Typography
-                sx={{
-                  fontFamily: fonts.heading,
-                  fontWeight: 800,
-                  fontSize: { xs: '1.85rem', md: '2.3rem' },
-                  color: '#fff',
-                  lineHeight: 1.15,
-                  mb: 1.5,
-                }}
-              >
-                Find the Right Home Service Expert
-              </Typography>
-              <Typography
-                sx={{
-                  fontFamily: fonts.body,
-                  fontSize: { xs: '0.95rem', md: '1.05rem' },
-                  maxWidth: 520,
-                  color: '#E2E8F0',
-                  mx: { xs: 'auto', md: 0 },
-                  mb: 2.5,
-                  lineHeight: 1.7,
-                }}
-              >
-                Browse Smart Appliances experts for appliance care, HVAC, plumbing, electrical,
-                smart home, and garage door services.
-              </Typography>
-
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: { xs: 'center', md: 'flex-start' }, mb: 3 }}>
-                {TRUST_BADGES.map(({ label, icon: Icon }) => (
-                  <Chip
-                    key={label}
-                    icon={<Icon sx={{ fontSize: 16, color: '#fff !important' }} />}
-                    label={label}
-                    sx={{
-                      backgroundColor: 'rgba(255,255,255,0.12)',
-                      color: '#fff',
-                      fontFamily: fonts.body,
-                      fontWeight: 600,
-                      fontSize: '12.5px',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                    }}
+            <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.05rem', color: colors.navy, mb: 1.75 }}>
+              Recommended Service Professionals
+            </Typography>
+            <Box sx={{ display: 'grid', gap: 1.25 }}>
+              {recommendedExperts.map((expert) => (
+                <Box
+                  key={expert.slug}
+                  component={RouterLink}
+                  to={`/experts/${expert.slug}`}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.25,
+                    p: 1,
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                    transition: 'background-color 0.15s ease',
+                    '&:hover': { backgroundColor: colors.lightBlueBg },
+                  }}
+                >
+                  <ExpertAvatar
+                    src={getExpertImageUrl(expert.slug, expert.imageUrl, expert.avatarUrl)}
+                    alt={expert.name}
+                    initials={expert.initials}
+                    slug={expert.slug}
+                    size={42}
                   />
-                ))}
-              </Box>
-
-              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                <Button
-                  variant="contained"
-                  sx={{ backgroundColor: '#fff', color: '#0B2D6B', '&:hover': { backgroundColor: '#E2E8F0' } }}
-                  onClick={() => navigate('/match-expert')}
-                >
-                  Match Me With an Expert
-                </Button>
-                <Button
-                  variant="outlined"
-                  sx={{ borderColor: '#E2E8F0', color: '#E2E8F0' }}
-                  onClick={() => navigate('/scheduler')}
-                >
-                  Book a Service
-                </Button>
-              </Box>
-            </Box>
-
-            {/* RIGHT — recommended experts card */}
-            <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 420, md: 'none' } }}>
-              <Box
-                sx={{
-                  backgroundColor: '#fff',
-                  borderRadius: '20px',
-                  p: { xs: 2.5, md: 3 },
-                  boxShadow: '0 24px 56px rgba(0,0,0,0.28)',
-                }}
-              >
-                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.05rem', color: colors.navy, mb: 1.75 }}>
-                  Recommended Service Professionals
-                </Typography>
-                <Box sx={{ display: 'grid', gap: 1.25 }}>
-                  {recommendedExperts.map((expert) => (
-                    <Box
-                      key={expert.slug}
-                      component={RouterLink}
-                      to={`/experts/${expert.slug}`}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.25,
-                        p: 1,
-                        borderRadius: '12px',
-                        textDecoration: 'none',
-                        transition: 'background-color 0.15s ease',
-                        '&:hover': { backgroundColor: colors.lightBlueBg },
-                      }}
-                    >
-                      <ExpertAvatar
-                        src={getExpertImageUrl(expert.slug, expert.imageUrl, expert.avatarUrl)}
-                        alt={expert.name}
-                        initials={expert.initials}
-                        slug={expert.slug}
-                        size={42}
-                      />
-                      <Box sx={{ minWidth: 0, flex: 1 }}>
-                        <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', color: colors.darkText, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {expert.name}
-                        </Typography>
-                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, display: 'flex', alignItems: 'center', gap: 0.4 }}>
-                          <StarIcon sx={{ fontSize: 13, color: colors.warningOrange }} />
-                          {expert.rating} · {expert.jobsCompleted} jobs
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ))}
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', color: colors.darkText, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {expert.name}
+                    </Typography>
+                    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.75rem', color: colors.mutedText, display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                      <StarIcon sx={{ fontSize: 13, color: colors.warningOrange }} />
+                      {expert.rating} · {expert.jobsCompleted} jobs
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
+              ))}
             </Box>
           </Box>
-        </Container>
-      </Box>
+        }
+      />
 
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
         {/* FILTER BAR */}
