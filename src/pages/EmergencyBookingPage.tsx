@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
@@ -32,6 +32,11 @@ interface EmergencyBookingState {
   serviceType?: string;
 }
 
+const STEPS = [
+  { num: 1, label: 'Emergency Details' },
+  { num: 2, label: 'Contact Info' },
+] as const;
+
 const EmergencyBookingPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,9 +62,28 @@ const EmergencyBookingPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [stepBlockedHint, setStepBlockedHint] = useState('');
+  const formRef = useRef<HTMLDivElement>(null);
+  const issueDescRef = useRef<HTMLTextAreaElement>(null);
 
   const selectedCategory = serviceCategories.find((c) => c.id === categoryId) ?? serviceCategories[0];
   const zipValidation = validateZipCode(zipCode);
+  const canAccessStep = (targetStep: number) => targetStep === 1 || issueDesc.trim().length > 0;
+
+  const goToStep = (targetStep: number) => {
+    if (canAccessStep(targetStep)) {
+      setStepBlockedHint('');
+      setStep(targetStep);
+      return;
+    }
+    setStepBlockedHint('Please describe the emergency before continuing to contact info.');
+    issueDescRef.current?.focus();
+    issueDescRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  useEffect(() => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [step]);
 
   const handleCategoryChange = (e: SelectChangeEvent<string>) => {
     const cat = serviceCategories.find((c) => c.id === e.target.value) ?? serviceCategories[0];
@@ -197,54 +221,106 @@ const EmergencyBookingPage: React.FC = () => {
         </Box>
 
         {/* Step indicators */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 5 }}>
-          {[1, 2].map((s) => {
-            const canGoToStep = s === 1 || issueDesc.trim().length > 0;
-            const goToStep = () => {
-              if (canGoToStep) setStep(s);
-            };
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            mb: stepBlockedHint ? 1.5 : 5,
+            px: { xs: 0, sm: 1 },
+          }}
+        >
+          {STEPS.map((s, index) => {
+            const isActive = step === s.num;
+            const isComplete = step > s.num;
+            const isHighlighted = isActive || isComplete;
+            const canNavigate = canAccessStep(s.num);
             return (
-              <Box
-                key={s}
-                role="button"
-                tabIndex={0}
-                aria-label={`Go to step ${s}`}
-                aria-current={step === s ? 'step' : undefined}
-                aria-disabled={!canGoToStep}
-                onClick={goToStep}
-                onKeyDown={(e: React.KeyboardEvent) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    goToStep();
-                  }
-                }}
-                sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  backgroundColor: step >= s ? '#EF4444' : '#E4E7EB',
-                  color: step >= s ? '#FFFFFF' : '#999999',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  transition: 'background-color 0.3s, transform 0.15s, box-shadow 0.2s',
-                  cursor: canGoToStep ? 'pointer' : 'not-allowed',
-                  outline: 'none',
-                  boxShadow: step === s ? '0 0 0 4px rgba(239,68,68,0.18)' : 'none',
-                  '&:hover': canGoToStep ? { transform: 'scale(1.08)' } : undefined,
-                  '&:focus-visible': { boxShadow: '0 0 0 4px rgba(239,68,68,0.35)' },
-                }}
-              >
-                {s}
-              </Box>
+              <React.Fragment key={s.num}>
+                <Button
+                  type="button"
+                  onClick={() => goToStep(s.num)}
+                  aria-label={`Step ${s.num}: ${s.label}`}
+                  aria-current={isActive ? 'step' : undefined}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    minWidth: { xs: 88, sm: 120, md: 140 },
+                    flex: index === STEPS.length - 1 ? '0 0 auto' : undefined,
+                    p: 0,
+                    minHeight: 0,
+                    textTransform: 'none',
+                    borderRadius: '12px',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    opacity: !canNavigate && !isActive ? 0.65 : 1,
+                    '&:hover': {
+                      backgroundColor: 'rgba(239,68,68,0.06)',
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                      fontWeight: 700,
+                      fontSize: '0.95rem',
+                      backgroundColor: isHighlighted ? '#EF4444' : '#E4E7EB',
+                      color: isHighlighted ? '#FFFFFF' : '#999999',
+                      boxShadow: isActive ? '0 0 0 4px rgba(239,68,68,0.18)' : 'none',
+                      transition: 'background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease',
+                      transform: isActive ? 'scale(1.05)' : 'none',
+                    }}
+                  >
+                    {s.num}
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                      fontWeight: isActive ? 700 : 500,
+                      fontSize: { xs: '11px', sm: '12px', md: '13px' },
+                      color: isActive ? '#EF4444' : '#64748B',
+                      textAlign: 'center',
+                      lineHeight: 1.25,
+                    }}
+                  >
+                    {s.label}
+                  </Typography>
+                </Button>
+                {index < STEPS.length - 1 && (
+                  <Box
+                    sx={{
+                      flex: 1,
+                      height: 2,
+                      backgroundColor: step > s.num ? '#EF4444' : '#E4E7EB',
+                      mt: '20px',
+                      mx: { xs: 0.5, sm: 1 },
+                      minWidth: { xs: 32, sm: 48 },
+                      transition: 'background-color 0.2s ease',
+                    }}
+                  />
+                )}
+              </React.Fragment>
             );
           })}
         </Box>
+        {stepBlockedHint ? (
+          <Alert severity="warning" sx={{ maxWidth: 520, mx: 'auto', mb: 3, borderRadius: '10px' }}>
+            {stepBlockedHint}
+          </Alert>
+        ) : null}
 
-        <Card sx={{ borderRadius: '20px', border: '2px solid #FFE5E5', boxShadow: 'none', backgroundColor: '#FFFFFF' }}>
+        <Card
+          ref={formRef}
+          sx={{ borderRadius: '20px', border: '2px solid #FFE5E5', boxShadow: 'none', backgroundColor: '#FFFFFF' }}
+        >
           <CardContent sx={{ p: { xs: 3, md: 5 } }}>
             {step === 1 && (
               <Box>
@@ -305,8 +381,12 @@ const EmergencyBookingPage: React.FC = () => {
                     </Typography>
                     <Box
                       component="textarea"
+                      ref={issueDescRef}
                       value={issueDesc}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setIssueDesc(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                        setIssueDesc(e.target.value);
+                        if (e.target.value.trim()) setStepBlockedHint('');
+                      }}
                       placeholder="Please describe what's happening in as much detail as possible."
                       sx={{
                         width: '100%',
@@ -332,7 +412,7 @@ const EmergencyBookingPage: React.FC = () => {
                   <Button
                     variant="contained"
                     disabled={!issueDesc.trim()}
-                    onClick={() => setStep(2)}
+                    onClick={() => goToStep(2)}
                     sx={{
                       backgroundColor: '#EF4444',
                       color: '#FFFFFF',
@@ -381,7 +461,7 @@ const EmergencyBookingPage: React.FC = () => {
                   <Alert severity="error" sx={{ mt: 2 }}>{submitError}</Alert>
                 ) : null}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-                  <Button onClick={() => setStep(1)} variant="outlined" sx={{ borderColor: '#0B3D91', color: '#0B3D91', textTransform: 'none', borderRadius: '10px', px: 3, py: 1.25 }}>
+                  <Button onClick={() => goToStep(1)} variant="outlined" sx={{ borderColor: '#0B3D91', color: '#0B3D91', textTransform: 'none', borderRadius: '10px', px: 3, py: 1.25 }}>
                     Back
                   </Button>
                   <Button
