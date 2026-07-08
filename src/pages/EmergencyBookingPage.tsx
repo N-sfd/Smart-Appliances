@@ -252,7 +252,7 @@ const EmergencyBookingPage: React.FC = () => {
         minHeight: '100vh',
         backgroundColor: PAGE_BG,
         backgroundImage:
-          'linear-gradient(180deg, rgba(245,247,251,0.94) 0%, rgba(245,247,251,0.97) 100%), url(/images/services/emergency-bg.png)',
+          'linear-gradient(180deg, rgba(245,247,251,0.62) 0%, rgba(245,247,251,0.80) 100%), url(/images/services/emergency-bg.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
