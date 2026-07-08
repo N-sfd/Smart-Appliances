@@ -125,7 +125,7 @@ export default function RelatedVideoCard({
             <OndemandVideoOutlinedIcon sx={{ fontSize: 21 }} />
           </Box>
           <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.88rem', color: colors.navy, mb: 0.5 }}>
-            Related Video Guide
+            Related Video Guide — Coming Soon
           </Typography>
           <Typography sx={{ fontFamily: fonts.body, fontSize: '12px', color: colors.mutedText, lineHeight: 1.5, mb: 1.5 }}>
             A short video guide for this topic is coming soon.

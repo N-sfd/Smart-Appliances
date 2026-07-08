@@ -11,6 +11,8 @@ export interface ResourceVideo {
   sourceName?: string;
   /** Link to the original video on YouTube, shown as attribution when the video is enabled. */
   sourceUrl?: string;
+  /** Optional local poster image shown behind the "coming soon" placeholder while the video is disabled. */
+  thumbnail?: string;
   orientation?: 'landscape' | 'portrait';
   /**
    * Only videos with enabled: true are rendered. New videos should stay
@@ -19,6 +21,8 @@ export interface ResourceVideo {
    * policy applied to images.
    */
   enabled: boolean;
+  /** Help Center article slugs this video supports — used to surface it in an article's sidebar. */
+  relatedArticleSlugs?: string[];
 }
 
 /**
@@ -38,6 +42,7 @@ export const RESOURCE_VIDEOS: ResourceVideo[] = [
     category: 'appliance-care',
     orientation: 'landscape',
     enabled: false,
+    relatedArticleSlugs: ['refrigerator-not-cooling', 'freezer-frost-buildup'],
   },
   {
     id: 'dryer-vent-safety',
@@ -46,6 +51,7 @@ export const RESOURCE_VIDEOS: ResourceVideo[] = [
     category: 'appliance-care',
     orientation: 'landscape',
     enabled: false,
+    relatedArticleSlugs: ['dryer-taking-too-long'],
   },
   {
     id: 'hvac-filter-replacement',
@@ -54,6 +60,7 @@ export const RESOURCE_VIDEOS: ResourceVideo[] = [
     category: 'hvac-energy',
     orientation: 'landscape',
     enabled: false,
+    relatedArticleSlugs: ['hvac-filter-guide'],
   },
   {
     id: 'electrical-warning-signs',
@@ -62,6 +69,7 @@ export const RESOURCE_VIDEOS: ResourceVideo[] = [
     category: 'electrical-safety',
     orientation: 'landscape',
     enabled: false,
+    relatedArticleSlugs: ['electrical-safety-diy-or-pro'],
   },
   {
     id: 'preventing-plumbing-leaks',
@@ -70,6 +78,7 @@ export const RESOURCE_VIDEOS: ResourceVideo[] = [
     category: 'plumbing',
     orientation: 'landscape',
     enabled: false,
+    relatedArticleSlugs: ['prevent-plumbing-leaks'],
   },
   {
     id: 'garage-door-maintenance-video',
@@ -78,6 +87,7 @@ export const RESOURCE_VIDEOS: ResourceVideo[] = [
     category: 'garage-door',
     orientation: 'landscape',
     enabled: false,
+    relatedArticleSlugs: ['garage-door-maintenance'],
   },
   {
     id: 'smart-thermostat-setup',
@@ -86,6 +96,7 @@ export const RESOURCE_VIDEOS: ResourceVideo[] = [
     category: 'smart-home',
     orientation: 'portrait',
     enabled: false,
+    relatedArticleSlugs: ['smart-thermostat-benefits'],
   },
 ];
 
@@ -95,4 +106,9 @@ export function getEnabledVideos(): ResourceVideo[] {
 
 export function getEnabledVideosByCategory(category: ResourceCategoryId): ResourceVideo[] {
   return getEnabledVideos().filter((v) => v.category === category);
+}
+
+/** First enabled, embeddable video that supports a given Help Center article, if any. */
+export function getVideoForArticle(slug: string): ResourceVideo | undefined {
+  return getEnabledVideos().find((v) => v.relatedArticleSlugs?.includes(slug));
 }

@@ -12,6 +12,7 @@ import { useSeo } from '../hooks/useSeo';
 import { getResourceArticle, getRelatedArticles, getArticleBookingHref, GENERAL_DISCLAIMER } from '../data/resourceArticles';
 import { getResourceCategory } from '../data/resourceCategories';
 import { getArticleRelatedVideo } from '../data/articleRelatedVideos';
+import { getVideoForArticle } from '../data/resourceVideos';
 import ResourceImage from '../components/resources/ResourceImage';
 import ResourceBreadcrumbs from '../components/resources/ResourceBreadcrumbs';
 import ResourceArticleCard from '../components/resources/ResourceArticleCard';
@@ -32,7 +33,8 @@ export default function ResourceArticleDetailPage() {
 
   const category = article ? getResourceCategory(article.category) : undefined;
   const relatedArticles = article ? getRelatedArticles(article) : [];
-  const relatedVideo = article ? getArticleRelatedVideo(article.slug) : undefined;
+  const enabledVideo = article ? getVideoForArticle(article.slug) : undefined;
+  const placeholderVideo = article ? getArticleRelatedVideo(article.slug) : undefined;
 
   useSeo({
     title: article ? `${article.title} | Smart Appliances Help Center` : 'Article Not Found | Smart Appliances',
@@ -328,11 +330,12 @@ export default function ResourceArticleDetailPage() {
             }}
           >
             <RelatedVideoCard
-              title={relatedVideo?.title ?? `${category?.label ?? 'Related'} Video Guide`}
-              description={relatedVideo?.description ?? 'A short video guide for this topic is coming soon.'}
+              title={enabledVideo?.title ?? placeholderVideo?.title ?? `${category?.label ?? 'Related'} Video Guide`}
+              description={enabledVideo?.description ?? placeholderVideo?.description ?? 'A short video guide for this topic is coming soon.'}
               category={category?.label ?? ''}
-              youtubeId={relatedVideo?.youtubeId}
-              sourceName={relatedVideo?.sourceName}
+              youtubeId={enabledVideo?.youtubeId}
+              sourceName={enabledVideo?.sourceName}
+              fallbackImage={enabledVideo?.thumbnail}
             />
 
             <Box

@@ -26,16 +26,86 @@ Smart Appliances is a modern home-service booking platform for appliance care, H
 
 ## Public Pages
 
-- Home
-- Our Services
-- Pricing
-- Experts
-- Smart Care
-- Service Areas
-- About Us
-- Contact Us
-- Scheduler
-- Track Request
+- Home (`/`)
+- Our Services (`/services`, `/services/:serviceId`)
+- Pricing (`/pricing`)
+- Experts (`/experts`, `/experts/:expertId`)
+- Smart Care membership (`/membership`)
+- Service Areas (`/` — Service Areas section)
+- About Us (`/about`)
+- Contact Us (`/contact`)
+- Resources / Help Center (`/resources`, `/resources/articles`, `/resources/articles/:slug`, `/resources/videos`)
+- Scheduler (`/scheduler`)
+- Track Request (`/track-request`)
+- Emergency Service (`/emergency-service`)
+- Match an Expert (`/match-expert`)
+
+## Resources / Help Center
+
+- `/resources` — hub with featured articles, category cards, and a videos preview.
+- `/resources/articles` — full, filterable article list.
+- `/resources/articles/:slug` — article detail, with a related-video sidebar card and related articles.
+- `/resources/videos` — full video library, filterable by category.
+
+Article and category art falls back to hand-drawn on-brand vector scenes
+(`TopicIllustration`) until a real photo is added at the documented path —
+see `docs/image-assets-needed.md`. Nothing renders as a broken image.
+
+## Optional Video System
+
+Resource videos are data-driven and optional, defined in
+`src/data/resourceVideos.ts`. Only videos with `enabled: true` **and** a
+`youtubeId` render — embedded via `youtube-nocookie.com`, lazy-loaded, never
+autoplaying, inside a responsive 16:9 (or 9:16 for `portrait`) frame. If no
+approved videos exist for a given context, the site shows a professional
+"Helpful Videos Coming Soon" panel (or a compact "Related Video Guide —
+Coming Soon" card in article sidebars) instead of a broken embed or a fake
+play button. A video should only be flipped to `enabled: true` after it's
+confirmed relevant, publicly embeddable, and from a reputable, attributable
+source — never just because a link was suggested somewhere.
+
+## Hero Layout System
+
+Membership, Pricing, About Us, and Contact Us share one hero container
+pattern: a `1180px` max-width container, a two-column grid (copy left,
+visual right) on desktop that stacks on mobile, and `56–64px` vertical
+padding on desktop (less on Contact, which is intentionally the shortest of
+the four). Each page's visual is a distinct vector scene from
+`src/components/illustrations/HeroIllustration.tsx` — no hero image is
+reused between pages.
+
+## Services Submenu Imagery
+
+The header **Our Services** menu is a two-column grid on desktop (single
+column, tap-accordion on mobile) with a small badge icon, category name,
+and one-line description per item, plus a "View All Services" link. Badge
+icons come from `src/components/illustrations/ServiceMenuIllustration.tsx`
+— a distinct visual style from the page-hero and Help Center illustrations
+so no artwork repeats across sections. See
+`docs/image-assets-needed.md` for how to swap in real category photography
+later.
+
+## Image Assets
+
+```text
+public/images/services/menu/     — header Services menu category art
+public/images/services/          — service detail/category photography
+public/images/resources/         — Help Center article photography
+public/images/membership/        — Membership page photography (optional)
+public/images/pricing/           — Pricing page photography (optional)
+public/images/about/             — About Us page photography (optional)
+public/images/contact/           — Contact Us page photography (optional)
+public/images/experts/           — expert profile portraits
+```
+
+**Local image policy**: all images are checked into `public/images/` and
+served locally — the site never fetches images from external/unlicensed
+sources at runtime or build time. Until a real photo is added at a
+documented path, pages render an on-brand vector illustration instead of a
+broken image or placeholder icon. See `docs/image-assets-needed.md` for the
+full per-section asset list, specs, and policy against reusing one image
+across multiple sections (Services, Resources, Membership, Pricing, About,
+Contact, Experts each keep their own imagery).
 
 ## Admin Features
 
@@ -86,9 +156,10 @@ npm run build
 ## Deployment Notes
 
 - Vercel deployment uses `vercel.json`.
-- Netlify deployment uses `netlify.toml`.
+- Netlify deployment uses `netlify.toml` (build command `npm run build`, publish `build`, functions in `netlify/functions`).
 - The Netlify AI Agent should not be used for this project.
-- Recommended workflow: make changes locally → test → push to GitHub → deploy.
+- Recommended workflow: make changes locally → `npm run build` → test → push to GitHub → deploy.
+- Verify `npm run build` passes before deploying — CRA's production build also type-checks the project.
 
 ## Database
 

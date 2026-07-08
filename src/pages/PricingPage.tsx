@@ -265,13 +265,13 @@ const PricingPage: React.FC = () => {
           background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth={false} sx={{ maxWidth: '1180px', mx: 'auto', width: '100%' }}>
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 0.9fr' },
+              gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(340px, 0.85fr)' },
               alignItems: 'center',
-              gap: { xs: 4, md: 7 },
+              gap: { xs: 4, md: 6 },
             }}
           >
             {/* Left — copy */}
@@ -295,7 +295,7 @@ const PricingPage: React.FC = () => {
                   color: 'rgba(255,255,255,0.85)',
                   fontSize: { xs: '0.95rem', md: '1.05rem' },
                   lineHeight: 1.7,
-                  maxWidth: 520,
+                  maxWidth: 580,
                   mx: { xs: 'auto', md: 0 },
                   mb: 3,
                 }}
@@ -326,7 +326,7 @@ const PricingPage: React.FC = () => {
 
             {/* Right — hero image + trust summary card, treated as one visual column */}
             <Box sx={{ width: '100%', maxWidth: { xs: 420, md: 460 }, mx: { xs: 'auto', md: 0 } }}>
-              <Box sx={{ mb: 1.5, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
+              <Box sx={{ mb: 2, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
                 <HeroIllustration variant="pricing" title="Transparent service pricing with a technician estimate before work begins" />
               </Box>
               <Box

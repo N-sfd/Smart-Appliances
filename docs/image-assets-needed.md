@@ -154,3 +154,40 @@ with a `StableImage`/`<img>` pointed at a new file under a page-specific
 folder (`public/images/membership/`, `public/images/pricing/`,
 `public/images/about/`, `public/images/contact/`) — same aspect ratio,
 lazy loading, and alt text conventions as everywhere else on the site.
+
+## 11. Header "Our Services" menu (NEW, vector badge icons)
+
+The desktop mega menu and mobile accordion under **Our Services** now show a
+small rounded-square badge per category, rendered by
+`src/components/illustrations/ServiceMenuIllustration.tsx` (7 variants:
+`appliance-care`, `hvac-services`, `plumbing-services`,
+`electrical-services`, `smart-home-setup`, `garage-door-repair`,
+`emergency-service`). This is a deliberately different composition style
+(flat square badge, not a scene) from `HeroIllustration` and
+`TopicIllustration` so no artwork is reused across the site. Category
+copy (`label`, `description`) and the `illustration` variant used per item
+live in `src/data/serviceNavItems.ts`.
+
+No files are required for this to work — it renders as inline SVG. To
+upgrade any category to a real photo, add a file under
+`public/images/services/menu/` (suggested names below) and swap the
+`<ServiceMenuIllustration variant="..." .../>` call in `TopBar.tsx` for a
+`StableImage`/`<img>` at that path — consistent crop (4:3 or square), WebP
+preferred, real service-context photography distinct from the images
+already used on Resources, Membership, Pricing, About, Contact, and
+Experts.
+
+| Category | Suggested path |
+|---|---|
+| Appliance Care | `public/images/services/menu/appliance-care-menu.webp` |
+| HVAC Services | `public/images/services/menu/hvac-services-menu.webp` |
+| Plumbing Services | `public/images/services/menu/plumbing-services-menu.webp` |
+| Electrical Services | `public/images/services/menu/electrical-services-menu.webp` |
+| Smart Home Services | `public/images/services/menu/smart-home-menu.webp` |
+| Garage Door Services | `public/images/services/menu/garage-door-menu.webp` |
+| Emergency Service | `public/images/services/menu/emergency-service-menu.webp` |
+
+## 12. Image group inventory (for spotting accidental reuse)
+
+Not rendered anywhere — a quick reference so a new image never gets reused
+across sections by accident. See `src/data/imageInventory.ts`.

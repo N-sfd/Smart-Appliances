@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { Box, Typography, Button } from '@mui/material';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import { colors, fonts } from '../../theme';
 
@@ -36,10 +37,28 @@ export default function VideosComingSoonPanel() {
       <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '1.1rem', md: '1.25rem' }, color: colors.navy, mb: 1 }}>
         Helpful Videos Coming Soon
       </Typography>
-      <Typography sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: colors.mutedText, lineHeight: 1.65, maxWidth: 520, mx: 'auto' }}>
+      <Typography sx={{ fontFamily: fonts.body, fontSize: '13.5px', color: colors.mutedText, lineHeight: 1.65, maxWidth: 520, mx: 'auto', mb: 2.5 }}>
         We&apos;re preparing short guides for appliance care, HVAC maintenance, plumbing, electrical safety, smart home
         setup, and garage door care.
       </Typography>
+      <Button
+        component={RouterLink}
+        to="/resources/articles"
+        variant="outlined"
+        sx={{
+          borderColor: colors.primaryBlue,
+          color: colors.primaryBlue,
+          backgroundColor: '#fff',
+          fontFamily: fonts.body,
+          fontWeight: 700,
+          textTransform: 'none',
+          borderRadius: '12px',
+          px: 3,
+          '&:hover': { backgroundColor: colors.lightBlueBg },
+        }}
+      >
+        Browse Articles
+      </Button>
     </Box>
   );
 }

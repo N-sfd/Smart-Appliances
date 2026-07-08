@@ -122,13 +122,13 @@ const MembershipPage: React.FC = () => {
           px: 2,
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth={false} sx={{ maxWidth: '1180px', mx: 'auto', width: '100%' }}>
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 0.9fr' },
+              gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(340px, 0.85fr)' },
               alignItems: 'center',
-              gap: { xs: 4, md: 7 },
+              gap: { xs: 4, md: 6 },
             }}
           >
             {/* Left — copy */}
@@ -155,7 +155,7 @@ const MembershipPage: React.FC = () => {
                   fontSize: { xs: '0.95rem', md: '1.05rem' },
                   color: 'rgba(255,255,255,0.78)',
                   lineHeight: 1.7,
-                  maxWidth: 520,
+                  maxWidth: 580,
                   mx: { xs: 'auto', md: 0 },
                   mb: 2.5,
                 }}
@@ -222,7 +222,7 @@ const MembershipPage: React.FC = () => {
 
             {/* Right — hero image + benefits card, treated as one visual column */}
             <Box sx={{ width: '100%', maxWidth: { xs: 420, md: 460 }, mx: { xs: 'auto', md: 0 } }}>
-              <Box sx={{ mb: 1.5, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
+              <Box sx={{ mb: 2, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 48px rgba(0,0,0,0.24)', display: { xs: 'none', sm: 'block' } }}>
                 <HeroIllustration variant="membership" title="Smart Care membership protecting a home with priority technician support" />
               </Box>
               <Box

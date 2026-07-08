@@ -16,11 +16,12 @@ import {
   Avatar,
   Tooltip,
 } from '@mui/material';
-import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon } from '@mui/icons-material';
+import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
 import { colors, fonts, primaryButtonSx } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
 import { BrandLogo } from './Logo';
+import ServiceMenuIllustration from './illustrations/ServiceMenuIllustration';
 import {
   serviceNavItems,
   serviceNavPath,
@@ -273,31 +274,45 @@ const TopBar: React.FC = () => {
                           role="menu"
                           aria-label="Services menu"
                         >
-                          {serviceNavItems.map((item, index) => {
-                            const itemActive = isServiceNavItemActive(
-                              item,
-                              location.pathname,
-                              location.search,
-                            );
-                            const Icon = item.icon;
-                            const isLast = index === serviceNavItems.length - 1;
-                            return (
-                              <button
-                                key={item.id}
-                                type="button"
-                                role="menuitem"
-                                className={[
-                                  'services-nav-dropdown-item',
-                                  itemActive ? 'is-active' : '',
-                                  isLast ? 'is-last' : '',
-                                ].filter(Boolean).join(' ')}
-                                onClick={() => goToService(item)}
-                              >
-                                <Icon className="services-nav-dropdown-icon" aria-hidden="true" />
-                                <span>{item.label}</span>
-                              </button>
-                            );
-                          })}
+                          <Box className="services-nav-dropdown-grid" role="none">
+                            {serviceNavItems.map((item) => {
+                              const itemActive = isServiceNavItemActive(
+                                item,
+                                location.pathname,
+                                location.search,
+                              );
+                              const isEmergency = item.id === 'emergency-service';
+                              return (
+                                <button
+                                  key={item.id}
+                                  type="button"
+                                  role="menuitem"
+                                  className={[
+                                    'services-nav-dropdown-card',
+                                    itemActive ? 'is-active' : '',
+                                    isEmergency ? 'is-emergency' : '',
+                                  ].filter(Boolean).join(' ')}
+                                  onClick={() => goToService(item)}
+                                >
+                                  <span className="services-nav-dropdown-card-thumb">
+                                    <ServiceMenuIllustration variant={item.illustration} title={item.label} />
+                                  </span>
+                                  <span className="services-nav-dropdown-card-text">
+                                    <span className="services-nav-dropdown-card-title">{item.label}</span>
+                                    <span className="services-nav-dropdown-card-desc">{item.description}</span>
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </Box>
+                          <button
+                            type="button"
+                            className="services-nav-dropdown-viewall"
+                            onClick={() => { navigate('/services'); setServicesMenuOpen(false); }}
+                          >
+                            View All Services
+                            <ArrowForwardIcon sx={{ fontSize: '1rem !important' }} />
+                          </button>
                         </Box>
                       </Box>
                     )}
@@ -540,7 +555,6 @@ const TopBar: React.FC = () => {
                           location.pathname,
                           location.search,
                         );
-                        const Icon = item.icon;
                         const isLast = index === serviceNavItems.length - 1;
                         return (
                           <ListItem key={item.id} disablePadding sx={{ px: 1.5 }}>
@@ -551,7 +565,7 @@ const TopBar: React.FC = () => {
                                 px: 2,
                                 py: 1.25,
                                 borderRadius: 0,
-                                gap: 2,
+                                gap: 1.5,
                                 borderBottom: isLast ? 'none' : '1px solid #E4E7EB',
                                 backgroundColor: itemActive ? colors.lightBlueBg : 'transparent',
                                 '&:hover': {
@@ -559,18 +573,31 @@ const TopBar: React.FC = () => {
                                 },
                               }}
                             >
-                              <Icon
-                                className="services-nav-dropdown-icon"
-                                aria-hidden="true"
-                                sx={{ color: itemActive ? colors.primaryBlue : '#64748B' }}
-                              />
+                              <Box
+                                sx={{
+                                  width: 34,
+                                  height: 34,
+                                  borderRadius: '10px',
+                                  overflow: 'hidden',
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <ServiceMenuIllustration variant={item.illustration} title={item.label} />
+                              </Box>
                               <ListItemText
                                 primary={item.label}
+                                secondary={item.description}
                                 primaryTypographyProps={{
                                   fontFamily: fonts.body,
                                   color: itemActive ? colors.primaryBlue : colors.darkText,
                                   fontWeight: 600,
                                   fontSize: '0.95rem',
+                                }}
+                                secondaryTypographyProps={{
+                                  fontFamily: fonts.body,
+                                  color: colors.mutedText,
+                                  fontSize: '0.76rem',
+                                  lineHeight: 1.3,
                                 }}
                               />
                             </ListItemButton>

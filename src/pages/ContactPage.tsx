@@ -23,6 +23,7 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import { serviceCategories } from '../data/services';
 import { primaryButtonSx, radii } from '../theme';
+import { SERVICE_AREA_REGION_LABEL } from '../data/serviceAreas';
 import HeroIllustration from '../components/illustrations/HeroIllustration';
 import ServiceAreaMap from '../components/ServiceAreaMap';
 
@@ -134,47 +135,85 @@ const ContactPage: React.FC = () => {
       {/* ── Page Hero ── */}
       <Box
         sx={{
-          backgroundColor: '#0B3D91',
-          py: { xs: 8, md: 9 },
+          background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',
+          py: { xs: 4, md: 5 },
           px: 2,
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth={false} sx={{ maxWidth: '1180px', mx: 'auto', width: '100%' }}>
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(280px, 0.7fr)' },
               alignItems: 'center',
-              gap: { xs: 4, md: 6 },
+              gap: { xs: 3, md: 5 },
             }}
           >
-            <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
+            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
               <Typography
                 variant="h1"
                 sx={{
                   fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                   fontWeight: 700,
                   color: '#FFFFFF',
-                  fontSize: { xs: '2rem', sm: '2.6rem', md: '3rem' },
-                  mb: 2,
+                  fontSize: { xs: '1.7rem', md: '2.15rem' },
+                  lineHeight: 1.2,
+                  mb: 1.25,
                 }}
               >
-                Contact Smart Appliances
+                Get in Touch with Smart Appliances
               </Typography>
               <Typography
                 variant="body1"
                 sx={{
                   fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                  color: '#A8D8F0',
-                  fontSize: { xs: '1rem', md: '1.1rem' },
-                  lineHeight: 1.8,
+                  color: 'rgba(255,255,255,0.78)',
+                  fontSize: { xs: '0.92rem', md: '1rem' },
+                  lineHeight: 1.65,
+                  maxWidth: 480,
+                  mx: { xs: 'auto', md: 0 },
+                  mb: 2,
                 }}
               >
-                We're here to help. Reach out and our team will respond quickly.
+                Our team is here to help with service requests, scheduling questions, coverage confirmation, and
+                general support.
               </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 2,
+                  justifyContent: { xs: 'center', md: 'flex-start' },
+                }}
+              >
+                <Box
+                  component="a"
+                  href="tel:+12405760397"
+                  sx={{ display: 'flex', alignItems: 'center', gap: 0.75, textDecoration: 'none', color: '#FFFFFF', '&:hover': { color: '#4FC3F7' } }}
+                >
+                  <PhoneIcon sx={{ fontSize: 17, color: '#4FC3F7' }} />
+                  <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem', fontWeight: 600 }}>
+                    +1 (240) 576-0397
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: '#FFFFFF' }}>
+                  <EmailIcon sx={{ fontSize: 17, color: '#4FC3F7' }} />
+                  <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem', fontWeight: 600 }}>
+                    service@smartappliances.co
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: '#FFFFFF' }}>
+                  <LocationOnIcon sx={{ fontSize: 17, color: '#4FC3F7' }} />
+                  <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem', fontWeight: 600 }}>
+                    Serving {SERVICE_AREA_REGION_LABEL}
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
-            <Box sx={{ flex: 1, width: '100%', maxWidth: { xs: 340, md: 'none' }, display: { xs: 'none', sm: 'block' } }}>
-              <HeroIllustration variant="contact" title="Smart Appliances support team ready to help by phone or chat" />
+            <Box sx={{ width: '100%', maxWidth: { xs: 300, md: 320 }, mx: { xs: 'auto', md: 0 }, display: { xs: 'none', sm: 'block' } }}>
+              <Box sx={{ borderRadius: '18px', overflow: 'hidden', boxShadow: '0 16px 36px rgba(0,0,0,0.24)' }}>
+                <HeroIllustration variant="contact" title="Smart Appliances support team ready to help by phone or chat" />
+              </Box>
             </Box>
           </Box>
         </Container>
