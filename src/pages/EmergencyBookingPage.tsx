@@ -161,7 +161,19 @@ const EmergencyBookingPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: '#FFF8F8', py: 6 }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#FFF8F8',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(255,248,248,0.90) 0%, rgba(255,248,248,0.94) 100%), url(/images/services/emergency-bg.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        backgroundRepeat: 'no-repeat',
+        py: 6,
+      }}
+    >
       <Container maxWidth="md">
         {/* Header */}
         <Box sx={{ textAlign: 'center', mb: 5 }}>
@@ -186,27 +198,50 @@ const EmergencyBookingPage: React.FC = () => {
 
         {/* Step indicators */}
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 5 }}>
-          {[1, 2].map((s) => (
-            <Box
-              key={s}
-              sx={{
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                backgroundColor: step >= s ? '#EF4444' : '#E4E7EB',
-                color: step >= s ? '#FFFFFF' : '#999999',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                fontWeight: 700,
-                fontSize: '0.9rem',
-                transition: 'background-color 0.3s',
-              }}
-            >
-              {s}
-            </Box>
-          ))}
+          {[1, 2].map((s) => {
+            const canGoToStep = s === 1 || issueDesc.trim().length > 0;
+            const goToStep = () => {
+              if (canGoToStep) setStep(s);
+            };
+            return (
+              <Box
+                key={s}
+                role="button"
+                tabIndex={0}
+                aria-label={`Go to step ${s}`}
+                aria-current={step === s ? 'step' : undefined}
+                aria-disabled={!canGoToStep}
+                onClick={goToStep}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    goToStep();
+                  }
+                }}
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  backgroundColor: step >= s ? '#EF4444' : '#E4E7EB',
+                  color: step >= s ? '#FFFFFF' : '#999999',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  transition: 'background-color 0.3s, transform 0.15s, box-shadow 0.2s',
+                  cursor: canGoToStep ? 'pointer' : 'not-allowed',
+                  outline: 'none',
+                  boxShadow: step === s ? '0 0 0 4px rgba(239,68,68,0.18)' : 'none',
+                  '&:hover': canGoToStep ? { transform: 'scale(1.08)' } : undefined,
+                  '&:focus-visible': { boxShadow: '0 0 0 4px rgba(239,68,68,0.35)' },
+                }}
+              >
+                {s}
+              </Box>
+            );
+          })}
         </Box>
 
         <Card sx={{ borderRadius: '20px', border: '2px solid #FFE5E5', boxShadow: 'none', backgroundColor: '#FFFFFF' }}>
