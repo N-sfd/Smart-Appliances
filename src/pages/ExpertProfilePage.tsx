@@ -49,6 +49,9 @@ const CATEGORY_TO_SERVICE_PATH: Record<SchedulerServiceCategory, { label: string
   Electrical: { label: 'Electrical Services', path: '/services/electrical' },
   'Smart Home': { label: 'Smart Home Services', path: '/services/smart-home' },
   'Garage Door': { label: 'Garage Door Services', path: '/services/garage-door' },
+  'TV Mounting': { label: 'TV Mounting', path: '/services/tv-mounting' },
+  'Phone Repair': { label: 'Phone Repair', path: '/services/phone-repair' },
+  Handyman: { label: 'Handyman', path: '/services/handyman' },
 };
 
 const TEAM_SERVICE_CATEGORIES: {

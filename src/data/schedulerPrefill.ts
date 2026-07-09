@@ -4,7 +4,10 @@ export type SchedulerServiceCategory =
   | 'Plumbing'
   | 'Electrical'
   | 'Smart Home'
-  | 'Garage Door';
+  | 'Garage Door'
+  | 'TV Mounting'
+  | 'Phone Repair'
+  | 'Handyman';
 
 export type SchedulerServiceTypeId = 'repair' | 'installation' | 'maintenance' | 'emergency';
 
@@ -34,6 +37,9 @@ export const HUB_CATEGORY_TO_SCHEDULER: Record<string, SchedulerServiceCategory>
   'plumbing-services': 'Plumbing',
   'electrical-services': 'Electrical',
   'smart-home-setup': 'Smart Home',
+  'tv-mounting': 'TV Mounting',
+  'phone-repair': 'Phone Repair',
+  handyman: 'Handyman',
 };
 
 /** Maps /services/:slug paths to scheduler categories */
@@ -45,6 +51,9 @@ export const SERVICE_SLUG_TO_SCHEDULER: Record<string, SchedulerServiceCategory>
   electrical: 'Electrical',
   'smart-home': 'Smart Home',
   'garage-door-repair': 'Garage Door',
+  'tv-mounting': 'TV Mounting',
+  'phone-repair': 'Phone Repair',
+  handyman: 'Handyman',
 };
 
 const SERVICE_TYPE_CODE: Record<string, SchedulerServiceTypeId> = {
@@ -65,6 +74,9 @@ const SCHEDULER_CATEGORIES = new Set<string>([
   'Electrical',
   'Smart Home',
   'Garage Door',
+  'TV Mounting',
+  'Phone Repair',
+  'Handyman',
 ]);
 
 export function normalizeProductName(raw: string): string {
@@ -239,6 +251,18 @@ const PRODUCT_CATEGORY_RULES: { category: SchedulerServiceCategory; patterns: st
     patterns: ['garage door'],
   },
   {
+    category: 'TV Mounting',
+    patterns: ['tv mount', 'television mount', 'soundbar', 'wire concealment', 'media device'],
+  },
+  {
+    category: 'Phone Repair',
+    patterns: ['phone repair', 'screen replacement', 'iphone', 'android phone', 'battery replacement', 'charging port'],
+  },
+  {
+    category: 'Handyman',
+    patterns: ['handyman', 'furniture assembly', 'drywall', 'wall hanging', 'shelf installation', 'curtain rod'],
+  },
+  {
     category: 'Appliance',
     patterns: [
       'refrigerator',
@@ -313,6 +337,10 @@ export function mapProductNameToFields(
     }
     case 'Garage Door':
       return { garageDoorService: matchFieldValue(name, GARAGE_FIELD_VALUES) ?? 'Repair' };
+    case 'TV Mounting':
+    case 'Phone Repair':
+    case 'Handyman':
+      return {};
     default:
       return {};
   }
@@ -382,6 +410,10 @@ export function resolvePrefilledCategoryDetail(
       return state.smartDevice || fields.smartDevice || mapped.smartDevice || '';
     case 'Garage Door':
       return state.garageDoorService || fields.garageDoorService || mapped.garageDoorService || '';
+    case 'TV Mounting':
+    case 'Phone Repair':
+    case 'Handyman':
+      return productName || '';
     default:
       return '';
   }

@@ -34,9 +34,12 @@ import {
   AlertTriangle,
   Calculator,
   Wrench,
+  Tv,
+  Smartphone,
+  Hammer,
   LucideIcon,
 } from 'lucide-react';
-import { colors, fonts, primaryButtonSx, secondaryButtonSx } from '../theme';
+import { colors, fonts } from '../theme';
 import { useSeo } from '../hooks/useSeo';
 import ServiceAreaMap from '../components/ServiceAreaMap';
 import TransparentPricingSection from '../components/TransparentPricingSection';
@@ -102,6 +105,9 @@ const POPULAR_BUNDLES: {
   { title: 'Drain Cleaning Visit', fee: 'From $149', icon: Droplets, serviceType: 'R', serviceCategory: 'Plumbing', productName: 'Drain Cleaning' },
   { title: 'Smart Thermostat Setup', fee: 'From $129', icon: HouseWifi, serviceType: 'I', serviceCategory: 'Smart Home', productName: 'Smart Thermostat Installation' },
   { title: 'Garage Door Safety Check', fee: 'From $129', icon: DoorOpen, serviceType: 'M', serviceCategory: 'Garage Door', productName: 'Garage Door Maintenance' },
+  { title: 'TV Mounting', fee: 'From $129', icon: Tv, serviceType: 'I', serviceCategory: 'TV Mounting', productName: 'Standard TV Mounting' },
+  { title: 'Phone Screen Repair', fee: 'From $149', icon: Smartphone, serviceType: 'R', serviceCategory: 'Phone Repair', productName: 'Screen Replacement' },
+  { title: 'Furniture Assembly', fee: 'From $109', icon: Hammer, serviceType: 'I', serviceCategory: 'Handyman', productName: 'Furniture Assembly' },
 ];
 
 const FAQ_ITEMS = [

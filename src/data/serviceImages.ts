@@ -4,6 +4,10 @@ import { PLUMBING_SERVICE_IMAGES } from './plumbingHub';
 import { ELECTRICAL_SERVICE_IMAGES } from './electricalHub';
 import { APPLIANCE_SERVICE_IMAGES, APPLIANCE_DEFAULT_IMAGE } from './applianceHub';
 import { SMART_HOME_SERVICE_IMAGES } from './smartHomeHub';
+import { serviceImages, CATEGORY_HERO_IMAGE } from './expandedServiceImages';
+import { SMART_LOCK_PLACEHOLDER_IMAGE } from './serviceCategoryDetails';
+
+export { serviceImages, CATEGORY_HERO_IMAGE };
 
 export interface ServiceImageInfo {
   image: string;
@@ -14,11 +18,12 @@ export interface ServiceImageInfo {
 const BASE = '/images/services';
 const SMART = `${BASE}/smart-home`;
 
-// Fallback for when nothing is selected
+// Neutral catch-all — only reached when a service/category truly has no mapping below.
+// Must never imply a specific category (e.g. Appliance) that isn't actually selected.
 export const DEFAULT_SERVICE_IMAGE: ServiceImageInfo = {
   image: APPLIANCE_DEFAULT_IMAGE,
-  title: 'Home Appliance & Repair Services',
-  desc: 'Certified technicians ready for any appliance or home service need.',
+  title: 'Professional Home Service Support',
+  desc: 'Certified technicians ready to help with your home service request.',
 };
 
 // Map product name (SchedulerPage) → image info
@@ -299,7 +304,7 @@ export const SERVICE_TYPE_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Indoor and outdoor security camera mounting and setup.',
   },
   'smart-lock-installation': {
-    image: `${SMART}/garage-opener.png`,
+    image: SMART_LOCK_PLACEHOLDER_IMAGE,
     title: 'Smart Lock Installation',
     desc: 'Professional smart lock fitting, programming, and app setup.',
   },
@@ -309,7 +314,7 @@ export const SERVICE_TYPE_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Connect and configure smart home devices to your network.',
   },
   'tv-mounting': {
-    image: SMART_HOME_SERVICE_IMAGES['tv-mounting'],
+    image: CATEGORY_HERO_IMAGE['tv-mounting'],
     title: 'TV Mounting',
     desc: 'Safe wall mounting with cable management for any TV size.',
   },
@@ -340,7 +345,7 @@ export const SERVICE_TYPE_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Spring, opener, track, and panel repair from licensed technicians.',
   },
   'general-handyman': {
-    image: APPLIANCE_DEFAULT_IMAGE,
+    image: CATEGORY_HERO_IMAGE.handyman,
     title: 'General Handyman Request',
     desc: 'Skilled technicians for a wide range of home repair and maintenance tasks.',
   },
@@ -374,7 +379,7 @@ export const CATEGORY_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Licensed electricians for wiring, panel, outlet, and safety issues.',
   },
   'smart-home-setup': {
-    image: `${BASE}/smart-home/hero-installer.png`,
+    image: CATEGORY_HERO_IMAGE['smart-home'],
     title: 'Smart Home Installation & Setup',
     desc: 'The convenient and stress-free solution to upgrade your home.',
   },
@@ -382,6 +387,23 @@ export const CATEGORY_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     image: APPLIANCE_DEFAULT_IMAGE,
     title: 'Home Maintenance',
     desc: 'Routine maintenance and preventive service for your home systems.',
+  },
+  // Safety nets so an unmapped service id on these pages never falls through to the
+  // generic appliance default — see getServiceImage below.
+  handyman: {
+    image: CATEGORY_HERO_IMAGE.handyman,
+    title: 'Handyman Services',
+    desc: 'Skilled help for furniture assembly, wall hanging, drywall repair, and minor home projects.',
+  },
+  'tv-mounting': {
+    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    title: 'TV Mounting Services',
+    desc: 'Secure wall mounting with cable management for any TV size.',
+  },
+  'phone-repair': {
+    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    title: 'Phone Repair Services',
+    desc: 'Screen, battery, charging port, and diagnostic services for popular devices.',
   },
 };
 

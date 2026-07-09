@@ -29,6 +29,9 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import HomeIcon from '@mui/icons-material/Home';
 import GarageIcon from '@mui/icons-material/Garage';
 import KitchenIcon from '@mui/icons-material/Kitchen';
+import TvIcon from '@mui/icons-material/Tv';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import ConstructionIcon from '@mui/icons-material/Construction';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import { colors, fonts } from '../theme';
@@ -37,6 +40,7 @@ import { PLUMBING_SERVICE_IMAGES } from '../data/plumbingHub';
 import { ELECTRICAL_SERVICE_IMAGES } from '../data/electricalHub';
 import { APPLIANCE_SERVICE_IMAGES, APPLIANCE_DEFAULT_IMAGE } from '../data/applianceHub';
 import { SMART_HOME_SERVICE_IMAGES } from '../data/smartHomeHub';
+import { CATEGORY_HERO_IMAGE } from '../data/expandedServiceImages';
 import {
   validateZipCode,
   getZipFieldHelperText,
@@ -77,6 +81,16 @@ import {
   validateUsPhone,
   SERVICE_AREA_STATES,
 } from '../lib/schedulerContactValidation';
+import CatalogBookingFields from '../components/booking/CatalogBookingFields';
+import {
+  CATALOG_PRIMARY_CATEGORIES,
+  CATALOG_QUESTION_CATEGORIES,
+  SCHEDULER_CATEGORY_SLUGS,
+} from '../types/services';
+import type { ServiceCatalogItem } from '../types/services';
+import { getCategoryBySlug } from '../services/serviceCatalog';
+import { answersToDescriptionLines, validateRequiredQuestions } from '../utils/bookingAnswers';
+import { loadCatalogQuestions } from '../services/serviceCatalog';
 
 const formatPhone = (raw: string): string => {
   const digits = raw.replace(/\D/g, '').slice(0, 10);
@@ -130,6 +144,9 @@ const SERVICE_CATEGORIES = [
   { id: 'Electrical',   label: 'Electrical',   icon: <BoltIcon />,             desc: "Outlets, fixtures & ceiling fans" },
   { id: 'Smart Home',   label: 'Smart Home',   icon: <HomeIcon />,             desc: "Thermostats, cameras & smart devices" },
   { id: 'Garage Door',  label: 'Garage Door',  icon: <GarageIcon />,           desc: "Opener, panels, springs & cables" },
+  { id: 'TV Mounting',  label: 'TV Mounting',  icon: <TvIcon />,               desc: "TV mount, soundbar & wire concealment" },
+  { id: 'Phone Repair', label: 'Phone Repair', icon: <PhoneAndroidIcon />,     desc: "Screen, battery, charging port & more" },
+  { id: 'Handyman',     label: 'Handyman',     icon: <ConstructionIcon />,     desc: "Assembly, drywall, hanging & small repairs" },
 ];
 
 const BRANDS = [
@@ -166,7 +183,7 @@ const CATEGORY_PANEL: Record<string, PanelInfo> = {
     bullets: ['Licensed & insured electricians', 'Safety-first approach', 'Outlet, panel & wiring work'],
   },
   'Smart Home': {
-    image: SMART_HOME_SERVICE_IMAGES['smart-thermostat-setup'],
+    image: CATEGORY_HERO_IMAGE['smart-home'],
     title: 'Smart Home Setup',
     desc: 'Professional installation and configuration for all smart devices.',
     bullets: ['All smart home brands', 'App setup & pairing included', 'Wi-Fi troubleshooting'],
@@ -176,6 +193,24 @@ const CATEGORY_PANEL: Record<string, PanelInfo> = {
     title: 'Garage Door Service',
     desc: 'Spring, opener, track, and sensor repair by specialists.',
     bullets: ['Same-day service available', 'All door brands & models', 'Spring & opener specialists'],
+  },
+  'TV Mounting': {
+    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    title: 'TV Mounting',
+    desc: 'Secure mounting, wire concealment, and entertainment setup.',
+    bullets: ['Standard and large TV installs', 'Wire concealment available', 'Soundbar setup included'],
+  },
+  'Phone Repair': {
+    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    title: 'Phone Repair',
+    desc: 'Diagnostics and common mobile device repairs.',
+    bullets: ['Screen and battery service', 'Charging port repair', 'No passcodes collected online'],
+  },
+  Handyman: {
+    image: CATEGORY_HERO_IMAGE.handyman,
+    title: 'Handyman Services',
+    desc: 'Reliable help for assembly, hanging, and minor home repairs.',
+    bullets: ['Furniture assembly', 'Drywall and shelf installs', 'Transparent hourly options'],
   },
 };
 
@@ -436,6 +471,9 @@ const SchedulerPage: React.FC = () => {
 
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingAnswers, setBookingAnswers] = useState<Record<string, unknown>>({});
+  const [catalogService, setCatalogService] = useState<ServiceCatalogItem | null>(null);
+  const [catalogQuestions, setCatalogQuestions] = useState<{ question_key: string; label: string; is_required: boolean; conditional_logic?: unknown }[]>([]);
 
   useEffect(() => {
     const next = parseSchedulerPrefill(params);
@@ -624,6 +662,7 @@ const SchedulerPage: React.FC = () => {
   // ── Pricing summary inputs ────────────────────────────────────────────────
   const pricingServiceTypeLabel = SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? null;
   const pricingProductName =
+    catalogService?.name ||
     prefill.productName || appliance || hvacService || plumbingIssue || electricalIssue || smartDevice || garageDoorService || null;
   const pricingUrgency =
     hvacUrgency || (serviceType === 'emergency' ? 'Emergency' : 'Regular');
@@ -644,6 +683,37 @@ const SchedulerPage: React.FC = () => {
     }),
     [category, pricingProductName, pricingServiceTypeLabel, pricingUrgency],
   );
+
+  const categorySlug = category ? SCHEDULER_CATEGORY_SLUGS[category] : undefined;
+  const usesCatalogQuestions = Boolean(category && CATALOG_QUESTION_CATEGORIES.has(category));
+
+  useEffect(() => {
+    if (!categorySlug || !usesCatalogQuestions) {
+      setCatalogQuestions([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const cat = await getCategoryBySlug(categorySlug);
+      if (!cat || cancelled) return;
+      const qs = await loadCatalogQuestions(cat.id, catalogService?.id ?? null);
+      if (!cancelled) {
+        setCatalogQuestions(qs.map((q) => ({
+          question_key: q.question_key,
+          label: q.label,
+          is_required: q.is_required,
+          conditional_logic: q.conditional_logic,
+        })));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [categorySlug, usesCatalogQuestions, catalogService?.id]);
+
+  const catalogValidationError = useMemo(() => {
+    if (!category || !CATALOG_PRIMARY_CATEGORIES.has(category)) return null;
+    if (!catalogService) return 'Please select a service';
+    return validateRequiredQuestions(catalogQuestions, bookingAnswers);
+  }, [category, catalogService, catalogQuestions, bookingAnswers]);
 
   const resolvedCategoryDetail = useMemo(
     () =>
@@ -715,6 +785,9 @@ const SchedulerPage: React.FC = () => {
     if (step === 0) return Boolean(serviceType);
     if (step === 1) {
       if (!category) return false;
+      if (CATALOG_PRIMARY_CATEGORIES.has(category)) {
+        return Boolean(catalogService) && !catalogValidationError;
+      }
       return Boolean(resolvedCategoryDetail);
     }
     if (step === 2) {
@@ -736,6 +809,8 @@ const SchedulerPage: React.FC = () => {
     serviceType,
     category,
     resolvedCategoryDetail,
+    catalogService,
+    catalogValidationError,
     zipValidation.isValid,
     nameError,
     emailError,
@@ -788,6 +863,8 @@ const SchedulerPage: React.FC = () => {
     setSmartDevice(''); setSmartHelp('');
     setGarageDoorService(''); setGarageDoorProblem('');
     setIssueDescription('');
+    setBookingAnswers({});
+    setCatalogService(null);
   };
 
   const handleChangeCategory = () => {
@@ -839,8 +916,11 @@ const SchedulerPage: React.FC = () => {
     if (garageDoorService) noteParts.push(`Garage door: ${garageDoorService}`);
     if (garageDoorProblem) noteParts.push(`Problem: ${garageDoorProblem}`);
     if (issueDescription) noteParts.push(`Notes: ${issueDescription}`);
+    noteParts.push(...answersToDescriptionLines(bookingAnswers));
 
     const reqNum = generateRequestNumber();
+    const categoryRecord = categorySlug ? await getCategoryBySlug(categorySlug) : null;
+
     console.log('[Booking] FormData', { name, email, phone, city, stateField, zipCode, reqNum });
 
     try {
@@ -858,7 +938,14 @@ const SchedulerPage: React.FC = () => {
         state: stateField || null,
         service_type: SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? serviceType,
         service_category: category || (SERVICE_TYPES.find((t) => t.id === serviceType)?.label ?? ''),
-        product_name: prefill.productName || appliance || hvacService || plumbingIssue || electricalIssue || smartDevice || garageDoorService || null,
+        product_name: catalogService?.name || prefill.productName || appliance || hvacService || plumbingIssue || electricalIssue || smartDevice || garageDoorService || null,
+        category_id: categoryRecord?.id ?? null,
+        service_id: catalogService?.id ?? null,
+        booking_answers: bookingAnswers,
+        source: 'scheduler',
+        technician_skill_group: catalogService?.technician_skill_group ?? null,
+        estimated_duration_minutes: catalogService?.estimated_duration_minutes ?? null,
+        materials_required: Boolean(bookingAnswers.materialsProvidedByCustomer),
         appliance_brand: brand || null,
         appliance_model: model || null,
         issue_description: noteParts.join('\n') || issueDescription || null,
@@ -1868,8 +1955,45 @@ const SchedulerPage: React.FC = () => {
                     </>
                   )}
 
+                  {/* ── Catalog-driven categories ── */}
+                  {category && CATALOG_PRIMARY_CATEGORIES.has(category) && categorySlug ? (
+                    <>
+                      <CatalogBookingFields
+                        categorySlug={categorySlug}
+                        initialServiceSlug={prefill.productName
+                          ? prefill.productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+                          : undefined}
+                        answers={bookingAnswers}
+                        onAnswersChange={setBookingAnswers}
+                        selectedService={catalogService}
+                        onServiceChange={setCatalogService}
+                      />
+                      {catalogValidationError ? (
+                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.emergency, mt: 1 }}>
+                          {catalogValidationError}
+                        </Typography>
+                      ) : null}
+                    </>
+                  ) : null}
+
+                  {category === 'Smart Home' && categorySlug ? (
+                    <Box sx={{ mt: 2.5, pt: 2.5, borderTop: `1px solid ${colors.border}` }}>
+                      <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', color: colors.navy, mb: 1.5 }}>
+                        Service details
+                      </Typography>
+                      <CatalogBookingFields
+                        categorySlug={categorySlug}
+                        answers={bookingAnswers}
+                        onAnswersChange={setBookingAnswers}
+                        selectedService={catalogService}
+                        onServiceChange={setCatalogService}
+                        showServicePicker={false}
+                      />
+                    </Box>
+                  ) : null}
+
                   {/* Issue description (shown once category is selected) */}
-                  {category && (
+                  {category && !CATALOG_PRIMARY_CATEGORIES.has(category) && (
                     <Box sx={{ mt: 0.5 }}>
                       <Typography
                         sx={{

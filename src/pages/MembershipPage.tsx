@@ -24,7 +24,7 @@ import ElectricBoltOutlinedIcon from '@mui/icons-material/ElectricBoltOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import GarageOutlinedIcon from '@mui/icons-material/GarageOutlined';
 import { useSeo } from '../hooks/useSeo';
-import { colors, fonts, primaryButtonSx, secondaryButtonSx } from '../theme';
+import { colors, fonts, primaryButtonSx } from '../theme';
 import {
   MEMBERSHIP_PLANS,
   MEMBERSHIP_DISCLAIMER,

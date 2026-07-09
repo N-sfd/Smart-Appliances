@@ -28,6 +28,7 @@ import { colors, fonts } from '../../theme';
 import { MATCH_EXPERT_SOURCE_TAG } from '../../data/expertMatchRules';
 import { EXPERTS, getExpertBySlug } from '../../data/experts';
 import { exportCsv } from '../../utils/csvExport';
+import BookingAnswersPanel from '../../components/admin/BookingAnswersPanel';
 
 type LeadSource = 'Quick Form' | 'Scheduler' | 'Matching Expert';
 const LEAD_SOURCES: LeadSource[] = ['Quick Form', 'Scheduler', 'Matching Expert'];
@@ -50,7 +51,7 @@ const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
   Emergency: { bg: '#FDECEA', text: '#C62828' },
 };
 
-const SERVICE_CATEGORIES = ['Appliance', 'HVAC', 'Plumbing', 'Electrical', 'Smart Home', 'Garage Door'];
+const SERVICE_CATEGORIES = ['Appliance', 'HVAC', 'Plumbing', 'Electrical', 'Smart Home', 'Garage Door', 'TV Mounting', 'Phone Repair', 'Handyman'];
 const SERVICE_TYPES = ['Repair', 'Installation', 'Maintenance', 'Emergency'];
 
 const displayCustomerName = (name?: string | null) => {
@@ -312,6 +313,31 @@ const RowDetail: React.FC<RowDetailProps> = ({ row, onStatusChange, activeExpert
           <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText, lineHeight: 1.6 }}>
             {row.issue_description}
           </Typography>
+        </Box>
+      )}
+
+      <BookingAnswersPanel answers={row.booking_answers} />
+
+      {(row.technician_skill_group || row.estimated_duration_minutes != null || row.source) && (
+        <Box sx={{ mb: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 1.5 }}>
+          {row.source ? (
+            <Box>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase' }}>Source</Typography>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>{row.source}</Typography>
+            </Box>
+          ) : null}
+          {row.technician_skill_group ? (
+            <Box>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase' }}>Skill Group</Typography>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>{row.technician_skill_group}</Typography>
+            </Box>
+          ) : null}
+          {row.estimated_duration_minutes != null ? (
+            <Box>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.72rem', color: colors.mutedText, mb: 0.25, textTransform: 'uppercase' }}>Est. Duration</Typography>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', color: colors.darkText }}>{row.estimated_duration_minutes} min</Typography>
+            </Box>
+          ) : null}
         </Box>
       )}
 

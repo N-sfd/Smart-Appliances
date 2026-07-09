@@ -5,6 +5,9 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import SensorsIcon from '@mui/icons-material/Sensors';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import TvIcon from '@mui/icons-material/Tv';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import ConstructionIcon from '@mui/icons-material/Construction';
 import type { SvgIconComponent } from '@mui/icons-material';
 import { serviceCategories } from './services';
 import type { ServiceMenuIllustrationVariant } from '../components/illustrations/ServiceMenuIllustration';
@@ -47,7 +50,7 @@ export const serviceNavItems: ServiceNavItem[] = [
     label: 'Appliance Care',
     path: '/services/home-appliances',
     icon: KitchenIcon,
-    description: 'Refrigerator, washer, dryer, dishwasher, oven, and microwave service.',
+    description: 'Refrigerator, Washer, Dryer, Dishwasher, Oven, and Microwave Service.',
     illustration: 'appliance-care',
   },
   {
@@ -55,7 +58,7 @@ export const serviceNavItems: ServiceNavItem[] = [
     label: 'HVAC Services',
     path: '/services/hvac-support',
     icon: AcUnitIcon,
-    description: 'AC repair, heating, thermostats, duct cleaning, and maintenance.',
+    description: 'AC Repair, Heating, Thermostats, Duct Cleaning, and Maintenance.',
     illustration: 'hvac-services',
   },
   {
@@ -63,7 +66,7 @@ export const serviceNavItems: ServiceNavItem[] = [
     label: 'Plumbing Services',
     path: '/services/plumbing',
     icon: WaterDropIcon,
-    description: 'Leak repair, drain cleaning, faucets, and water heater service.',
+    description: 'Leak Repair, Drain Cleaning, Faucets, and Water Heater Service.',
     illustration: 'plumbing-services',
   },
   {
@@ -71,23 +74,47 @@ export const serviceNavItems: ServiceNavItem[] = [
     label: 'Electrical Services',
     path: '/services/electrical',
     icon: BoltIcon,
-    description: 'Outlets, breaker panels, fixtures, and wiring troubleshooting.',
+    description: 'Outlets, Breaker Panels, Fixtures, and Wiring Troubleshooting.',
     illustration: 'electrical-services',
   },
   {
     id: 'smart-home-setup',
     label: 'Smart Home Services',
-    path: '/services/smart-thermostat-setup',
+    path: '/services/smart-home',
     icon: SensorsIcon,
-    description: 'Video doorbells, smart locks, thermostats, and security cameras.',
+    description: 'Video Doorbells, Smart Locks, Smart Thermostats, Security Cameras, and Device Setup.',
     illustration: 'smart-home-setup',
+  },
+  {
+    id: 'tv-mounting',
+    label: 'TV Mounting',
+    path: '/services/tv-mounting',
+    icon: TvIcon,
+    description: 'TV Mounting, Wire Concealment, Soundbar Installation, and Device Setup.',
+    illustration: 'tv-mounting',
+  },
+  {
+    id: 'phone-repair',
+    label: 'Phone Repair',
+    path: '/services/phone-repair',
+    icon: PhoneAndroidIcon,
+    description: 'Screen Replacement, Battery Replacement, Charging Port Repair, and Device Diagnostics.',
+    illustration: 'phone-repair',
+  },
+  {
+    id: 'handyman',
+    label: 'Handyman Services',
+    path: '/services/handyman',
+    icon: ConstructionIcon,
+    description: 'Furniture Assembly, Wall Hanging, Drywall Repair, Painting, and Minor Home Projects.',
+    illustration: 'handyman',
   },
   {
     id: 'garage-door-repair',
     label: 'Garage Door Services',
     path: '/services/garage-door-repair',
     icon: WarehouseIcon,
-    description: 'Openers, tracks, sensors, and spring inspection.',
+    description: 'Openers, Tracks, Sensors, and Spring Inspection.',
     illustration: 'garage-door-repair',
   },
   {
@@ -95,7 +122,7 @@ export const serviceNavItems: ServiceNavItem[] = [
     label: 'Emergency Service',
     path: '/emergency-service',
     icon: WarningAmberIcon,
-    description: 'Urgent, same-day service when something can’t wait.',
+    description: 'Urgent, Same-Day Service When Something Can’t Wait.',
     illustration: 'emergency-service',
   },
 ];
@@ -103,12 +130,15 @@ export const serviceNavItems: ServiceNavItem[] = [
 export const serviceNavPath = (item: ServiceNavItem): string => item.path;
 
 const SMART_HOME_PREFIXES = [
+  '/services/smart-home',
   '/services/smart-thermostat-setup',
+  '/services/tv-mounting',
+  '/services/phone-repair',
+  '/services/handyman',
   '/services/doorbell-installation',
   '/services/camera-installation',
   '/services/smart-lock-installation',
   '/services/wifi-setup',
-  '/services/tv-mounting',
 ];
 
 export const isServiceNavItemActive = (
@@ -139,6 +169,18 @@ export const isServiceNavItemActive = (
 
   if (item.id === 'smart-home-setup') {
     return SMART_HOME_PREFIXES.some((p) => pathname === p || pathname.startsWith(p));
+  }
+
+  if (item.id === 'tv-mounting') {
+    return pathname === '/services/tv-mounting';
+  }
+
+  if (item.id === 'phone-repair') {
+    return pathname === '/services/phone-repair';
+  }
+
+  if (item.id === 'handyman') {
+    return pathname === '/services/handyman';
   }
 
   if (item.id === 'garage-door-repair') {

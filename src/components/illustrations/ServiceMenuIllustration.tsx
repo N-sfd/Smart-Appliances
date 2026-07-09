@@ -6,6 +6,9 @@ export type ServiceMenuIllustrationVariant =
   | 'plumbing-services'
   | 'electrical-services'
   | 'smart-home-setup'
+  | 'tv-mounting'
+  | 'phone-repair'
+  | 'handyman'
   | 'garage-door-repair'
   | 'emergency-service';
 
@@ -61,6 +64,9 @@ const PALETTES: Record<ServiceMenuIllustrationVariant, Palette> = {
   'plumbing-services': { from: '#EAF6FF', to: '#D3ECFF', accent: '#2563EB' },
   'electrical-services': { from: '#FFF7E0', to: '#FFECB3', accent: '#D97706' },
   'smart-home-setup': { from: '#EFEAFF', to: '#DCD1FF', accent: '#7C3AED' },
+  'tv-mounting': { from: '#ECEBFF', to: '#D8D5FF', accent: '#4F46E5' },
+  'phone-repair': { from: '#E6FBF7', to: '#CFF5EC', accent: '#0D9488' },
+  handyman: { from: '#FFF0E6', to: '#FFE0CC', accent: '#EA580C' },
   'garage-door-repair': { from: '#EEF2F7', to: '#DCE4EF', accent: '#334155' },
   'emergency-service': { from: '#FFECEC', to: '#FFD6D6', accent: '#DC2626' },
 };
@@ -107,6 +113,29 @@ const GLYPHS: Record<ServiceMenuIllustrationVariant, (p: Palette) => React.React
       <rect x="42" y="58" width="12" height="16" fill={p.accent} opacity="0.8" />
       <path d="M48 24 a20 20 0 0 1 20 20" fill="none" stroke={p.accent} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
       <circle cx="34" cy="62" r="3.5" fill={p.accent} />
+    </g>
+  ),
+  'tv-mounting': (p) => (
+    <g>
+      <rect x="24" y="24" width="48" height="32" rx="4" fill={WHITE} stroke={p.accent} strokeWidth="3.5" />
+      <line x1="48" y1="56" x2="48" y2="66" stroke={p.accent} strokeWidth="3" strokeLinecap="round" />
+      <line x1="36" y1="70" x2="60" y2="70" stroke={p.accent} strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx="48" cy="40" r="3" fill={p.accent} />
+    </g>
+  ),
+  'phone-repair': (p) => (
+    <g>
+      <rect x="34" y="18" width="28" height="56" rx="6" fill={WHITE} stroke={p.accent} strokeWidth="3.5" />
+      <line x1="43" y1="66" x2="53" y2="66" stroke={p.accent} strokeWidth="3" strokeLinecap="round" />
+      <path d="M40 28 L50 40 L44 46 L54 58" fill="none" stroke={p.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+  ),
+  handyman: (p) => (
+    <g>
+      <rect x="24" y="42" width="48" height="30" rx="5" fill={WHITE} stroke={p.accent} strokeWidth="3.5" />
+      <path d="M38 42 v-4 a4 4 0 0 1 4 -4 h12 a4 4 0 0 1 4 4 v4" fill="none" stroke={p.accent} strokeWidth="3.5" strokeLinejoin="round" />
+      <line x1="24" y1="54" x2="72" y2="54" stroke={p.accent} strokeWidth="3" />
+      <rect x="43" y="48" width="10" height="10" rx="2" fill={p.accent} />
     </g>
   ),
   'garage-door-repair': (p) => (

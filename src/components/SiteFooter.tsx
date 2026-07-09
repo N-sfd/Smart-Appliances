@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { Box, Typography, TextField, Button, IconButton, Tooltip } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import YouTubeIcon from '@mui/icons-material/YouTube';
@@ -9,63 +9,52 @@ import { colors, fonts } from '../theme';
 
 interface FooterLink {
   label: string;
-  path: string;
+  /** Route to navigate to. Omit when using `hash`. */
+  path?: string;
+  /** Element id on the homepage to scroll to instead of navigating to a new page. */
+  hash?: string;
 }
 
 interface SocialLink {
   label: string;
+  ariaLabel: string;
   href: string;
-  icon: React.ReactNode | null;
+  icon: React.ReactNode;
 }
 
 const companyLinks: FooterLink[] = [
   { label: 'Home', path: '/' },
   { label: 'About Us', path: '/about' },
-  { label: 'How It Works', path: '/how-it-works' },
-  { label: 'Pricing', path: '/pricing' },
   { label: 'Smart Care', path: '/membership' },
-  { label: 'Service Professionals', path: '/experts' },
-  { label: 'Service Areas', path: '/areas' },
+  { label: 'Service Areas', hash: 'service-areas' },
   { label: 'Contact Us', path: '/contact' },
 ];
 
 const serviceLinks: FooterLink[] = [
-  { label: 'Appliance Repair', path: '/services/home-appliances' },
+  { label: 'Appliance Care', path: '/services/home-appliances' },
   { label: 'HVAC Services', path: '/services/hvac' },
   { label: 'Plumbing Services', path: '/services/plumbing' },
   { label: 'Electrical Services', path: '/services/electrical' },
   { label: 'Smart Home Services', path: '/services/smart-home' },
-  { label: 'Garage Door Services', path: '/services/garage-door' },
-  { label: 'Emergency Service', path: '/scheduler?serviceType=E' },
+  { label: 'TV Mounting', path: '/services/tv-mounting' },
+  { label: 'Phone Repair', path: '/services/phone-repair' },
+  { label: 'Handyman', path: '/services/handyman' },
+  { label: 'Garage Door Services', path: '/services/garage-door-repair' },
 ];
 
 const resourceLinks: FooterLink[] = [
   { label: 'Help Center', path: '/resources' },
   { label: 'Articles', path: '/resources/articles' },
   { label: 'Videos', path: '/resources/videos' },
-  { label: 'Appliance Care', path: '/resources/articles?category=appliance-care' },
-  { label: 'HVAC Tips', path: '/resources/articles?category=hvac-energy' },
-  { label: 'Electrical Safety', path: '/resources/articles?category=electrical-safety' },
   { label: 'Maintenance Guides', path: '/resources/articles?category=maintenance' },
-  { label: 'FAQ', path: '/#faqs' },
+  { label: 'FAQ', hash: 'faqs' },
 ];
 
-const popularServiceLinks: FooterLink[] = [
-  { label: 'Refrigerator Service', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Refrigerator+Repair' },
-  { label: 'Washer & Dryer Service', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Washer+Dryer+Repair' },
-  { label: 'Oven & Stove Service', path: '/scheduler?serviceType=R&serviceCategory=Appliance&productName=Oven+Stove+Repair' },
-  { label: 'AC Service', path: '/scheduler?serviceType=R&serviceCategory=HVAC&productName=AC+Repair' },
-  { label: 'Drain Cleaning', path: '/scheduler?serviceType=R&serviceCategory=Plumbing&productName=Drain+Cleaning' },
-  { label: 'Light Fixture Installation', path: '/scheduler?serviceType=I&serviceCategory=Electrical&productName=Light+Fixture+Installation' },
-  { label: 'Video Doorbell Installation', path: '/scheduler?serviceType=I&serviceCategory=Smart%20Home&productName=Video+Doorbell+Installation' },
-];
-
-const legalLinks: FooterLink[] = [
+const supportLinks: FooterLink[] = [
   { label: 'Privacy Policy', path: '/privacy-policy' },
   { label: 'Terms of Service', path: '/terms-of-service' },
-  { label: 'Membership Terms', path: '/membership-terms' },
-  { label: 'Warranty FAQ', path: '/warranty-faq' },
-  { label: 'Service Guarantee', path: '/service-guarantee' },
+  { label: 'Membership Terms', path: '/membership' },
+  { label: 'Service Guarantee', hash: 'service-guarantee' },
   { label: 'Sitemap', path: '/sitemap' },
 ];
 
@@ -75,61 +64,115 @@ const bottomBarLinks: FooterLink[] = [
   { label: 'Sitemap', path: '/sitemap' },
 ];
 
+// TODO: replace with the real Smart Appliances social profile URLs once they exist,
+// then restore target="_blank" rel="noreferrer" (already wired up below for real links).
 const socialLinks: SocialLink[] = [
-  { label: 'Facebook', href: 'https://facebook.com/', icon: <FacebookIcon sx={{ fontSize: 19 }} /> },
-  { label: 'X', href: 'https://x.com/', icon: null },
-  { label: 'YouTube', href: 'https://youtube.com/', icon: <YouTubeIcon sx={{ fontSize: 19 }} /> },
-  { label: 'Google Business', href: 'https://www.google.com/business/', icon: <StorefrontIcon sx={{ fontSize: 19 }} /> },
-  { label: 'Instagram', href: 'https://instagram.com/', icon: <InstagramIcon sx={{ fontSize: 19 }} /> },
+  { label: 'Facebook', ariaLabel: 'Visit Smart Appliances on Facebook', href: '#', icon: <FacebookIcon sx={{ fontSize: 18 }} /> },
+  {
+    label: 'X',
+    ariaLabel: 'Visit Smart Appliances on X',
+    href: '#',
+    icon: <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '0.85rem', lineHeight: 1 }}>X</Typography>,
+  },
+  { label: 'YouTube', ariaLabel: 'Visit Smart Appliances on YouTube', href: '#', icon: <YouTubeIcon sx={{ fontSize: 18 }} /> },
+  { label: 'Google Business', ariaLabel: 'View Smart Appliances Google Business Profile', href: '#', icon: <StorefrontIcon sx={{ fontSize: 18 }} /> },
+  { label: 'Instagram', ariaLabel: 'Visit Smart Appliances on Instagram', href: '#', icon: <InstagramIcon sx={{ fontSize: 18 }} /> },
 ];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Accessible, readable against the white footer background (~7.5:1 contrast). */
+const FOOTER_LINK_COLOR = '#4B5563';
 
 const FOOTER_HEADING = {
   fontFamily: fonts.heading,
   color: colors.navy,
   fontWeight: 700,
-  fontSize: '0.95rem',
+  fontSize: '1rem',
   letterSpacing: '-0.01em',
   lineHeight: 1.3,
   m: 0,
-  mb: 2,
+  mb: 1.75,
 } as const;
 
 const footerLinkSx = {
   fontFamily: fonts.body,
-  color: colors.mutedText,
+  color: FOOTER_LINK_COLOR,
   fontSize: '0.875rem',
   lineHeight: 1.6,
   textDecoration: 'none',
   display: 'block',
-  mb: 1.1,
+  mb: 0.9,
   transition: 'color 0.2s',
   '&:hover': { color: colors.primaryBlue },
-  '&:last-of-type': { mb: 0 },
 } as const;
 
-const FooterColumn: React.FC<{ title: string; links: FooterLink[] }> = ({ title, links }) => (
+const hashLinkButtonSx = {
+  ...footerLinkSx,
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  width: '100%',
+  textAlign: 'left',
+  cursor: 'pointer',
+  font: 'inherit',
+} as const;
+
+/** Scrolls to a section on the homepage, navigating there first if needed (mirrors TopBar's nav behavior). */
+function scrollToHomeSection(id: string, navigate: ReturnType<typeof useNavigate>, pathname: string) {
+  const snap = (behavior: ScrollBehavior) => document.getElementById(id)?.scrollIntoView({ behavior });
+  const run = () => {
+    snap('smooth');
+    setTimeout(() => snap('auto'), 650);
+  };
+  if (pathname !== '/') {
+    navigate('/');
+    setTimeout(run, 400);
+  } else {
+    run();
+  }
+}
+
+const FooterColumn: React.FC<{
+  title: string;
+  links: FooterLink[];
+  onHashLinkClick: (hash: string) => void;
+}> = ({ title, links, onHashLinkClick }) => (
   <Box>
     <Typography component="h3" sx={FOOTER_HEADING}>
       {title}
     </Typography>
-    {links.map((link) => (
-      <Box key={link.label} component={RouterLink} to={link.path} sx={footerLinkSx}>
-        {link.label}
-      </Box>
-    ))}
+    {links.map((link) =>
+      link.hash ? (
+        <Box
+          key={link.label}
+          component="button"
+          type="button"
+          onClick={() => onHashLinkClick(link.hash as string)}
+          sx={hashLinkButtonSx}
+        >
+          {link.label}
+        </Box>
+      ) : (
+        <Box key={link.label} component={RouterLink} to={link.path as string} sx={footerLinkSx}>
+          {link.label}
+        </Box>
+      ),
+    )}
   </Box>
 );
 
 const SiteFooter: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   if (location.pathname.startsWith('/admin')) {
     return null;
   }
+
+  const handleHashLinkClick = (hash: string) => scrollToHomeSection(hash, navigate, location.pathname);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,11 +198,11 @@ const SiteFooter: React.FC = () => {
           maxWidth: '1280px',
           mx: 'auto',
           px: { xs: 2, sm: 3 },
-          pt: { xs: 5, md: 7 },
+          pt: { xs: 4, md: 6 },
           pb: { xs: 3, md: 4 },
         }}
       >
-        {/* Multi-column footer: Company | Services | Popular Services | Resources | Legal | Stay Connected */}
+        {/* Multi-column footer: Company | Services | Resources | Support | Stay Connected */}
         <Box
           sx={{
             display: 'grid',
@@ -167,39 +210,53 @@ const SiteFooter: React.FC = () => {
               xs: '1fr',
               sm: 'repeat(2, minmax(0, 1fr))',
               md: 'repeat(3, minmax(0, 1fr))',
-              lg: 'repeat(7, minmax(0, 1fr))',
+              lg: '1fr 1.35fr 1fr 1fr 1.3fr',
             },
             columnGap: { xs: 0, sm: 4, lg: 4 },
             rowGap: { xs: 4, sm: 5 },
             alignItems: 'start',
           }}
         >
-          <FooterColumn title="Company" links={companyLinks} />
-          <FooterColumn title="Services" links={serviceLinks} />
-          <FooterColumn title="Popular Services" links={popularServiceLinks} />
-          <FooterColumn title="Resources" links={resourceLinks} />
-          <FooterColumn title="Legal" links={legalLinks} />
+          <Box sx={{ order: { xs: 2, sm: 0 } }}>
+            <FooterColumn title="Company" links={companyLinks} onHashLinkClick={handleHashLinkClick} />
+          </Box>
+          <Box sx={{ order: { xs: 3, sm: 0 } }}>
+            <FooterColumn title="Services" links={serviceLinks} onHashLinkClick={handleHashLinkClick} />
+          </Box>
+          <Box sx={{ order: { xs: 4, sm: 0 } }}>
+            <FooterColumn title="Resources" links={resourceLinks} onHashLinkClick={handleHashLinkClick} />
+          </Box>
+          <Box sx={{ order: { xs: 5, sm: 0 } }}>
+            <FooterColumn title="Support" links={supportLinks} onHashLinkClick={handleHashLinkClick} />
+          </Box>
 
           {/* Stay Connected */}
-          <Box sx={{ gridColumn: { lg: 'span 2' } }}>
+          <Box sx={{ order: { xs: 1, sm: 0 } }}>
             <Typography component="h3" sx={FOOTER_HEADING}>
               Stay Connected
+            </Typography>
+            <Typography sx={{ fontFamily: fonts.body, color: FOOTER_LINK_COLOR, fontSize: '0.85rem', lineHeight: 1.55, mb: 1.75 }}>
+              Get service tips, maintenance reminders, and Smart Care updates.
             </Typography>
             <Box
               component="form"
               onSubmit={handleSubscribe}
               noValidate
-              sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row', lg: 'row' }, gap: 1 }}
+              sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row', md: 'row', lg: 'column' }, gap: 1 }}
             >
               <TextField
                 type="email"
-                placeholder="Enter email"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setSubscribeStatus('idle'); }}
                 size="small"
+                inputProps={{ 'aria-label': 'Email address' }}
                 sx={{
-                  flex: '1 1 240px',
-                  minWidth: { xs: '100%', sm: 200 },
+                  // flex-basis/grow apply to the main axis, which flips with flexDirection above —
+                  // only stretch to fill space when the form is a row; column mode already gets
+                  // full width for free from the flex container's default align-items: stretch.
+                  flex: { xs: 'auto', sm: '1 1 160px', md: '1 1 160px', lg: 'auto' },
+                  minWidth: 0,
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '10px',
                     fontFamily: fonts.body,
@@ -238,35 +295,36 @@ const SiteFooter: React.FC = () => {
               </Typography>
             )}
 
-            <Box sx={{ display: 'flex', gap: 1.25, mt: 2.5 }}>
-              {socialLinks.map((social) => (
-                <Tooltip key={social.label} title={social.label}>
-                  <IconButton
-                    component="a"
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    sx={{
-                      width: 38,
-                      height: 38,
-                      backgroundColor: colors.primaryBlue,
-                      color: '#fff',
-                      transition: 'transform 0.2s ease, background-color 0.2s ease',
-                      '&:hover': { backgroundColor: colors.navy, transform: 'translateY(-2px)' },
-                    }}
-                  >
-                    {social.icon ?? (
-                      <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '0.9rem' }}>
-                        X
-                      </Typography>
-                    )}
-                  </IconButton>
-                </Tooltip>
-              ))}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+              {socialLinks.map((social) => {
+                const isPlaceholder = social.href === '#';
+                return (
+                  <Tooltip key={social.label} title={social.label} enterTouchDelay={0}>
+                    <IconButton
+                      component="a"
+                      href={social.href}
+                      target={isPlaceholder ? undefined : '_blank'}
+                      rel={isPlaceholder ? undefined : 'noreferrer'}
+                      onClick={(e) => { if (isPlaceholder) e.preventDefault(); }}
+                      aria-label={social.ariaLabel}
+                      sx={{
+                        width: 38,
+                        height: 38,
+                        backgroundColor: colors.primaryBlue,
+                        color: '#fff',
+                        transition: 'transform 0.2s ease, background-color 0.2s ease',
+                        '&:hover': { backgroundColor: colors.navy, transform: 'translateY(-2px)' },
+                        '&:focus-visible': { outline: `2px solid ${colors.navy}`, outlineOffset: 2 },
+                      }}
+                    >
+                      {social.icon}
+                    </IconButton>
+                  </Tooltip>
+                );
+              })}
             </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 2.5 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 2 }}>
               <Box component="a" href="mailto:service@smartappliances.co" sx={{ ...footerLinkSx, mb: 0 }}>
                 service@smartappliances.co
               </Box>
@@ -291,7 +349,7 @@ const SiteFooter: React.FC = () => {
             textAlign: { xs: 'center', md: 'left' },
           }}
         >
-          <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '14px' }}>
+          <Typography sx={{ fontFamily: fonts.body, color: FOOTER_LINK_COLOR, fontSize: '14px' }}>
             © {new Date().getFullYear()} Smart Appliances. All rights reserved.
           </Typography>
           <Box
@@ -306,10 +364,10 @@ const SiteFooter: React.FC = () => {
               <Box
                 key={link.label}
                 component={RouterLink}
-                to={link.path}
+                to={link.path as string}
                 sx={{
                   fontFamily: fonts.body,
-                  color: colors.mutedText,
+                  color: FOOTER_LINK_COLOR,
                   fontSize: '14px',
                   textDecoration: 'none',
                   transition: 'color 0.2s',

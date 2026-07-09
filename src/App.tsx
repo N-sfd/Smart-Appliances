@@ -133,6 +133,9 @@ function AppRoutes() {
             <Route path="/services/smart-home" element={<ServiceCategoryPage slug="smart-home" />} />
             <Route path="/services/hvac" element={<ServiceCategoryPage slug="hvac" />} />
             <Route path="/services/electrical" element={<ServiceCategoryPage slug="electrical" />} />
+            <Route path="/services/tv-mounting" element={<ServiceCategoryPage slug="tv-mounting" />} />
+            <Route path="/services/phone-repair" element={<ServiceCategoryPage slug="phone-repair" />} />
+            <Route path="/services/handyman" element={<ServiceCategoryPage slug="handyman" />} />
             <Route path="/services/garage-door" element={<Navigate to="/services/garage-door-repair" replace />} />
             <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
             <Route path="/scheduler" element={<SchedulerPage />} />

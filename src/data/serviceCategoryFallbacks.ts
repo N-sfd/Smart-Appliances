@@ -1,5 +1,6 @@
 import { APPLIANCE_DEFAULT_IMAGE, APPLIANCE_SERVICE_IMAGES } from './applianceHub';
 import { HVAC_SERVICE_IMAGES } from './hvacHub';
+import { CATEGORY_HERO_IMAGE } from './expandedServiceImages';
 
 const BASE = '/images/services';
 
@@ -11,6 +12,9 @@ export const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
   'smart-home-setup': `${BASE}/smart-home/hero-installer.png`,
   'hvac-services': HVAC_SERVICE_IMAGES['ac-repair'],
   'electrical-services': `${BASE}/electrical-default.jpg`,
+  handyman: CATEGORY_HERO_IMAGE.handyman,
+  'tv-mounting': CATEGORY_HERO_IMAGE['tv-mounting'],
+  'phone-repair': CATEGORY_HERO_IMAGE['phone-repair'],
 };
 
 export function getCategoryFallbackImage(categoryId: string): string {

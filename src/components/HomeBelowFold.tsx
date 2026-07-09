@@ -1017,7 +1017,7 @@ const HomeBelowFold: React.FC = () => {
       </Box>
 
       {/* ── 30-Day Service Follow-Up ── */}
-      <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#FFFFFF' }}>
+      <Box id="service-guarantee" sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#FFFFFF', scrollMarginTop: '80px' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"

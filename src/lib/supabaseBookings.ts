@@ -7,6 +7,8 @@ export interface BookingRow {
   user_id?: string | null;
   customer_id?: string | null;
   service_id?: string | null;
+  category_id?: string | null;
+  booking_answers?: Record<string, unknown>;
 
   request_number?: string | null;
   admin_status?: string;
@@ -61,6 +63,12 @@ export interface BookingRow {
   selected_membership_plan?: string | null;
   membership_status?: string | null;
 
+  internal_notes?: string | null;
+  source?: string | null;
+  technician_skill_group?: string | null;
+  estimated_duration_minutes?: number | null;
+  materials_required?: boolean | null;
+
   status: string;
   created_at?: string;
 }
@@ -77,7 +85,17 @@ const EXPERT_KEYS = ['expert_slug', 'expert_name'] as const;
 
 const MEMBERSHIP_KEYS = ['membership_interest', 'selected_membership_plan'] as const;
 
-const OPTIONAL_INSERT_KEYS = [...PRICING_ESTIMATE_KEYS, ...EXPERT_KEYS, ...MEMBERSHIP_KEYS] as const;
+const CATALOG_KEYS = [
+  'category_id',
+  'booking_answers',
+  'internal_notes',
+  'source',
+  'technician_skill_group',
+  'estimated_duration_minutes',
+  'materials_required',
+] as const;
+
+const OPTIONAL_INSERT_KEYS = [...PRICING_ESTIMATE_KEYS, ...EXPERT_KEYS, ...MEMBERSHIP_KEYS, ...CATALOG_KEYS] as const;
 
 export interface Customer {
   id?: string;

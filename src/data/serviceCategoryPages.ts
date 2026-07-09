@@ -4,9 +4,13 @@ import {
   smartHomeIconCards,
   hvacIconCards,
   electricalIconCards,
+  tvMountingIconCards,
+  phoneRepairIconCards,
+  handymanIconCards,
   HUB_CATEGORY_IDS,
 } from './serviceHubConfigs';
 import type { HubIconCard } from './serviceHubConfigs';
+import { CATEGORY_HERO_IMAGE } from './expandedServiceImages';
 
 export interface CategoryFaq {
   question: string;
@@ -220,7 +224,7 @@ export const smartHomePageConfig: ServiceCategoryPageConfig = {
     title: 'Smart Home Setup & Installation',
     subtitle:
       'Get help installing and connecting smart devices, security cameras, video doorbells, thermostats, hubs, speakers, and WiFi-connected home technology.',
-    image: `${BASE}/smart-home/hero.jpg`,
+    image: CATEGORY_HERO_IMAGE['smart-home'],
     primaryCta: 'Book Smart Home Service',
     secondaryCta: 'Ask About Installation',
     layout: 'split',
@@ -439,4 +443,85 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
   'smart-home': smartHomePageConfig,
   hvac: hvacPageConfig,
   electrical: electricalPageConfig,
+  'tv-mounting': {
+    slug: 'tv-mounting',
+    categoryId: 'tv-mounting',
+    hero: {
+      title: 'Professional TV Mounting',
+      subtitle: 'Secure mounting, wire concealment, soundbar installation, and media device setup.',
+      image: CATEGORY_HERO_IMAGE['tv-mounting'],
+      primaryCta: 'Book TV Mounting',
+      layout: 'split',
+      trustBullets: ['Clean cable management', 'Standard and large TVs', 'Same-day options'],
+    },
+    iconSectionTitle: 'What TV service do you need?',
+    iconCards: tvMountingIconCards,
+    popularSectionTitle: 'Popular TV Mounting Services',
+    howItWorks: DEFAULT_HOW_IT_WORKS,
+    faqs: [
+      { question: 'Do I need to buy the mount first?', answer: 'You can purchase your own mount or ask your technician for recommendations during booking.' },
+      { question: 'Can you hide the wires?', answer: 'Yes. Wire concealment is available as an add-on service during booking.' },
+    ],
+    bottomCta: {
+      title: 'Ready to mount your TV?',
+      subtitle: 'Book online and tell us your wall type and TV size.',
+      primaryLabel: 'Schedule TV Mounting',
+    },
+    desktopIconColumns: 3,
+    cardHoverLift: true,
+  },
+  'phone-repair': {
+    slug: 'phone-repair',
+    categoryId: 'phone-repair',
+    hero: {
+      title: 'Fast, Convenient Phone Repair',
+      subtitle: 'Screen, battery, charging port, and diagnostic services for popular devices.',
+      image: CATEGORY_HERO_IMAGE['phone-repair'],
+      primaryCta: 'Book Phone Repair',
+      layout: 'split',
+      trustBullets: ['Diagnostics available', 'Major brands supported', 'No passcodes collected online'],
+    },
+    iconSectionTitle: 'What phone issue do you have?',
+    iconCards: phoneRepairIconCards,
+    popularSectionTitle: 'Popular Phone Repair Services',
+    howItWorks: DEFAULT_HOW_IT_WORKS,
+    faqs: [
+      { question: 'Do you need my passcode?', answer: 'No. We do not collect device passcodes or full serial numbers during online booking.' },
+      { question: 'Can you repair water damage?', answer: 'We offer water-damage assessment and will recommend the safest next step after inspection.' },
+    ],
+    bottomCta: {
+      title: 'Need phone repair help?',
+      subtitle: 'Tell us your device model and issue to get started.',
+      primaryLabel: 'Book Phone Repair',
+    },
+    desktopIconColumns: 3,
+    cardHoverLift: true,
+  },
+  handyman: {
+    slug: 'handyman',
+    categoryId: 'handyman',
+    hero: {
+      title: 'Professional Handyman Services',
+      subtitle: 'Furniture assembly, hanging, drywall repair, and minor home fixes.',
+      image: CATEGORY_HERO_IMAGE.handyman,
+      primaryCta: 'Book Handyman Service',
+      layout: 'split',
+      trustBullets: ['Transparent estimates', 'Skilled local technicians', 'Flexible project sizes'],
+    },
+    iconSectionTitle: 'What handyman help do you need?',
+    iconCards: handymanIconCards,
+    popularSectionTitle: 'Popular Handyman Services',
+    howItWorks: DEFAULT_HOW_IT_WORKS,
+    faqs: [
+      { question: 'Is this hourly or flat-rate?', answer: 'Many jobs start at a listed price; larger projects may require an on-site quote.' },
+      { question: 'Do I need to supply materials?', answer: 'Tell us during booking whether materials are already purchased so we can plan accordingly.' },
+    ],
+    bottomCta: {
+      title: 'Need a handyman?',
+      subtitle: 'Describe your project and pick a convenient time.',
+      primaryLabel: 'Book Handyman Service',
+    },
+    desktopIconColumns: 3,
+    cardHoverLift: true,
+  },
 };

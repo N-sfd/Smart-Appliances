@@ -115,6 +115,102 @@ full per-section asset list, specs, and policy against reusing one image
 across multiple sections (Services, Resources, Membership, Pricing, About,
 Contact, Experts each keep their own imagery).
 
+## Scalable Service Catalog Architecture
+
+Smart Appliances uses **one central booking table** (`service_requests`) for all service categories. Service-specific details are stored in `booking_answers` JSONB — not as dozens of per-service columns or separate request tables.
+
+### Database tables
+
+```text
+auth.users
+  └── profiles
+
+profiles
+  └── customers
+
+customers
+  └── service_requests
+
+service_categories
+  └── services
+        └── service_questions
+
+service_categories
+  └── service_questions
+
+services
+  └── service_requests
+```
+
+| Table | Purpose |
+|-------|---------|
+| `service_categories` | Category catalog (Appliance Care, HVAC, TV Mounting, Phone Repair, Handyman, …) |
+| `services` | Individual bookable services with pricing metadata |
+| `service_questions` | Dynamic booking question definitions per category/service |
+| `service_requests` | **Single** booking table for all categories |
+
+### New service categories (2026 expansion)
+
+- TV Mounting (`/services/tv-mounting`)
+- Phone Repair (`/services/phone-repair`)
+- Handyman (`/services/handyman`)
+- Expanded Smart Home catalog services
+
+### Booking answers
+
+Dynamic scheduler questions save to `service_requests.booking_answers` as JSON, for example:
+
+```json
+{
+  "tvSize": "55–65 inches",
+  "wallType": "Drywall",
+  "wireConcealment": true
+}
+```
+
+### Address field standardization
+
+Going forward, writes should use:
+
+- `street_address`
+- `suite_apt`
+- `city`
+- `state`
+- `zip_code`
+
+The legacy `address` column is **deprecated** but retained for historical rows. A migration backfills `street_address` from `address` where needed.
+
+### Migrations
+
+Apply catalog expansion:
+
+```text
+supabase/migrations/20260708143000_expand_service_catalog.sql
+```
+
+Run in the Supabase SQL Editor (or your migration workflow). Safe to re-run.
+
+### RLS model
+
+- Public (anon/authenticated): read active `service_categories`, `services`, `service_questions`
+- Admin (`profiles.role = 'admin'`): manage catalog tables
+- `service_requests`: existing insert/select policies unchanged; users read own requests; admins manage all
+
+### Frontend catalog API
+
+- Types: `src/types/services.ts`
+- Supabase helpers: `src/services/serviceCatalog.ts` (with local fallback in `src/data/serviceCatalogFallback.ts`)
+- Dynamic scheduler fields: `src/components/booking/DynamicServiceQuestion.tsx`
+- Admin answer display: `src/components/admin/BookingAnswersPanel.tsx`
+
+### Backward compatibility
+
+Legacy text fields (`service_category`, `product_name`) remain populated during transition. Catalog IDs (`category_id`, `service_id`) are set when lookup succeeds; null IDs do not block booking submission.
+
+### Future: phone repair operations module
+
+No specialized phone repair table in this release. If parts inventory, device intake, or warranty workflows are needed later, a dedicated operational module may be added — `booking_answers` covers MVP intake.
+
 ## Admin Features
 
 - Admin dashboard

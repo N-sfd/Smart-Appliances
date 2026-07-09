@@ -15,8 +15,11 @@ import { TriangleAlert, ClipboardList, CalendarClock, CheckCircle2, MessageSquar
 import { colors, fonts } from '../theme';
 import ServiceCategoryBookingSection from './ServiceCategoryBookingSection';
 import CategoryBrandSection from './CategoryBrandSection';
+import CategorySupportSection from './CategorySupportSection';
 import type { ServiceCategoryPageConfig } from '../data/serviceCategoryPages';
 import { SERVICE_SLUG_TO_SCHEDULER } from '../data/schedulerPrefill';
+import { getCategoryHeroFallback } from '../data/categoryHeroFallbacks';
+import { SERVICE_SUPPORT_CONTENT_BY_SLUG } from '../data/servicePageContent';
 
 const HOW_IT_WORKS_ICONS_BY_LENGTH: Record<number, (typeof ClipboardList)[]> = {
   3: [ClipboardList, CalendarClock, CheckCircle2],
@@ -78,6 +81,14 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
     bookingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const heroFallback = getCategoryHeroFallback(config.slug);
+  const handleHeroError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    if (!heroFallback) return;
+    const img = e.currentTarget;
+    if (img.src === heroFallback) return;
+    img.src = heroFallback;
+  };
+
   const handlePrimaryCta = () => {
     if (config.slug === 'smart-home' && config.hero.secondaryCta) {
       scrollToBooking();
@@ -121,6 +132,8 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
             component="img"
             src={config.hero.image}
             alt=""
+            loading="eager"
+            onError={handleHeroError}
             sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <Box
@@ -454,7 +467,11 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
               <Box
                 component="img"
                 src={config.hero.image}
-                alt=""
+                alt={config.hero.title}
+                loading="eager"
+                width={400}
+                height={400}
+                onError={handleHeroError}
                 sx={{
                   width: '100%',
                   height: '100%',
@@ -487,6 +504,8 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
   const brandBeforeHowItWorksMode =
     config.brandSection?.marqueePlacement === 'before-how-it-works' ? 'marquee-only' : 'full';
 
+  const supportContent = SERVICE_SUPPORT_CONTENT_BY_SLUG[config.slug];
+
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
       {renderHero()}
@@ -514,6 +533,8 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
         cardHoverLift={config.cardHoverLift}
         compactIconCards={config.compactIconCards}
       />
+
+      {supportContent && <CategorySupportSection content={supportContent} />}
 
       {brandBeforeHowItWorks && (
         <CategoryBrandSection config={brandBeforeHowItWorks} sectionMode={brandBeforeHowItWorksMode} />

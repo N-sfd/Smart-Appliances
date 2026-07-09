@@ -25,8 +25,23 @@ import {
   Fan,
   Camera,
   Bell,
-  HelpCircle,
   Wifi,
+  Tv,
+  Smartphone,
+  Hammer,
+  Monitor,
+  PaintRoller,
+  Ruler,
+  Frame,
+  Armchair,
+  BatteryCharging,
+  ToggleLeft,
+  Unplug,
+  Cast,
+  PlugZap,
+  Aperture,
+  Mic,
+  Droplet,
 } from 'lucide-react';
 
 export interface HubIconCard {
@@ -79,14 +94,39 @@ export const electricalIconCards: HubIconCard[] = [
 ];
 
 export const smartHomeIconCards: HubIconCard[] = [
-  { id: 'security-camera', label: 'Security Camera', Icon: Camera, serviceIds: ['camera-installation'] },
-  { id: 'video-doorbell', label: 'Video Doorbell', Icon: Bell, serviceIds: ['doorbell-installation'] },
-  { id: 'smart-thermostat', label: 'Smart Thermostat', Icon: Thermometer, serviceIds: ['smart-thermostat-setup'] },
-  { id: 'smart-lock', label: 'Smart Lock', Icon: Lock, serviceIds: ['smart-lock-installation'] },
-  { id: 'smart-hub', label: 'Smart Hub / Speaker', Icon: Speaker, serviceIds: ['smart-hub-setup'] },
-  { id: 'wifi-network', label: 'WiFi / Network Device', Icon: Wifi, serviceIds: ['wifi-device-setup'] },
-  { id: 'smart-lighting', label: 'Smart Lighting', Icon: Lightbulb, serviceIds: ['smart-lighting-setup'] },
-  { id: 'other-smart', label: 'Other Smart Device', Icon: HelpCircle, serviceIds: ['smart-device-troubleshooting', 'wifi-device-setup', 'smart-hub-setup'] },
+  { id: 'video-doorbell', label: 'Video Doorbell Installation', Icon: Bell, serviceIds: ['doorbell-installation'] },
+  { id: 'smart-thermostat', label: 'Smart Thermostat Installation', Icon: Thermometer, serviceIds: ['smart-thermostat-setup'] },
+  { id: 'smart-lock', label: 'Smart Lock Installation', Icon: Lock, serviceIds: ['smart-lock-installation'] },
+  { id: 'security-camera', label: 'Security Camera Installation', Icon: Camera, serviceIds: ['camera-installation'] },
+  { id: 'smart-switch', label: 'Smart Switch Installation', Icon: ToggleLeft, serviceIds: ['smart-lighting-setup', 'smart-device-wiring'] },
+  { id: 'wifi-setup', label: 'Wi-Fi Device Setup', Icon: Wifi, serviceIds: ['wifi-device-setup', 'wifi-setup'] },
+];
+
+export const tvMountingIconCards: HubIconCard[] = [
+  { id: 'standard-mount', label: 'Standard TV Mounting', Icon: Tv, serviceIds: ['standard-tv-mounting'] },
+  { id: 'large-mount', label: 'Large TV Mounting', Icon: Monitor, serviceIds: ['large-tv-mounting'] },
+  { id: 'wire-hide', label: 'Wire Concealment', Icon: Cable, serviceIds: ['wire-concealment'] },
+  { id: 'soundbar', label: 'Soundbar Installation', Icon: Speaker, serviceIds: ['soundbar-installation'] },
+  { id: 'dismount', label: 'TV Dismount / Remount', Icon: Unplug, serviceIds: ['tv-dismount'] },
+  { id: 'media-setup', label: 'Media Device Setup', Icon: Cast, serviceIds: ['media-device-setup'] },
+];
+
+export const phoneRepairIconCards: HubIconCard[] = [
+  { id: 'screen', label: 'Screen Replacement', Icon: Smartphone, serviceIds: ['phone-screen-replacement'] },
+  { id: 'battery', label: 'Battery Replacement', Icon: BatteryCharging, serviceIds: ['phone-battery-replacement'] },
+  { id: 'charging', label: 'Charging Port Repair', Icon: PlugZap, serviceIds: ['phone-charging-port-repair'] },
+  { id: 'camera', label: 'Camera Repair', Icon: Aperture, serviceIds: ['phone-camera-repair'] },
+  { id: 'speaker', label: 'Speaker / Microphone', Icon: Mic, serviceIds: ['phone-speaker-microphone-repair'] },
+  { id: 'water-damage', label: 'Water-Damage Assessment', Icon: Droplet, serviceIds: ['phone-device-diagnostic', 'phone-water-damage'] },
+];
+
+export const handymanIconCards: HubIconCard[] = [
+  { id: 'general', label: 'General Handyman', Icon: Hammer, serviceIds: ['general-handyman-service', 'general-handyman'] },
+  { id: 'furniture', label: 'Furniture Assembly', Icon: Armchair, serviceIds: ['furniture-assembly'] },
+  { id: 'wall-hang', label: 'Wall Hanging', Icon: Frame, serviceIds: ['wall-hanging'] },
+  { id: 'drywall', label: 'Drywall Repair', Icon: Wrench, serviceIds: ['drywall-repair'] },
+  { id: 'painting', label: 'Interior Painting', Icon: PaintRoller, serviceIds: ['interior-painting', 'general-handyman-service'] },
+  { id: 'shelf', label: 'Shelf Installation', Icon: Ruler, serviceIds: ['shelf-installation'] },
 ];
 
 export const HUB_CATEGORY_IDS = {
