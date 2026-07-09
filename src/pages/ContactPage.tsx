@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -106,6 +106,7 @@ interface FormErrors {
 
 const ContactPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState<FormState>({
     name: '',
     email: '',
@@ -120,6 +121,18 @@ const ContactPage: React.FC = () => {
     emailFormat: false,
   });
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    const serviceParam = searchParams.get('service') ?? searchParams.get('serviceCategory') ?? '';
+    if (!serviceParam) return;
+    const normalized = serviceParam.trim().toLowerCase();
+    const match = CONTACT_SERVICE_CATEGORIES.find(
+      (item) => item.id === normalized || item.id === serviceParam.trim(),
+    );
+    if (match) {
+      setForm((prev) => ({ ...prev, serviceCategory: match.id }));
+    }
+  }, [searchParams]);
 
   const handleChange = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));

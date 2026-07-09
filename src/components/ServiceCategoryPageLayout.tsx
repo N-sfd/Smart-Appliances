@@ -14,12 +14,10 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { TriangleAlert, ClipboardList, CalendarClock, CheckCircle2, MessageSquareText, SearchCheck } from 'lucide-react';
 import { colors, fonts } from '../theme';
 import ServiceCategoryBookingSection from './ServiceCategoryBookingSection';
-import CategoryBrandSection from './CategoryBrandSection';
-import CategorySupportSection from './CategorySupportSection';
+import BrandsWeService from './brands/BrandsWeService';
 import type { ServiceCategoryPageConfig } from '../data/serviceCategoryPages';
 import { SERVICE_SLUG_TO_SCHEDULER } from '../data/schedulerPrefill';
 import { getCategoryHeroFallback } from '../data/categoryHeroFallbacks';
-import { SERVICE_SUPPORT_CONTENT_BY_SLUG } from '../data/servicePageContent';
 
 const HOW_IT_WORKS_ICONS_BY_LENGTH: Record<number, (typeof ClipboardList)[]> = {
   3: [ClipboardList, CalendarClock, CheckCircle2],
@@ -487,32 +485,10 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
     );
   };
 
-  const brandBeforeBooking =
-    config.brandSection &&
-    config.brandSection.placement !== 'after-icon-selection' &&
-    config.brandSection.placement !== 'with-icon-header' &&
-    config.brandSection.placement !== 'before-how-it-works';
-  const brandWithIconHeader =
-    config.brandSection?.placement === 'with-icon-header' ? config.brandSection : undefined;
-  const brandAfterIcons =
-    config.brandSection?.placement === 'after-icon-selection' ? config.brandSection : undefined;
-  const brandBeforeHowItWorks =
-    config.brandSection?.placement === 'before-how-it-works' ||
-    config.brandSection?.marqueePlacement === 'before-how-it-works'
-      ? config.brandSection
-      : undefined;
-  const brandBeforeHowItWorksMode =
-    config.brandSection?.marqueePlacement === 'before-how-it-works' ? 'marquee-only' : 'full';
-
-  const supportContent = SERVICE_SUPPORT_CONTENT_BY_SLUG[config.slug];
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
       {renderHero()}
-
-      {brandBeforeBooking && config.brandSection && (
-        <CategoryBrandSection config={config.brandSection} />
-      )}
 
       <ServiceCategoryBookingSection
         sectionRef={bookingRef}
@@ -527,19 +503,14 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
         selectedServiceId={selectedServiceId}
         onSelectService={setSelectedServiceId}
         desktopColumns={config.desktopIconColumns}
-        brandAfterIcons={brandAfterIcons}
-        brandWithIconHeader={brandWithIconHeader}
+        serviceTypeChips={config.serviceTypeChips}
         detailPanelVariant={config.detailPanelVariant}
         cardHoverLift={config.cardHoverLift}
         compactIconCards={config.compactIconCards}
         serviceCardVariant={config.serviceCardVariant}
       />
 
-      {supportContent && <CategorySupportSection content={supportContent} />}
-
-      {brandBeforeHowItWorks && (
-        <CategoryBrandSection config={brandBeforeHowItWorks} sectionMode={brandBeforeHowItWorksMode} />
-      )}
+      {config.brandsCategory && <BrandsWeService category={config.brandsCategory} />}
 
       <Box sx={{ py: { xs: 6, md: 8 }, backgroundColor: colors.sectionBg, borderTop: '1px solid #EEF0F3' }}>
         <Container maxWidth="md">

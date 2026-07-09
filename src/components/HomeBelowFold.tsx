@@ -46,6 +46,7 @@ import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import HomeResourcesSection from './HomeResourcesSection';
 import BrandsWeServiceMarquee from './BrandsWeServiceMarquee';
+import { getContactUrlForCategory } from '../data/service-brands';
 import { serviceCategories } from '../data/services';
 import { popularServices } from '../data/popularServices';
 import { SERVICE_TYPE_IMAGE_MAP, CATEGORY_IMAGE_MAP, DEFAULT_SERVICE_IMAGE } from '../data/serviceImages';
@@ -1275,7 +1276,7 @@ const HomeBelowFold: React.FC = () => {
 
           <Box sx={{ textAlign: 'center', mt: 4, mb: 2 }}>
             <Button
-              onClick={() => navigate('/contact')}
+              onClick={() => navigate(getContactUrlForCategory('home-appliances'))}
               sx={{
                 fontFamily: fonts.body,
                 fontWeight: 600,

@@ -26,6 +26,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { colors, fonts } from '../theme';
+import BrandsWeService from '../components/brands/BrandsWeService';
 
 const ISSUE_CARDS = [
   { id: 'wont-open', label: "Door won't open", Icon: AlertCircle },
@@ -740,6 +741,8 @@ const GarageDoorRepairPage: React.FC = () => {
           </Box>
         </Container>
       </Box>
+
+      <BrandsWeService category="garage-door" />
 
       {/* ── FAQ ── */}
       <Box sx={{ py: { xs: 5, md: 7 }, backgroundColor: '#F8FAFC', borderTop: '1px solid #EEF0F3' }}>

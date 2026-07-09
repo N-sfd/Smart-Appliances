@@ -14,6 +14,7 @@ import ResourceArticleCard from '../components/resources/ResourceArticleCard';
 import VideoCard from '../components/resources/VideoCard';
 import VideosComingSoonPanel from '../components/resources/VideosComingSoonPanel';
 import PageHero from '../components/common/PageHero';
+import BrandsDirectory from '../components/brands/BrandsDirectory';
 
 export default function ResourcesPage() {
   const navigate = useNavigate();
@@ -132,6 +133,8 @@ export default function ResourcesPage() {
           )}
         </Container>
       </Box>
+
+      <BrandsDirectory />
     </Box>
   );
 }

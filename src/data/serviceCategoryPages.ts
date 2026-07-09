@@ -11,6 +11,7 @@ import {
 } from './serviceHubConfigs';
 import type { HubIconCard } from './serviceHubConfigs';
 import { CATEGORY_HERO_IMAGE } from './expandedServiceImages';
+import type { BrandCategoryId } from './service-brands';
 
 export interface CategoryFaq {
   question: string;
@@ -27,29 +28,6 @@ export interface IconChipItem {
   label: string;
   /** Lucide icon component name, e.g. 'Plug', 'Fan' */
   iconName: string;
-}
-
-export interface CategoryBrandConfig {
-  title: string;
-  subtitle: string;
-  brands: string[];
-  secondaryBrands?: string[];
-  variant: 'marquee' | 'pills' | 'logo-marquee' | 'icon-pills';
-  /** Chips with icons — used when variant is icon-pills */
-  iconChips?: IconChipItem[];
-  /** Which logo set to use when variant is logo-marquee or icon-pills brand strip */
-  logoMarqueeSet?: 'smart-home' | 'plumbing' | 'electrical';
-  /** Show logos without pill/oval backgrounds (logo-marquee only) */
-  logoMarqueePlain?: boolean;
-  /** Compact icon pill chips (icon-pills variant) */
-  compactIconPills?: boolean;
-  /** Where to render the brand strip on the page */
-  placement?: 'before-booking' | 'after-icon-selection' | 'with-icon-header' | 'before-how-it-works';
-  /** For icon-pills: render logo marquee separately before How It Works */
-  marqueePlacement?: 'inline' | 'before-how-it-works';
-  /** Title/subtitle for marquee when split from icon-pills header */
-  marqueeTitle?: string;
-  marqueeSubtitle?: string;
 }
 
 export interface ServiceCategoryPageConfig {
@@ -77,7 +55,10 @@ export interface ServiceCategoryPageConfig {
   iconCards: HubIconCard[];
   popularSectionTitle: string;
   popularSectionSubtitle?: string;
-  brandSection?: CategoryBrandConfig;
+  /** Category-specific brands grid — rendered after booking, before How It Works */
+  brandsCategory?: BrandCategoryId;
+  /** Service-type chips for booking header (e.g. electrical) — not brand logos */
+  serviceTypeChips?: IconChipItem[];
   howItWorks: CategoryHowItWorksStep[];
   howItWorksTitle?: string;
   howItWorksSubtitle?: string;
@@ -123,13 +104,7 @@ export const homeAppliancesPageConfig: ServiceCategoryPageConfig = {
   iconSectionTitle: 'What appliance needs service?',
   iconCards: homeApplianceIconCards,
   popularSectionTitle: 'Popular Appliance Services',
-  brandSection: {
-    title: 'Brands We Service',
-    subtitle: 'Our technicians service most major appliance brands.',
-    brands: ['GE', 'Whirlpool', 'Samsung', 'LG', 'Bosch', 'Frigidaire', 'Maytag'],
-    variant: 'marquee',
-    placement: 'before-how-it-works',
-  },
+  brandsCategory: 'appliances',
   howItWorks: DEFAULT_HOW_IT_WORKS,
   faqs: [
     {
@@ -179,15 +154,7 @@ export const plumbingPageConfig: ServiceCategoryPageConfig = {
   iconSectionTitle: 'What plumbing issue do you need help with?',
   iconCards: plumbingIconCards,
   popularSectionTitle: 'Popular Plumbing Services',
-  brandSection: {
-    title: 'Plumbing Fixtures & Systems We Service',
-    subtitle: 'We work with leading fixture and water system brands.',
-    brands: ['Moen', 'Delta', 'Kohler', 'Rheem', 'AO Smith', 'InSinkErator'],
-    variant: 'logo-marquee',
-    logoMarqueeSet: 'plumbing',
-    logoMarqueePlain: true,
-    placement: 'after-icon-selection',
-  },
+  brandsCategory: 'plumbing',
   howItWorks: DEFAULT_HOW_IT_WORKS,
   faqs: [
     {
@@ -238,14 +205,7 @@ export const smartHomePageConfig: ServiceCategoryPageConfig = {
   iconSectionTitle: 'What Smart Home Device Do You Need Help With?',
   iconCards: smartHomeIconCards,
   popularSectionTitle: 'Popular Smart Home Services',
-  brandSection: {
-    title: 'Smart Home Brands We Support',
-    subtitle: 'We help install and connect many popular smart home devices and ecosystems.',
-    brands: ['Ring', 'Nest', 'Google Home', 'Alexa', 'Ecobee', 'Arlo'],
-    variant: 'logo-marquee',
-    logoMarqueePlain: true,
-    placement: 'after-icon-selection',
-  },
+  brandsCategory: 'smart-home',
   howItWorks: DEFAULT_HOW_IT_WORKS,
   faqs: [
     {
@@ -299,14 +259,7 @@ export const hvacPageConfig: ServiceCategoryPageConfig = {
   iconSectionTitle: 'What HVAC service do you need?',
   iconCards: hvacIconCards,
   popularSectionTitle: 'Popular HVAC Services',
-  brandSection: {
-    title: 'Brands We Service',
-    subtitle: 'Trusted HVAC equipment and thermostat brands we work with.',
-    brands: ['Carrier', 'Trane', 'Lennox', 'Rheem', 'Goodman', 'Honeywell'],
-    variant: 'logo-marquee',
-    logoMarqueePlain: true,
-    placement: 'after-icon-selection',
-  },
+  brandsCategory: 'hvac',
   howItWorks: DEFAULT_HOW_IT_WORKS,
   faqs: [
     {
@@ -351,33 +304,22 @@ export const electricalPageConfig: ServiceCategoryPageConfig = {
     trustBullets: ['Licensed & Insured', 'Same-Day Availability', 'Safety-Focused Service'],
     heroBg: '#F5F7FA',
   },
-  iconSectionTitle: '',
+  iconSectionTitle: 'What electrical service do you need?',
+  iconSectionSubtitle: 'Choose the type of electrical issue or installation you need help with.',
   iconCards: electricalIconCards,
   popularSectionTitle: 'Popular Electrical Services',
   popularSectionSubtitle: 'Select a service to see details and schedule a technician.',
-  brandSection: {
-    title: 'What electrical service do you need?',
-    subtitle: 'Choose the type of electrical issue or installation you need help with.',
-    brands: ['Leviton', 'Lutron', 'GE Lighting', 'Kasa', 'TP-Link', 'Eaton', 'Square D', 'Legrand'],
-    iconChips: [
-      { label: 'Outlets', iconName: 'Plug' },
-      { label: 'Switches', iconName: 'ToggleLeft' },
-      { label: 'Light Fixtures', iconName: 'Lightbulb' },
-      { label: 'Ceiling Fans', iconName: 'Fan' },
-      { label: 'Breakers', iconName: 'Zap' },
-      { label: 'Panels', iconName: 'PanelsTopLeft' },
-      { label: 'Smart Switches', iconName: 'Wifi' },
-      { label: 'Appliance Connections', iconName: 'Cable' },
-    ],
-    variant: 'icon-pills',
-    logoMarqueeSet: 'electrical',
-    logoMarqueePlain: true,
-    compactIconPills: true,
-    placement: 'with-icon-header',
-    marqueePlacement: 'before-how-it-works',
-    marqueeTitle: 'Brands We Service',
-    marqueeSubtitle: 'Trusted electrical fixture, device, and smart-home brands we support.',
-  },
+  brandsCategory: 'electrical',
+  serviceTypeChips: [
+    { label: 'Outlets', iconName: 'Plug' },
+    { label: 'Switches', iconName: 'ToggleLeft' },
+    { label: 'Light Fixtures', iconName: 'Lightbulb' },
+    { label: 'Ceiling Fans', iconName: 'Fan' },
+    { label: 'Breakers', iconName: 'Zap' },
+    { label: 'Panels', iconName: 'PanelsTopLeft' },
+    { label: 'Smart Switches', iconName: 'Wifi' },
+    { label: 'Appliance Connections', iconName: 'Cable' },
+  ],
   howItWorksTitle: 'How Electrical Service Works',
   howItWorks: [
     {
@@ -464,6 +406,7 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
     iconSectionTitle: 'What TV Service Do You Need?',
     iconCards: tvMountingIconCards,
     popularSectionTitle: 'Popular TV Mounting Services',
+    brandsCategory: 'tv-entertainment',
     howItWorks: DEFAULT_HOW_IT_WORKS,
     faqs: [
       { question: 'Do I need to buy the mount first?', answer: 'You can purchase your own mount or ask your technician for recommendations during booking.' },
@@ -493,6 +436,7 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
     iconSectionTitle: 'What Phone Issue Do You Have?',
     iconCards: phoneRepairIconCards,
     popularSectionTitle: 'Popular Phone Repair Services',
+    brandsCategory: 'phone-repair',
     howItWorks: DEFAULT_HOW_IT_WORKS,
     faqs: [
       { question: 'Do you need my passcode?', answer: 'No. We do not collect device passcodes or full serial numbers during online booking.' },
@@ -522,6 +466,7 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
     iconSectionTitle: 'What Handyman Help Do You Need?',
     iconCards: handymanIconCards,
     popularSectionTitle: 'Popular Handyman Services',
+    brandsCategory: 'handyman',
     howItWorks: DEFAULT_HOW_IT_WORKS,
     faqs: [
       { question: 'Is this hourly or flat-rate?', answer: 'Many jobs start at a listed price; larger projects may require an on-site quote.' },

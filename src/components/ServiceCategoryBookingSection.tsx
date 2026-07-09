@@ -11,8 +11,8 @@ import { CATEGORY_SERVICE_DETAILS } from '../data/serviceCategoryDetails';
 import { getCategoryFallbackImage } from '../data/serviceCategoryFallbacks';
 import { getCategoryHeroFallback } from '../data/categoryHeroFallbacks';
 import { APPLIANCE_DEFAULT_IMAGE } from '../data/applianceHub';
-import CategoryBrandSection from './CategoryBrandSection';
-import type { CategoryBrandConfig } from '../data/serviceCategoryPages';
+import ServiceTypeChips from './brands/ServiceTypeChips';
+import type { IconChipItem } from '../data/serviceCategoryPages';
 
 /** categoryId -> the slug used by categoryHeroFallbacks (only smart-home's differ). */
 const CATEGORY_SLUG_BY_ID: Record<string, string> = {
@@ -68,8 +68,7 @@ interface ServiceCategoryBookingSectionProps {
   onSelectService: (id: string | null) => void;
   desktopColumns?: 3 | 4 | 5;
   sectionRef?: React.RefObject<HTMLDivElement | null>;
-  brandAfterIcons?: CategoryBrandConfig;
-  brandWithIconHeader?: CategoryBrandConfig;
+  serviceTypeChips?: IconChipItem[];
   detailPanelVariant?: 'default' | 'electrical';
   cardHoverLift?: boolean;
   compactIconCards?: boolean;
@@ -149,8 +148,7 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
   onSelectService,
   desktopColumns = 4,
   sectionRef,
-  brandAfterIcons,
-  brandWithIconHeader,
+  serviceTypeChips,
   detailPanelVariant = 'default',
   cardHoverLift = false,
   compactIconCards = false,
@@ -227,13 +225,11 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
   return (
     <Box ref={sectionRef} sx={{ backgroundColor: '#FFFFFF', py: { xs: 6, md: 8 } }}>
       <Box sx={{ maxWidth: 1180, mx: 'auto', px: { xs: 2, sm: 3 } }}>
-        {brandWithIconHeader ? (
-          <CategoryBrandSection
-            config={brandWithIconHeader}
-            embedded
-            sectionMode={
-              brandWithIconHeader.marqueePlacement === 'before-how-it-works' ? 'chips-only' : 'full'
-            }
+        {serviceTypeChips && serviceTypeChips.length > 0 ? (
+          <ServiceTypeChips
+            title={iconSectionTitle}
+            subtitle={iconSectionSubtitle}
+            chips={serviceTypeChips}
           />
         ) : (
           <>
@@ -292,7 +288,7 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
             alignItems: 'stretch',
             maxWidth: !isPhotoCards && desktopColumns === 4 && iconCards.length === 8 ? 960 : undefined,
             mx: !isPhotoCards && desktopColumns === 4 && iconCards.length === 8 ? 'auto' : undefined,
-            mb: displayService ? 4 : brandAfterIcons ? 0 : 0,
+              mb: displayService ? 4 : 0,
           }}
         >
           {iconCards.map(({ id, label, description, Icon, cardImage }) => {
@@ -475,7 +471,7 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
               gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
               gap: { xs: 3, md: 5 },
               alignItems: 'center',
-              mb: brandAfterIcons ? 5 : 0,
+              mb: 0,
             }}
           >
             <Box
@@ -642,9 +638,6 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
           </Box>
         )}
 
-        {brandAfterIcons && (
-          <CategoryBrandSection config={brandAfterIcons} embedded />
-        )}
       </Box>
     </Box>
   );

@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { colors, fonts } from '../theme';
 import BrandsWeServiceMarquee from './BrandsWeServiceMarquee';
+import { getContactUrlForCategory } from '../data/service-brands';
 
 interface BrandsWeServiceBlockProps {
   headingId?: string;
@@ -50,7 +51,7 @@ export const BrandsWeServiceBlock: React.FC<BrandsWeServiceBlockProps> = ({
     <Box sx={{ textAlign: 'center', mt: { xs: 2.5, md: 3 } }}>
       <Box
         component={RouterLink}
-        to="/contact"
+        to={getContactUrlForCategory('home-appliances')}
         sx={{
           fontFamily: fonts.body,
           fontSize: '0.875rem',
