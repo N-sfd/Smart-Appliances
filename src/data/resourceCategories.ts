@@ -1,5 +1,6 @@
 import {
   Refrigerator, Snowflake, Droplets, Zap, HouseWifi, DoorOpen, ClipboardList, RefreshCcw, LucideIcon,
+  Hammer, Tv, Smartphone,
 } from 'lucide-react';
 
 export type ResourceCategoryId =
@@ -10,7 +11,10 @@ export type ResourceCategoryId =
   | 'smart-home'
   | 'garage-door'
   | 'maintenance'
-  | 'repair-or-replace';
+  | 'repair-or-replace'
+  | 'handyman'
+  | 'tv-mounting'
+  | 'phone-repair';
 
 export interface ResourceCategory {
   id: ResourceCategoryId;
@@ -68,6 +72,24 @@ export const RESOURCE_CATEGORIES: ResourceCategory[] = [
     label: 'Repair or Replace',
     description: 'How to weigh age, cost, and reliability when deciding what to do next.',
     icon: RefreshCcw,
+  },
+  {
+    id: 'handyman',
+    label: 'Handyman',
+    description: 'Furniture assembly, wall hanging, drywall patching, and other small home projects.',
+    icon: Hammer,
+  },
+  {
+    id: 'tv-mounting',
+    label: 'TV Mounting',
+    description: 'What to know about mounting cost, wall placement, and clean wire concealment.',
+    icon: Tv,
+  },
+  {
+    id: 'phone-repair',
+    label: 'Phone Repair',
+    description: 'Screen, battery, and charging-port issues — and how to know if repair or replacement makes sense.',
+    icon: Smartphone,
   },
 ];
 

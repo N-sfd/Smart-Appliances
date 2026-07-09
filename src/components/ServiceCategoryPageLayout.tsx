@@ -467,7 +467,7 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
               <Box
                 component="img"
                 src={config.hero.image}
-                alt={config.hero.title}
+                alt={config.hero.imageAlt ?? config.hero.title}
                 loading="eager"
                 width={400}
                 height={400}

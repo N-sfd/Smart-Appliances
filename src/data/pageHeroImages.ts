@@ -18,9 +18,9 @@ export const PAGE_HERO_PHOTOS = {
     aspectRatio: '4 / 3',
   },
   contact: {
-    src: '/images/services/plumbing/trust-technician.webp',
-    alt: 'Smart Appliances technician providing professional in-home service consultation',
-    objectPosition: 'center 20%',
+    src: '/images/contact/contact-hero.svg',
+    alt: 'Smart Appliances support team helping with a service request',
+    objectPosition: 'center center',
     aspectRatio: '4 / 3',
   },
   experts: {

@@ -149,8 +149,17 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
     }
     const schedulerCategory = schedulerCategoryFromHubId(categoryId);
     const title = service.title;
-    const typeCode = /install/i.test(title) ? 'I' : /mainten|clean/i.test(title) ? 'M' : 'R';
-    const productName = /repair|install|mainten|clean|service|setup/i.test(title)
+    // Card titles like "Furniture Assembly" or "Standard TV Mounting" are already
+    // complete, human-readable product names — only titles with no descriptive
+    // keyword at all (rare) get a suffix appended so the scheduler category-detail
+    // step still has something meaningful to show.
+    const isInstallType = /install|mount|assembly|hanging|setup|conceal/i.test(title);
+    const isMaintenanceType = /mainten|clean/i.test(title);
+    const typeCode = isInstallType ? 'I' : isMaintenanceType ? 'M' : 'R';
+    const isCompleteTitle = /repair|install|mainten|clean|service|setup|mount|assembly|hanging|assessment|replacement|painting|conceal|diagnostic/i.test(
+      title,
+    );
+    const productName = isCompleteTitle
       ? title
       : typeCode === 'I' ? `${title} Installation`
       : typeCode === 'M' ? `${title} Maintenance`
@@ -312,6 +321,9 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
               component="img"
               src={displayService.image}
               alt={displayService.title}
+              loading="lazy"
+              width={480}
+              height={360}
               sx={{
                 width: '100%',
                 height: { xs: 240, sm: 300, md: 360 },

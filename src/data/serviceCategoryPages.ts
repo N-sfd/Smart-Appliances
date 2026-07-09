@@ -69,6 +69,8 @@ export interface ServiceCategoryPageConfig {
     heroBg?: string;
     /** CSS object-position for circular split hero image */
     imagePosition?: string;
+    /** Descriptive alt text for the hero photo. Falls back to `title` when omitted. */
+    imageAlt?: string;
   };
   iconSectionTitle: string;
   iconSectionSubtitle?: string;
@@ -225,6 +227,7 @@ export const smartHomePageConfig: ServiceCategoryPageConfig = {
     subtitle:
       'Get help installing and connecting smart devices, security cameras, video doorbells, thermostats, hubs, speakers, and WiFi-connected home technology.',
     image: CATEGORY_HERO_IMAGE['smart-home'],
+    imageAlt: 'Smart home devices including a thermostat, camera, lock, and doorbell',
     primaryCta: 'Book Smart Home Service',
     secondaryCta: 'Ask About Installation',
     layout: 'split',
@@ -450,6 +453,7 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
       title: 'Professional TV Mounting',
       subtitle: 'Secure mounting, wire concealment, soundbar installation, and media device setup.',
       image: CATEGORY_HERO_IMAGE['tv-mounting'],
+      imageAlt: 'Wall-mounted television setup in a living room',
       primaryCta: 'Book TV Mounting',
       layout: 'split',
       trustBullets: ['Clean cable management', 'Standard and large TVs', 'Same-day options'],
@@ -477,6 +481,7 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
       title: 'Fast, Convenient Phone Repair',
       subtitle: 'Screen, battery, charging port, and diagnostic services for popular devices.',
       image: CATEGORY_HERO_IMAGE['phone-repair'],
+      imageAlt: 'Smartphone repair on a technician workbench',
       primaryCta: 'Book Phone Repair',
       layout: 'split',
       trustBullets: ['Diagnostics available', 'Major brands supported', 'No passcodes collected online'],
@@ -504,6 +509,7 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
       title: 'Professional Handyman Services',
       subtitle: 'Furniture assembly, hanging, drywall repair, and minor home fixes.',
       image: CATEGORY_HERO_IMAGE.handyman,
+      imageAlt: 'Handyman completing a small home repair project',
       primaryCta: 'Book Handyman Service',
       layout: 'split',
       trustBullets: ['Transparent estimates', 'Skilled local technicians', 'Flexible project sizes'],

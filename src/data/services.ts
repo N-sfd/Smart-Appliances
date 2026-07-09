@@ -54,6 +54,14 @@ export interface ServiceRequest {
   callbackTime: string | null;
   assignedTechnicianId: string | null;
   technicianStatus: 'accepted' | 'on_the_way' | 'started' | 'completed' | null;
+  /**
+   * ZIP-based service-area check (currently only set by the Emergency Service
+   * form). Additive/optional fields — not part of the Supabase `service_requests`
+   * row shape (see mapServiceRequestToRow in lib/supabase.ts), so they're safely
+   * ignored on that write path and only persisted to localStorage/Firestore.
+   */
+  outsideServiceArea?: boolean;
+  detectedServiceArea?: string | null;
 }
 
 export const serviceCategories: ServiceCategory[] = [

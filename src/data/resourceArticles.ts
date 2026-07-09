@@ -29,6 +29,8 @@ export interface ResourceArticle {
   relatedSlugs: string[];
   serviceCategory: SchedulerServiceCategory | null;
   schedulerProductName: string;
+  /** Scheduler `serviceType` query param — defaults to 'R' (repair) when omitted, matching every existing article. */
+  schedulerServiceType?: 'R' | 'I' | 'M' | 'E';
   ctaQuestion: string;
   ctaLabel: string;
 }
@@ -666,6 +668,595 @@ export const RESOURCE_ARTICLES: ResourceArticle[] = [
     ctaQuestion: 'Garage door not working like it should?',
     ctaLabel: 'Book Garage Door Service',
   },
+  // ── Handyman ──────────────────────────────────────────────────────────────
+  {
+    slug: 'handyman-small-home-projects',
+    title: 'Common Small Home Projects a Handyman Can Help With',
+    excerpt: 'From furniture assembly to drywall patching, here is a look at the small home projects a handyman handles most often — and when it makes sense to book help.',
+    category: 'handyman',
+    image: '/images/resources/articles/handyman-small-home-projects.webp',
+    imageAlt: 'Handyman completing a small home repair project',
+    readingTime: '5 min read',
+    publishedAt: '2026-02-09',
+    featured: true,
+    intro: 'Not every home project needs a specialist — a lot of the small jobs that pile up on a to-do list fall squarely into "handyman" territory. Here is a rundown of the most common requests we see, so you know what to expect before booking.',
+    sections: [
+      {
+        heading: 'Furniture assembly',
+        paragraphs: [
+          'Flat-pack furniture is affordable and convenient to order, but assembly can eat up an entire afternoon — especially for larger pieces like wardrobes, bed frames, and sectional shelving.',
+        ],
+        bullets: ['Bookshelves, dressers, and wardrobes', 'Bed frames and headboards', 'Desks and office furniture', 'TV stands and media consoles'],
+      },
+      {
+        heading: 'Wall hanging and shelf installation',
+        paragraphs: [
+          'Mirrors, shelves, curtain rods, and wall art all need to be mounted securely — which means finding the right anchor point for the wall type and weight involved.',
+        ],
+      },
+      {
+        heading: 'Drywall patching and minor repairs',
+        paragraphs: [
+          'Small nail holes, minor dents, and hairline cracks are common after moving furniture or taking down old décor. Left alone, they are mostly cosmetic — but a clean patch job makes a real difference before painting.',
+        ],
+      },
+      {
+        heading: 'Curtain rods and other quick fixes',
+        paragraphs: [
+          'Curtain rod installation, loose door hinges, sticking cabinet doors, and other five-minute annoyances are exactly the kind of small jobs worth batching into a single handyman visit.',
+        ],
+      },
+      {
+        heading: 'When it makes sense to book help',
+        paragraphs: [
+          'If a project involves heavy or wall-mounted items, multiple pieces of furniture, or you simply do not have the time or tools on hand, booking a handyman visit is usually faster and safer than tackling it solo.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'The project involves a heavy or wall-mounted item (TV, large mirror, cabinetry)',
+      'You are assembling multiple furniture pieces in one visit',
+      'A repair involves structural framing rather than a small patch',
+      'You are unsure what type of wall anchor a job requires',
+    ],
+    relatedSlugs: ['tv-wall-mounting-checklist', 'wall-hanging-guide', 'drywall-repair-basics'],
+    serviceCategory: 'Handyman',
+    schedulerProductName: 'General Handyman Service',
+    schedulerServiceType: 'I',
+    ctaQuestion: 'Have a small home project on your list?',
+    ctaLabel: 'Book Handyman Service',
+  },
+  {
+    slug: 'furniture-assembly-tips',
+    title: 'Furniture Assembly Tips Before Booking Help',
+    excerpt: 'A little prep before your handyman arrives makes furniture assembly faster and smoother for everyone.',
+    category: 'handyman',
+    image: '/images/resources/articles/furniture-assembly-tips.webp',
+    imageAlt: 'Flat-pack furniture parts and tools laid out before assembly',
+    readingTime: '4 min read',
+    publishedAt: '2026-02-11',
+    intro: 'Furniture assembly usually goes quickly once a technician is on site — but a few minutes of preparation beforehand can save real time during the visit.',
+    sections: [
+      {
+        heading: 'Check that all parts are present',
+        paragraphs: [
+          'Before your appointment, open the box and compare the contents against the parts list in the instructions. Missing hardware is one of the most common causes of assembly delays, and it is much easier to reorder a part beforehand than mid-appointment.',
+        ],
+      },
+      {
+        heading: 'Keep the instructions and hardware together',
+        paragraphs: [
+          'Keep the manual, the small parts bag, and any included tools in one place. If the original packaging is gone, a labeled bag or box works fine — just make sure nothing gets swept up and thrown out.',
+        ],
+      },
+      {
+        heading: 'Clear the work area',
+        paragraphs: [
+          'Assembly needs open floor space — clear a section of the room roughly the size of the finished piece, plus extra room to maneuver panels and tools.',
+        ],
+      },
+      {
+        heading: 'Estimate the number of items in advance',
+        paragraphs: [
+          'When booking, give an accurate count of how many pieces need assembly. A single bookshelf and a five-piece bedroom set call for very different amounts of time on site.',
+        ],
+        bullets: ['Note any heavy items (dressers, wardrobes)', 'Flag anything that will be wall-mounted once assembled', 'Mention if multiple rooms are involved'],
+      },
+    ],
+    whenToCallPro: [
+      'Parts appear missing, damaged, or mislabeled',
+      'The piece will be mounted to a wall once assembled',
+      'You are assembling several large items in one visit',
+      'The manufacturer instructions call for two people',
+    ],
+    relatedSlugs: ['tv-wall-mounting-checklist', 'wall-hanging-guide', 'drywall-repair-basics'],
+    serviceCategory: 'Handyman',
+    schedulerProductName: 'General Handyman Service',
+    schedulerServiceType: 'I',
+    ctaQuestion: 'Ready to get that furniture assembled?',
+    ctaLabel: 'Book Handyman Service',
+  },
+  {
+    slug: 'wall-hanging-guide',
+    title: 'Wall Hanging Guide: Pictures, Shelves, Mirrors, and Décor',
+    excerpt: 'Hanging something securely comes down to knowing your wall type, the item’s weight, and using the right anchor — here is what to check first.',
+    category: 'handyman',
+    image: '/images/resources/articles/wall-hanging-guide.webp',
+    imageAlt: 'Level and wall anchor hardware used for hanging a picture frame',
+    readingTime: '5 min read',
+    publishedAt: '2026-02-13',
+    intro: 'A picture frame and a heavy mirror do not hang the same way. Getting wall hanging right is mostly about matching the anchor to the wall type and the weight of the item.',
+    sections: [
+      {
+        heading: 'Identify your wall type first',
+        paragraphs: [
+          'Drywall, plaster, brick, and concrete all require different hardware. A stud finder can also tell you whether there is a wood or metal stud behind the surface, which is usually the strongest anchor point available.',
+        ],
+      },
+      {
+        heading: 'Match the anchor to the weight',
+        paragraphs: [
+          'Light frames can often use simple picture hooks, but anything heavier — mirrors, floating shelves, larger art — needs a weight-rated anchor or, ideally, a mounting point directly into a stud.',
+        ],
+        bullets: ['Picture hooks: lightweight frames only', 'Plastic or metal drywall anchors: moderate weight', 'Toggle bolts: heavier items without a stud', 'Direct stud mounting: heaviest and safest option'],
+      },
+      {
+        heading: 'Level placement matters',
+        paragraphs: [
+          'A level placed against the frame or shelf before marking anchor points avoids the frustrating rehang. For multiple items, measuring and marking all points first keeps spacing even.',
+        ],
+      },
+      {
+        heading: 'When professional installation is the safer call',
+        paragraphs: [
+          'Heavy mirrors, floating shelves meant to hold real weight, and anything mounted above a bed or seating area are worth having installed professionally — the anchor has to be right the first time.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'The item is heavy, oversized, or mounted above a bed or seating area',
+      'You are unsure what is behind the wall (electrical, plumbing, brick, concrete)',
+      'A floating shelf needs to hold real weight, not just décor',
+      'You are hanging multiple items and want them evenly leveled',
+    ],
+    relatedSlugs: ['tv-wall-mounting-checklist', 'drywall-repair-basics', 'handyman-small-home-projects'],
+    serviceCategory: 'Handyman',
+    schedulerProductName: 'General Handyman Service',
+    schedulerServiceType: 'I',
+    ctaQuestion: 'Want it hung level and secure the first time?',
+    ctaLabel: 'Book Handyman Service',
+  },
+  {
+    slug: 'drywall-repair-basics',
+    title: 'Drywall Repair Basics: Small Holes, Cracks, and Patches',
+    excerpt: 'Most small drywall damage is a straightforward patch job — here is how to tell the difference between a quick fix and something bigger.',
+    category: 'handyman',
+    image: '/images/resources/articles/drywall-repair-basics.webp',
+    imageAlt: 'Drywall patch being smoothed over a small wall repair',
+    readingTime: '4 min read',
+    publishedAt: '2026-02-16',
+    intro: 'Small nail holes, dents, and hairline cracks are some of the most common drywall issues in any home, and most are simple to patch cleanly before painting.',
+    sections: [
+      {
+        heading: 'Small nail holes and dents',
+        paragraphs: [
+          'Small holes from picture hooks or minor dents from moved furniture are typically filled with lightweight spackle, sanded smooth, and ready to paint the same day.',
+        ],
+      },
+      {
+        heading: 'Hairline cracks',
+        paragraphs: [
+          'Cracks along corners or above doorways are common as a house settles. These are usually cosmetic, but recurring cracks in the same spot can point to a settling issue worth a closer look.',
+        ],
+      },
+      {
+        heading: 'Patching larger areas',
+        paragraphs: [
+          'Holes larger than a couple of inches typically need a patch piece and mesh tape rather than spackle alone, followed by a couple of thin coats of joint compound to blend with the surrounding wall.',
+        ],
+      },
+      {
+        heading: 'Painting after the repair',
+        paragraphs: [
+          'A patched area can look slightly different from the surrounding wall until it is primed and painted to match — texture matching is part of getting a clean, invisible repair.',
+        ],
+      },
+      {
+        heading: 'When larger damage needs a professional',
+        paragraphs: [
+          'Water-stained drywall, damage near electrical boxes, or holes larger than about a foot across usually call for a professional to make sure the repair is structurally sound, not just cosmetic.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'The damage is larger than a small patch (more than a few inches across)',
+      'You notice water staining, soft spots, or a musty smell near the damage',
+      'The repair is close to an outlet, switch, or other electrical fixture',
+      'Cracks keep reappearing in the same location',
+    ],
+    relatedSlugs: ['tv-wall-mounting-checklist', 'wall-hanging-guide', 'handyman-small-home-projects'],
+    serviceCategory: 'Handyman',
+    schedulerProductName: 'General Handyman Service',
+    schedulerServiceType: 'I',
+    ctaQuestion: 'Got drywall damage that needs patching?',
+    ctaLabel: 'Book Handyman Service',
+  },
+  // ── TV Mounting ───────────────────────────────────────────────────────────
+  {
+    slug: 'tv-mounting-cost-guide',
+    title: 'TV Mounting Cost Guide: What Affects the Final Price?',
+    excerpt: 'TV mounting pricing depends on more than just the TV itself — here is what actually factors into the final quote.',
+    category: 'tv-mounting',
+    image: '/images/resources/articles/tv-mounting-cost-guide.webp',
+    imageAlt: 'Wall-mounted television setup in a living room',
+    readingTime: '5 min read',
+    publishedAt: '2026-02-18',
+    featured: true,
+    intro: 'TV mounting looks simple from the outside, but the final price depends on several factors specific to your setup. Here is what actually goes into a quote, so there are no surprises before work begins.',
+    sections: [
+      {
+        heading: 'TV size and weight',
+        paragraphs: [
+          'Larger, heavier televisions need a more robust bracket and, in some cases, additional wall reinforcement — both of which affect the scope of the job compared to a smaller, lighter TV.',
+        ],
+      },
+      {
+        heading: 'Wall type and mount type',
+        paragraphs: [
+          'Drywall over wood studs is the most straightforward mounting surface. Brick, concrete, plaster, or a wall without a conveniently placed stud all require different hardware and more time.',
+        ],
+        bullets: ['Fixed mounts: simplest installation', 'Tilting mounts: added viewing-angle adjustment', 'Full-motion mounts: most flexible, most involved install'],
+      },
+      {
+        heading: 'Wire concealment and outlet location',
+        paragraphs: [
+          'A clean, wire-free look usually means routing cables through an in-wall kit or a surface channel. If there is no outlet near the mounting height, that adds another step to the job.',
+        ],
+      },
+      {
+        heading: 'Soundbar setup and number of TVs',
+        paragraphs: [
+          'Adding a soundbar, connecting additional devices, or mounting more than one TV in a single visit all add to the scope — and the price — of the appointment.',
+        ],
+      },
+      {
+        heading: 'Getting a final quote before work begins',
+        paragraphs: [
+          'Final pricing varies by TV size, wall type, mount type, wire concealment, and installation complexity. Your technician reviews your specific setup and confirms pricing before any work starts, so you know what to expect.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'You are unsure what mount type is compatible with your TV',
+      'The wall is brick, concrete, tile, or otherwise non-standard',
+      'You want a completely wire-free look with in-wall concealment',
+      'You are mounting more than one TV or adding a soundbar in the same visit',
+    ],
+    relatedSlugs: ['wall-hanging-guide', 'wire-concealment-guide', 'smart-thermostat-benefits'],
+    serviceCategory: 'TV Mounting',
+    schedulerProductName: 'TV Mounting',
+    schedulerServiceType: 'I',
+    ctaQuestion: 'Ready to get a quote for your TV mounting?',
+    ctaLabel: 'Book TV Mounting',
+  },
+  {
+    slug: 'tv-wall-mounting-checklist',
+    title: 'TV Wall Mounting Checklist Before Your Appointment',
+    excerpt: 'A few details ready ahead of time make your TV mounting appointment faster and help your technician arrive with the right hardware.',
+    category: 'tv-mounting',
+    image: '/images/resources/articles/tv-wall-mounting-checklist.webp',
+    imageAlt: 'Checklist for a TV wall mounting appointment in a living room',
+    readingTime: '4 min read',
+    publishedAt: '2026-02-20',
+    intro: 'A little preparation before your TV mounting appointment helps things go smoothly — here is what to have ready.',
+    sections: [
+      {
+        heading: 'Know your TV size and have the mount ready',
+        paragraphs: [
+          'Confirm your TV’s screen size and VESA mounting-hole pattern (found in the manual or on the back of the TV). If you have already purchased a mount, have the box and hardware on hand; if not, your technician can recommend a compatible option.',
+        ],
+      },
+      {
+        heading: 'Check the wall type and preferred height',
+        paragraphs: [
+          'Think about how high you want the TV and which wall it is going on. If you know the wall is brick, concrete, or plaster rather than standard drywall, mention it when booking.',
+        ],
+      },
+      {
+        heading: 'Note the outlet location and cable plans',
+        paragraphs: [
+          'Look at where your nearest power outlet is relative to the planned mounting height — this affects whether cables run along the surface or through the wall.',
+        ],
+        bullets: ['Outlet location relative to the TV', 'Cable/satellite box or streaming device placement', 'Whether a soundbar is part of the setup', 'Furniture that needs to move out of the way'],
+      },
+      {
+        heading: 'Clear the furniture placement',
+        paragraphs: [
+          'Move any furniture away from the wall ahead of time so your technician has clear access to the mounting area from floor to ceiling.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'You are not sure if your existing mount is compatible with your TV',
+      'The wall is not standard drywall over wood studs',
+      'You want wires fully concealed inside the wall',
+      'You are mounting a very large or heavy TV',
+    ],
+    relatedSlugs: ['wall-hanging-guide', 'wire-concealment-guide', 'smart-thermostat-benefits'],
+    serviceCategory: 'TV Mounting',
+    schedulerProductName: 'TV Mounting',
+    schedulerServiceType: 'I',
+    ctaQuestion: 'Ready to book your TV mounting appointment?',
+    ctaLabel: 'Book TV Mounting',
+  },
+  {
+    slug: 'wire-concealment-guide',
+    title: 'Wire Concealment for TV Mounting: What to Know',
+    excerpt: 'A clean, wire-free look is one of the most requested add-ons for TV mounting — here is how it works and what to consider.',
+    category: 'tv-mounting',
+    image: '/images/resources/articles/wire-concealment-guide.webp',
+    imageAlt: 'Concealed wiring behind a wall-mounted television',
+    readingTime: '4 min read',
+    publishedAt: '2026-02-23',
+    intro: 'Visible cables hanging beneath a mounted TV are one of the most common complaints after a DIY install. Wire concealment solves it — here is what the options actually involve.',
+    sections: [
+      {
+        heading: 'Surface wire covers',
+        paragraphs: [
+          'A paintable surface channel runs along the wall and can be matched to your paint color for a low-profile, budget-friendly option that does not require opening the wall.',
+        ],
+      },
+      {
+        heading: 'In-wall concealment considerations',
+        paragraphs: [
+          'Running cables inside the wall gives the cleanest possible look, but it depends on the wall type, what is already inside it, and local electrical code for how power cables can be routed in-wall.',
+        ],
+      },
+      {
+        heading: 'Outlet availability',
+        paragraphs: [
+          'If there is no outlet near the TV’s mounting height, your technician can discuss options such as an in-wall power relocation kit or a surface-mounted outlet extension.',
+        ],
+      },
+      {
+        heading: 'Safety comes first',
+        paragraphs: [
+          'Not every cable is rated to run inside a wall cavity, and power cables in particular need to be handled according to code. Your technician will confirm what is safe for your specific setup before starting.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'You want an in-wall power outlet added near the mounting height',
+      'You are unsure whether your walls have insulation, blocking, or other obstructions',
+      'The setup involves multiple devices and cable types',
+      'You want the cleanest possible entertainment setup with no visible wiring',
+    ],
+    relatedSlugs: ['wall-hanging-guide', 'smart-thermostat-benefits', 'tv-mounting-cost-guide'],
+    serviceCategory: 'TV Mounting',
+    schedulerProductName: 'TV Mounting',
+    schedulerServiceType: 'I',
+    ctaQuestion: 'Want your wires completely out of sight?',
+    ctaLabel: 'Book TV Mounting',
+  },
+  // ── Phone Repair ──────────────────────────────────────────────────────────
+  {
+    slug: 'phone-screen-repair-guide',
+    title: 'Phone Screen Repair Guide: Cracks, Touch Issues, and Display Problems',
+    excerpt: 'A cracked screen is not always just cosmetic — here is how to tell when a repair is urgent and what to do before your appointment.',
+    category: 'phone-repair',
+    image: '/images/resources/articles/phone-screen-repair-guide.webp',
+    imageAlt: 'Smartphone repair on a technician workbench',
+    readingTime: '4 min read',
+    publishedAt: '2026-02-25',
+    featured: true,
+    intro: 'Screen damage ranges from a small cosmetic crack to a display that is no longer usable. Knowing the difference helps you decide how quickly to book a repair.',
+    sections: [
+      {
+        heading: 'Cracked glass',
+        paragraphs: [
+          'A cracked but still-responsive screen is usually safe to keep using short-term, though the crack can spread over time and small glass shards along the edge are a cutting risk — a case or screen protector can help in the meantime.',
+        ],
+      },
+      {
+        heading: 'Touch not responding',
+        paragraphs: [
+          'Areas of the screen that do not register taps, or a touchscreen that registers phantom taps on its own, usually point to damage in the digitizer layer beneath the glass and typically need a full screen replacement.',
+        ],
+      },
+      {
+        heading: 'Display lines or a black screen',
+        paragraphs: [
+          'Colored lines, flickering, or areas that have gone completely black usually indicate damage to the display panel itself or its connection, rather than something fixable with a restart.',
+        ],
+      },
+      {
+        heading: 'When to stop using the device',
+        paragraphs: [
+          'Stop using the phone and book a repair promptly if you see glass separating from the frame, the screen is non-responsive, or you notice heat, swelling, or a burning smell — those go beyond a routine screen issue.',
+        ],
+      },
+      {
+        heading: 'Back up your device first',
+        paragraphs: [
+          'Before any repair, back up your photos and data through your phone’s standard cloud or computer backup. We do not need your passcode, IMEI, or account credentials to complete a screen repair.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'Touch is unresponsive or registers phantom input',
+      'You see display lines, flickering, or a partially black screen',
+      'Glass is separating from the frame or shedding shards',
+      'The device shows any heat, swelling, or unusual smell',
+    ],
+    relatedSlugs: ['phone-battery-replacement-signs', 'charging-port-repair-guide', 'phone-repair-or-replace'],
+    serviceCategory: 'Phone Repair',
+    schedulerProductName: 'Screen Replacement',
+    ctaQuestion: 'Dealing with a cracked or unresponsive screen?',
+    ctaLabel: 'Book Phone Repair',
+  },
+  {
+    slug: 'phone-battery-replacement-signs',
+    title: 'Signs Your Phone Battery May Need Replacement',
+    excerpt: 'A phone battery that drains fast, shuts off unexpectedly, or feels warm is telling you something — here are the signs worth paying attention to.',
+    category: 'phone-repair',
+    image: '/images/resources/articles/phone-battery-replacement-signs.webp',
+    imageAlt: 'Phone battery icon representing battery health and replacement signs',
+    readingTime: '4 min read',
+    publishedAt: '2026-02-27',
+    safetyNotice: 'If a battery is swollen, hot, leaking, or smells unusual, stop using the device immediately and seek professional help. Do not attempt to charge or puncture a swollen battery.',
+    intro: 'Phone batteries naturally degrade over time, and the signs are usually gradual before they become impossible to ignore. Here is what to watch for.',
+    sections: [
+      {
+        heading: 'Battery drains quickly',
+        paragraphs: [
+          'If your phone needs charging noticeably more often than it used to, even with similar usage habits, battery capacity has likely declined — most phones show battery health in their settings menu.',
+        ],
+      },
+      {
+        heading: 'Phone shuts off unexpectedly',
+        paragraphs: [
+          'A phone that powers off suddenly while showing 20-30% battery remaining is a classic sign of a battery that can no longer deliver consistent power under load.',
+        ],
+      },
+      {
+        heading: 'Overheating during normal use',
+        paragraphs: [
+          'Some warmth during charging or heavy use is normal, but a phone that gets hot during light, everyday tasks may have a battery working harder than it should.',
+        ],
+      },
+      {
+        heading: 'Charging problems',
+        paragraphs: [
+          'Charging that stalls, slows dramatically near the end, or never quite reaches 100% can point to the battery as well as the charging port — a technician can help pinpoint which one.',
+        ],
+      },
+      {
+        heading: 'The swelling warning sign',
+        paragraphs: [
+          'A swollen battery can cause the screen to lift or the back panel to bulge. This is a safety issue, not just a performance one — stop using the device and have it inspected as soon as possible.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'The phone shuts off well before it reaches 0% battery',
+      'The device or battery feels swollen, hot, or emits an unusual smell',
+      'Charging has become unreliable or unusually slow',
+      'Battery health reporting in your settings shows significant degradation',
+    ],
+    relatedSlugs: ['charging-port-repair-guide', 'phone-repair-or-replace', 'phone-screen-repair-guide'],
+    serviceCategory: 'Phone Repair',
+    schedulerProductName: 'Screen Replacement',
+    ctaQuestion: 'Noticing signs your battery is wearing out?',
+    ctaLabel: 'Book Phone Repair',
+  },
+  {
+    slug: 'charging-port-repair-guide',
+    title: 'Charging Port Problems: Cable, Dirt, or Repair Needed?',
+    excerpt: 'A phone that will not charge is not always a repair issue — here is how to rule out the simple causes first.',
+    category: 'phone-repair',
+    image: '/images/resources/articles/charging-port-repair-guide.webp',
+    imageAlt: 'Close-up of a smartphone charging port during inspection',
+    readingTime: '4 min read',
+    publishedAt: '2026-03-02',
+    intro: 'Before assuming the worst about a phone that will not charge, a few quick checks can rule out the most common — and easiest to fix — causes.',
+    sections: [
+      {
+        heading: 'Check the cable',
+        paragraphs: [
+          'Frayed or damaged charging cables are one of the most common causes of charging problems. Try a different cable you know works before assuming the port itself is the issue.',
+        ],
+      },
+      {
+        heading: 'Check the adapter and outlet',
+        paragraphs: [
+          'Test a different wall adapter or outlet, and check for a low-power warning message on screen — some fast chargers are not compatible with every device.',
+        ],
+      },
+      {
+        heading: 'Look for debris in the port',
+        paragraphs: [
+          'Lint and dust build up in charging ports over time and can block a solid connection. A dry, soft brush or a can of compressed air can clear light debris — avoid metal objects, which can damage the internal pins.',
+        ],
+      },
+      {
+        heading: 'A loose or damaged port',
+        paragraphs: [
+          'If the cable only charges at a certain angle, or feels loose when plugged in, the port connector itself may be damaged and typically needs professional repair rather than cleaning.',
+        ],
+      },
+      {
+        heading: 'Moisture warning',
+        paragraphs: [
+          'If the phone has been exposed to moisture, do not attempt to charge it until it has been inspected — charging a wet port raises the risk of a short circuit.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'A different cable and adapter do not resolve the issue',
+      'The port looks physically damaged, bent, or loose',
+      'The phone was recently exposed to moisture or liquid',
+      'Charging only works at a specific angle or intermittently',
+    ],
+    relatedSlugs: ['phone-battery-replacement-signs', 'phone-repair-or-replace', 'phone-screen-repair-guide'],
+    serviceCategory: 'Phone Repair',
+    schedulerProductName: 'Screen Replacement',
+    ctaQuestion: 'Charging port acting up?',
+    ctaLabel: 'Book Phone Repair',
+  },
+  {
+    slug: 'phone-repair-or-replace',
+    title: 'Should You Repair or Replace Your Phone?',
+    excerpt: 'Repair cost, battery health, and how long you plan to keep the device all factor into whether a repair or a new phone makes more sense.',
+    category: 'phone-repair',
+    image: '/images/resources/articles/phone-repair-or-replace.webp',
+    imageAlt: 'Older and newer smartphone compared side by side',
+    readingTime: '5 min read',
+    publishedAt: '2026-03-05',
+    intro: 'A cracked screen or failing battery does not automatically mean it is time for a new phone. Here is how to think through the decision.',
+    sections: [
+      {
+        heading: 'Age of the device',
+        paragraphs: [
+          'Phones generally see the best value from repairs within their first two to three years. Beyond that, software support and replacement-part availability both start to decline.',
+        ],
+      },
+      {
+        heading: 'Repair cost versus replacement cost',
+        paragraphs: [
+          'A single, common repair like a screen or battery replacement is almost always less expensive than a new device. Multiple simultaneous issues change that math quickly.',
+        ],
+      },
+      {
+        heading: 'Battery health and performance',
+        paragraphs: [
+          'A phone that otherwise runs well but has a weak battery is usually a great repair candidate. A phone that is also slow, low on storage, or struggling with current apps may not be worth further investment.',
+        ],
+      },
+      {
+        heading: 'Warranty and insurance coverage',
+        paragraphs: [
+          'Check whether your device is still under manufacturer warranty or covered by phone insurance before paying out of pocket — coverage can make repair the clear choice.',
+        ],
+      },
+      {
+        heading: 'Back up your data either way',
+        paragraphs: [
+          'Whether you repair or replace, back up your photos, contacts, and files first. We never need your passcode, full serial number, or account credentials to complete a repair.',
+        ],
+      },
+    ],
+    whenToCallPro: [
+      'You are unsure whether a repair is cost-effective for your specific device',
+      'Multiple issues are affecting the phone at the same time',
+      'You want a professional diagnostic before deciding',
+      'You are not sure if warranty or insurance coverage applies',
+    ],
+    relatedSlugs: ['phone-battery-replacement-signs', 'charging-port-repair-guide', 'phone-screen-repair-guide'],
+    serviceCategory: 'Phone Repair',
+    schedulerProductName: 'Screen Replacement',
+    ctaQuestion: 'Not sure whether to repair or replace?',
+    ctaLabel: 'Book Phone Repair',
+  },
 ];
 
 export function getResourceArticle(slug: string): ResourceArticle | undefined {
@@ -689,6 +1280,6 @@ export function getRelatedArticles(article: ResourceArticle): ResourceArticle[] 
 /** Scheduler booking URL for an article's CTA — prefilled with its service category and product name when known. */
 export function getArticleBookingHref(article: ResourceArticle): string {
   return article.serviceCategory
-    ? `/scheduler?serviceType=R&serviceCategory=${encodeURIComponent(article.serviceCategory)}&productName=${encodeURIComponent(article.schedulerProductName)}`
+    ? `/scheduler?serviceType=${article.schedulerServiceType ?? 'R'}&serviceCategory=${encodeURIComponent(article.serviceCategory)}&productName=${encodeURIComponent(article.schedulerProductName)}`
     : '/scheduler';
 }

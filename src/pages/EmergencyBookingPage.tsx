@@ -8,6 +8,7 @@ import {
   TextField,
   FormControl,
   FormLabel,
+  InputLabel,
   Select,
   MenuItem,
   SelectChangeEvent,
@@ -28,11 +29,15 @@ import { serviceCategories, urgencyOptions, ServiceRequest } from '../data/servi
 import { getServiceImage } from '../data/serviceImages';
 import {
   normalizeZipInput,
-  validateZipCode,
-  getZipFieldHelperText,
-  isZipFieldError,
+  isValidUsZip,
+  isInServiceArea,
+  SERVICE_AREA_ZIP_HINT,
+  type MetroServiceState,
 } from '../data/serviceAreas';
+import { getServiceAreaByZip } from '../utils/serviceAreas';
 import { saveServiceRequest } from '../lib/firebase';
+
+const US_STATE_OPTIONS: MetroServiceState[] = ['MD', 'VA', 'WV', 'PA', 'DE', 'DC'];
 
 interface EmergencyBookingState {
   serviceCategory?: string;
@@ -76,7 +81,7 @@ const EmergencyBookingPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
-  const [stateVal, setStateVal] = useState('');
+  const [stateVal, setStateVal] = useState<MetroServiceState>('MD');
   const [zipCode, setZipCode] = useState('');
   const [zipTouched, setZipTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -86,7 +91,30 @@ const EmergencyBookingPage: React.FC = () => {
   const [showStepErrors, setShowStepErrors] = useState(false);
 
   const selectedCategory = serviceCategories.find((c) => c.id === categoryId) ?? serviceCategories[0];
-  const zipValidation = validateZipCode(zipCode);
+
+  // ZIP is only required to be a valid 5-digit format to submit — being outside the
+  // service area is a warning, not a submission blocker (see spec section 1).
+  const zipFormatValid = isValidUsZip(zipCode);
+  const zipInArea = zipFormatValid && isInServiceArea(zipCode);
+  const zipShowFeedback = zipTouched || zipCode.length === 5;
+
+  let zipStatusMessage = SERVICE_AREA_ZIP_HINT;
+  let zipHasError = false;
+  if (zipShowFeedback) {
+    if (!zipCode.trim()) {
+      zipStatusMessage = 'Please enter your ZIP code.';
+      zipHasError = true;
+    } else if (!zipFormatValid) {
+      zipStatusMessage = 'Please enter a valid 5-digit ZIP code.';
+      zipHasError = true;
+    } else if (zipInArea) {
+      zipStatusMessage = 'Great news — this ZIP is within our emergency service region.';
+      zipHasError = false;
+    } else {
+      zipStatusMessage = 'This ZIP may be outside our current emergency service area. Please call us to confirm availability.';
+      zipHasError = false;
+    }
+  }
 
   const descMissing = !issueDesc.trim();
   const ackMissing = !acknowledged;
@@ -112,12 +140,24 @@ const EmergencyBookingPage: React.FC = () => {
     setIsSubmitting(true);
 
     const newId = `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const detectedServiceArea = getServiceAreaByZip(zipCode);
+    const outsideServiceArea = zipFormatValid && !zipInArea;
     const triageNotes = [
       `Happening now: ${happeningNow || 'Not specified'}`,
       `Active water/smoke/sparks/burning smell: ${activeHazard || 'Not specified'}`,
       `Anyone in immediate danger: ${immediateDanger || 'Not specified'}`,
       `Acknowledged non-emergency-service notice: ${acknowledged ? 'Yes' : 'No'}`,
-    ].join(' | ');
+      // Fallback surface for outside-area flagging — the Supabase service_requests
+      // table has no dedicated column for this yet, so it rides along in notes
+      // (admin_notes-equivalent) in addition to the typed fields below.
+      outsideServiceArea
+        ? 'ZIP outside current emergency service area — confirm availability before dispatch.'
+        : detectedServiceArea
+        ? `Detected service area: ${detectedServiceArea}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(' | ');
 
     const request: ServiceRequest = {
       id: newId,
@@ -157,6 +197,8 @@ const EmergencyBookingPage: React.FC = () => {
       status: 'new',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      outsideServiceArea,
+      detectedServiceArea,
     };
 
     try {
@@ -578,25 +620,47 @@ const EmergencyBookingPage: React.FC = () => {
                   Share how to reach you and where the issue is located so our team can respond quickly.
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                  <TextField label="Full Name *" value={name} onChange={(e) => setName(e.target.value)} fullWidth required />
-                  <TextField label="Phone *" value={phone} onChange={(e) => setPhone(e.target.value)} fullWidth required />
-                  <TextField label="Email *" type="email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth required />
-                  <TextField label="Street Address *" value={address} onChange={(e) => setAddress(e.target.value)} fullWidth required />
+                  <TextField label="Full Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth required />
+                  <TextField label="Phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} fullWidth required />
+                  <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth required />
+                  <TextField label="Street Address" value={address} onChange={(e) => setAddress(e.target.value)} fullWidth required />
                   <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2 }}>
                     <TextField label="City" value={city} onChange={(e) => setCity(e.target.value)} fullWidth />
-                    <TextField label="State" value={stateVal} onChange={(e) => setStateVal(e.target.value)} fullWidth />
+                    <FormControl fullWidth>
+                      <InputLabel id="emergency-state-label">State</InputLabel>
+                      <Select
+                        labelId="emergency-state-label"
+                        label="State"
+                        value={stateVal}
+                        onChange={(e: SelectChangeEvent<string>) => setStateVal(e.target.value as MetroServiceState)}
+                      >
+                        {US_STATE_OPTIONS.map((abbr) => (
+                          <MenuItem key={abbr} value={abbr}>{abbr}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                     <TextField
-                      label="ZIP Code *"
+                      label="ZIP Code"
                       value={zipCode}
                       onChange={(e) => setZipCode(normalizeZipInput(e.target.value))}
                       onBlur={() => setZipTouched(true)}
                       inputProps={{ inputMode: 'numeric', maxLength: 5 }}
-                      error={isZipFieldError(zipCode, zipTouched || zipCode.length === 5)}
-                      helperText={getZipFieldHelperText(zipCode, zipTouched || zipCode.length === 5)}
+                      error={zipHasError}
                       fullWidth
                       required
                     />
                   </Box>
+                  <Typography
+                    role={zipHasError ? 'alert' : undefined}
+                    sx={{
+                      mt: -1.5,
+                      fontSize: '0.8rem',
+                      fontWeight: zipShowFeedback ? 600 : 400,
+                      color: zipHasError ? RED_DARK : zipShowFeedback && zipFormatValid && !zipInArea ? '#B45309' : MUTED,
+                    }}
+                  >
+                    {zipStatusMessage}
+                  </Typography>
                 </Box>
                 {submitError ? (
                   <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>{submitError}</Alert>
@@ -612,7 +676,7 @@ const EmergencyBookingPage: React.FC = () => {
                   </Button>
                   <Button
                     variant="contained"
-                    disabled={!name || !phone || !email || !address || !zipValidation.isValid || isSubmitting}
+                    disabled={!name || !phone || !email || !address || !zipFormatValid || isSubmitting}
                     onClick={handleSubmit}
                     fullWidth
                     startIcon={isSubmitting ? <CircularProgress size={18} sx={{ color: '#FFFFFF' }} /> : undefined}

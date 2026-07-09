@@ -43,13 +43,33 @@ Smart Appliances is a modern home-service booking platform for appliance care, H
 ## Resources / Help Center
 
 - `/resources` — hub with featured articles, category cards, and a videos preview.
-- `/resources/articles` — full, filterable article list.
-- `/resources/articles/:slug` — article detail, with a related-video sidebar card and related articles.
+- `/resources/articles` — full, filterable article list (`?category=` filters by `ResourceCategoryId`, e.g. `?category=handyman`, `?category=tv-mounting`, `?category=phone-repair`).
+- `/resources/:slug` — article detail, with a related-video sidebar card and related articles.
 - `/resources/videos` — full video library, filterable by category.
 
+Categories: Appliance Care, HVAC & Energy Savings, Plumbing Tips, Electrical
+Safety, Smart Home Guides, Garage Door Care, Maintenance Checklists, Repair or
+Replace, Handyman, TV Mounting, and Phone Repair (`src/data/resourceCategories.ts`).
+
+- **Handyman** — furniture assembly, wall hanging, drywall repair, and small
+  home projects (`handyman-small-home-projects`, `furniture-assembly-tips`,
+  `wall-hanging-guide`, `drywall-repair-basics`).
+- **TV Mounting** — mounting cost factors, a pre-appointment checklist, and
+  wire concealment (`tv-mounting-cost-guide`, `tv-wall-mounting-checklist`,
+  `wire-concealment-guide`).
+- **Phone Repair** — screen, battery, and charging-port issues, plus repair-vs-replace
+  guidance (`phone-screen-repair-guide`, `phone-battery-replacement-signs`,
+  `charging-port-repair-guide`, `phone-repair-or-replace`). These articles never
+  ask for a passcode, full serial number, IMEI, or account credentials.
+
+Resources content is original and inspired by common customer questions across
+home-service categories.
+
 Article and category art falls back to hand-drawn on-brand vector scenes
-(`TopicIllustration`) until a real photo is added at the documented path —
-see `docs/image-assets-needed.md`. Nothing renders as a broken image.
+(`TopicIllustration` for category art, `ArticleTopicIllustration` for articles
+whose shared category art would otherwise repeat) until a real photo is added
+at the documented path — see `docs/image-assets-needed.md`. Nothing renders as
+a broken image.
 
 ## Optional Video System
 
@@ -276,6 +296,20 @@ Bookings trigger an admin notification email and a customer confirmation email, 
 ## Service Areas
 
 Serving MD, VA, WV, PA, DE, and Washington DC.
+
+ZIP-code service-area checks are shared across the site through
+`src/utils/serviceAreas.ts` (`getServiceAreaByZip` / `isZipInServiceArea`,
+coarse ZIP-range lookup) and the higher-level helpers in
+`src/data/serviceAreas.ts` (validation messages, ZIP normalization, state
+inference). The Emergency Service form (`/emergency-service`) uses this same
+logic but never blocks submission for a ZIP outside the service area — it
+only shows a warning ("This ZIP may be outside our current emergency service
+area. Please call us to confirm availability.") and still lets the request go
+through as long as the contact fields are valid. When a ZIP is outside the
+area, the request is flagged with `outsideServiceArea` / `detectedServiceArea`
+on the saved record (localStorage/Firestore); the Supabase `service_requests`
+table has no matching columns yet, so that detail is also folded into the
+request's free-text notes as a fallback rather than sent as extra columns.
 
 ## Contact
 

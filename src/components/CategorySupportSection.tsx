@@ -29,6 +29,8 @@ const CategorySupportSection: React.FC<CategorySupportSectionProps> = ({ content
           src={content.image}
           alt={content.imageAlt}
           loading="lazy"
+          width={560}
+          height={320}
           sx={{
             width: '100%',
             height: { xs: 220, sm: 280, md: 320 },

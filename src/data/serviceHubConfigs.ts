@@ -117,7 +117,7 @@ export const phoneRepairIconCards: HubIconCard[] = [
   { id: 'charging', label: 'Charging Port Repair', Icon: PlugZap, serviceIds: ['phone-charging-port-repair'] },
   { id: 'camera', label: 'Camera Repair', Icon: Aperture, serviceIds: ['phone-camera-repair'] },
   { id: 'speaker', label: 'Speaker / Microphone', Icon: Mic, serviceIds: ['phone-speaker-microphone-repair'] },
-  { id: 'water-damage', label: 'Water-Damage Assessment', Icon: Droplet, serviceIds: ['phone-device-diagnostic', 'phone-water-damage'] },
+  { id: 'water-damage', label: 'Water-Damage Assessment', Icon: Droplet, serviceIds: ['phone-water-damage', 'phone-device-diagnostic'] },
 ];
 
 export const handymanIconCards: HubIconCard[] = [

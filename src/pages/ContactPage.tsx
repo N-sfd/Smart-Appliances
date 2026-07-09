@@ -21,16 +21,33 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
-import { serviceCategories } from '../data/services';
 import { primaryButtonSx, radii } from '../theme';
-import { SERVICE_AREA_REGION_LABEL } from '../data/serviceAreas';
+import { SERVICE_AREA_REGION_LABEL, SERVICE_AREA_REGION_LABEL_SHORT } from '../data/serviceAreas';
 import PageHero from '../components/common/PageHero';
 import { PAGE_HERO_PHOTOS } from '../data/pageHeroImages';
 import ServiceAreaMap from '../components/ServiceAreaMap';
 
+/** Customer-facing categories for the contact inquiry form — kept in sync with the header nav. */
+const CONTACT_SERVICE_CATEGORIES: { id: string; label: string }[] = [
+  { id: 'home-appliances', label: 'Appliance Care' },
+  { id: 'hvac-services', label: 'HVAC Services' },
+  { id: 'plumbing-services', label: 'Plumbing Services' },
+  { id: 'electrical-services', label: 'Electrical Services' },
+  { id: 'smart-home-setup', label: 'Smart Home' },
+  { id: 'garage-door-repair', label: 'Garage Door' },
+  { id: 'tv-mounting', label: 'TV Mounting' },
+  { id: 'phone-repair', label: 'Phone Repair' },
+  { id: 'handyman', label: 'Handyman' },
+  { id: 'emergency-service', label: 'Emergency Service' },
+];
+
 const contactInputSx = {
   '& .MuiOutlinedInput-root': { borderRadius: radii.xl },
 };
+
+/** Shared card treatment so the business-hours card and the form card read as one family. */
+const CARD_RADIUS = '20px';
+const CARD_SHADOW = '0 4px 20px rgba(11,61,145,0.06)';
 
 interface ContactInfo {
   icon: React.ReactNode;
@@ -59,8 +76,8 @@ const contactInfoItems: ContactInfo[] = [
   },
   {
     icon: <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 22 }} />,
-    label: 'Serving Your Local Area',
-    sublabel: 'We cover the greater metro area and surrounding regions',
+    label: `Serving ${SERVICE_AREA_REGION_LABEL_SHORT}`,
+    sublabel: 'Licensed technicians across the full coverage area',
     iconBg: '#E8F1FF',
     value: 'location',
   },
@@ -232,8 +249,9 @@ const ContactPage: React.FC = () => {
               <Box
                 sx={{
                   backgroundColor: '#FFFFFF',
-                  borderRadius: '16px',
+                  borderRadius: CARD_RADIUS,
                   border: '1px solid #E4E7EB',
+                  boxShadow: CARD_SHADOW,
                   p: 3,
                   mt: 2,
                 }}
@@ -284,8 +302,9 @@ const ContactPage: React.FC = () => {
             <Box
               sx={{
                 backgroundColor: '#FFFFFF',
-                borderRadius: '20px',
+                borderRadius: CARD_RADIUS,
                 border: '1px solid #E4E7EB',
+                boxShadow: CARD_SHADOW,
                 p: { xs: 3, md: 4 },
               }}
             >
@@ -385,9 +404,9 @@ const ContactPage: React.FC = () => {
                           <MenuItem value="">
                             <em>Select a category</em>
                           </MenuItem>
-                          {serviceCategories.map((cat) => (
+                          {CONTACT_SERVICE_CATEGORIES.map((cat) => (
                             <MenuItem key={cat.id} value={cat.id}>
-                              {cat.title}
+                              {cat.label}
                             </MenuItem>
                           ))}
                         </Select>
@@ -407,6 +426,7 @@ const ContactPage: React.FC = () => {
                     />
                     <Button
                       variant="contained"
+                      fullWidth
                       onClick={handleSubmit}
                       sx={{ ...primaryButtonSx, py: 1.75, fontSize: '1rem' }}
                     >

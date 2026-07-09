@@ -42,6 +42,21 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.smartappliances.com/services/tv-mounting</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/services/phone-repair</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/services/handyman</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.smartappliances.com/services/refrigerator-service</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -208,6 +223,61 @@
   </url>
   <url>
     <loc>https://www.smartappliances.com/resources/garage-door-maintenance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/handyman-small-home-projects</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/furniture-assembly-tips</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/wall-hanging-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/drywall-repair-basics</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/tv-mounting-cost-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/tv-wall-mounting-checklist</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/wire-concealment-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/phone-screen-repair-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/phone-battery-replacement-signs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/charging-port-repair-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.smartappliances.com/resources/phone-repair-or-replace</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

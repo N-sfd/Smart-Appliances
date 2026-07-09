@@ -207,4 +207,63 @@ const SCENES: Record<ResourceCategoryId, () => React.ReactNode> = {
       <path d="M215 138 L232 150 L215 162" fill="none" stroke={BLUE} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
     </g>
   ),
+  handyman: () => (
+    <g>
+      <rect x="0" y="205" width="400" height="45" fill="#D6E8FF" />
+      {/* toolbox */}
+      <rect x="55" y="140" width="150" height="80" rx="10" fill={WHITE} stroke={NAVY} strokeWidth="3" />
+      <path d="M95 140 v-20 a12 12 0 0 1 12 -12 h36 a12 12 0 0 1 12 12 v20" fill="none" stroke={NAVY} strokeWidth="3.5" />
+      <line x1="55" y1="172" x2="205" y2="172" stroke={NAVY} strokeWidth="2.5" />
+      <rect x="112" y="158" width="26" height="26" rx="4" fill={AMBER} />
+      {/* hammer */}
+      <g transform="translate(260,110) rotate(28)">
+        <rect x="-7" y="-14" width="14" height="90" rx="5" fill="#C08A4E" />
+        <rect x="-28" y="-38" width="56" height="30" rx="8" fill={SLATE} />
+      </g>
+      {/* framed picture being hung */}
+      <g transform="translate(330,150)">
+        <rect x="-22" y="-28" width="44" height="56" rx="4" fill={WHITE} stroke={BLUE} strokeWidth="3" />
+        <path d="M-14 -20 l10 12 l8 -18" fill="none" stroke={SKY} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M0 -28 q0 -18 0 -18" stroke={SLATE} strokeWidth="2" strokeDasharray="3 4" />
+      </g>
+    </g>
+  ),
+  'tv-mounting': () => (
+    <g>
+      <rect x="0" y="0" width="400" height="250" fill="#EAF6FF" />
+      {/* wall-mounted TV */}
+      <rect x="110" y="45" width="200" height="120" rx="8" fill={WHITE} stroke={NAVY} strokeWidth="3" />
+      <rect x="118" y="53" width="184" height="104" rx="4" fill="#0B3D91" opacity="0.08" />
+      {/* wall bracket arm */}
+      <rect x="196" y="165" width="8" height="26" fill={SLATE} />
+      <path d="M170 191 h60" stroke={SLATE} strokeWidth="6" strokeLinecap="round" />
+      {/* soundbar below */}
+      <rect x="140" y="205" width="120" height="18" rx="9" fill={WHITE} stroke={BLUE} strokeWidth="3" />
+      <circle cx="160" cy="214" r="3" fill={BLUE} />
+      <circle cx="180" cy="214" r="3" fill={SKY} />
+      {/* concealed cable path */}
+      <path d="M300 100 q30 20 0 91" fill="none" stroke={SLATE} strokeWidth="4" strokeDasharray="2 7" strokeLinecap="round" />
+    </g>
+  ),
+  'phone-repair': () => (
+    <g>
+      <rect x="0" y="205" width="400" height="45" fill="#D6E8FF" />
+      {/* phone body */}
+      <rect x="165" y="35" width="105" height="180" rx="18" fill={WHITE} stroke={NAVY} strokeWidth="3.5" />
+      <rect x="177" y="52" width="81" height="128" rx="4" fill="#EAF3FF" />
+      {/* crack lines across screen */}
+      <path d="M185 70 L220 110 L205 150 L235 175" fill="none" stroke={SLATE} strokeWidth="2.5" strokeLinecap="round" />
+      {/* screwdriver tool */}
+      <g transform="translate(80,120) rotate(-20)">
+        <rect x="-5" y="-46" width="10" height="60" rx="4" fill={AMBER} />
+        <rect x="-9" y="-58" width="18" height="16" rx="4" fill={SLATE} />
+      </g>
+      {/* battery accent */}
+      <g transform="translate(320,150)">
+        <rect x="-20" y="-14" width="40" height="28" rx="5" fill={WHITE} stroke={GREEN} strokeWidth="3" />
+        <rect x="20" y="-6" width="6" height="12" rx="2" fill={GREEN} />
+        <rect x="-14" y="-8" width="18" height="16" fill={GREEN} />
+      </g>
+    </g>
+  ),
 };
