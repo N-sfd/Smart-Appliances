@@ -5,6 +5,7 @@ import { CssBaseline, Box, CircularProgress } from '@mui/material';
 import { theme } from './theme';
 import TopBar from './components/TopBar';
 import SiteFooter from './components/SiteFooter';
+import FooterBrandsWeService from './components/FooterBrandsWeService';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -296,7 +297,12 @@ function AppRoutes() {
             </Routes>
           </Suspense>
         </Box>
-        {showPublicChrome && <SiteFooter />}
+        {showPublicChrome && (
+          <>
+            <FooterBrandsWeService />
+            <SiteFooter />
+          </>
+        )}
       </Box>
     </>
   );

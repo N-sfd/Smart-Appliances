@@ -9,7 +9,7 @@ export const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
   'appliance-repair': APPLIANCE_SERVICE_IMAGES['washer-dryer'],
   'appliance-installation': APPLIANCE_DEFAULT_IMAGE,
   'plumbing-services': `${BASE}/plumbing/leak-repair.png`,
-  'smart-home-setup': `${BASE}/smart-home/hero-installer.png`,
+  'smart-home-setup': `${BASE}/smart-home/hero-installer.webp`,
   'hvac-services': HVAC_SERVICE_IMAGES['ac-repair'],
   'electrical-services': `${BASE}/electrical-default.jpg`,
   handyman: CATEGORY_HERO_IMAGE.handyman,

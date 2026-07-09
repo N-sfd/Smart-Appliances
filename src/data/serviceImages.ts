@@ -5,7 +5,9 @@ import { ELECTRICAL_SERVICE_IMAGES } from './electricalHub';
 import { APPLIANCE_SERVICE_IMAGES, APPLIANCE_DEFAULT_IMAGE } from './applianceHub';
 import { SMART_HOME_SERVICE_IMAGES } from './smartHomeHub';
 import { serviceImages, CATEGORY_HERO_IMAGE } from './expandedServiceImages';
-import { SMART_LOCK_PLACEHOLDER_IMAGE } from './serviceCategoryDetails';
+import { HANDYMAN_SERVICE_IMAGES } from './handymanHub';
+import { TV_MOUNTING_SERVICE_IMAGES } from './tvMountingHub';
+import { PHONE_REPAIR_SERVICE_IMAGES } from './phoneRepairHub';
 
 export { serviceImages, CATEGORY_HERO_IMAGE };
 
@@ -180,7 +182,7 @@ export const SERVICE_TYPE_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Repair and installation for ignition, heating elements, gas lines, and electrical hookup.',
   },
   'smart-appliance-setup': {
-    image: `${SMART}/hero-installer.png`,
+    image: `${SMART}/hero-installer.webp`,
     title: 'Smart Appliance Setup',
     desc: 'Wi-Fi connection, app pairing, and configuration for smart appliances.',
   },
@@ -304,7 +306,7 @@ export const SERVICE_TYPE_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Indoor and outdoor security camera mounting and setup.',
   },
   'smart-lock-installation': {
-    image: SMART_LOCK_PLACEHOLDER_IMAGE,
+    image: SMART_HOME_SERVICE_IMAGES['smart-lock-installation'],
     title: 'Smart Lock Installation',
     desc: 'Professional smart lock fitting, programming, and app setup.',
   },
@@ -314,7 +316,7 @@ export const SERVICE_TYPE_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Connect and configure smart home devices to your network.',
   },
   'tv-mounting': {
-    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    image: TV_MOUNTING_SERVICE_IMAGES['standard-tv-mounting'],
     title: 'TV Mounting',
     desc: 'Safe wall mounting with cable management for any TV size.',
   },
@@ -345,7 +347,7 @@ export const SERVICE_TYPE_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Spring, opener, track, and panel repair from licensed technicians.',
   },
   'general-handyman': {
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['general-handyman-service'],
     title: 'General Handyman Request',
     desc: 'Skilled technicians for a wide range of home repair and maintenance tasks.',
   },
@@ -396,7 +398,7 @@ export const CATEGORY_IMAGE_MAP: Record<string, ServiceImageInfo> = {
     desc: 'Skilled help for furniture assembly, wall hanging, drywall repair, and minor home projects.',
   },
   'tv-mounting': {
-    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    image: TV_MOUNTING_SERVICE_IMAGES['standard-tv-mounting'],
     title: 'TV Mounting Services',
     desc: 'Secure wall mounting with cable management for any TV size.',
   },

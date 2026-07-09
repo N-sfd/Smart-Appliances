@@ -1,0 +1,997 @@
+{
+  "tv-mounting/tv-dismount-remount.webp": {
+    "hash": "2776829ab1ae47dd9cd04fdd14d5261ef96f74eec534e41843cc35c0cf53ac63",
+    "processedAt": "2026-07-09T15:44:51.493Z",
+    "sourceBytes": 27608,
+    "outputs": [
+      {
+        "file": "public/images/services/tv-mounting/tv-dismount-remount.webp",
+        "bytes": 14664
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-dismount-remount.avif",
+        "bytes": 13383
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-dismount-remount-400w.webp",
+        "bytes": 7452
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-dismount-remount-700w.webp",
+        "bytes": 14664
+      }
+    ]
+  },
+  "tv-mounting/tv-large-mount.webp": {
+    "hash": "b20f2bd0e875e668d8e4dfcf784208d6ba4fbdf087aba4b9374f166561b19deb",
+    "processedAt": "2026-07-09T15:44:52.216Z",
+    "sourceBytes": 28620,
+    "outputs": [
+      {
+        "file": "public/images/services/tv-mounting/tv-large-mount.webp",
+        "bytes": 14322
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-large-mount.avif",
+        "bytes": 12335
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-large-mount-400w.webp",
+        "bytes": 6758
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-large-mount-700w.webp",
+        "bytes": 14322
+      }
+    ]
+  },
+  "tv-mounting/tv-media-setup.webp": {
+    "hash": "726c97e2f7e4a37bde352408289ebe3fed39e9f4602e1ccd355ba9c318639ca2",
+    "processedAt": "2026-07-09T15:44:52.981Z",
+    "sourceBytes": 34522,
+    "outputs": [
+      {
+        "file": "public/images/services/tv-mounting/tv-media-setup.webp",
+        "bytes": 15192
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-media-setup.avif",
+        "bytes": 12491
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-media-setup-400w.webp",
+        "bytes": 6452
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-media-setup-700w.webp",
+        "bytes": 15192
+      }
+    ]
+  },
+  "tv-mounting/tv-mounting-hero.webp": {
+    "hash": "0dfdfd97eca8bd01c425e8bec218db465aaaf9f181f3313debc022cc1eb77cb1",
+    "processedAt": "2026-07-09T15:44:54.107Z",
+    "sourceBytes": 32214,
+    "outputs": [
+      {
+        "file": "public/images/services/tv-mounting/tv-mounting-hero.webp",
+        "bytes": 26248
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-mounting-hero.avif",
+        "bytes": 21149
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-mounting-hero-400w.webp",
+        "bytes": 8596
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-mounting-hero-700w.webp",
+        "bytes": 16608
+      }
+    ]
+  },
+  "tv-mounting/tv-mounting-support.webp": {
+    "hash": "0dfdfd97eca8bd01c425e8bec218db465aaaf9f181f3313debc022cc1eb77cb1",
+    "processedAt": "2026-07-09T15:44:55.271Z",
+    "sourceBytes": 32214,
+    "outputs": [
+      {
+        "file": "public/images/services/tv-mounting/tv-mounting-support.webp",
+        "bytes": 19606
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-mounting-support.avif",
+        "bytes": 16633
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-mounting-support-400w.webp",
+        "bytes": 8798
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-mounting-support-700w.webp",
+        "bytes": 15536
+      }
+    ]
+  },
+  "tv-mounting/tv-soundbar-install.webp": {
+    "hash": "7553f49a2cb768514be1d8c7ec0f40b7db4e1d8d87a5b7b8098eb1b07d412bd5",
+    "processedAt": "2026-07-09T15:44:55.946Z",
+    "sourceBytes": 25458,
+    "outputs": [
+      {
+        "file": "public/images/services/tv-mounting/tv-soundbar-install.webp",
+        "bytes": 13362
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-soundbar-install.avif",
+        "bytes": 10902
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-soundbar-install-400w.webp",
+        "bytes": 6424
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-soundbar-install-700w.webp",
+        "bytes": 13362
+      }
+    ]
+  },
+  "tv-mounting/tv-standard-mount.webp": {
+    "hash": "1adda91d86ea998aae30a4f75c6054be491ddcd67da3ccb210b8b96aeaa44a91",
+    "processedAt": "2026-07-09T15:44:56.624Z",
+    "sourceBytes": 38586,
+    "outputs": [
+      {
+        "file": "public/images/services/tv-mounting/tv-standard-mount.webp",
+        "bytes": 20604
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-standard-mount.avif",
+        "bytes": 18092
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-standard-mount-400w.webp",
+        "bytes": 10240
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-standard-mount-700w.webp",
+        "bytes": 20604
+      }
+    ]
+  },
+  "tv-mounting/tv-wire-concealment.webp": {
+    "hash": "c5d53e0582a8d6179933bcbddcedf481c00f28f40becff574aa5ee8a6b5a01ae",
+    "processedAt": "2026-07-09T15:44:57.395Z",
+    "sourceBytes": 36354,
+    "outputs": [
+      {
+        "file": "public/images/services/tv-mounting/tv-wire-concealment.webp",
+        "bytes": 17396
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-wire-concealment.avif",
+        "bytes": 14719
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-wire-concealment-400w.webp",
+        "bytes": 8098
+      },
+      {
+        "file": "public/images/services/tv-mounting/tv-wire-concealment-700w.webp",
+        "bytes": 17396
+      }
+    ]
+  },
+  "phone-repair/phone-battery-replacement.webp": {
+    "hash": "debb1e07d61a899df393c5d4d84332c7ba44f44acf17cbb96f8ccb2379eb20aa",
+    "processedAt": "2026-07-09T15:44:57.999Z",
+    "sourceBytes": 48602,
+    "outputs": [
+      {
+        "file": "public/images/services/phone-repair/phone-battery-replacement.webp",
+        "bytes": 21840
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-battery-replacement.avif",
+        "bytes": 17718
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-battery-replacement-400w.webp",
+        "bytes": 9348
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-battery-replacement-700w.webp",
+        "bytes": 21840
+      }
+    ]
+  },
+  "phone-repair/phone-camera-repair.webp": {
+    "hash": "a1fcbaa121d5331b84b186506a84fd9e07192402b943cc11f261690c8e76d59b",
+    "processedAt": "2026-07-09T15:44:58.604Z",
+    "sourceBytes": 34976,
+    "outputs": [
+      {
+        "file": "public/images/services/phone-repair/phone-camera-repair.webp",
+        "bytes": 20188
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-camera-repair.avif",
+        "bytes": 16502
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-camera-repair-400w.webp",
+        "bytes": 10020
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-camera-repair-700w.webp",
+        "bytes": 20188
+      }
+    ]
+  },
+  "phone-repair/phone-charging-port.webp": {
+    "hash": "fab60eb6176bc0cf18cfea8f76290e7e9c48cbcb55ca544eece0e3459480c3ba",
+    "processedAt": "2026-07-09T15:44:59.440Z",
+    "sourceBytes": 29780,
+    "outputs": [
+      {
+        "file": "public/images/services/phone-repair/phone-charging-port.webp",
+        "bytes": 17512
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-charging-port.avif",
+        "bytes": 13531
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-charging-port-400w.webp",
+        "bytes": 8970
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-charging-port-700w.webp",
+        "bytes": 17512
+      }
+    ]
+  },
+  "phone-repair/phone-repair-hero.webp": {
+    "hash": "16fca470f264562f848f0e4cace014f59d0f8605f52f07b487de00e2e5d1f555",
+    "processedAt": "2026-07-09T15:45:00.769Z",
+    "sourceBytes": 68182,
+    "outputs": [
+      {
+        "file": "public/images/services/phone-repair/phone-repair-hero.webp",
+        "bytes": 57292
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-repair-hero.avif",
+        "bytes": 46640
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-repair-hero-400w.webp",
+        "bytes": 19026
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-repair-hero-700w.webp",
+        "bytes": 37772
+      }
+    ]
+  },
+  "phone-repair/phone-repair-support.webp": {
+    "hash": "16fca470f264562f848f0e4cace014f59d0f8605f52f07b487de00e2e5d1f555",
+    "processedAt": "2026-07-09T15:45:01.879Z",
+    "sourceBytes": 68182,
+    "outputs": [
+      {
+        "file": "public/images/services/phone-repair/phone-repair-support.webp",
+        "bytes": 44396
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-repair-support.avif",
+        "bytes": 37252
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-repair-support-400w.webp",
+        "bytes": 19142
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-repair-support-700w.webp",
+        "bytes": 34302
+      }
+    ]
+  },
+  "phone-repair/phone-screen-replacement.webp": {
+    "hash": "dc82de1fe8eac1de4230dedb0498d333e8cb01746fb5c940e1663507617d05a2",
+    "processedAt": "2026-07-09T15:45:02.536Z",
+    "sourceBytes": 49400,
+    "outputs": [
+      {
+        "file": "public/images/services/phone-repair/phone-screen-replacement.webp",
+        "bytes": 23390
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-screen-replacement.avif",
+        "bytes": 21693
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-screen-replacement-400w.webp",
+        "bytes": 9206
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-screen-replacement-700w.webp",
+        "bytes": 23390
+      }
+    ]
+  },
+  "phone-repair/phone-speaker-repair.webp": {
+    "hash": "deb6d4d4d1798fdcc7e32983cc8376f9946ede1664782089ec1929c0c0c0c860",
+    "processedAt": "2026-07-09T15:45:03.162Z",
+    "sourceBytes": 33472,
+    "outputs": [
+      {
+        "file": "public/images/services/phone-repair/phone-speaker-repair.webp",
+        "bytes": 16138
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-speaker-repair.avif",
+        "bytes": 13309
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-speaker-repair-400w.webp",
+        "bytes": 7462
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-speaker-repair-700w.webp",
+        "bytes": 16138
+      }
+    ]
+  },
+  "phone-repair/phone-water-damage.webp": {
+    "hash": "d4c6d85dba35bc393fc15653ee20924dc6b2caccf53c1ecfc038559e7c993dcc",
+    "processedAt": "2026-07-09T15:45:03.849Z",
+    "sourceBytes": 40830,
+    "outputs": [
+      {
+        "file": "public/images/services/phone-repair/phone-water-damage.webp",
+        "bytes": 23426
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-water-damage.avif",
+        "bytes": 19733
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-water-damage-400w.webp",
+        "bytes": 12336
+      },
+      {
+        "file": "public/images/services/phone-repair/phone-water-damage-700w.webp",
+        "bytes": 23426
+      }
+    ]
+  },
+  "smart-home/doorbell-install.jpg": {
+    "hash": "0ef24442981125f40fc28e327be9c35bc97aa80db663c6c51f49b72b76320016",
+    "processedAt": "2026-07-09T15:45:04.239Z",
+    "sourceBytes": 179212,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/doorbell-install.webp",
+        "bytes": 21242
+      },
+      {
+        "file": "public/images/services/smart-home/doorbell-install.avif",
+        "bytes": 20868
+      },
+      {
+        "file": "public/images/services/smart-home/doorbell-install-400w.webp",
+        "bytes": 21242
+      },
+      {
+        "file": "public/images/services/smart-home/doorbell-install-700w.webp",
+        "bytes": 21242
+      }
+    ]
+  },
+  "smart-home/electrical-panel.png": {
+    "hash": "ae9fe2b93801b3a09cd18b786d1064003a594881a275e07b3b16bccfc9753e8a",
+    "processedAt": "2026-07-09T15:45:04.530Z",
+    "sourceBytes": 32908,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/electrical-panel.webp",
+        "bytes": 14834
+      },
+      {
+        "file": "public/images/services/smart-home/electrical-panel.avif",
+        "bytes": 14870
+      },
+      {
+        "file": "public/images/services/smart-home/electrical-panel-400w.webp",
+        "bytes": 12288
+      }
+    ]
+  },
+  "smart-home/garage-door-service.png": {
+    "hash": "36d4a1972dfb19c3d19a9cf4315f34d5363def3485b8061ff5e7d3bf28b24055",
+    "processedAt": "2026-07-09T15:45:05.009Z",
+    "sourceBytes": 111307,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/garage-door-service.webp",
+        "bytes": 23420
+      },
+      {
+        "file": "public/images/services/smart-home/garage-door-service.avif",
+        "bytes": 21220
+      },
+      {
+        "file": "public/images/services/smart-home/garage-door-service-400w.webp",
+        "bytes": 11610
+      },
+      {
+        "file": "public/images/services/smart-home/garage-door-service-700w.webp",
+        "bytes": 23420
+      }
+    ]
+  },
+  "smart-home/garage-door.png": {
+    "hash": "dcd071eba9422f2af275008a5ec7d509debc9d9438c26f0b35c69b6f5ead6b09",
+    "processedAt": "2026-07-09T15:45:05.156Z",
+    "sourceBytes": 24470,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/garage-door.webp",
+        "bytes": 7862
+      },
+      {
+        "file": "public/images/services/smart-home/garage-door.avif",
+        "bytes": 7580
+      }
+    ]
+  },
+  "smart-home/garage-opener.png": {
+    "hash": "aa428b9ec0a672d6646935bd6c6752beff0004119ddb6841433a3d048f90396d",
+    "processedAt": "2026-07-09T15:45:05.384Z",
+    "sourceBytes": 43768,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/garage-opener.webp",
+        "bytes": 14562
+      },
+      {
+        "file": "public/images/services/smart-home/garage-opener.avif",
+        "bytes": 14070
+      },
+      {
+        "file": "public/images/services/smart-home/garage-opener-400w.webp",
+        "bytes": 7640
+      }
+    ]
+  },
+  "smart-home/hero-installer.png": {
+    "hash": "8c982ab94c600dd8f8ff64b01fa72b6528cca61d1d8096bf893c5f2ab5aa9705",
+    "processedAt": "2026-07-09T15:45:05.545Z",
+    "sourceBytes": 29331,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/hero-installer.webp",
+        "bytes": 9406
+      },
+      {
+        "file": "public/images/services/smart-home/hero-installer.avif",
+        "bytes": 9527
+      }
+    ]
+  },
+  "smart-home/hero.jpg": {
+    "hash": "470f25040580f2ca257c5bbc17475368ff6f1078dae32ee9e56c084bd5b9f83b",
+    "processedAt": "2026-07-09T15:45:06.173Z",
+    "sourceBytes": 53179,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/hero.webp",
+        "bytes": 25726
+      },
+      {
+        "file": "public/images/services/smart-home/hero.avif",
+        "bytes": 23272
+      },
+      {
+        "file": "public/images/services/smart-home/hero-400w.webp",
+        "bytes": 11292
+      },
+      {
+        "file": "public/images/services/smart-home/hero-700w.webp",
+        "bytes": 21596
+      }
+    ]
+  },
+  "smart-home/security-camera.png": {
+    "hash": "a8308f00636046f95271c17218184ef55f3f872ef1108f1971c8b8c80b2e6e29",
+    "processedAt": "2026-07-09T15:45:06.355Z",
+    "sourceBytes": 18445,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/security-camera.webp",
+        "bytes": 5922
+      },
+      {
+        "file": "public/images/services/smart-home/security-camera.avif",
+        "bytes": 5529
+      },
+      {
+        "file": "public/images/services/smart-home/security-camera-400w.webp",
+        "bytes": 5130
+      }
+    ]
+  },
+  "smart-home/smart-camera-install.webp": {
+    "hash": "b975242d591e6d71d5946f67b126fad1442e541b66b2a5116f4a4e56488a7a6f",
+    "processedAt": "2026-07-09T15:45:07.251Z",
+    "sourceBytes": 46052,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/smart-camera-install.webp",
+        "bytes": 24534
+      },
+      {
+        "file": "public/images/services/smart-home/smart-camera-install.avif",
+        "bytes": 22072
+      },
+      {
+        "file": "public/images/services/smart-home/smart-camera-install-400w.webp",
+        "bytes": 12156
+      },
+      {
+        "file": "public/images/services/smart-home/smart-camera-install-700w.webp",
+        "bytes": 24534
+      }
+    ]
+  },
+  "smart-home/smart-doorbell-install.webp": {
+    "hash": "8727dacf441643c84b7c22a785966bb0638016b2165c2abf6dea2a8b416355fe",
+    "processedAt": "2026-07-09T15:45:07.902Z",
+    "sourceBytes": 49184,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/smart-doorbell-install.webp",
+        "bytes": 19262
+      },
+      {
+        "file": "public/images/services/smart-home/smart-doorbell-install.avif",
+        "bytes": 16182
+      },
+      {
+        "file": "public/images/services/smart-home/smart-doorbell-install-400w.webp",
+        "bytes": 8704
+      },
+      {
+        "file": "public/images/services/smart-home/smart-doorbell-install-700w.webp",
+        "bytes": 19262
+      }
+    ]
+  },
+  "smart-home/smart-home-hero.webp": {
+    "hash": "2261eb4aa9b54760dde936da0f3841a3eb2284532d98351dd9a0e138a89ac8dd",
+    "processedAt": "2026-07-09T15:45:09.178Z",
+    "sourceBytes": 42486,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/smart-home-hero.webp",
+        "bytes": 33524
+      },
+      {
+        "file": "public/images/services/smart-home/smart-home-hero.avif",
+        "bytes": 27620
+      },
+      {
+        "file": "public/images/services/smart-home/smart-home-hero-400w.webp",
+        "bytes": 10796
+      },
+      {
+        "file": "public/images/services/smart-home/smart-home-hero-700w.webp",
+        "bytes": 20782
+      }
+    ]
+  },
+  "smart-home/smart-home-support.webp": {
+    "hash": "2261eb4aa9b54760dde936da0f3841a3eb2284532d98351dd9a0e138a89ac8dd",
+    "processedAt": "2026-07-09T15:45:10.301Z",
+    "sourceBytes": 42486,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/smart-home-support.webp",
+        "bytes": 25052
+      },
+      {
+        "file": "public/images/services/smart-home/smart-home-support.avif",
+        "bytes": 22382
+      },
+      {
+        "file": "public/images/services/smart-home/smart-home-support-400w.webp",
+        "bytes": 11124
+      },
+      {
+        "file": "public/images/services/smart-home/smart-home-support-700w.webp",
+        "bytes": 19706
+      }
+    ]
+  },
+  "smart-home/smart-lock-install.webp": {
+    "hash": "20d95aafba3990d82cdbd42bf846ed2fe8df65597da1a84a94c1c2239cd750e6",
+    "processedAt": "2026-07-09T15:45:10.979Z",
+    "sourceBytes": 22632,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/smart-lock-install.webp",
+        "bytes": 11764
+      },
+      {
+        "file": "public/images/services/smart-home/smart-lock-install.avif",
+        "bytes": 10089
+      },
+      {
+        "file": "public/images/services/smart-home/smart-lock-install-400w.webp",
+        "bytes": 6034
+      },
+      {
+        "file": "public/images/services/smart-home/smart-lock-install-700w.webp",
+        "bytes": 11764
+      }
+    ]
+  },
+  "smart-home/smart-switch-install.webp": {
+    "hash": "8fbe34d828a77ccbc65a253b9b778d487fd671e4b08f9ca9338dd61cbdec68e9",
+    "processedAt": "2026-07-09T15:45:11.574Z",
+    "sourceBytes": 16042,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/smart-switch-install.webp",
+        "bytes": 8576
+      },
+      {
+        "file": "public/images/services/smart-home/smart-switch-install.avif",
+        "bytes": 6935
+      },
+      {
+        "file": "public/images/services/smart-home/smart-switch-install-400w.webp",
+        "bytes": 4240
+      },
+      {
+        "file": "public/images/services/smart-home/smart-switch-install-700w.webp",
+        "bytes": 8576
+      }
+    ]
+  },
+  "smart-home/smart-thermostat-install.webp": {
+    "hash": "930d615fc2e1f81b2ffee8416a96aad9a31a44a8e5b8d8360a0d50952da35a6e",
+    "processedAt": "2026-07-09T15:45:12.189Z",
+    "sourceBytes": 23806,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/smart-thermostat-install.webp",
+        "bytes": 11486
+      },
+      {
+        "file": "public/images/services/smart-home/smart-thermostat-install.avif",
+        "bytes": 10452
+      },
+      {
+        "file": "public/images/services/smart-home/smart-thermostat-install-400w.webp",
+        "bytes": 5858
+      },
+      {
+        "file": "public/images/services/smart-home/smart-thermostat-install-700w.webp",
+        "bytes": 11486
+      }
+    ]
+  },
+  "smart-home/smart-wifi-setup.webp": {
+    "hash": "0a3147963ee47949e52a574a01843fcecd7eb5b9ae71d65ffe0fb23830edad82",
+    "processedAt": "2026-07-09T15:45:12.814Z",
+    "sourceBytes": 31914,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/smart-wifi-setup.webp",
+        "bytes": 16876
+      },
+      {
+        "file": "public/images/services/smart-home/smart-wifi-setup.avif",
+        "bytes": 14001
+      },
+      {
+        "file": "public/images/services/smart-home/smart-wifi-setup-400w.webp",
+        "bytes": 8934
+      },
+      {
+        "file": "public/images/services/smart-home/smart-wifi-setup-700w.webp",
+        "bytes": 16876
+      }
+    ]
+  },
+  "smart-home/thermostat-setup.png": {
+    "hash": "8bf00ebf18449354fda25d3081060f5a16b375103fa8d8b4e703592f83fc5d8f",
+    "processedAt": "2026-07-09T15:45:13.027Z",
+    "sourceBytes": 31129,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/thermostat-setup.webp",
+        "bytes": 13282
+      },
+      {
+        "file": "public/images/services/smart-home/thermostat-setup.avif",
+        "bytes": 13755
+      },
+      {
+        "file": "public/images/services/smart-home/thermostat-setup-400w.webp",
+        "bytes": 10874
+      }
+    ]
+  },
+  "smart-home/tv-mounting.jpg": {
+    "hash": "5911b0a37575912461a2f039eaea2c2a2c6dfef55627308406f3aa493c4c63ed",
+    "processedAt": "2026-07-09T15:45:13.534Z",
+    "sourceBytes": 69431,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/tv-mounting.webp",
+        "bytes": 21812
+      },
+      {
+        "file": "public/images/services/smart-home/tv-mounting.avif",
+        "bytes": 21133
+      },
+      {
+        "file": "public/images/services/smart-home/tv-mounting-400w.webp",
+        "bytes": 10364
+      },
+      {
+        "file": "public/images/services/smart-home/tv-mounting-700w.webp",
+        "bytes": 21812
+      }
+    ]
+  },
+  "smart-home/wifi-tools.png": {
+    "hash": "964fd526df782fec3ebdb668e3be3a04a4768690d0e71262d30250cf955212ff",
+    "processedAt": "2026-07-09T15:45:13.718Z",
+    "sourceBytes": 50247,
+    "outputs": [
+      {
+        "file": "public/images/services/smart-home/wifi-tools.webp",
+        "bytes": 21796
+      },
+      {
+        "file": "public/images/services/smart-home/wifi-tools.avif",
+        "bytes": 21148
+      }
+    ]
+  },
+  "handyman/handyman-curtain-rod.webp": {
+    "hash": "8d18d59e74fbbc8d1d3b368cf2f195f751a8a5fa78256f86dff27a6035330f72",
+    "processedAt": "2026-07-09T15:45:14.360Z",
+    "sourceBytes": 39344,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-curtain-rod.webp",
+        "bytes": 21426
+      },
+      {
+        "file": "public/images/services/handyman/handyman-curtain-rod.avif",
+        "bytes": 20155
+      },
+      {
+        "file": "public/images/services/handyman/handyman-curtain-rod-400w.webp",
+        "bytes": 9886
+      },
+      {
+        "file": "public/images/services/handyman/handyman-curtain-rod-700w.webp",
+        "bytes": 21426
+      }
+    ]
+  },
+  "handyman/handyman-drywall-repair.webp": {
+    "hash": "f7f8679cb6bcb0968a63782e936753fe8d32ec3fd06ad31d1402b3b8c095a037",
+    "processedAt": "2026-07-09T15:45:15.096Z",
+    "sourceBytes": 54558,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-drywall-repair.webp",
+        "bytes": 21282
+      },
+      {
+        "file": "public/images/services/handyman/handyman-drywall-repair.avif",
+        "bytes": 20745
+      },
+      {
+        "file": "public/images/services/handyman/handyman-drywall-repair-400w.webp",
+        "bytes": 8928
+      },
+      {
+        "file": "public/images/services/handyman/handyman-drywall-repair-700w.webp",
+        "bytes": 21282
+      }
+    ]
+  },
+  "handyman/handyman-furniture-assembly.webp": {
+    "hash": "cbb840724adada24aa55ea68da05d25f3a3bf9b9c955445176461d83ee0520c4",
+    "processedAt": "2026-07-09T15:45:15.752Z",
+    "sourceBytes": 30612,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-furniture-assembly.webp",
+        "bytes": 16952
+      },
+      {
+        "file": "public/images/services/handyman/handyman-furniture-assembly.avif",
+        "bytes": 15336
+      },
+      {
+        "file": "public/images/services/handyman/handyman-furniture-assembly-400w.webp",
+        "bytes": 8688
+      },
+      {
+        "file": "public/images/services/handyman/handyman-furniture-assembly-700w.webp",
+        "bytes": 16952
+      }
+    ]
+  },
+  "handyman/handyman-general.webp": {
+    "hash": "bbf5afe6c44d79f4e68a402405566c4c19c1dc333a428d438bc0a56abfc8683d",
+    "processedAt": "2026-07-09T15:45:16.705Z",
+    "sourceBytes": 37472,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-general.webp",
+        "bytes": 29478
+      },
+      {
+        "file": "public/images/services/handyman/handyman-general.avif",
+        "bytes": 25084
+      },
+      {
+        "file": "public/images/services/handyman/handyman-general-400w.webp",
+        "bytes": 11690
+      },
+      {
+        "file": "public/images/services/handyman/handyman-general-700w.webp",
+        "bytes": 21388
+      }
+    ]
+  },
+  "handyman/handyman-hero.webp": {
+    "hash": "97fd0f10873e8ec1cc8a0633253c4edef94aba8dd58e57e69b7c14a17e9ae0f5",
+    "processedAt": "2026-07-09T15:45:17.574Z",
+    "sourceBytes": 37388,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-hero.webp",
+        "bytes": 31226
+      },
+      {
+        "file": "public/images/services/handyman/handyman-hero.avif",
+        "bytes": 28541
+      },
+      {
+        "file": "public/images/services/handyman/handyman-hero-400w.webp",
+        "bytes": 11976
+      },
+      {
+        "file": "public/images/services/handyman/handyman-hero-700w.webp",
+        "bytes": 21872
+      }
+    ]
+  },
+  "handyman/handyman-interior-painting.webp": {
+    "hash": "c9e963c6bacb7fa3281498143c3b9413d959f8bccc8ddfbd7f34296cbfad3850",
+    "processedAt": "2026-07-09T15:45:18.218Z",
+    "sourceBytes": 42038,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-interior-painting.webp",
+        "bytes": 17040
+      },
+      {
+        "file": "public/images/services/handyman/handyman-interior-painting.avif",
+        "bytes": 15762
+      },
+      {
+        "file": "public/images/services/handyman/handyman-interior-painting-400w.webp",
+        "bytes": 6662
+      },
+      {
+        "file": "public/images/services/handyman/handyman-interior-painting-700w.webp",
+        "bytes": 17040
+      }
+    ]
+  },
+  "handyman/handyman-minor-repairs.webp": {
+    "hash": "c8fb93c02fc7dce3a9047844e4fef74726128495cd3015adf9ed66c09cc1c2a5",
+    "processedAt": "2026-07-09T15:45:18.837Z",
+    "sourceBytes": 39928,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-minor-repairs.webp",
+        "bytes": 18418
+      },
+      {
+        "file": "public/images/services/handyman/handyman-minor-repairs.avif",
+        "bytes": 15868
+      },
+      {
+        "file": "public/images/services/handyman/handyman-minor-repairs-400w.webp",
+        "bytes": 8256
+      },
+      {
+        "file": "public/images/services/handyman/handyman-minor-repairs-700w.webp",
+        "bytes": 18418
+      }
+    ]
+  },
+  "handyman/handyman-shelf-installation.webp": {
+    "hash": "440225ec1ae3de9f6e251ef75ec43bbc7e618e83dbc1fbc8a7d02f9a333a8b62",
+    "processedAt": "2026-07-09T15:45:19.520Z",
+    "sourceBytes": 32390,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-shelf-installation.webp",
+        "bytes": 16944
+      },
+      {
+        "file": "public/images/services/handyman/handyman-shelf-installation.avif",
+        "bytes": 14547
+      },
+      {
+        "file": "public/images/services/handyman/handyman-shelf-installation-400w.webp",
+        "bytes": 8098
+      },
+      {
+        "file": "public/images/services/handyman/handyman-shelf-installation-700w.webp",
+        "bytes": 16944
+      }
+    ]
+  },
+  "handyman/handyman-support.webp": {
+    "hash": "97fd0f10873e8ec1cc8a0633253c4edef94aba8dd58e57e69b7c14a17e9ae0f5",
+    "processedAt": "2026-07-09T15:45:20.432Z",
+    "sourceBytes": 37388,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-support.webp",
+        "bytes": 31226
+      },
+      {
+        "file": "public/images/services/handyman/handyman-support.avif",
+        "bytes": 28541
+      },
+      {
+        "file": "public/images/services/handyman/handyman-support-400w.webp",
+        "bytes": 11976
+      },
+      {
+        "file": "public/images/services/handyman/handyman-support-700w.webp",
+        "bytes": 21872
+      }
+    ]
+  },
+  "handyman/handyman-wall-hanging.webp": {
+    "hash": "f76a5f6eafa0adfecf2a4f98fc5d40d9273cd7f32a8bda2153a6a2fcb1a2bd92",
+    "processedAt": "2026-07-09T15:45:21.263Z",
+    "sourceBytes": 26668,
+    "outputs": [
+      {
+        "file": "public/images/services/handyman/handyman-wall-hanging.webp",
+        "bytes": 14484
+      },
+      {
+        "file": "public/images/services/handyman/handyman-wall-hanging.avif",
+        "bytes": 12416
+      },
+      {
+        "file": "public/images/services/handyman/handyman-wall-hanging-400w.webp",
+        "bytes": 7312
+      },
+      {
+        "file": "public/images/services/handyman/handyman-wall-hanging-700w.webp",
+        "bytes": 14484
+      }
+    ]
+  }
+}

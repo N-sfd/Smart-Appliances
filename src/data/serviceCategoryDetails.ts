@@ -3,30 +3,9 @@ import { ELECTRICAL_SERVICE_IMAGES } from './electricalHub';
 import { APPLIANCE_SERVICE_IMAGES } from './applianceHub';
 import { PLUMBING_SERVICE_IMAGES } from './plumbingHub';
 import { SMART_HOME_SERVICE_IMAGES } from './smartHomeHub';
-import { CATEGORY_HERO_IMAGE } from './expandedServiceImages';
-
-/**
- * No dedicated smart lock photo exists yet (the old data accidentally pointed this
- * at the garage-door-opener image instead). Inline placeholder until a real
- * photo is available.
- */
-export const SMART_LOCK_PLACEHOLDER_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Smart lock illustration">
-  <defs>
-    <linearGradient id="lockBg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#5B21B6"/>
-      <stop offset="1" stop-color="#7C3AED"/>
-    </linearGradient>
-  </defs>
-  <rect width="400" height="300" fill="url(#lockBg)"/>
-  <g fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="140" y="140" width="120" height="90" rx="12"/>
-    <path d="M162 140v-30a38 38 0 0 1 76 0v30"/>
-    <circle cx="200" cy="180" r="10" fill="#FFFFFF" stroke="none"/>
-    <path d="M200 190v18" />
-  </g>
-</svg>
-`)}`;
+import { HANDYMAN_SERVICE_IMAGES } from './handymanHub';
+import { TV_MOUNTING_SERVICE_IMAGES } from './tvMountingHub';
+import { PHONE_REPAIR_SERVICE_IMAGES } from './phoneRepairHub';
 
 /** Rich content overrides for category booking cards and detail panels */
 export interface CategoryServiceDetail {
@@ -47,6 +26,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Security Camera Installation',
     description: 'Install and connect indoor or outdoor smart cameras.',
     chips: ['Camera setup', 'App connection', 'WiFi check'],
+    image: SMART_HOME_SERVICE_IMAGES['camera-installation'],
     detailDescription:
       'Our technician mounts your camera, connects it to WiFi, pairs it with the app, and walks you through live view and alerts before leaving.',
     includes: ['Mounting and positioning', 'WiFi connection', 'App pairing', 'Basic feature walkthrough', 'Testing before completion'],
@@ -64,20 +44,21 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Smart Thermostat Installation',
     description: 'Install and set up compatible smart thermostats.',
     chips: ['Thermostat wiring', 'WiFi setup', 'App tutorial'],
+    image: SMART_HOME_SERVICE_IMAGES['smart-thermostat-setup'],
     includes: ['Thermostat installation', 'WiFi connection', 'App setup', 'Schedule configuration', 'Testing before completion'],
   },
   'smart-lock-installation': {
     title: 'Smart Lock Installation',
     description: 'Install and configure smart locks for supported doors.',
     chips: ['Lock setup', 'App pairing', 'Access codes'],
-    image: SMART_LOCK_PLACEHOLDER_IMAGE,
+    image: SMART_HOME_SERVICE_IMAGES['smart-lock-installation'],
     includes: ['Lock fitting', 'App pairing', 'Access code setup', 'Battery check', 'Testing before completion'],
   },
   'smart-hub-setup': {
     title: 'Smart Hub / Speaker Setup',
     description: 'Connect smart hubs, speakers, and voice assistant devices.',
     chips: ['Hub setup', 'Device pairing', 'App tutorial'],
-    image: '/images/services/smart-home/wifi-tools.webp',
+    image: SMART_HOME_SERVICE_IMAGES['wifi-setup'],
     scheduleId: 'wifi-setup',
     includes: ['Hub placement', 'Device pairing', 'App configuration', 'Voice assistant setup', 'Testing before completion'],
   },
@@ -85,7 +66,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Smart Lighting Setup',
     description: 'Install and connect smart bulbs, switches, or lighting systems.',
     chips: ['Light setup', 'App pairing', 'Automation'],
-    image: '/images/services/showcase/electrical-light.webp',
+    image: SMART_HOME_SERVICE_IMAGES['smart-lighting-setup'],
     scheduleId: 'light-fixture-installation',
     includes: ['Fixture or switch install', 'App pairing', 'Automation setup', 'Testing before completion'],
   },
@@ -93,7 +74,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'WiFi Device Setup',
     description: 'Connect supported smart devices to your home network.',
     chips: ['WiFi setup', 'Signal check', 'Device connection'],
-    image: '/images/services/smart-home/wifi-tools.webp',
+    image: SMART_HOME_SERVICE_IMAGES['wifi-device-setup'],
     scheduleId: 'wifi-setup',
     includes: ['Network connection', 'Signal verification', 'Device registration', 'App pairing', 'Testing before completion'],
   },
@@ -101,9 +82,19 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Smart Device Troubleshooting',
     description: 'Help reconnect or configure existing smart devices.',
     chips: ['Offline device', 'App issue', 'Network problem'],
-    image: '/images/services/smart-home/wifi-tools.webp',
+    image: SMART_HOME_SERVICE_IMAGES['wifi-setup'],
     scheduleId: 'wifi-setup',
     includes: ['Device diagnostics', 'Network troubleshooting', 'App reconnection', 'Feature verification'],
+  },
+  // Smart Home's own "Smart Device Wiring" id — kept separate from Electrical's
+  // 'smart-device-wiring' below so this image change doesn't affect that page.
+  'smart-home-device-wiring': {
+    title: 'Smart Device Wiring',
+    description: 'Low-voltage wiring support for smart switches and connected devices.',
+    chips: ['Low-voltage wiring', 'Smart switch', 'Safe setup'],
+    image: SMART_HOME_SERVICE_IMAGES['smart-home-device-wiring'],
+    scheduleId: 'smart-device-wiring',
+    includes: ['Low-voltage wiring check', 'Smart switch or device wiring', 'Neutral wire verification', 'Safe, tested connection'],
   },
   // Plumbing
   'garbage-disposal-install': {
@@ -322,63 +313,63 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
   // Handyman
   'general-handyman-service': {
     title: 'General Handyman Service',
-    description: 'Skilled help for a wide range of home repair and maintenance tasks.',
+    description: 'Help with small home projects and minor repairs.',
     chips: ['Home projects', 'Repairs', 'Installations'],
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['general-handyman-service'],
     detailDescription:
       'Tell us about your project and our technician will review the scope, confirm timing, and provide an estimate before starting work.',
-    includes: ['Project scope reviewed first', 'Skilled local technician', 'Estimate before work begins', 'Clean, careful workmanship'],
+    includes: ['Small project help', 'Minor repair support', 'Clear request details', 'Request ID included'],
   },
   'furniture-assembly': {
     title: 'Furniture Assembly',
-    description: 'Assembly for flat-pack furniture, shelving units, and home office pieces.',
+    description: 'Assembly for flat-pack furniture, shelves, desks, and more.',
     chips: ['Flat-pack assembly', 'Shelving', 'Office furniture'],
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['furniture-assembly'],
     detailDescription:
       'Our technician assembles your furniture using the manufacturer instructions and checks stability before finishing.',
-    includes: ['Flat-pack and kit furniture', 'Shelving and storage units', 'Hardware and tool provided', 'Stability check before completion'],
+    includes: ['Furniture assembly support', 'Hardware and instructions reviewed', 'Room setup guidance', 'Request ID included'],
   },
   'wall-hanging': {
     title: 'Wall Hanging',
-    description: 'Secure mounting for shelves, mirrors, art, and curtain rods.',
+    description: 'Hang pictures, mirrors, décor, and wall-mounted items.',
     chips: ['Picture hanging', 'Mirror mounting', 'Curtain rods'],
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['wall-hanging'],
     detailDescription:
       'Our technician locates studs or uses appropriate anchors, levels the item, and mounts it securely for your wall type.',
     includes: ['Stud finding and anchoring', 'Level and secure mounting', 'Art, mirrors, and shelving', 'Curtain rod installation'],
   },
   'drywall-repair': {
     title: 'Drywall Repair',
-    description: 'Patch holes, cracks, and dents for a smooth, paint-ready wall.',
+    description: 'Patch small holes, dents, cracks, and wall damage.',
     chips: ['Small holes', 'Cracks', 'Dents'],
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['drywall-repair'],
     detailDescription:
       'Our technician patches and sands the damaged area so it is smooth and ready for paint or texture matching.',
-    includes: ['Hole and crack patching', 'Sanding and smoothing', 'Texture matching where possible', 'Paint-ready finish'],
+    includes: ['Small holes and dents', 'Crack and patch support', 'Surface preparation', 'Paint touch-up guidance'],
   },
   'interior-painting': {
     title: 'Interior Painting',
-    description: 'Touch-up and small-room painting for walls, trim, and ceilings.',
+    description: 'Small-room painting, touch-ups, and wall refreshes.',
     chips: ['Wall painting', 'Trim touch-up', 'Small rooms'],
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['interior-painting'],
     detailDescription:
       'Our technician preps the surface, protects surrounding areas, and applies a clean, even coat for the space you choose.',
-    includes: ['Surface prep and taping', 'Walls, trim, or ceilings', 'Even, clean coverage', 'Furniture and floor protection'],
+    includes: ['Small-room painting', 'Touch-up support', 'Wall preparation', 'Clean finish guidance'],
   },
   'shelf-installation': {
     title: 'Shelf Installation',
-    description: 'Level, secure shelving for closets, garages, and living spaces.',
+    description: 'Install shelves, brackets, and small wall storage.',
     chips: ['Floating shelves', 'Closet shelving', 'Garage storage'],
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['shelf-installation'],
     detailDescription:
       'Our technician measures and levels your shelving, anchors it to the wall, and confirms it can safely hold your items.',
-    includes: ['Measuring and leveling', 'Stud-anchored mounting', 'Weight-safe installation', 'Closet, garage, or living space shelving'],
+    includes: ['Bracket placement', 'Level shelf mounting', 'Wall type reviewed', 'Secure installation'],
   },
   'curtain-rod-installation': {
     title: 'Curtain Rod Installation',
     description: 'Install curtain rods, brackets, and window hardware.',
     chips: ['Curtain rods', 'Brackets', 'Window hardware'],
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['curtain-rod-installation'],
     detailDescription:
       'Our technician measures and levels the placement, anchors the brackets securely, and mounts your curtain rod or window hardware.',
     includes: ['Measuring and leveling', 'Wall-appropriate anchoring', 'Curtain rods and brackets', 'Blinds and shade hardware'],
@@ -387,7 +378,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Minor Home Repairs',
     description: 'Simple repairs and small household fixes.',
     chips: ['Small fixes', 'Loose hardware', 'Quick repairs'],
-    image: CATEGORY_HERO_IMAGE.handyman,
+    image: HANDYMAN_SERVICE_IMAGES['minor-home-repairs'],
     detailDescription:
       'Our technician handles small, everyday repairs in a single visit — from loose hinges and sticking doors to other quick household fixes.',
     includes: ['Loose hinges and handles', 'Sticking doors or drawers', 'Minor hardware replacement', 'Small household fixes'],
@@ -397,7 +388,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Standard TV Mounting',
     description: 'Secure wall mounting for standard-size televisions.',
     chips: ['Up to 55"', 'Stud mounting', 'Level install'],
-    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    image: TV_MOUNTING_SERVICE_IMAGES['standard-tv-mounting'],
     detailDescription:
       'Our technician finds studs, mounts the bracket securely, and levels and attaches your TV for a clean, safe install.',
     includes: ['Bracket mounted to studs', 'TV leveled and secured', 'Cables connected and tested', 'Packaging cleared away'],
@@ -406,7 +397,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Large TV Mounting',
     description: 'Secure wall mounting for large and extra-large televisions.',
     chips: ['56" and larger', 'Reinforced mounting', 'Two-person install'],
-    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    image: TV_MOUNTING_SERVICE_IMAGES['large-tv-mounting'],
     detailDescription:
       'Our technician uses a reinforced bracket and confirms wall support before mounting your large-screen TV securely and level.',
     includes: ['Reinforced bracket for larger screens', 'Wall support verified', 'Level, secure mounting', 'Cables connected and tested'],
@@ -415,7 +406,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Wire Concealment',
     description: 'Hide cables in-wall or in a cable channel for a clean look.',
     chips: ['In-wall kit', 'Cable channel', 'Outlet relocation'],
-    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    image: TV_MOUNTING_SERVICE_IMAGES['wire-concealment'],
     detailDescription:
       'Our technician routes cables using an in-wall kit or cable channel so your setup looks clean with no visible wires.',
     includes: ['In-wall cable kit option', 'Surface cable channel option', 'Power and A/V cables routed', 'Clean, finished appearance'],
@@ -424,7 +415,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Soundbar Installation',
     description: 'Mounting and connection for soundbars and audio systems.',
     chips: ['Wall or shelf mount', 'Audio connection', 'Remote setup'],
-    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    image: TV_MOUNTING_SERVICE_IMAGES['soundbar-installation'],
     detailDescription:
       'Our technician mounts or places your soundbar, connects it to your TV, and confirms audio is working before leaving.',
     includes: ['Wall or shelf mounting', 'Audio cable or HDMI-ARC connection', 'Remote and input setup', 'Sound test before completion'],
@@ -433,7 +424,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'TV Dismount / Remount',
     description: 'Safely remove and reinstall a TV for moving, painting, or repairs.',
     chips: ['Dismount', 'Remount', 'Wall patch on request'],
-    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    image: TV_MOUNTING_SERVICE_IMAGES['tv-dismount'],
     detailDescription:
       'Our technician safely dismounts your TV and either reinstalls it on the same wall or prepares it for your move.',
     includes: ['Safe TV removal', 'Bracket removal or reuse', 'Reinstallation at new location', 'Cable reconnection and test'],
@@ -442,7 +433,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Media Device Setup',
     description: 'Connect streaming devices, game consoles, and A/V receivers.',
     chips: ['Streaming device', 'Game console', 'A/V receiver'],
-    image: CATEGORY_HERO_IMAGE['tv-mounting'],
+    image: TV_MOUNTING_SERVICE_IMAGES['media-device-setup'],
     detailDescription:
       'Our technician connects and configures your streaming devices, consoles, or receiver so everything works from one remote setup.',
     includes: ['Device connection and power', 'Input and remote configuration', 'Network and app sign-in help', 'Picture and sound check'],
@@ -452,7 +443,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Screen Replacement',
     description: 'Replace cracked or unresponsive smartphone screens.',
     chips: ['Cracked screen', 'Unresponsive touch', 'Display issue'],
-    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    image: PHONE_REPAIR_SERVICE_IMAGES['phone-screen-replacement'],
     detailDescription:
       'Our technician replaces your damaged screen with a quality-tested part and confirms touch response and display quality before handoff.',
     includes: ['Device brand and model confirmed', 'Screen replaced and tested', 'Touch and display check', 'No passcodes collected online'],
@@ -461,7 +452,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Battery Replacement',
     description: 'Replace batteries that drain quickly or fail to hold a charge.',
     chips: ['Fast draining', "Won't charge", 'Swollen battery'],
-    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    image: PHONE_REPAIR_SERVICE_IMAGES['phone-battery-replacement'],
     detailDescription:
       'Our technician safely replaces your battery and tests charging and power performance before returning your device.',
     includes: ['Battery health checked', 'Safe battery replacement', 'Charging test', 'Device performance check'],
@@ -470,7 +461,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Charging Port Repair',
     description: 'Fix loose, damaged, or unresponsive charging ports.',
     chips: ['Loose connection', "Won't charge", 'Debris in port'],
-    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    image: PHONE_REPAIR_SERVICE_IMAGES['phone-charging-port-repair'],
     detailDescription:
       'Our technician inspects and repairs or replaces the charging port so your device connects and charges reliably again.',
     includes: ['Port inspection and cleaning', 'Repair or part replacement', 'Charging cable test', 'Connection stability check'],
@@ -479,7 +470,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Camera Repair',
     description: 'Fix blurry, cracked, or non-functioning phone cameras.',
     chips: ['Blurry photos', 'Cracked lens', "Camera won't open"],
-    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    image: PHONE_REPAIR_SERVICE_IMAGES['phone-camera-repair'],
     detailDescription:
       'Our technician diagnoses the front or rear camera issue, repairs or replaces the affected module, and tests photo and video quality.',
     includes: ['Front and rear camera diagnostics', 'Lens or module replacement', 'Photo and video test', 'Focus and clarity check'],
@@ -488,7 +479,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Speaker / Microphone Repair',
     description: 'Fix muffled audio, call issues, or unresponsive microphones.',
     chips: ['Muffled sound', 'No call audio', 'Mic not working'],
-    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    image: PHONE_REPAIR_SERVICE_IMAGES['phone-speaker-microphone-repair'],
     detailDescription:
       'Our technician tests speaker and microphone function, repairs or replaces the affected part, and confirms clear call and media audio.',
     includes: ['Speaker and mic diagnostics', 'Component repair or replacement', 'Call audio test', 'Media playback check'],
@@ -497,7 +488,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Device Diagnostic',
     description: 'A full check-up to identify the source of a device issue.',
     chips: ['Unknown issue', 'Multiple symptoms', 'Pre-repair check'],
-    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    image: PHONE_REPAIR_SERVICE_IMAGES['phone-device-diagnostic'],
     detailDescription:
       'Our technician runs a full diagnostic across hardware and software to identify the issue and recommend the right repair.',
     includes: ['Hardware and software check', 'Issue identification', 'Repair recommendation', 'No data collected without consent'],
@@ -506,7 +497,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Water-Damage Assessment',
     description: 'Inspection and next-step guidance for a water-exposed device.',
     chips: ['Liquid exposure', 'Not powering on', 'Corrosion check'],
-    image: CATEGORY_HERO_IMAGE['phone-repair'],
+    image: PHONE_REPAIR_SERVICE_IMAGES['phone-water-damage'],
     detailDescription:
       'Our technician inspects your device for liquid damage and corrosion and recommends the safest next step for recovery or repair.',
     includes: ['Liquid damage inspection', 'Corrosion check', 'Safe drying guidance', 'Repair or replacement recommendation'],

@@ -9,9 +9,7 @@ import { colors, fonts } from '../theme';
 
 interface FooterLink {
   label: string;
-  /** Route to navigate to. Omit when using `hash`. */
   path?: string;
-  /** Element id on the homepage to scroll to instead of navigating to a new page. */
   hash?: string;
 }
 
@@ -59,20 +57,17 @@ const supportLinks: FooterLink[] = [
 ];
 
 const bottomBarLinks: FooterLink[] = [
-  { label: 'Privacy Policy', path: '/privacy-policy' },
-  { label: 'Terms of Service', path: '/terms-of-service' },
-  { label: 'Sitemap', path: '/sitemap' },
+  { label: 'Privacy', path: '/privacy-policy' },
+  { label: 'Terms', path: '/terms-of-service' },
 ];
 
-// TODO: replace with the real Smart Appliances social profile URLs once they exist,
-// then restore target="_blank" rel="noreferrer" (already wired up below for real links).
 const socialLinks: SocialLink[] = [
   { label: 'Facebook', ariaLabel: 'Visit Smart Appliances on Facebook', href: '#', icon: <FacebookIcon sx={{ fontSize: 18 }} /> },
   {
     label: 'X',
     ariaLabel: 'Visit Smart Appliances on X',
     href: '#',
-    icon: <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '0.85rem', lineHeight: 1 }}>X</Typography>,
+    icon: <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '0.85rem', lineHeight: 1, color: 'inherit' }}>X</Typography>,
   },
   { label: 'YouTube', ariaLabel: 'Visit Smart Appliances on YouTube', href: '#', icon: <YouTubeIcon sx={{ fontSize: 18 }} /> },
   { label: 'Google Business', ariaLabel: 'View Smart Appliances Google Business Profile', href: '#', icon: <StorefrontIcon sx={{ fontSize: 18 }} /> },
@@ -80,8 +75,6 @@ const socialLinks: SocialLink[] = [
 ];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/** Accessible, readable against the white footer background (~7.5:1 contrast). */
 const FOOTER_LINK_COLOR = '#4B5563';
 
 const FOOTER_HEADING = {
@@ -92,17 +85,17 @@ const FOOTER_HEADING = {
   letterSpacing: '-0.01em',
   lineHeight: 1.3,
   m: 0,
-  mb: 1.75,
+  mb: '12px',
 } as const;
 
 const footerLinkSx = {
   fontFamily: fonts.body,
   color: FOOTER_LINK_COLOR,
   fontSize: '0.875rem',
-  lineHeight: 1.6,
+  lineHeight: 1.45,
   textDecoration: 'none',
   display: 'block',
-  mb: 0.9,
+  mb: '7px',
   transition: 'color 0.2s',
   '&:hover': { color: colors.primaryBlue },
 } as const;
@@ -118,7 +111,6 @@ const hashLinkButtonSx = {
   font: 'inherit',
 } as const;
 
-/** Scrolls to a section on the homepage, navigating there first if needed (mirrors TopBar's nav behavior). */
 function scrollToHomeSection(id: string, navigate: ReturnType<typeof useNavigate>, pathname: string) {
   const snap = (behavior: ScrollBehavior) => document.getElementById(id)?.scrollIntoView({ behavior });
   const run = () => {
@@ -188,21 +180,20 @@ const SiteFooter: React.FC = () => {
     <Box
       component="footer"
       sx={{
-        backgroundColor: colors.surface,
+        backgroundColor: '#FFFFFF',
         borderTop: `1px solid ${colors.border}`,
         mt: 'auto',
       }}
     >
       <Box
         sx={{
-          maxWidth: '1280px',
+          maxWidth: 1200,
           mx: 'auto',
           px: { xs: 2, sm: 3 },
-          pt: { xs: 4, md: 6 },
-          pb: { xs: 3, md: 4 },
+          pt: { xs: 4, md: 5 },
+          pb: { xs: 2, md: 2.5 },
         }}
       >
-        {/* Multi-column footer: Company | Services | Resources | Support | Stay Connected */}
         <Box
           sx={{
             display: 'grid',
@@ -210,58 +201,48 @@ const SiteFooter: React.FC = () => {
               xs: '1fr',
               sm: 'repeat(2, minmax(0, 1fr))',
               md: 'repeat(3, minmax(0, 1fr))',
-              lg: '1fr 1.35fr 1fr 1fr 1.3fr',
+              lg: '1.05fr 1.4fr 1fr 1fr 1.35fr',
             },
-            columnGap: { xs: 0, sm: 4, lg: 4 },
-            rowGap: { xs: 4, sm: 5 },
+            columnGap: { xs: 0, sm: 4, lg: 5 },
+            rowGap: { xs: 3.5, sm: 4 },
             alignItems: 'start',
           }}
         >
-          <Box sx={{ order: { xs: 2, sm: 0 } }}>
-            <FooterColumn title="Company" links={companyLinks} onHashLinkClick={handleHashLinkClick} />
-          </Box>
-          <Box sx={{ order: { xs: 3, sm: 0 } }}>
-            <FooterColumn title="Services" links={serviceLinks} onHashLinkClick={handleHashLinkClick} />
-          </Box>
-          <Box sx={{ order: { xs: 4, sm: 0 } }}>
-            <FooterColumn title="Resources" links={resourceLinks} onHashLinkClick={handleHashLinkClick} />
-          </Box>
-          <Box sx={{ order: { xs: 5, sm: 0 } }}>
-            <FooterColumn title="Support" links={supportLinks} onHashLinkClick={handleHashLinkClick} />
-          </Box>
+          <FooterColumn title="Company" links={companyLinks} onHashLinkClick={handleHashLinkClick} />
+          <FooterColumn title="Services" links={serviceLinks} onHashLinkClick={handleHashLinkClick} />
+          <FooterColumn title="Resources" links={resourceLinks} onHashLinkClick={handleHashLinkClick} />
+          <FooterColumn title="Support" links={supportLinks} onHashLinkClick={handleHashLinkClick} />
 
-          {/* Stay Connected */}
-          <Box sx={{ order: { xs: 1, sm: 0 } }}>
+          <Box>
             <Typography component="h3" sx={FOOTER_HEADING}>
               Stay Connected
             </Typography>
-            <Typography sx={{ fontFamily: fonts.body, color: FOOTER_LINK_COLOR, fontSize: '0.85rem', lineHeight: 1.55, mb: 1.75 }}>
-              Get service tips, maintenance reminders, and Smart Care updates.
-            </Typography>
+
             <Box
               component="form"
               onSubmit={handleSubscribe}
               noValidate
-              sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row', md: 'row', lg: 'column' }, gap: 1 }}
+              sx={{ display: 'flex', flexDirection: 'row', gap: 0.75, mb: 1.5 }}
             >
               <TextField
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => { setEmail(e.target.value); setSubscribeStatus('idle'); }}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setSubscribeStatus('idle');
+                }}
                 size="small"
+                fullWidth
                 inputProps={{ 'aria-label': 'Email address' }}
                 sx={{
-                  // flex-basis/grow apply to the main axis, which flips with flexDirection above —
-                  // only stretch to fill space when the form is a row; column mode already gets
-                  // full width for free from the flex container's default align-items: stretch.
-                  flex: { xs: 'auto', sm: '1 1 160px', md: '1 1 160px', lg: 'auto' },
+                  flex: 1,
                   minWidth: 0,
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '10px',
                     fontFamily: fonts.body,
                     fontSize: '0.85rem',
-                    backgroundColor: '#fff',
+                    backgroundColor: '#F6F9FC',
                   },
                 }}
               />
@@ -270,6 +251,7 @@ const SiteFooter: React.FC = () => {
                 variant="contained"
                 sx={{
                   flexShrink: 0,
+                  minHeight: 40,
                   backgroundColor: colors.primaryBlue,
                   color: '#fff',
                   fontFamily: fonts.body,
@@ -278,24 +260,26 @@ const SiteFooter: React.FC = () => {
                   borderRadius: '10px',
                   px: 2.5,
                   whiteSpace: 'nowrap',
-                  '&:hover': { backgroundColor: colors.navy },
+                  boxShadow: 'none',
+                  '&:hover': { backgroundColor: colors.navy, boxShadow: 'none' },
                 }}
               >
                 Subscribe
               </Button>
             </Box>
+
             {subscribeStatus === 'success' && (
-              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.success, mt: 1 }}>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: colors.success, mb: 1 }}>
                 Thank you for subscribing.
               </Typography>
             )}
             {subscribeStatus === 'error' && (
-              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: '#DC2626', mt: 1 }}>
+              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: '#DC2626', mb: 1 }}>
                 Please enter a valid email address.
               </Typography>
             )}
 
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
               {socialLinks.map((social) => {
                 const isPlaceholder = social.href === '#';
                 return (
@@ -305,15 +289,18 @@ const SiteFooter: React.FC = () => {
                       href={social.href}
                       target={isPlaceholder ? undefined : '_blank'}
                       rel={isPlaceholder ? undefined : 'noreferrer'}
-                      onClick={(e) => { if (isPlaceholder) e.preventDefault(); }}
+                      onClick={(e) => {
+                        if (isPlaceholder) e.preventDefault();
+                      }}
                       aria-label={social.ariaLabel}
                       sx={{
-                        width: 38,
-                        height: 38,
-                        backgroundColor: colors.primaryBlue,
-                        color: '#fff',
-                        transition: 'transform 0.2s ease, background-color 0.2s ease',
-                        '&:hover': { backgroundColor: colors.navy, transform: 'translateY(-2px)' },
+                        width: 40,
+                        height: 40,
+                        backgroundColor: '#EEF5FF',
+                        color: '#0B3D91',
+                        border: '1px solid #D8E6FF',
+                        transition: 'transform 0.2s ease, background-color 0.2s ease, color 0.2s ease',
+                        '&:hover': { backgroundColor: '#1A73E8', color: '#fff', transform: 'translateY(-2px)' },
                         '&:focus-visible': { outline: `2px solid ${colors.navy}`, outlineOffset: 2 },
                       }}
                     >
@@ -324,58 +311,75 @@ const SiteFooter: React.FC = () => {
               })}
             </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 2 }}>
-              <Box component="a" href="mailto:service@smartappliances.co" sx={{ ...footerLinkSx, mb: 0 }}>
+            <Typography
+              component="p"
+              sx={{
+                fontFamily: fonts.body,
+                color: FOOTER_LINK_COLOR,
+                fontSize: '0.875rem',
+                lineHeight: 1.5,
+                m: 0,
+              }}
+            >
+              <Box
+                component="a"
+                href="mailto:service@smartappliances.co"
+                sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: colors.primaryBlue } }}
+              >
                 service@smartappliances.co
               </Box>
-              <Box component="a" href="tel:+12405760397" sx={{ ...footerLinkSx, mb: 0 }}>
+              <Box component="span" sx={{ mx: 1, color: '#9CA3AF' }} aria-hidden>
+                |
+              </Box>
+              <Box
+                component="a"
+                href="tel:+12405760397"
+                sx={{ color: 'inherit', textDecoration: 'none', whiteSpace: 'nowrap', '&:hover': { color: colors.primaryBlue } }}
+              >
                 +1 (240) 576-0397
               </Box>
-            </Box>
+            </Typography>
           </Box>
         </Box>
 
-        {/* Bottom bar */}
         <Box
           sx={{
             borderTop: `1px solid ${colors.border}`,
             mt: { xs: 4, md: 5 },
-            pt: 2.5,
+            pt: 2,
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
             alignItems: { xs: 'center', md: 'center' },
             justifyContent: 'space-between',
-            gap: 2,
-            textAlign: { xs: 'center', md: 'left' },
+            gap: 1.5,
           }}
         >
           <Typography sx={{ fontFamily: fonts.body, color: FOOTER_LINK_COLOR, fontSize: '14px' }}>
-            © {new Date().getFullYear()} Smart Appliances. All rights reserved.
+            © {new Date().getFullYear()} Smart Appliances
           </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: { xs: 1.5, md: 2.5 },
-              justifyContent: { xs: 'center', md: 'flex-end' },
-            }}
-          >
-            {bottomBarLinks.map((link) => (
-              <Box
-                key={link.label}
-                component={RouterLink}
-                to={link.path as string}
-                sx={{
-                  fontFamily: fonts.body,
-                  color: FOOTER_LINK_COLOR,
-                  fontSize: '14px',
-                  textDecoration: 'none',
-                  transition: 'color 0.2s',
-                  '&:hover': { color: colors.primaryBlue },
-                }}
-              >
-                {link.label}
-              </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {bottomBarLinks.map((link, index) => (
+              <React.Fragment key={link.label}>
+                {index > 0 ? (
+                  <Box component="span" sx={{ color: '#9CA3AF', fontSize: '14px' }} aria-hidden>
+                    |
+                  </Box>
+                ) : null}
+                <Box
+                  component={RouterLink}
+                  to={link.path as string}
+                  sx={{
+                    fontFamily: fonts.body,
+                    color: FOOTER_LINK_COLOR,
+                    fontSize: '14px',
+                    textDecoration: 'none',
+                    transition: 'color 0.2s',
+                    '&:hover': { color: colors.primaryBlue },
+                  }}
+                >
+                  {link.label}
+                </Box>
+              </React.Fragment>
             ))}
           </Box>
         </Box>

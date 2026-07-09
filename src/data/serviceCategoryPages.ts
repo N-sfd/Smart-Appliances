@@ -95,6 +95,8 @@ export interface ServiceCategoryPageConfig {
   cardHoverLift?: boolean;
   /** Smaller clickable icon cards in the booking grid */
   compactIconCards?: boolean;
+  /** Photo-forward service picker cards (Handyman-style hub grid). */
+  serviceCardVariant?: 'icon' | 'photo';
 }
 
 const BASE = '/images/services';
@@ -277,8 +279,9 @@ export const smartHomePageConfig: ServiceCategoryPageConfig = {
     primaryLabel: 'Book Smart Home Service',
     secondaryLabel: 'Ask About Installation',
   },
-  desktopIconColumns: 4,
+  desktopIconColumns: 3,
   cardHoverLift: true,
+  serviceCardVariant: 'photo',
 };
 
 export const hvacPageConfig: ServiceCategoryPageConfig = {
@@ -473,6 +476,7 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
     },
     desktopIconColumns: 3,
     cardHoverLift: true,
+    serviceCardVariant: 'photo',
   },
   'phone-repair': {
     slug: 'phone-repair',
@@ -501,6 +505,7 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
     },
     desktopIconColumns: 3,
     cardHoverLift: true,
+    serviceCardVariant: 'photo',
   },
   handyman: {
     slug: 'handyman',
@@ -527,7 +532,8 @@ export const SERVICE_CATEGORY_PAGE_MAP: Record<string, ServiceCategoryPageConfig
       subtitle: 'Describe your project and pick a convenient time.',
       primaryLabel: 'Book Handyman Service',
     },
-    desktopIconColumns: 4,
+    desktopIconColumns: 3,
     cardHoverLift: true,
+    serviceCardVariant: 'photo',
   },
 };

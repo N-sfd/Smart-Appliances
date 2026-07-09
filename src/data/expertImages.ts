@@ -23,7 +23,7 @@ export const GALLERY_CATEGORY_IMAGES: Record<string, string> = {
   'HVAC Services': '/images/services/hvac-service.jpg',
   Plumbing: '/images/services/plumbing-service.jpg',
   Electrical: '/images/services/electrical/hero.jpg',
-  'Smart Home': '/images/services/smart-home/hero.jpg',
+  'Smart Home': '/images/services/smart-home/smart-home-hero.webp',
   'Garage Door': '/images/services/garage-door/hero.jpg',
 };
 

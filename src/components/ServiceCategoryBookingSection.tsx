@@ -9,8 +9,30 @@ import { schedulerCategoryFromHubId } from '../data/schedulerPrefill';
 import { SERVICE_ISSUE_CHIPS } from '../data/serviceIssueChips';
 import { CATEGORY_SERVICE_DETAILS } from '../data/serviceCategoryDetails';
 import { getCategoryFallbackImage } from '../data/serviceCategoryFallbacks';
+import { getCategoryHeroFallback } from '../data/categoryHeroFallbacks';
+import { APPLIANCE_DEFAULT_IMAGE } from '../data/applianceHub';
 import CategoryBrandSection from './CategoryBrandSection';
 import type { CategoryBrandConfig } from '../data/serviceCategoryPages';
+
+/** categoryId -> the slug used by categoryHeroFallbacks (only smart-home's differ). */
+const CATEGORY_SLUG_BY_ID: Record<string, string> = {
+  'smart-home-setup': 'smart-home',
+  'tv-mounting': 'tv-mounting',
+  'phone-repair': 'phone-repair',
+  handyman: 'handyman',
+};
+
+/** Absolute last resort when no category fallback or illustration is available. */
+const NEUTRAL_PLACEHOLDER_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="Image not available">
+  <rect width="480" height="360" fill="#E4E7EB"/>
+  <g fill="none" stroke="#94A3B8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="translate(190 130)">
+    <rect x="0" y="0" width="100" height="72" rx="8"/>
+    <circle cx="24" cy="22" r="9"/>
+    <path d="M0 58l28-26 20 16 30-28 22 38"/>
+  </g>
+</svg>
+`)}`;
 
 const EMERGENCY_IDS = new Set([
   'emergency-plumbing',
@@ -51,6 +73,7 @@ interface ServiceCategoryBookingSectionProps {
   detailPanelVariant?: 'default' | 'electrical';
   cardHoverLift?: boolean;
   compactIconCards?: boolean;
+  serviceCardVariant?: 'icon' | 'photo';
 }
 
 interface ResolvedService {
@@ -69,16 +92,31 @@ interface ResolvedService {
 function resolveService(serviceId: string, categoryId: string): ResolvedService {
   const base = getServiceImage(serviceId, categoryId);
   const override = CATEGORY_SERVICE_DETAILS[serviceId];
-  const fallback = getCategoryFallbackImage(categoryId);
-  const image = override?.image ?? base.image;
-  const useFallback = image.includes('hero-technician') && categoryId !== 'electrical-services';
+  let image = override?.image ?? base.image;
+
+  // Tier 1 (selected service image) failed to resolve to anything but the
+  // generic appliance photo — work down the rest of the fallback hierarchy
+  // instead of ever showing that image outside the Appliance/Electrical pages.
+  const looksLikeApplianceDefault = image.includes('hero-technician') || image === APPLIANCE_DEFAULT_IMAGE;
+  if (looksLikeApplianceDefault && categoryId !== 'electrical-services') {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[ServiceCategoryBookingSection] No dedicated image for service "${serviceId}" in category "${categoryId}" — using a category fallback instead of the appliance default.`,
+      );
+    }
+    const categorySlug = CATEGORY_SLUG_BY_ID[categoryId] ?? categoryId;
+    // Tier 2: category support image (a real photo where one exists) → Tier 3:
+    // category-specific illustration → Tier 4: neutral placeholder.
+    image = getCategoryFallbackImage(categoryId) || getCategoryHeroFallback(categorySlug) || NEUTRAL_PLACEHOLDER_IMAGE;
+  }
 
   return {
     id: serviceId,
     scheduleId: override?.scheduleId ?? serviceId,
     title: override?.title ?? base.title,
     description: override?.description ?? base.desc,
-    image: useFallback ? fallback : image,
+    image,
     chips: override?.chips ?? SERVICE_ISSUE_CHIPS[serviceId] ?? [],
     detailDescription: override?.detailDescription,
     includes: override?.includes,
@@ -116,6 +154,7 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
   detailPanelVariant = 'default',
   cardHoverLift = false,
   compactIconCards = false,
+  serviceCardVariant = 'icon',
 }) => {
   const navigate = useNavigate();
   const detailRef = useRef<HTMLDivElement>(null);
@@ -171,8 +210,15 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
     navigate(`/scheduler?${query.toString()}`);
   };
 
-  const lgIconCols =
-    desktopColumns === 5 ? 'repeat(5, 1fr)' : desktopColumns === 3 ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)';
+  const isPhotoCards = serviceCardVariant === 'photo';
+
+  const lgIconCols = isPhotoCards
+    ? 'repeat(3, minmax(0, 1fr))'
+    : desktopColumns === 5
+    ? 'repeat(5, 1fr)'
+    : desktopColumns === 3
+    ? 'repeat(3, 1fr)'
+    : 'repeat(4, 1fr)';
 
   // When any card in this grid has a description, size every card in the grid to
   // match so the row stays equal-height instead of some cards being taller than others.
@@ -229,21 +275,103 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-              md: desktopColumns === 4 ? 'repeat(4, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))',
-              lg: lgIconCols,
-            },
-            gap: { xs: 1.5, md: 2 },
+            gridTemplateColumns: isPhotoCards
+              ? {
+                  xs: '1fr',
+                  sm: 'repeat(2, minmax(0, 1fr))',
+                  md: 'repeat(3, minmax(0, 1fr))',
+                  lg: lgIconCols,
+                }
+              : {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  md: desktopColumns === 4 ? 'repeat(4, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))',
+                  lg: lgIconCols,
+                },
+            gap: isPhotoCards ? { xs: 2, md: 2.5 } : { xs: 1.5, md: 2 },
             alignItems: 'stretch',
-            maxWidth: desktopColumns === 4 && iconCards.length === 8 ? 960 : undefined,
-            mx: desktopColumns === 4 && iconCards.length === 8 ? 'auto' : undefined,
+            maxWidth: !isPhotoCards && desktopColumns === 4 && iconCards.length === 8 ? 960 : undefined,
+            mx: !isPhotoCards && desktopColumns === 4 && iconCards.length === 8 ? 'auto' : undefined,
             mb: displayService ? 4 : brandAfterIcons ? 0 : 0,
           }}
         >
-          {iconCards.map(({ id, label, description, Icon }) => {
+          {iconCards.map(({ id, label, description, Icon, cardImage }) => {
             const isActive = selectedIconId === id;
+            const photoSrc = cardImage ?? (isPhotoCards ? resolveService(iconCards.find((c) => c.id === id)?.serviceIds[0] ?? '', categoryId).image : undefined);
+
+            if (isPhotoCards && photoSrc) {
+              return (
+                <Box
+                  key={id}
+                  component="button"
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => {
+                    if (isActive) {
+                      onSelectIcon(null);
+                      onSelectService(null);
+                    } else {
+                      const card = iconCards.find((c) => c.id === id);
+                      onSelectIcon(id);
+                      onSelectService(card?.serviceIds[0] ?? null);
+                    }
+                  }}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: '100%',
+                    p: 0,
+                    overflow: 'hidden',
+                    backgroundColor: '#FFFFFF',
+                    border: `2px solid ${isActive ? '#1A73E8' : '#E4E7EB'}`,
+                    borderRadius: '14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease-in-out',
+                    outline: 'none',
+                    boxShadow: isActive ? '0 8px 24px rgba(26, 115, 232, 0.16)' : '0 2px 8px rgba(15, 23, 42, 0.06)',
+                    '&:hover': {
+                      borderColor: '#1A73E8',
+                      transform: cardHoverLift ? 'translateY(-3px)' : 'none',
+                      boxShadow: '0 12px 28px rgba(26, 115, 232, 0.14)',
+                    },
+                    '&:focus-visible': {
+                      outline: '2px solid #1A73E8',
+                      outlineOffset: '2px',
+                    },
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={photoSrc}
+                    alt={label}
+                    loading="lazy"
+                    width={400}
+                    height={300}
+                    sx={{
+                      width: '100%',
+                      aspectRatio: '4 / 3',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontFamily: fonts.body,
+                      fontWeight: isActive ? 700 : 600,
+                      fontSize: { xs: '0.9rem', md: '0.95rem' },
+                      color: '#1A1A1A',
+                      textAlign: 'center',
+                      px: 1.5,
+                      py: 1.5,
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {label}
+                  </Typography>
+                </Box>
+              );
+            }
+
             return (
               <Box
                 key={id}

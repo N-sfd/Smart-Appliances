@@ -17,8 +17,6 @@ import { colors, fonts } from '../theme';
 import { useSeo } from '../hooks/useSeo';
 import type { ServiceLandingPageConfig } from '../data/serviceLandingPageTypes';
 import { SERVICE_AREA_REGION_LABEL_SHORT, SERVICE_AREA_REGION_LABEL } from '../data/serviceAreas';
-import BrandsWeServiceSection from './BrandsWeServiceSection';
-
 interface ServiceLandingPageLayoutProps {
   config: ServiceLandingPageConfig;
 }
@@ -594,8 +592,6 @@ const ServiceLandingPageLayout: React.FC<ServiceLandingPageLayoutProps> = ({ con
           </Box>
         </Container>
       </Box>
-
-      <BrandsWeServiceSection backgroundColor="#FFFFFF" />
 
       {/* ── FAQ ── */}
       <Box sx={{ py: { xs: 5, md: 7 }, backgroundColor: '#F8FAFC', borderTop: '1px solid #EEF0F3' }}>

@@ -532,6 +532,7 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
         detailPanelVariant={config.detailPanelVariant}
         cardHoverLift={config.cardHoverLift}
         compactIconCards={config.compactIconCards}
+        serviceCardVariant={config.serviceCardVariant}
       />
 
       {supportContent && <CategorySupportSection content={supportContent} />}

@@ -86,6 +86,7 @@ const EmergencyBookingPage: React.FC = () => {
   const [city, setCity] = useState('');
   const [stateVal, setStateVal] = useState<MetroServiceState>('MD');
   const [stateAutoCorrectedFrom, setStateAutoCorrectedFrom] = useState<MetroServiceState | null>(null);
+  const [stateTouchedManually, setStateTouchedManually] = useState(false);
   const [zipCode, setZipCode] = useState('');
   const [zipTouched, setZipTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -112,6 +113,9 @@ const EmergencyBookingPage: React.FC = () => {
   // Auto-detect + auto-set the State dropdown whenever the ZIP becomes a valid,
   // in-service-area code — matches the "preferred behavior" in the spec. Manual
   // state changes afterward are left alone until the ZIP itself changes again.
+  // The "state has been updated automatically" notice only fires when this
+  // overrides a state the user *chose themselves* — not the untouched default,
+  // since silently populating a never-touched field isn't really a "correction".
   useEffect(() => {
     if (!zipFormatValid) {
       setStateAutoCorrectedFrom(null);
@@ -123,11 +127,12 @@ const EmergencyBookingPage: React.FC = () => {
       return;
     }
     if (stateValRef.current !== match.code) {
-      setStateAutoCorrectedFrom(stateValRef.current);
+      setStateAutoCorrectedFrom(stateTouchedManually ? stateValRef.current : null);
       setStateVal(match.code);
     } else {
       setStateAutoCorrectedFrom(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zipCode, zipFormatValid]);
 
   let zipStatusMessage = 'Enter a 5-digit ZIP code.';
@@ -705,6 +710,7 @@ const EmergencyBookingPage: React.FC = () => {
                         value={stateVal}
                         onChange={(e: SelectChangeEvent<string>) => {
                           setStateVal(e.target.value as MetroServiceState);
+                          setStateTouchedManually(true);
                           setStateAutoCorrectedFrom(null);
                         }}
                       >

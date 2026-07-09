@@ -37,7 +37,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "optimize:images": "node scripts/optimize-images.mjs"
   },
   "eslintConfig": {
     "extends": [
@@ -58,6 +59,7 @@
     ]
   },
   "devDependencies": {
-    "playwright": "^1.61.0"
+    "playwright": "^1.61.0",
+    "sharp": "^0.34.3"
   }
 }
