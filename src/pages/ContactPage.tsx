@@ -194,12 +194,12 @@ const ContactPage: React.FC = () => {
             sx={{
               display: 'grid',
               gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-              alignItems: 'start',
+              alignItems: 'stretch',
               gap: { xs: 4, md: 6 },
             }}
           >
             {/* Left: contact info */}
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <Typography
                 variant="h4"
                 sx={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: '#0B3D91', mb: 4 }}
@@ -306,6 +306,9 @@ const ContactPage: React.FC = () => {
                 border: '1px solid #E4E7EB',
                 boxShadow: CARD_SHADOW,
                 p: { xs: 3, md: 4 },
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
               {submitted ? (
@@ -332,7 +335,7 @@ const ContactPage: React.FC = () => {
                   >
                     Send Us a Message
                   </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, flex: 1 }}>
                     <Box sx={{ display: 'flex', gap: 2.5, flexDirection: { xs: 'column', sm: 'row' } }}>
                       <TextField
                         label="Name *"
@@ -412,18 +415,36 @@ const ContactPage: React.FC = () => {
                         </Select>
                       </FormControl>
                     </Box>
-                    <TextField
-                      label="Message *"
-                      value={form.message}
-                      onChange={handleChange('message')}
-                      error={errors.message}
-                      helperText={errors.message ? 'Message is required' : ''}
-                      fullWidth
-                      multiline
-                      minRows={5}
-                      variant="outlined"
-                      sx={contactInputSx}
-                    />
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: { xs: 140, md: 200 } }}>
+                      <TextField
+                        label="Message *"
+                        value={form.message}
+                        onChange={handleChange('message')}
+                        error={errors.message}
+                        helperText={errors.message ? 'Message is required' : ''}
+                        fullWidth
+                        multiline
+                        minRows={8}
+                        variant="outlined"
+                        sx={{
+                          ...contactInputSx,
+                          flex: 1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          '& .MuiInputBase-root': {
+                            flex: 1,
+                            height: '100%',
+                            alignItems: 'flex-start',
+                          },
+                          '& .MuiInputBase-inputMultiline': {
+                            flex: 1,
+                            minHeight: { xs: 120, md: 180 },
+                            height: '100% !important',
+                            boxSizing: 'border-box',
+                          },
+                        }}
+                      />
+                    </Box>
                     <Button
                       variant="contained"
                       fullWidth

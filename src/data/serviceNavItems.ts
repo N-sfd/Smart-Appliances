@@ -132,9 +132,6 @@ export const serviceNavPath = (item: ServiceNavItem): string => item.path;
 const SMART_HOME_PREFIXES = [
   '/services/smart-home',
   '/services/smart-thermostat-setup',
-  '/services/tv-mounting',
-  '/services/phone-repair',
-  '/services/handyman',
   '/services/doorbell-installation',
   '/services/camera-installation',
   '/services/smart-lock-installation',

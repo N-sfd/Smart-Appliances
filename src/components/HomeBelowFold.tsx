@@ -45,6 +45,7 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import HomeResourcesSection from './HomeResourcesSection';
+import BrandsWeServiceMarquee from './BrandsWeServiceMarquee';
 import { serviceCategories } from '../data/services';
 import { popularServices } from '../data/popularServices';
 import { SERVICE_TYPE_IMAGE_MAP, CATEGORY_IMAGE_MAP, DEFAULT_SERVICE_IMAGE } from '../data/serviceImages';
@@ -65,7 +66,6 @@ import {
   howItWorks,
   faqs,
   serviceCoverageItems,
-  BRANDS_WE_SERVICE,
 } from '../data/homePageData';
 
 const SERVICE_COVERAGE_ICONS = {
@@ -1264,47 +1264,32 @@ const HomeBelowFold: React.FC = () => {
                 maxWidth: 560,
                 mx: 'auto',
                 lineHeight: 1.75,
+                mb: 4,
               }}
             >
-              We service many major appliance and home-system brands. If you do not see your brand listed, contact us and we will confirm availability.
+              Our technicians service many major appliance brands. Brand availability may vary by appliance type and service area.
             </Typography>
           </Box>
 
-          {/* Brand pills — text-only badges, no logo assets required */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              gap: { xs: 1, md: 1.25 },
-              mb: 4,
-            }}
-          >
-            {BRANDS_WE_SERVICE.map((brand) => (
-              <Chip
-                key={brand}
-                label={brand}
-                sx={{
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E4E7EB',
-                  color: colors.navy,
-                  fontFamily: fonts.body,
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  px: 1.5,
-                  py: 2.5,
-                  boxShadow: '0 2px 10px rgba(10, 37, 64, 0.04)',
-                  transition: 'box-shadow 0.22s ease, transform 0.22s ease',
-                  '&:hover': {
-                    boxShadow: '0 10px 28px rgba(11,94,215,0.10)',
-                    transform: 'translateY(-2px)',
-                  },
-                }}
-              />
-            ))}
+          <BrandsWeServiceMarquee fadeColor={colors.sectionBg} />
+
+          <Box sx={{ textAlign: 'center', mt: 4, mb: 2 }}>
+            <Button
+              onClick={() => navigate('/contact')}
+              sx={{
+                fontFamily: fonts.body,
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                color: colors.primaryBlue,
+                textTransform: 'none',
+                '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' },
+              }}
+            >
+              Don&apos;t see your brand? Contact us to confirm availability.
+            </Button>
           </Box>
 
-          <Box sx={{ textAlign: 'center', mb: 5 }}>
+          <Box sx={{ textAlign: 'center', mt: 3, mb: 5 }}>
             <Button
               onClick={() => navigate('/scheduler')}
               variant="contained"
@@ -2092,26 +2077,38 @@ const HomeBelowFold: React.FC = () => {
                       },
                     }}
                   />
-                  <TextField
-                    label="Message"
-                    value={contactMessage}
-                    onChange={(e) => setContactMessage(e.target.value)}
-                    onBlur={() => setContactMessageTouched(true)}
-                    fullWidth
-                    multiline
-                    minRows={6}
-                    error={contactMessageTouched && !contactMessage.trim()}
-                    helperText={contactMessageTouched && !contactMessage.trim() ? 'Message is required.' : ''}
-                    sx={{
-                      flexGrow: 1,
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '10px',
-                        fontFamily: fonts.body,
-                        backgroundColor: '#FAFBFC',
-                        alignItems: 'flex-start',
-                      },
-                    }}
-                  />
+                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: { xs: 168, md: 260 } }}>
+                    <TextField
+                      label="Message"
+                      value={contactMessage}
+                      onChange={(e) => setContactMessage(e.target.value)}
+                      onBlur={() => setContactMessageTouched(true)}
+                      fullWidth
+                      multiline
+                      minRows={8}
+                      error={contactMessageTouched && !contactMessage.trim()}
+                      helperText={contactMessageTouched && !contactMessage.trim() ? 'Message is required.' : ''}
+                      sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        '& .MuiInputBase-root': {
+                          flex: 1,
+                          height: '100%',
+                          borderRadius: '10px',
+                          fontFamily: fonts.body,
+                          backgroundColor: '#FAFBFC',
+                          alignItems: 'flex-start',
+                        },
+                        '& .MuiInputBase-inputMultiline': {
+                          flex: 1,
+                          minHeight: { xs: 140, md: 220 },
+                          height: '100% !important',
+                          boxSizing: 'border-box',
+                        },
+                      }}
+                    />
+                  </Box>
                   <Button
                     variant="contained"
                     onClick={handleContactSubmit}
