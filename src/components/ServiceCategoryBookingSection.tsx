@@ -174,6 +174,10 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
   const lgIconCols =
     desktopColumns === 5 ? 'repeat(5, 1fr)' : desktopColumns === 3 ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)';
 
+  // When any card in this grid has a description, size every card in the grid to
+  // match so the row stays equal-height instead of some cards being taller than others.
+  const hasCardDescriptions = iconCards.some((c) => c.description);
+
   return (
     <Box ref={sectionRef} sx={{ backgroundColor: '#FFFFFF', py: { xs: 6, md: 8 } }}>
       <Box sx={{ maxWidth: 1180, mx: 'auto', px: { xs: 2, sm: 3 } }}>
@@ -192,9 +196,11 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
                 sx={{
                   fontFamily: fonts.heading,
                   fontWeight: 800,
-                  fontSize: { xs: '1.5rem', md: '1.85rem' },
+                  fontSize: { xs: '1.35rem', sm: '1.5rem', md: '1.85rem' },
                   color: '#1A1A1A',
                   textAlign: 'center',
+                  whiteSpace: 'normal',
+                  overflowWrap: 'break-word',
                   mb: iconSectionSubtitle ? 1 : 4.5,
                 }}
               >
@@ -236,13 +242,14 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
             mb: displayService ? 4 : brandAfterIcons ? 0 : 0,
           }}
         >
-          {iconCards.map(({ id, label, Icon }) => {
+          {iconCards.map(({ id, label, description, Icon }) => {
             const isActive = selectedIconId === id;
             return (
               <Box
                 key={id}
                 component="button"
                 type="button"
+                aria-pressed={isActive}
                 onClick={() => {
                   if (isActive) {
                     onSelectIcon(null);
@@ -257,10 +264,14 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: description ? 'flex-start' : 'center',
                   width: '100%',
                   height: '100%',
-                  minHeight: compactIconCards ? { xs: 108, sm: 112, md: 116 } : { xs: 120, sm: 128, md: 132 },
+                  minHeight: compactIconCards
+                    ? { xs: 108, sm: 112, md: 116 }
+                    : hasCardDescriptions
+                    ? { xs: 172, sm: 180, md: 184 }
+                    : { xs: 120, sm: 128, md: 132 },
                   backgroundColor: isActive ? '#E8F1FF' : '#FFFFFF',
                   border: `1px solid ${isActive ? '#1A73E8' : '#E4E7EB'}`,
                   borderRadius: compactIconCards ? '16px' : '20px',
@@ -277,6 +288,10 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
                     boxShadow: '0 8px 22px rgba(26, 115, 232, 0.14)',
                     '& .hub-icon': { color: '#1A73E8' },
                   },
+                  '&:focus-visible': {
+                    outline: '2px solid #1A73E8',
+                    outlineOffset: '2px',
+                  },
                 }}
               >
                 <Icon
@@ -284,7 +299,7 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
                   size={compactIconCards ? 32 : 42}
                   strokeWidth={1.5}
                   color={isActive ? '#1A73E8' : '#64748B'}
-                  style={{ transition: 'color 0.18s ease' }}
+                  style={{ transition: 'color 0.18s ease', flexShrink: 0 }}
                 />
                 <Typography
                   sx={{
@@ -301,6 +316,24 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
                 >
                   {label}
                 </Typography>
+                {description && (
+                  <Typography
+                    sx={{
+                      fontFamily: fonts.body,
+                      fontSize: '0.76rem',
+                      color: isActive ? '#0B3D91' : '#64748B',
+                      textAlign: 'center',
+                      lineHeight: 1.4,
+                      mt: 0.5,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {description}
+                  </Typography>
+                )}
               </Box>
             );
           })}

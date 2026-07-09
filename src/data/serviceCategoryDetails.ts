@@ -374,6 +374,24 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
       'Our technician measures and levels your shelving, anchors it to the wall, and confirms it can safely hold your items.',
     includes: ['Measuring and leveling', 'Stud-anchored mounting', 'Weight-safe installation', 'Closet, garage, or living space shelving'],
   },
+  'curtain-rod-installation': {
+    title: 'Curtain Rod Installation',
+    description: 'Install curtain rods, brackets, and window hardware.',
+    chips: ['Curtain rods', 'Brackets', 'Window hardware'],
+    image: CATEGORY_HERO_IMAGE.handyman,
+    detailDescription:
+      'Our technician measures and levels the placement, anchors the brackets securely, and mounts your curtain rod or window hardware.',
+    includes: ['Measuring and leveling', 'Wall-appropriate anchoring', 'Curtain rods and brackets', 'Blinds and shade hardware'],
+  },
+  'minor-home-repairs': {
+    title: 'Minor Home Repairs',
+    description: 'Simple repairs and small household fixes.',
+    chips: ['Small fixes', 'Loose hardware', 'Quick repairs'],
+    image: CATEGORY_HERO_IMAGE.handyman,
+    detailDescription:
+      'Our technician handles small, everyday repairs in a single visit — from loose hinges and sticking doors to other quick household fixes.',
+    includes: ['Loose hinges and handles', 'Sticking doors or drawers', 'Minor hardware replacement', 'Small household fixes'],
+  },
   // TV Mounting
   'standard-tv-mounting': {
     title: 'Standard TV Mounting',

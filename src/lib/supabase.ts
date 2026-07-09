@@ -22,10 +22,10 @@ export interface ServiceRequestRow {
 }
 
 export function mapServiceRequestToRow(request: ServiceRequest): ServiceRequestRow {
-  const urgency =
-    request.servicePriority === 'emergency'
-      ? request.urgencyLevel ?? request.requestedResponseTime ?? 'Emergency'
-      : request.urgencyLevel;
+  // Emergency-priority requests always report a categorical "Emergency" urgency —
+  // the specific ASAP/Today/etc. response-time preference is preserved separately
+  // in the request notes rather than in this column.
+  const urgency = request.servicePriority === 'emergency' ? 'Emergency' : request.urgencyLevel;
 
   return {
     customer_name: request.customerName,

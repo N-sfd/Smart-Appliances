@@ -13,15 +13,19 @@ const BASE = '/images/services';
 export const serviceImages = {
   handyman: {
     hero: `${BASE}/handyman/handyman-hero.webp`,
+    support: `${BASE}/handyman/handyman-support.webp`,
   },
   phoneRepair: {
     hero: `${BASE}/phone-repair/phone-repair-hero.webp`,
+    support: `${BASE}/phone-repair/phone-repair-support.webp`,
   },
   tvMounting: {
     hero: `${BASE}/tv-mounting/tv-mounting-hero.webp`,
+    support: `${BASE}/tv-mounting/tv-mounting-support.webp`,
   },
   smartHome: {
     hero: `${BASE}/smart-home/smart-home-hero.webp`,
+    support: `${BASE}/smart-home/smart-home-support.webp`,
   },
 } as const;
 

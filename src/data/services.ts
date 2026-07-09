@@ -62,6 +62,8 @@ export interface ServiceRequest {
    */
   outsideServiceArea?: boolean;
   detectedServiceArea?: string | null;
+  /** Admin-facing status marker, separate from the Supabase `status` column. */
+  adminStatus?: string;
 }
 
 export const serviceCategories: ServiceCategory[] = [
