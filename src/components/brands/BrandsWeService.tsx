@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { colors, fonts } from '../../theme';
@@ -9,7 +9,9 @@ import {
   getBrandsSectionConfig,
   getContactUrlForCategory,
 } from '../../data/service-brands';
-import BrandCard from './BrandCard';
+
+const ITEM_WIDTH = { xs: 108, sm: 126, md: 140 } as const;
+const LOGO_HEIGHT = { xs: 30, md: 36 } as const;
 
 interface BrandsWeServiceProps {
   category: BrandCategoryId;
@@ -19,10 +21,6 @@ interface BrandsWeServiceProps {
   description?: string;
   headingId?: string;
   backgroundColor?: string;
-  /** Show expand/collapse on service pages (default true) */
-  expandable?: boolean;
-  /** Max brands before expand (defaults from config) */
-  initialVisibleCount?: number;
 }
 
 const BrandsWeService: React.FC<BrandsWeServiceProps> = ({
@@ -31,20 +29,15 @@ const BrandsWeService: React.FC<BrandsWeServiceProps> = ({
   description,
   headingId,
   backgroundColor = colors.sectionBg,
-  expandable = true,
-  initialVisibleCount,
 }) => {
   const config = getBrandsSectionConfig(category);
   const brands = getBrandsForCategory(category);
   const sectionTitle = title ?? config.title;
   const sectionDescription = description ?? config.description;
-  const initialCount = initialVisibleCount ?? config.initialVisibleCount ?? 10;
-  const [expanded, setExpanded] = useState(false);
   const headingIdResolved = headingId ?? `brands-${category}-heading`;
-  const expandButtonId = useId();
-
-  const visibleBrands = expandable && !expanded ? brands.slice(0, initialCount) : brands;
-  const hasMore = expandable && brands.length > initialCount;
+  // Duplicate the track for a seamless scroll loop; the second copy is
+  // decorative and hidden from assistive tech to avoid announcing brands twice.
+  const trackItems = [...brands, ...brands];
 
   return (
     <Box
@@ -86,50 +79,106 @@ const BrandsWeService: React.FC<BrandsWeServiceProps> = ({
         </Box>
 
         <Box
-          role="list"
           sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: 'repeat(2, minmax(0, 1fr))',
-              sm: 'repeat(4, minmax(0, 1fr))',
-              md: 'repeat(6, minmax(0, 1fr))',
+            position: 'relative',
+            overflow: 'hidden',
+            py: 0.5,
+            '&::before, &::after': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              width: { xs: 32, md: 72 },
+              zIndex: 1,
+              pointerEvents: 'none',
             },
-            gap: { xs: 1.5, md: 2.25 },
-            maxWidth: 1080,
-            mx: 'auto',
+            '&::before': {
+              left: 0,
+              background: `linear-gradient(90deg, ${backgroundColor} 0%, transparent 100%)`,
+            },
+            '&::after': {
+              right: 0,
+              background: `linear-gradient(270deg, ${backgroundColor} 0%, transparent 100%)`,
+            },
           }}
         >
-          {visibleBrands.map((brand) => (
-            <Box key={brand.id} role="listitem">
-              <BrandCard brand={brand} />
-            </Box>
-          ))}
-        </Box>
-
-        {hasMore && (
-          <Box sx={{ textAlign: 'center', mt: 3 }}>
-            <Button
-              id={expandButtonId}
-              onClick={() => setExpanded((prev) => !prev)}
-              aria-expanded={expanded}
-              aria-controls={`${headingIdResolved}-grid`}
-              sx={{
-                fontFamily: fonts.body,
-                fontWeight: 600,
-                fontSize: '0.875rem',
-                color: colors.primaryBlue,
-                textTransform: 'none',
-                '&:hover': { backgroundColor: colors.lightBlueBg },
-                '&:focus-visible': {
-                  outline: `2px solid ${colors.primaryBlue}`,
-                  outlineOffset: 2,
-                },
-              }}
-            >
-              {expanded ? 'Show fewer brands' : 'View all brands'}
-            </Button>
+          <Box
+            className="brand-marquee-track"
+            role="list"
+            aria-label={sectionTitle}
+            sx={{ gap: { xs: 2.5, md: 3.5 }, alignItems: 'center' }}
+          >
+            {trackItems.map((brand, index) => {
+              const isDuplicate = index >= brands.length;
+              return (
+                <Box
+                  key={`${brand.id}-${index}`}
+                  role={isDuplicate ? undefined : 'listitem'}
+                  aria-hidden={isDuplicate || undefined}
+                  sx={{
+                    flexShrink: 0,
+                    width: ITEM_WIDTH,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 0.5,
+                  }}
+                >
+                  {brand.logo ? (
+                    <Box
+                      component="img"
+                      src={brand.logo}
+                      alt={brand.alt}
+                      width={130}
+                      height={40}
+                      loading="lazy"
+                      decoding="async"
+                      draggable={false}
+                      sx={{
+                        maxWidth: '100%',
+                        maxHeight: LOGO_HEIGHT,
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain',
+                        display: 'block',
+                        userSelect: 'none',
+                      }}
+                    />
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontFamily: fonts.heading,
+                        fontWeight: 700,
+                        fontSize: { xs: '0.8rem', md: '0.9rem' },
+                        color: colors.navy,
+                        textAlign: 'center',
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {brand.name}
+                    </Typography>
+                  )}
+                  {brand.logo && (
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontFamily: fonts.body,
+                        fontWeight: 600,
+                        fontSize: '0.68rem',
+                        color: colors.mutedText,
+                        textAlign: 'center',
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {brand.name}
+                    </Typography>
+                  )}
+                </Box>
+              );
+            })}
           </Box>
-        )}
+        </Box>
 
         <Box sx={{ textAlign: 'center', mt: { xs: 4, md: 4.5 } }}>
           <Typography

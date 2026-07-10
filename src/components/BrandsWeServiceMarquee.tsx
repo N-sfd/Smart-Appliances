@@ -4,7 +4,7 @@ import { colors, fonts } from '../theme';
 import { BRANDS_WE_SERVICE_FOOTER } from '../data/footerBrands';
 
 const LOGO_HEIGHT = { xs: 28, md: 34 } as const;
-const CARD_WIDTH = { xs: 118, sm: 132, md: 148 } as const;
+const ITEM_WIDTH = { xs: 108, sm: 122, md: 136 } as const;
 
 interface BrandsWeServiceMarqueeProps {
   /** Background color for edge fade gradients */
@@ -12,13 +12,16 @@ interface BrandsWeServiceMarqueeProps {
 }
 
 /**
- * Auto-scrolling brand logo strip with compact logo cards.
+ * Auto-scrolling, boxless brand logo strip in full color.
  * Pauses on hover; respects prefers-reduced-motion via global CSS.
  */
 const BrandsWeServiceMarquee: React.FC<BrandsWeServiceMarqueeProps> = ({
   fadeColor = '#F6F9FC',
 }) => {
+  // Duplicate the track for a seamless scroll loop; the second copy is
+  // decorative and hidden from assistive tech to avoid announcing brands twice.
   const trackItems = [...BRANDS_WE_SERVICE_FOOTER, ...BRANDS_WE_SERVICE_FOOTER];
+  const baseLength = BRANDS_WE_SERVICE_FOOTER.length;
 
   return (
     <Box
@@ -47,75 +50,79 @@ const BrandsWeServiceMarquee: React.FC<BrandsWeServiceMarqueeProps> = ({
     >
       <Box
         className="brand-marquee-track"
-        sx={{ gap: { xs: 1.25, md: 1.5 }, alignItems: 'center', py: 0.25 }}
+        role="list"
         aria-label="Brands we service"
+        sx={{ gap: { xs: 2.5, md: 3.25 }, alignItems: 'center', py: 0.25 }}
       >
-        {trackItems.map((brand, index) => (
-          <Box
-            key={`${brand.name}-${index}`}
-            sx={{
-              flexShrink: 0,
-              width: CARD_WIDTH,
-              minHeight: { xs: 64, md: 76 },
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              px: 1.5,
-              py: 1.25,
-              borderRadius: '13px',
-              border: '1px solid #DCE5EF',
-              backgroundColor: '#FFFFFF',
-              transition: 'border-color 0.2s ease',
-              '&:hover': {
-                borderColor: '#B8C9DE',
-              },
-              '&:hover .brand-logo': {
-                filter: 'grayscale(0)',
-                opacity: 1,
-              },
-            }}
-          >
-            {brand.logo ? (
-              <Box
-                component="img"
-                className="brand-logo"
-                src={brand.logo}
-                alt={brand.name}
-                width={120}
-                height={40}
-                loading="lazy"
-                decoding="async"
-                draggable={false}
-                sx={{
-                  maxWidth: '100%',
-                  maxHeight: LOGO_HEIGHT,
-                  width: 'auto',
-                  height: 'auto',
-                  objectFit: 'contain',
-                  display: 'block',
-                  filter: 'grayscale(1)',
-                  opacity: 0.78,
-                  transition: 'filter 0.22s ease, opacity 0.22s ease',
-                  userSelect: 'none',
-                }}
-              />
-            ) : (
-              <Typography
-                sx={{
-                  fontFamily: fonts.heading,
-                  fontWeight: 700,
-                  fontSize: { xs: '0.78rem', md: '0.88rem' },
-                  color: colors.navy,
-                  textAlign: 'center',
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {brand.name}
-              </Typography>
-            )}
-          </Box>
-        ))}
+        {trackItems.map((brand, index) => {
+          const isDuplicate = index >= baseLength;
+          return (
+            <Box
+              key={`${brand.name}-${index}`}
+              role={isDuplicate ? undefined : 'listitem'}
+              aria-hidden={isDuplicate || undefined}
+              sx={{
+                flexShrink: 0,
+                width: ITEM_WIDTH,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 0.5,
+              }}
+            >
+              {brand.logo ? (
+                <Box
+                  component="img"
+                  src={brand.logo}
+                  alt={brand.name}
+                  width={120}
+                  height={40}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                  sx={{
+                    maxWidth: '100%',
+                    maxHeight: LOGO_HEIGHT,
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    display: 'block',
+                    userSelect: 'none',
+                  }}
+                />
+              ) : (
+                <Typography
+                  sx={{
+                    fontFamily: fonts.heading,
+                    fontWeight: 700,
+                    fontSize: { xs: '0.78rem', md: '0.88rem' },
+                    color: colors.navy,
+                    textAlign: 'center',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {brand.name}
+                </Typography>
+              )}
+              {brand.logo && (
+                <Typography
+                  component="span"
+                  sx={{
+                    fontFamily: fonts.body,
+                    fontWeight: 600,
+                    fontSize: '0.66rem',
+                    color: colors.mutedText,
+                    textAlign: 'center',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {brand.name}
+                </Typography>
+              )}
+            </Box>
+          );
+        })}
       </Box>
     </Box>
   );
