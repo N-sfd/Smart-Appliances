@@ -110,6 +110,7 @@ const AdminShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 /** Routes that already render their own category-relevant Brands We Service
  * section — the generic sitewide footer strip would duplicate it there. */
 const ROUTES_WITH_OWN_BRANDS_SECTION = new Set([
+  '/',
   '/resources',
   '/services/home-appliances',
   '/services/plumbing',

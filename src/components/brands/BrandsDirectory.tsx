@@ -24,6 +24,7 @@ import {
 import BrandCard from './BrandCard';
 
 const SEARCH_THRESHOLD = 30;
+const INITIAL_VISIBLE_COUNT = 42;
 
 const BrandsDirectory: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,6 +32,7 @@ const BrandsDirectory: React.FC = () => {
   const brandQueryParam = searchParams.get('brand') ?? '';
   const [searchQuery, setSearchQuery] = useState(brandQueryParam);
   const [activeCategory, setActiveCategory] = useState<BrandCategoryId | 'all'>(categoryParam);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
 
   const allBrands = useMemo(() => getAllBrands(), []);
   const showSearch = allBrands.length >= SEARCH_THRESHOLD;
@@ -42,6 +44,11 @@ const BrandsDirectory: React.FC = () => {
   useEffect(() => {
     setSearchQuery(brandQueryParam);
   }, [brandQueryParam]);
+
+  // Show the first page of results again whenever the filter or search changes.
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
+  }, [activeCategory, searchQuery]);
 
   const updateParams = useCallback(
     (category: BrandCategoryId | 'all', query: string) => {
@@ -76,6 +83,9 @@ const BrandsDirectory: React.FC = () => {
     [allBrands, activeCategory, searchQuery],
   );
 
+  const visibleBrands = filteredBrands.slice(0, visibleCount);
+  const hasMoreBrands = filteredBrands.length > visibleCount;
+
   const searchId = 'brands-directory-search';
   const filterLabelId = 'brands-directory-filters';
 
@@ -84,7 +94,8 @@ const BrandsDirectory: React.FC = () => {
       component="section"
       aria-labelledby="resources-brands-heading"
       sx={{
-        py: { xs: 7, md: 8.5 },
+        pt: { xs: 7, md: 8.5 },
+        pb: { xs: 5, md: 6 },
         backgroundColor: '#FFFFFF',
         borderTop: '1px solid #EEF0F3',
       }}
@@ -170,7 +181,7 @@ const BrandsDirectory: React.FC = () => {
         </Box>
 
         {showSearch && (
-          <Box sx={{ maxWidth: 420, mx: 'auto', mb: 3 }}>
+          <Box sx={{ maxWidth: 560, mx: 'auto', mb: 3 }}>
             <TextField
               id={searchId}
               label="Search by brand name"
@@ -228,7 +239,7 @@ const BrandsDirectory: React.FC = () => {
               mx: 'auto',
             }}
           >
-            {filteredBrands.map((brand) => (
+            {visibleBrands.map((brand) => (
               <Box key={brand.id} role="listitem">
                 <BrandCard brand={brand} />
               </Box>
@@ -279,7 +290,32 @@ const BrandsDirectory: React.FC = () => {
           </Box>
         )}
 
-        <Box sx={{ textAlign: 'center', mt: { xs: 4, md: 5 } }}>
+        {hasMoreBrands && (
+          <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 3.5 } }}>
+            <Button
+              onClick={() => setVisibleCount(filteredBrands.length)}
+              variant="outlined"
+              sx={{
+                borderColor: colors.primaryBlue,
+                color: colors.primaryBlue,
+                fontFamily: fonts.body,
+                fontWeight: 700,
+                textTransform: 'none',
+                borderRadius: '12px',
+                px: 3,
+                '&:hover': {
+                  borderColor: colors.navy,
+                  color: colors.navy,
+                  backgroundColor: colors.lightBlueBg,
+                },
+              }}
+            >
+              View More Brands
+            </Button>
+          </Box>
+        )}
+
+        <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 3.5 } }}>
           <Button
             component={RouterLink}
             to={getContactUrlForCategory('')}
@@ -307,7 +343,7 @@ const BrandsDirectory: React.FC = () => {
           sx={{
             fontFamily: fonts.body,
             fontSize: '0.72rem',
-            color: '#94A3B8',
+            color: '#64748B',
             textAlign: 'center',
             lineHeight: 1.55,
             maxWidth: 720,

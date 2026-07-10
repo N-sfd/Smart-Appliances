@@ -15,9 +15,6 @@ import {
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -46,6 +43,7 @@ import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import HomeResourcesSection from './HomeResourcesSection';
 import BrandsWeServiceMarquee from './BrandsWeServiceMarquee';
+import GetInTouchSection from './contact/GetInTouchSection';
 import { getContactUrlForCategory } from '../data/service-brands';
 import { serviceCategories } from '../data/services';
 import { popularServices } from '../data/popularServices';
@@ -79,6 +77,7 @@ const SERVICE_COVERAGE_ICONS = {
 
 const BUSINESS_PHONE_DISPLAY = '+1 (240) 576-0397';
 const BUSINESS_PHONE_HREF = 'tel:+12405760397';
+const INITIAL_AREA_COUNT = 15;
 
 const ServiceAreaMap = lazy(() => import('./ServiceAreaMap'));
 
@@ -123,17 +122,11 @@ const HomeBelowFold: React.FC = () => {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<ServiceCategoryTab>('Appliances');
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
-  const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactMessage, setContactMessage] = useState('');
-  const [contactSent, setContactSent] = useState(false);
-  const [contactNameTouched, setContactNameTouched] = useState(false);
-  const [contactEmailTouched, setContactEmailTouched] = useState(false);
-  const [contactMessageTouched, setContactMessageTouched] = useState(false);
   const [areaZip, setAreaZip] = useState('');
   const [areaZipTouched, setAreaZipTouched] = useState(false);
   const [notifyEmail, setNotifyEmail] = useState('');
   const [notifySubmitted, setNotifySubmitted] = useState(false);
+  const [showAllAreas, setShowAllAreas] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<string | false>(false);
   const [stickyVisible, setStickyVisible] = useState(false);
 
@@ -207,22 +200,11 @@ const HomeBelowFold: React.FC = () => {
 
   const handleAreaZipCheck = () => {
     setAreaZipTouched(true);
-    if (!areaZip) return;
-    if (!areaZipValidation.isValid) return;
-    navigate(`/scheduler?${new URLSearchParams({ zipCode: areaZip }).toString()}`);
   };
 
-  const CONTACT_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const contactEmailValid = CONTACT_EMAIL_RE.test(contactEmail);
-  const contactFormValid =
-    contactName.trim().length > 0 && contactEmailValid && contactMessage.trim().length > 0;
-
-  const handleContactSubmit = () => {
-    setContactNameTouched(true);
-    setContactEmailTouched(true);
-    setContactMessageTouched(true);
-    if (contactFormValid) setContactSent(true);
-  };
+  const visibleAreas = showAllAreas
+    ? serviceAreaNeighborhoods
+    : serviceAreaNeighborhoods.slice(0, INITIAL_AREA_COUNT);
 
   return (
     <>
@@ -1552,7 +1534,7 @@ const HomeBelowFold: React.FC = () => {
                     '&:hover': { backgroundColor: '#0B3D91' },
                   }}
                 >
-                  Schedule Service
+                  Check Availability
                 </Button>
               </Box>
 
@@ -1593,7 +1575,7 @@ const HomeBelowFold: React.FC = () => {
                       '&:hover': { backgroundColor: '#15803D' },
                     }}
                   >
-                    Find My Technician
+                    Schedule Service
                   </Button>
                 </Box>
               )}
@@ -1695,7 +1677,7 @@ const HomeBelowFold: React.FC = () => {
                 Popular service areas
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.25, md: 1.75 } }}>
-                {serviceAreaNeighborhoods.map((area) => (
+                {visibleAreas.map((area) => (
                   <Box
                     key={area}
                     component="span"
@@ -1723,6 +1705,25 @@ const HomeBelowFold: React.FC = () => {
                   </Box>
                 ))}
               </Box>
+              {!showAllAreas && serviceAreaNeighborhoods.length > INITIAL_AREA_COUNT && (
+                <Button
+                  variant="text"
+                  onClick={() => setShowAllAreas(true)}
+                  sx={{
+                    alignSelf: 'flex-start',
+                    mt: 1.5,
+                    fontFamily: fonts.body,
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    textTransform: 'none',
+                    color: '#1A73E8',
+                    px: 0,
+                    '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' },
+                  }}
+                >
+                  View All Service Areas →
+                </Button>
+              )}
             </Box>
 
             {/* Right — service coverage card */}
@@ -1744,13 +1745,13 @@ const HomeBelowFold: React.FC = () => {
                   fontWeight: 800,
                   color: '#0B3D91',
                   fontSize: { xs: '1.25rem', md: '1.35rem' },
-                  mb: 2,
+                  mb: 1.75,
                 }}
               >
                 Service Coverage
               </Typography>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2.5 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75, mb: 2 }}>
                 {serviceCoverageItems.map((item) => {
                   const Icon = SERVICE_COVERAGE_ICONS[item.icon];
                   return (
@@ -1784,8 +1785,8 @@ const HomeBelowFold: React.FC = () => {
                 })}
               </Box>
 
-              <Suspense fallback={<Box sx={{ height: { xs: 230, sm: 250, md: 264 } }} aria-hidden />}>
-                <ServiceAreaMap height={{ xs: 230, sm: 250, md: 264 }} />
+              <Suspense fallback={<Box sx={{ height: { xs: 250, sm: 270, md: 292 } }} aria-hidden />}>
+                <ServiceAreaMap height={{ xs: 250, sm: 270, md: 292 }} />
               </Suspense>
             </Box>
           </Box>
@@ -1884,266 +1885,7 @@ const HomeBelowFold: React.FC = () => {
         </Container>
       </Box>
 
-      {/* ── Get In Touch ── */}
-      <Box id="contact" sx={{ py: { xs: 7, md: 9 }, backgroundColor: colors.surface, scrollMarginTop: '80px' }}>
-        <Container maxWidth="lg">
-          {/* Header */}
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Typography
-              variant="h2"
-              sx={{ fontFamily: fonts.heading, fontWeight: 800, color: colors.navy, fontSize: { xs: '1.8rem', md: '2rem' }, mb: 1, letterSpacing: '-0.3px' }}
-            >
-              Get In Touch
-            </Typography>
-            <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '1rem', maxWidth: 560, mx: 'auto' }}>
-              Questions before you book? Reach us by phone, email, or the form below.
-            </Typography>
-          </Box>
-
-          {/* Why Choose Us strip */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              gap: { xs: 1.5, md: 3 },
-              mb: 5,
-              pb: 4,
-              borderBottom: `1px solid ${colors.border}`,
-            }}
-          >
-            {[
-              'Licensed & insured technicians',
-              'Transparent pricing before work begins',
-              'Same-day & emergency availability',
-              '30-day labor warranty',
-            ].map((item) => (
-              <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                <CheckCircleOutlineIcon sx={{ fontSize: 16, color: colors.primaryBlue, flexShrink: 0 }} />
-                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', fontWeight: 600, color: colors.darkText }}>
-                  {item}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-
-          {/* Two-column grid — equal-height cards */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-              gap: { xs: 3, md: 4 },
-              alignItems: 'stretch',
-            }}
-          >
-            {/* Left: contact info + hours + map */}
-            <Box
-              sx={{
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #E4E7EB',
-                borderRadius: '20px',
-                boxShadow: '0 4px 20px rgba(10,37,64,0.07)',
-                p: { xs: '24px', md: '28px' },
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {/* Contact items */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75, mb: 2.5 }}>
-                {[
-                  { icon: <PhoneIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Phone', value: '+1 (240) 576-0397', href: 'tel:+12405760397' },
-                  { icon: <EmailIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Email', value: 'service@smartappliances.co', href: 'mailto:service@smartappliances.co' },
-                  { icon: <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 18 }} />, label: 'Coverage', value: SERVICE_AREA_REGION_LABEL_SHORT, href: undefined },
-                ].map((item) => (
-                  <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{ width: 36, height: 36, borderRadius: '9px', backgroundColor: '#E8F1FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {item.icon}
-                    </Box>
-                    <Box>
-                      <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.75rem', color: colors.mutedText, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        {item.label}
-                      </Typography>
-                      {item.href ? (
-                        <Box component="a" href={item.href} sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: colors.navy, fontWeight: 600, textDecoration: 'none', '&:hover': { color: colors.primaryBlue } }}>
-                          {item.value}
-                        </Box>
-                      ) : (
-                        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: colors.navy, fontWeight: 600 }}>{item.value}</Typography>
-                      )}
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-
-              {/* Hours */}
-              <Box sx={{ backgroundColor: '#F5F7FA', borderRadius: '12px', border: '1px solid #E4E7EB', p: 2, mb: 2.5 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
-                  <AccessTimeIcon sx={{ color: '#1A73E8', fontSize: 16 }} />
-                  <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.82rem', color: colors.navy }}>Service Hours</Typography>
-                </Box>
-                {[
-                  { day: 'Mon – Fri', hours: '8:00 AM – 6:00 PM' },
-                  { day: 'Saturday', hours: '9:00 AM – 4:00 PM' },
-                  { day: 'Sunday', hours: 'Emergency Only' },
-                ].map((row) => (
-                  <Box key={row.day} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography sx={{ fontFamily: fonts.body, color: colors.mutedText, fontSize: '0.8rem' }}>{row.day}</Typography>
-                    <Typography sx={{ fontFamily: fonts.body, color: row.hours === 'Emergency Only' ? '#D97706' : colors.navy, fontWeight: 600, fontSize: '0.8rem' }}>{row.hours}</Typography>
-                  </Box>
-                ))}
-              </Box>
-
-              {/* Map */}
-              <Box sx={{ borderRadius: '14px', overflow: 'hidden', border: `1px solid ${colors.border}` }}>
-                <Suspense fallback={<Box sx={{ height: 240, backgroundColor: '#EAF1FF' }} aria-hidden />}>
-                  <ServiceAreaMap height={{ xs: 220, sm: 240, md: 240 }} />
-                </Suspense>
-              </Box>
-            </Box>
-
-            {/* Right: message form */}
-            <Box
-              sx={{
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #E4E7EB',
-                borderRadius: '20px',
-                boxShadow: '0 4px 20px rgba(10,37,64,0.07)',
-                p: { xs: '24px', md: '28px' },
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.2rem', color: colors.navy, mb: 0.5 }}>
-                Send Us a Message
-              </Typography>
-              <Typography sx={{ fontFamily: fonts.body, fontSize: '0.85rem', color: colors.mutedText, mb: 2.5 }}>
-                We typically respond within a few hours during business hours.
-              </Typography>
-
-              {contactSent ? (
-                <Box
-                  sx={{
-                    flexGrow: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#F0FDF4',
-                    border: '1px solid #86EFAC',
-                    borderRadius: '14px',
-                    p: 4,
-                    textAlign: 'center',
-                  }}
-                >
-                  <CheckCircleOutlineIcon sx={{ color: '#15803D', fontSize: 48, mb: 2 }} />
-                  <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '1.1rem', color: '#14532D', mb: 0.75 }}>Message Sent!</Typography>
-                  <Typography sx={{ fontFamily: fonts.body, color: '#166534', fontSize: '0.9rem' }}>
-                    Thank you — we&apos;ll get back to you shortly.
-                  </Typography>
-                </Box>
-              ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flexGrow: 1 }}>
-                  <TextField
-                    label="Your Name"
-                    value={contactName}
-                    onChange={(e) => setContactName(e.target.value)}
-                    onBlur={() => setContactNameTouched(true)}
-                    fullWidth
-                    error={contactNameTouched && !contactName.trim()}
-                    helperText={contactNameTouched && !contactName.trim() ? 'Name is required.' : ''}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '10px',
-                        fontFamily: fonts.body,
-                        backgroundColor: '#FAFBFC',
-                      },
-                    }}
-                  />
-                  <TextField
-                    label="Email Address"
-                    type="email"
-                    value={contactEmail}
-                    onChange={(e) => setContactEmail(e.target.value)}
-                    onBlur={() => setContactEmailTouched(true)}
-                    fullWidth
-                    error={contactEmailTouched && !contactEmailValid}
-                    helperText={contactEmailTouched && !contactEmailValid ? 'Please enter a valid email address.' : ''}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '10px',
-                        fontFamily: fonts.body,
-                        backgroundColor: '#FAFBFC',
-                      },
-                    }}
-                  />
-                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: { xs: 168, md: 260 } }}>
-                    <TextField
-                      label="Message"
-                      value={contactMessage}
-                      onChange={(e) => setContactMessage(e.target.value)}
-                      onBlur={() => setContactMessageTouched(true)}
-                      fullWidth
-                      multiline
-                      minRows={8}
-                      error={contactMessageTouched && !contactMessage.trim()}
-                      helperText={contactMessageTouched && !contactMessage.trim() ? 'Message is required.' : ''}
-                      sx={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        '& .MuiInputBase-root': {
-                          flex: 1,
-                          height: '100%',
-                          borderRadius: '10px',
-                          fontFamily: fonts.body,
-                          backgroundColor: '#FAFBFC',
-                          alignItems: 'flex-start',
-                        },
-                        '& .MuiInputBase-inputMultiline': {
-                          flex: 1,
-                          minHeight: { xs: 140, md: 220 },
-                          height: '100% !important',
-                          boxSizing: 'border-box',
-                        },
-                      }}
-                    />
-                  </Box>
-                  <Button
-                    variant="contained"
-                    onClick={handleContactSubmit}
-                    disabled={!contactFormValid}
-                    sx={{
-                      backgroundColor: '#1A73E8',
-                      color: '#fff',
-                      fontFamily: fonts.body,
-                      fontWeight: 700,
-                      py: 1.5,
-                      borderRadius: '10px',
-                      textTransform: 'none',
-                      fontSize: '0.95rem',
-                      '&:hover': { backgroundColor: '#0B3D91' },
-                      '&.Mui-disabled': {
-                        backgroundColor: 'rgba(26,115,232,0.32)',
-                        color: 'rgba(255,255,255,0.75)',
-                      },
-                    }}
-                  >
-                    Send Message
-                  </Button>
-                  <Typography sx={{ color: colors.mutedText, fontFamily: fonts.body, textAlign: 'center', fontSize: '0.82rem' }}>
-                    Or call us directly at{' '}
-                    <Box component="a" href="tel:+12405760397" sx={{ color: colors.primaryBlue, fontWeight: 700, textDecoration: 'none' }}>
-                      +1 (240) 576-0397
-                    </Box>
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          </Box>
-        </Container>
-      </Box>
+      <GetInTouchSection compact backgroundColor={colors.surface} />
 
       {/* Spacer so footer isn't hidden behind sticky bar on mobile */}
       <Box sx={{ display: { xs: 'block', md: 'none' }, height: 80 }} />

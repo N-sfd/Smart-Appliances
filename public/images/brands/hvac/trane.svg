@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 40" role="img" aria-label="Trane">
+  <rect x="6" y="12" width="16" height="16" rx="3" fill="#1B3F8B"/>
+  <path d="M10 20h8M14 16v8" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+  <text x="32" y="27" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#1B3F8B">Trane</text>
+</svg>

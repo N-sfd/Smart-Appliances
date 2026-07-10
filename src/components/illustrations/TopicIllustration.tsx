@@ -21,6 +21,7 @@ export default function TopicIllustration({ variant, title, className, style }: 
       viewBox="0 0 400 250"
       className={className}
       style={{ width: '100%', height: '100%', display: 'block', ...style }}
+      preserveAspectRatio="xMidYMid slice"
       role="img"
       aria-label={title}
       xmlns="http://www.w3.org/2000/svg"

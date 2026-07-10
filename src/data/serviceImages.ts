@@ -7,7 +7,6 @@ import { SMART_HOME_SERVICE_IMAGES } from './smartHomeHub';
 import { serviceImages, CATEGORY_HERO_IMAGE } from './expandedServiceImages';
 import { HANDYMAN_SERVICE_IMAGES } from './handymanHub';
 import { TV_MOUNTING_SERVICE_IMAGES } from './tvMountingHub';
-import { PHONE_REPAIR_SERVICE_IMAGES } from './phoneRepairHub';
 
 export { serviceImages, CATEGORY_HERO_IMAGE };
 

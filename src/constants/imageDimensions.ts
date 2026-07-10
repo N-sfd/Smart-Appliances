@@ -1,6 +1,6 @@
-/** Intrinsic dimensions for layout-stable image rendering (CLS) */
-export const LOGO_BRAND_WIDTH = 410;
-export const LOGO_BRAND_HEIGHT = 308;
+/** Intrinsic dimensions for layout-stable image rendering (CLS) — must match src/assets/logo-brand.png (1447×645) so objectFit: 'contain' renders it at full size instead of shrinking it to fit a mismatched box. */
+export const LOGO_BRAND_WIDTH = 1447;
+export const LOGO_BRAND_HEIGHT = 645;
 export const LOGO_BRAND_ASPECT = LOGO_BRAND_WIDTH / LOGO_BRAND_HEIGHT;
 
 /** Header logo display sizes (width derived from height × aspect ratio) */

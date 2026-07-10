@@ -179,6 +179,8 @@ const PricingPage: React.FC = () => {
 
   const fieldSx = {
     '& .MuiOutlinedInput-root': { backgroundColor: '#FFFFFF', borderRadius: '12px' },
+    '& .MuiOutlinedInput-input': { paddingTop: '13px', paddingBottom: '13px' },
+    '& .MuiSelect-select': { paddingTop: '13px !important', paddingBottom: '13px !important' },
   };
 
   const scrollToEstimator = () => {
@@ -622,7 +624,7 @@ const PricingPage: React.FC = () => {
                 textAlign: 'center',
               }}
             >
-              Service Cost Estimator
+              Get a Starting Estimate
             </Typography>
           </Box>
           <Typography
@@ -634,7 +636,7 @@ const PricingPage: React.FC = () => {
               lineHeight: 1.65,
             }}
           >
-            Answer a few quick questions to see a starting estimate and confirm whether we serve your area.
+            Tell us what you need, check availability, and receive a starting estimate.
           </Typography>
 
           <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -656,7 +658,7 @@ const PricingPage: React.FC = () => {
 
           <Box
             sx={{
-              p: { xs: 2, md: 3 },
+              p: { xs: 2, md: 2.5 },
               borderRadius: '20px',
               border: '1px solid #C8D8F8',
               backgroundColor: '#FFFFFF',
@@ -668,16 +670,16 @@ const PricingPage: React.FC = () => {
             <Box
               sx={{
                 display: 'grid',
-                gridTemplateColumns: { xs: '1fr', lg: '1.1fr 0.9fr' },
-                gap: { xs: 3, lg: 4 },
+                gridTemplateColumns: { xs: '1fr', lg: '1.5fr 1fr' },
+                gap: { xs: 2.5, lg: 3 },
                 alignItems: 'start',
               }}
             >
               <Box>
-                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: colors.navy, mb: 1.5 }}>
+                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: colors.navy, mb: 1.25 }}>
                   Tell us about the service
                 </Typography>
-                <Box sx={{ display: 'grid', gap: 1.75 }}>
+                <Box sx={{ display: 'grid', gap: 1.5 }}>
                   <FormControl fullWidth size="small">
                     <InputLabel id="est-category-label">Service category</InputLabel>
                     <Select
@@ -722,7 +724,7 @@ const PricingPage: React.FC = () => {
                     </Select>
                   </FormControl>
 
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small" disabled={!estService}>
                     <InputLabel id="est-issue-label">Issue</InputLabel>
                     <Select
                       labelId="est-issue-label"
@@ -774,7 +776,7 @@ const PricingPage: React.FC = () => {
                   />
                 </Box>
 
-                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: colors.navy, mt: 2.5, mb: 1.25 }}>
+                <Typography sx={{ fontFamily: fonts.heading, fontWeight: 700, fontSize: '0.95rem', color: colors.navy, mt: 2, mb: 1 }}>
                   Check your area
                 </Typography>
                 <TextField
@@ -791,8 +793,44 @@ const PricingPage: React.FC = () => {
                   error={isZipFieldError(estZip, estZipTouched || estZip.length === 5)}
                   helperText={getZipFieldHelperText(estZip, estZipTouched || estZip.length === 5)}
                   inputProps={{ inputMode: 'numeric', maxLength: 5, 'aria-label': 'ZIP code' }}
-                  sx={{ ...fieldSx, mb: 2 }}
+                  sx={fieldSx}
                 />
+
+                <Box sx={{ mt: 1, mb: 2 }}>
+                  {estZipValidation.isInServiceArea && (
+                    <Box
+                      sx={{
+                        p: 1,
+                        borderRadius: '10px',
+                        backgroundColor: '#ECFDF3',
+                        border: '1px solid #BBF7D0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                      }}
+                    >
+                      <CheckCircleOutlineIcon sx={{ color: '#15803D', fontSize: 18 }} />
+                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', fontWeight: 600, color: '#15803D' }}>
+                        ZIP {estZip} is within our regional service area.
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {estZipValidation.isValidFormat && !estZipValidation.isInServiceArea && (
+                    <Box
+                      sx={{
+                        p: 1,
+                        borderRadius: '10px',
+                        backgroundColor: '#FEF2F2',
+                        border: '1px solid #FECACA',
+                      }}
+                    >
+                      <Typography sx={{ fontFamily: fonts.body, fontSize: '0.82rem', fontWeight: 600, color: colors.emergency }}>
+                        This ZIP may be outside our current service area. Please call us to confirm.
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
 
                 <Button
                   fullWidth
@@ -809,7 +847,7 @@ const PricingPage: React.FC = () => {
                     '&:hover': { backgroundColor: colors.navy },
                   }}
                 >
-                  Calculate Estimate
+                  Get My Starting Estimate
                 </Button>
 
                 {estError && (
@@ -884,12 +922,12 @@ const PricingPage: React.FC = () => {
                 )}
 
                 <Typography sx={{ fontFamily: fonts.body, fontSize: '0.78rem', color: '#94A3B8', textAlign: 'center', lineHeight: 1.6, mt: 1.5 }}>
-                  Prices shown are starting estimates. Final pricing depends on diagnosis, parts, labor, accessibility, and service urgency.
+                  Starting estimates may vary based on diagnosis, parts, labor, location, accessibility, and urgency.
                 </Typography>
               </Box>
 
               <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.25 }}>
                   <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '1.1rem', color: colors.navy }}>
                     Service Coverage Map
                   </Typography>
@@ -900,47 +938,11 @@ const PricingPage: React.FC = () => {
                     sx={{ backgroundColor: colors.lightBlueBg, color: colors.primaryBlue, fontFamily: fonts.body, fontWeight: 700, fontSize: '10.5px' }}
                   />
                 </Box>
-                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: '#64748B', mb: 2, lineHeight: 1.65 }}>
+                <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9rem', color: '#64748B', mb: 1.5, lineHeight: 1.65 }}>
                   We serve {SERVICE_AREA_REGION_LABEL}. Enter a ZIP in our coverage range to calculate pricing and book online.
                 </Typography>
 
-                <ServiceAreaMap height={{ xs: 220, md: 260 }} />
-
-                {estZipValidation.isInServiceArea && (
-                  <Box
-                    sx={{
-                      mt: 2,
-                      p: 1.5,
-                      borderRadius: '12px',
-                      backgroundColor: '#ECFDF3',
-                      border: '1px solid #BBF7D0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                    }}
-                  >
-                    <CheckCircleOutlineIcon sx={{ color: '#15803D', fontSize: 20 }} />
-                    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', fontWeight: 600, color: '#15803D' }}>
-                      ZIP {estZip} is within our regional service area.
-                    </Typography>
-                  </Box>
-                )}
-
-                {estZipValidation.isValidFormat && !estZipValidation.isInServiceArea && (
-                  <Box
-                    sx={{
-                      mt: 2,
-                      p: 1.5,
-                      borderRadius: '12px',
-                      backgroundColor: '#FEF2F2',
-                      border: '1px solid #FECACA',
-                    }}
-                  >
-                    <Typography sx={{ fontFamily: fonts.body, fontSize: '0.88rem', fontWeight: 600, color: colors.emergency }}>
-                      This ZIP may be outside our current service area. Please call us to confirm.
-                    </Typography>
-                  </Box>
-                )}
+                <ServiceAreaMap height={{ xs: 200, md: 220 }} />
               </Box>
             </Box>
           </Box>

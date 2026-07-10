@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40" role="img" aria-label="Bryant">
+  <circle cx="20" cy="20" r="14" fill="#005EB8"/>
+  <path d="M14 13h7c2.8 0 5 1.8 5 4s-2.2 4-5 4c3 0 5.5 1.8 5.5 4.2S23.8 29 21 29h-7z" fill="#FFFFFF"/>
+  <text x="40" y="27" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#005EB8">Bryant</text>
+</svg>

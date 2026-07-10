@@ -17,9 +17,9 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, compact = false }) => (
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: compact ? { xs: 72, md: 80 } : { xs: 76, md: 88 },
+      height: 96,
       px: { xs: 1.25, md: 1.5 },
-      py: { xs: 1.25, md: 1.5 },
+      py: { xs: 1, md: 1.25 },
       borderRadius: '13px',
       border: '1px solid #DCE5EF',
       backgroundColor: '#FFFFFF',
@@ -46,8 +46,8 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, compact = false }) => (
           alignItems: 'center',
           justifyContent: 'center',
           width: '100%',
-          height: { xs: 34, md: 38 },
-          mb: 0.5,
+          height: 40,
+          mb: 0.25,
         }}
       >
         <Box
@@ -57,11 +57,11 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, compact = false }) => (
           alt={brand.alt}
           loading="lazy"
           decoding="async"
-          width={120}
-          height={38}
+          width={130}
+          height={40}
           sx={{
-            maxWidth: { xs: 100, md: 120 },
-            maxHeight: { xs: 32, md: 38 },
+            maxWidth: { xs: 116, md: 138 },
+            maxHeight: 40,
             width: 'auto',
             height: 'auto',
             objectFit: 'contain',
@@ -76,8 +76,8 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, compact = false }) => (
           alignItems: 'center',
           justifyContent: 'center',
           width: '100%',
-          minHeight: { xs: 34, md: 38 },
-          mb: 0.5,
+          minHeight: 40,
+          mb: 0.25,
         }}
       >
         <Typography
@@ -105,7 +105,7 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, compact = false }) => (
           color: colors.mutedText,
           textAlign: 'center',
           lineHeight: 1.2,
-          mt: 0.25,
+          mt: 0,
         }}
       >
         {brand.name}

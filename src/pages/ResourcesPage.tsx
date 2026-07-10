@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { Box, Typography, Container, Button } from '@mui/material';
+import { Box, Typography, Container, Button, useMediaQuery, useTheme } from '@mui/material';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -16,8 +16,14 @@ import VideosComingSoonPanel from '../components/resources/VideosComingSoonPanel
 import PageHero from '../components/common/PageHero';
 import BrandsDirectory from '../components/brands/BrandsDirectory';
 
+const CATEGORY_GRID_ID = 'resource-category-grid';
+
 export default function ResourcesPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
+  const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   useSeo({
     title: 'Smart Appliances Help Center | Appliance Care & Home Maintenance Tips',
@@ -31,6 +37,14 @@ export default function ResourcesPage() {
 
   const featuredArticles = getFeaturedArticles();
   const enabledVideos = getEnabledVideos();
+
+  // Collapsed counts match the grid's own column counts (4/2/1) exactly, so the
+  // collapsed view never ends on a partial row.
+  const collapsedCategoryCount = isMdUp ? 8 : isSmUp ? 6 : 4;
+  const hasMoreCategories = RESOURCE_CATEGORIES.length > collapsedCategoryCount;
+  const visibleCategories = showAllCategories
+    ? RESOURCE_CATEGORIES
+    : RESOURCE_CATEGORIES.slice(0, collapsedCategoryCount);
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
@@ -49,19 +63,20 @@ export default function ResourcesPage() {
         <Typography
           sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: { xs: '1.4rem', md: '1.65rem' }, color: colors.navy, textAlign: 'center', mb: 0.75 }}
         >
-          Browse by category
+          Helpful Guides and Resources
         </Typography>
-        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.mutedText, textAlign: 'center', mb: 4 }}>
-          {RESOURCE_ARTICLES.length} original guides across appliance, HVAC, plumbing, electrical, smart home, and garage door topics.
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '0.92rem', color: colors.mutedText, textAlign: 'center', mb: 6, maxWidth: 640, mx: 'auto' }}>
+          Browse {RESOURCE_ARTICLES.length} maintenance, repair, installation, and safety guides across appliance, HVAC, plumbing, electrical, smart home, and garage door topics.
         </Typography>
         <Box
+          id={CATEGORY_GRID_ID}
           sx={{
             display: 'grid',
             gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
             gap: 2,
           }}
         >
-          {RESOURCE_CATEGORIES.map((category) => (
+          {visibleCategories.map((category) => (
             <ResourceCategoryCard
               key={category.id}
               category={category}
@@ -69,6 +84,33 @@ export default function ResourcesPage() {
             />
           ))}
         </Box>
+
+        {hasMoreCategories && (
+          <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <Button
+              onClick={() => setShowAllCategories((prev) => !prev)}
+              aria-expanded={showAllCategories}
+              aria-controls={CATEGORY_GRID_ID}
+              variant="outlined"
+              sx={{
+                borderColor: colors.primaryBlue,
+                color: colors.primaryBlue,
+                fontFamily: fonts.body,
+                fontWeight: 700,
+                textTransform: 'none',
+                borderRadius: '12px',
+                px: 3,
+                '&:hover': {
+                  borderColor: colors.navy,
+                  color: colors.navy,
+                  backgroundColor: colors.lightBlueBg,
+                },
+              }}
+            >
+              {showAllCategories ? 'Show Fewer Resources' : 'View All Resources'}
+            </Button>
+          </Box>
+        )}
       </Container>
 
       {/* POPULAR GUIDES */}

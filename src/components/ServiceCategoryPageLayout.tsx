@@ -15,8 +15,10 @@ import { TriangleAlert, ClipboardList, CalendarClock, CheckCircle2, MessageSquar
 import { colors, fonts } from '../theme';
 import ServiceCategoryBookingSection from './ServiceCategoryBookingSection';
 import BrandsWeService from './brands/BrandsWeService';
+import GetInTouchSection from './contact/GetInTouchSection';
 import type { ServiceCategoryPageConfig } from '../data/serviceCategoryPages';
 import { SERVICE_SLUG_TO_SCHEDULER } from '../data/schedulerPrefill';
+import { SERVICE_SLUG_TO_CONTACT_CATEGORY } from '../data/contact-info';
 import { getCategoryHeroFallback } from '../data/categoryHeroFallbacks';
 
 const HOW_IT_WORKS_ICONS_BY_LENGTH: Record<number, (typeof ClipboardList)[]> = {
@@ -809,6 +811,8 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
           </Typography>
         </Container>
       </Box>
+
+      <GetInTouchSection compact defaultServiceCategory={SERVICE_SLUG_TO_CONTACT_CATEGORY[config.slug]} />
     </Box>
   );
 };

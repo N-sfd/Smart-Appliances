@@ -18,6 +18,10 @@ interface SocialLink {
   ariaLabel: string;
   href: string;
   icon: React.ReactNode;
+  /** Brand color used for the icon (and its hover fill) so each platform reads as itself. */
+  color: string;
+  /** Optional brand gradient (e.g. Instagram) used for the hover fill instead of a flat color. */
+  hoverGradient?: string;
 }
 
 const companyLinks: FooterLink[] = [
@@ -62,16 +66,24 @@ const bottomBarLinks: FooterLink[] = [
 ];
 
 const socialLinks: SocialLink[] = [
-  { label: 'Facebook', ariaLabel: 'Visit Smart Appliances on Facebook', href: '#', icon: <FacebookIcon sx={{ fontSize: 18 }} /> },
+  { label: 'Facebook', ariaLabel: 'Visit Smart Appliances on Facebook', href: '#', icon: <FacebookIcon sx={{ fontSize: 18 }} />, color: '#1877F2' },
   {
     label: 'X',
     ariaLabel: 'Visit Smart Appliances on X',
     href: '#',
     icon: <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '0.85rem', lineHeight: 1, color: 'inherit' }}>X</Typography>,
+    color: '#000000',
   },
-  { label: 'YouTube', ariaLabel: 'Visit Smart Appliances on YouTube', href: '#', icon: <YouTubeIcon sx={{ fontSize: 18 }} /> },
-  { label: 'Google Business', ariaLabel: 'View Smart Appliances Google Business Profile', href: '#', icon: <StorefrontIcon sx={{ fontSize: 18 }} /> },
-  { label: 'Instagram', ariaLabel: 'Visit Smart Appliances on Instagram', href: '#', icon: <InstagramIcon sx={{ fontSize: 18 }} /> },
+  { label: 'YouTube', ariaLabel: 'Visit Smart Appliances on YouTube', href: '#', icon: <YouTubeIcon sx={{ fontSize: 18 }} />, color: '#FF0000' },
+  { label: 'Google Business', ariaLabel: 'View Smart Appliances Google Business Profile', href: '#', icon: <StorefrontIcon sx={{ fontSize: 18 }} />, color: '#4285F4' },
+  {
+    label: 'Instagram',
+    ariaLabel: 'Visit Smart Appliances on Instagram',
+    href: '#',
+    icon: <InstagramIcon sx={{ fontSize: 18 }} />,
+    color: '#D62976',
+    hoverGradient: 'linear-gradient(45deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)',
+  },
 ];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -296,11 +308,16 @@ const SiteFooter: React.FC = () => {
                       sx={{
                         width: 40,
                         height: 40,
-                        backgroundColor: '#EEF5FF',
-                        color: '#0B3D91',
-                        border: '1px solid #D8E6FF',
-                        transition: 'transform 0.2s ease, background-color 0.2s ease, color 0.2s ease',
-                        '&:hover': { backgroundColor: '#1A73E8', color: '#fff', transform: 'translateY(-2px)' },
+                        backgroundColor: '#F5F7FA',
+                        color: social.color,
+                        border: '1px solid #E4E7EB',
+                        transition: 'transform 0.2s ease, background-color 0.2s ease, background-image 0.2s ease, color 0.2s ease',
+                        '&:hover': {
+                          backgroundColor: social.color,
+                          backgroundImage: social.hoverGradient ?? 'none',
+                          color: '#fff',
+                          transform: 'translateY(-2px)',
+                        },
                         '&:focus-visible': { outline: `2px solid ${colors.navy}`, outlineOffset: 2 },
                       }}
                     >
@@ -338,6 +355,19 @@ const SiteFooter: React.FC = () => {
               >
                 +1 (240) 576-0397
               </Box>
+            </Typography>
+            <Typography
+              component="p"
+              sx={{
+                fontFamily: fonts.body,
+                color: FOOTER_LINK_COLOR,
+                fontSize: '0.875rem',
+                lineHeight: 1.5,
+                mt: 0.5,
+                mb: 0,
+              }}
+            >
+              1101 Opal Ct, Hagerstown, MD 21740
             </Typography>
           </Box>
         </Box>

@@ -15,7 +15,7 @@ export default function ResourceCategoryCard({ category, articleCount }: Props) 
   const Icon = category.icon;
   const countLabel = articleCount > 0
     ? `${articleCount} ${articleCount === 1 ? 'guide' : 'guides'}`
-    : 'Explore Guides';
+    : 'Explore guides';
 
   return (
     <Box
@@ -30,12 +30,16 @@ export default function ResourceCategoryCard({ category, articleCount }: Props) 
         textDecoration: 'none',
         overflow: 'hidden',
         boxShadow: '0 4px 16px rgba(10,37,64,0.05)',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        height: '100%',
-        '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 14px 34px rgba(10,37,64,0.1)' },
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+        height: 352,
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: '0 14px 34px rgba(10,37,64,0.1)',
+          borderColor: colors.primaryBlue,
+        },
       }}
     >
-      <Box sx={{ width: '100%', aspectRatio: '16 / 9', flexShrink: 0 }}>
+      <Box sx={{ width: '100%', height: 160, flexShrink: 0 }}>
         <TopicIllustration variant={category.id} title={category.label} />
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, p: 2, flexGrow: 1 }}>
@@ -67,16 +71,19 @@ export default function ResourceCategoryCard({ category, articleCount }: Props) 
             lineHeight: 1.55,
             flexGrow: 1,
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}
         >
           {category.description}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+        <Typography sx={{ fontFamily: fonts.body, fontSize: '11.5px', color: colors.mutedText, mt: 0.25 }}>
+          {countLabel}
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
           <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '12.5px', color: colors.primaryBlue }}>
-            {countLabel}
+            View Guides
           </Typography>
           <ArrowForwardIcon sx={{ fontSize: 14, color: colors.primaryBlue }} />
         </Box>

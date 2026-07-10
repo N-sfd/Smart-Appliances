@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40" role="img" aria-label="Lennox">
+  <circle cx="20" cy="20" r="14" fill="#003DA5"/>
+  <path d="M14 24l6-10 6 10z" fill="#FFFFFF"/>
+  <text x="40" y="27" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#003DA5">Lennox</text>
+</svg>

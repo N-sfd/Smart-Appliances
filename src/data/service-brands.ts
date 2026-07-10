@@ -45,6 +45,11 @@ const B = '/images/brands';
 const P = `${B}/plumbing`;
 const E = `${B}/electrical`;
 const S = `${B}/smart-home`;
+const H = `${B}/hvac`;
+const G = `${B}/garage-door`;
+const TV = `${B}/tv`;
+const PH = `${B}/phone`;
+const HM = `${B}/handyman`;
 
 /** Central brand catalog — each brand appears once with category tags. */
 export const SERVICE_BRANDS: ServiceBrand[] = [
@@ -63,18 +68,18 @@ export const SERVICE_BRANDS: ServiceBrand[] = [
   { id: 'miele', name: 'Miele', categories: ['appliances'], alt: 'Miele', featured: true },
 
   // HVAC
-  { id: 'carrier', name: 'Carrier', categories: ['hvac'], alt: 'Carrier', featured: true },
-  { id: 'trane', name: 'Trane', categories: ['hvac'], alt: 'Trane', featured: true },
-  { id: 'lennox', name: 'Lennox', categories: ['hvac'], alt: 'Lennox', featured: true },
+  { id: 'carrier', name: 'Carrier', logo: `${H}/carrier.svg`, categories: ['hvac'], alt: 'Carrier logo', featured: true },
+  { id: 'trane', name: 'Trane', logo: `${H}/trane.svg`, categories: ['hvac'], alt: 'Trane logo', featured: true },
+  { id: 'lennox', name: 'Lennox', logo: `${H}/lennox.svg`, categories: ['hvac'], alt: 'Lennox logo', featured: true },
   { id: 'rheem-hvac', name: 'Rheem', logo: `${P}/rheem.svg`, categories: ['hvac', 'plumbing'], alt: 'Rheem logo', featured: true },
-  { id: 'goodman', name: 'Goodman', categories: ['hvac'], alt: 'Goodman', featured: true },
-  { id: 'york', name: 'York', categories: ['hvac'], alt: 'York', featured: true },
-  { id: 'bryant', name: 'Bryant', categories: ['hvac'], alt: 'Bryant', featured: true },
-  { id: 'american-standard-hvac', name: 'American Standard', categories: ['hvac', 'plumbing'], alt: 'American Standard', featured: true },
-  { id: 'daikin', name: 'Daikin', categories: ['hvac'], alt: 'Daikin', featured: true },
-  { id: 'mitsubishi-electric', name: 'Mitsubishi Electric', categories: ['hvac'], alt: 'Mitsubishi Electric', featured: true },
-  { id: 'fujitsu', name: 'Fujitsu', categories: ['hvac'], alt: 'Fujitsu' },
-  { id: 'ruud', name: 'Ruud', categories: ['hvac'], alt: 'Ruud' },
+  { id: 'goodman', name: 'Goodman', logo: `${H}/goodman.svg`, categories: ['hvac'], alt: 'Goodman logo', featured: true },
+  { id: 'york', name: 'York', logo: `${H}/york.svg`, categories: ['hvac'], alt: 'York logo', featured: true },
+  { id: 'bryant', name: 'Bryant', logo: `${H}/bryant.svg`, categories: ['hvac'], alt: 'Bryant logo', featured: true },
+  { id: 'american-standard-hvac', name: 'American Standard', logo: `${H}/american-standard.svg`, categories: ['hvac', 'plumbing'], alt: 'American Standard logo', featured: true },
+  { id: 'daikin', name: 'Daikin', logo: `${H}/daikin.svg`, categories: ['hvac'], alt: 'Daikin logo', featured: true },
+  { id: 'mitsubishi-electric', name: 'Mitsubishi Electric', logo: `${H}/mitsubishi-electric.svg`, categories: ['hvac'], alt: 'Mitsubishi Electric logo', featured: true },
+  { id: 'fujitsu', name: 'Fujitsu', logo: `${H}/fujitsu.svg`, categories: ['hvac'], alt: 'Fujitsu logo' },
+  { id: 'ruud', name: 'Ruud', logo: `${H}/ruud.svg`, categories: ['hvac'], alt: 'Ruud logo' },
 
   // Plumbing
   { id: 'moen', name: 'Moen', logo: `${P}/moen.svg`, categories: ['plumbing'], alt: 'Moen logo', featured: true },
@@ -100,15 +105,15 @@ export const SERVICE_BRANDS: ServiceBrand[] = [
   { id: 'philips-hue', name: 'Philips Hue', categories: ['electrical', 'smart-home'], alt: 'Philips Hue', featured: true },
 
   // Garage doors
-  { id: 'liftmaster', name: 'LiftMaster', categories: ['garage-door'], alt: 'LiftMaster', featured: true },
-  { id: 'chamberlain', name: 'Chamberlain', categories: ['garage-door'], alt: 'Chamberlain', featured: true },
-  { id: 'genie', name: 'Genie', categories: ['garage-door'], alt: 'Genie', featured: true },
-  { id: 'craftsman', name: 'Craftsman', categories: ['garage-door'], alt: 'Craftsman', featured: true },
-  { id: 'clopay', name: 'Clopay', categories: ['garage-door'], alt: 'Clopay', featured: true },
-  { id: 'amarr', name: 'Amarr', categories: ['garage-door'], alt: 'Amarr', featured: true },
-  { id: 'wayne-dalton', name: 'Wayne Dalton', categories: ['garage-door'], alt: 'Wayne Dalton', featured: true },
-  { id: 'linear', name: 'Linear', categories: ['garage-door'], alt: 'Linear' },
-  { id: 'sommer', name: 'Sommer', categories: ['garage-door'], alt: 'Sommer' },
+  { id: 'liftmaster', name: 'LiftMaster', logo: `${G}/liftmaster.svg`, categories: ['garage-door'], alt: 'LiftMaster logo', featured: true },
+  { id: 'chamberlain', name: 'Chamberlain', logo: `${G}/chamberlain.svg`, categories: ['garage-door'], alt: 'Chamberlain logo', featured: true },
+  { id: 'genie', name: 'Genie', logo: `${G}/genie.svg`, categories: ['garage-door'], alt: 'Genie logo', featured: true },
+  { id: 'craftsman', name: 'Craftsman', logo: `${G}/craftsman.svg`, categories: ['garage-door'], alt: 'Craftsman logo', featured: true },
+  { id: 'clopay', name: 'Clopay', logo: `${G}/clopay.svg`, categories: ['garage-door'], alt: 'Clopay logo', featured: true },
+  { id: 'amarr', name: 'Amarr', logo: `${G}/amarr.svg`, categories: ['garage-door'], alt: 'Amarr logo', featured: true },
+  { id: 'wayne-dalton', name: 'Wayne Dalton', logo: `${G}/wayne-dalton.svg`, categories: ['garage-door'], alt: 'Wayne Dalton logo', featured: true },
+  { id: 'linear', name: 'Linear', logo: `${G}/linear.svg`, categories: ['garage-door'], alt: 'Linear logo' },
+  { id: 'sommer', name: 'Sommer', logo: `${G}/sommer.svg`, categories: ['garage-door'], alt: 'Sommer logo' },
 
   // Smart home (shared logos also tagged for electrical where relevant)
   { id: 'google-nest', name: 'Google Nest', logo: `${S}/nest.svg`, categories: ['smart-home', 'electrical'], alt: 'Google Nest logo', featured: true },
@@ -125,31 +130,31 @@ export const SERVICE_BRANDS: ServiceBrand[] = [
   { id: 'tp-link-kasa', name: 'TP-Link Kasa', logo: `${E}/kasa.svg`, categories: ['smart-home', 'electrical'], alt: 'TP-Link Kasa logo' },
 
   // TV & entertainment
-  { id: 'sony', name: 'Sony', categories: ['tv-entertainment', 'phone-repair'], alt: 'Sony', featured: true },
-  { id: 'tcl', name: 'TCL', categories: ['tv-entertainment'], alt: 'TCL', featured: true },
-  { id: 'hisense', name: 'Hisense', categories: ['tv-entertainment'], alt: 'Hisense', featured: true },
-  { id: 'vizio', name: 'Vizio', categories: ['tv-entertainment'], alt: 'Vizio', featured: true },
-  { id: 'panasonic', name: 'Panasonic', categories: ['tv-entertainment'], alt: 'Panasonic', featured: true },
-  { id: 'philips-tv', name: 'Philips', categories: ['tv-entertainment'], alt: 'Philips' },
-  { id: 'roku', name: 'Roku', categories: ['tv-entertainment'], alt: 'Roku', featured: true },
-  { id: 'fire-tv', name: 'Amazon Fire TV', categories: ['tv-entertainment'], alt: 'Amazon Fire TV' },
+  { id: 'sony', name: 'Sony', logo: `${TV}/sony.svg`, categories: ['tv-entertainment', 'phone-repair'], alt: 'Sony logo', featured: true },
+  { id: 'tcl', name: 'TCL', logo: `${TV}/tcl.svg`, categories: ['tv-entertainment'], alt: 'TCL logo', featured: true },
+  { id: 'hisense', name: 'Hisense', logo: `${TV}/hisense.svg`, categories: ['tv-entertainment'], alt: 'Hisense logo', featured: true },
+  { id: 'vizio', name: 'Vizio', logo: `${TV}/vizio.svg`, categories: ['tv-entertainment'], alt: 'Vizio logo', featured: true },
+  { id: 'panasonic', name: 'Panasonic', logo: `${TV}/panasonic.svg`, categories: ['tv-entertainment'], alt: 'Panasonic logo', featured: true },
+  { id: 'philips-tv', name: 'Philips', logo: `${TV}/philips.svg`, categories: ['tv-entertainment'], alt: 'Philips logo' },
+  { id: 'roku', name: 'Roku', logo: `${TV}/roku.svg`, categories: ['tv-entertainment'], alt: 'Roku logo', featured: true },
+  { id: 'fire-tv', name: 'Amazon Fire TV', logo: `${TV}/fire-tv.svg`, categories: ['tv-entertainment'], alt: 'Amazon Fire TV logo' },
 
   // Phone repair
-  { id: 'apple', name: 'Apple', categories: ['phone-repair'], alt: 'Apple', featured: true },
-  { id: 'google-pixel', name: 'Google', categories: ['phone-repair'], alt: 'Google', featured: true },
-  { id: 'motorola', name: 'Motorola', categories: ['phone-repair'], alt: 'Motorola', featured: true },
-  { id: 'oneplus', name: 'OnePlus', categories: ['phone-repair'], alt: 'OnePlus', featured: true },
-  { id: 'nokia', name: 'Nokia', categories: ['phone-repair'], alt: 'Nokia' },
+  { id: 'apple', name: 'Apple', logo: `${PH}/apple.svg`, categories: ['phone-repair'], alt: 'Apple logo', featured: true },
+  { id: 'google-pixel', name: 'Google', logo: `${PH}/google.svg`, categories: ['phone-repair'], alt: 'Google logo', featured: true },
+  { id: 'motorola', name: 'Motorola', logo: `${PH}/motorola.svg`, categories: ['phone-repair'], alt: 'Motorola logo', featured: true },
+  { id: 'oneplus', name: 'OnePlus', logo: `${PH}/oneplus.svg`, categories: ['phone-repair'], alt: 'OnePlus logo', featured: true },
+  { id: 'nokia', name: 'Nokia', logo: `${PH}/nokia.svg`, categories: ['phone-repair'], alt: 'Nokia logo' },
 
   // Handyman
-  { id: 'ikea', name: 'IKEA', categories: ['handyman'], alt: 'IKEA', featured: true },
-  { id: 'wayfair', name: 'Wayfair', categories: ['handyman'], alt: 'Wayfair', featured: true },
-  { id: 'ashley', name: 'Ashley', categories: ['handyman'], alt: 'Ashley', featured: true },
-  { id: 'sauder', name: 'Sauder', categories: ['handyman'], alt: 'Sauder', featured: true },
-  { id: 'closetmaid', name: 'ClosetMaid', categories: ['handyman'], alt: 'ClosetMaid', featured: true },
-  { id: 'rubbermaid', name: 'Rubbermaid', categories: ['handyman'], alt: 'Rubbermaid', featured: true },
-  { id: 'elfa', name: 'Elfa', categories: ['handyman'], alt: 'Elfa' },
-  { id: 'home-decorators', name: 'Home Decorators Collection', categories: ['handyman'], alt: 'Home Decorators Collection' },
+  { id: 'ikea', name: 'IKEA', logo: `${HM}/ikea.svg`, categories: ['handyman'], alt: 'IKEA logo', featured: true },
+  { id: 'wayfair', name: 'Wayfair', logo: `${HM}/wayfair.svg`, categories: ['handyman'], alt: 'Wayfair logo', featured: true },
+  { id: 'ashley', name: 'Ashley', logo: `${HM}/ashley.svg`, categories: ['handyman'], alt: 'Ashley logo', featured: true },
+  { id: 'sauder', name: 'Sauder', logo: `${HM}/sauder.svg`, categories: ['handyman'], alt: 'Sauder logo', featured: true },
+  { id: 'closetmaid', name: 'ClosetMaid', logo: `${HM}/closetmaid.svg`, categories: ['handyman'], alt: 'ClosetMaid logo', featured: true },
+  { id: 'rubbermaid', name: 'Rubbermaid', logo: `${HM}/rubbermaid.svg`, categories: ['handyman'], alt: 'Rubbermaid logo', featured: true },
+  { id: 'elfa', name: 'Elfa', logo: `${HM}/elfa.svg`, categories: ['handyman'], alt: 'Elfa logo' },
+  { id: 'home-decorators', name: 'Home Decorators Collection', logo: `${HM}/home-decorators.svg`, categories: ['handyman'], alt: 'Home Decorators Collection logo' },
 ];
 
 export const BRANDS_SECTION_CONFIGS: Record<BrandCategoryId, BrandsSectionConfig> = {

@@ -71,10 +71,10 @@ export const faqs = [
 
 export const serviceCoverageItems = [
   { label: 'Appliance Care', icon: 'appliance' as const },
-  { label: 'Installations', icon: 'install' as const },
+  { label: 'Home Installations', icon: 'install' as const },
   { label: 'HVAC Service', icon: 'hvac' as const },
   { label: 'Plumbing Service', icon: 'plumbing' as const },
-  { label: 'Same-Day / Emergency Priority', icon: 'emergency' as const },
+  { label: 'Same-Day & Emergency Requests', icon: 'emergency' as const },
 ];
 
 // Text-only — avoids any trademark/logo-licensing question while still naming the brands served.
