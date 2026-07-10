@@ -125,7 +125,7 @@ export const SERVICE_BRANDS: ServiceBrand[] = [
   { id: 'tp-link-kasa', name: 'TP-Link Kasa', logo: `${E}/kasa.svg`, categories: ['smart-home', 'electrical'], alt: 'TP-Link Kasa logo' },
 
   // TV & entertainment
-  { id: 'sony', name: 'Sony', categories: ['tv-entertainment'], alt: 'Sony', featured: true },
+  { id: 'sony', name: 'Sony', categories: ['tv-entertainment', 'phone-repair'], alt: 'Sony', featured: true },
   { id: 'tcl', name: 'TCL', categories: ['tv-entertainment'], alt: 'TCL', featured: true },
   { id: 'hisense', name: 'Hisense', categories: ['tv-entertainment'], alt: 'Hisense', featured: true },
   { id: 'vizio', name: 'Vizio', categories: ['tv-entertainment'], alt: 'Vizio', featured: true },
@@ -140,7 +140,6 @@ export const SERVICE_BRANDS: ServiceBrand[] = [
   { id: 'motorola', name: 'Motorola', categories: ['phone-repair'], alt: 'Motorola', featured: true },
   { id: 'oneplus', name: 'OnePlus', categories: ['phone-repair'], alt: 'OnePlus', featured: true },
   { id: 'nokia', name: 'Nokia', categories: ['phone-repair'], alt: 'Nokia' },
-  { id: 'sony-phone', name: 'Sony', categories: ['phone-repair'], alt: 'Sony' },
 
   // Handyman
   { id: 'ikea', name: 'IKEA', categories: ['handyman'], alt: 'IKEA', featured: true },

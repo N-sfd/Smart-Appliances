@@ -107,9 +107,25 @@ const AdminShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </Box>
 );
 
+/** Routes that already render their own category-relevant Brands We Service
+ * section — the generic sitewide footer strip would duplicate it there. */
+const ROUTES_WITH_OWN_BRANDS_SECTION = new Set([
+  '/resources',
+  '/services/home-appliances',
+  '/services/plumbing',
+  '/services/smart-home',
+  '/services/hvac',
+  '/services/electrical',
+  '/services/tv-mounting',
+  '/services/phone-repair',
+  '/services/handyman',
+  '/services/garage-door-repair',
+]);
+
 function AppRoutes() {
   const location = useLocation();
   const showPublicChrome = !location.pathname.startsWith('/admin');
+  const showFooterBrandsStrip = !ROUTES_WITH_OWN_BRANDS_SECTION.has(location.pathname);
 
   return (
     <>
@@ -299,7 +315,7 @@ function AppRoutes() {
         </Box>
         {showPublicChrome && (
           <>
-            <FooterBrandsWeService />
+            {showFooterBrandsStrip && <FooterBrandsWeService />}
             <SiteFooter />
           </>
         )}
