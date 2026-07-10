@@ -143,6 +143,8 @@ const BrandsWeService: React.FC<BrandsWeServiceProps> = ({
                         objectFit: 'contain',
                         display: 'block',
                         userSelect: 'none',
+                        filter: 'none',
+                        opacity: 1,
                       }}
                     />
                   ) : (
@@ -154,21 +156,6 @@ const BrandsWeService: React.FC<BrandsWeServiceProps> = ({
                         color: colors.navy,
                         textAlign: 'center',
                         lineHeight: 1.25,
-                      }}
-                    >
-                      {brand.name}
-                    </Typography>
-                  )}
-                  {brand.logo && (
-                    <Typography
-                      component="span"
-                      sx={{
-                        fontFamily: fonts.body,
-                        fontWeight: 600,
-                        fontSize: '0.68rem',
-                        color: colors.mutedText,
-                        textAlign: 'center',
-                        lineHeight: 1.2,
                       }}
                     >
                       {brand.name}

@@ -1268,7 +1268,7 @@ const HomeBelowFold: React.FC = () => {
                 mb: 4,
               }}
             >
-              Our technicians service many major appliance brands. Brand availability may vary by appliance type and service area.
+              We service many major appliance and home-system brands. If you do not see your brand listed, contact us and we will confirm availability.
             </Typography>
           </Box>
 

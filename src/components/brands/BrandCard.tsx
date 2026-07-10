@@ -32,10 +32,6 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, compact = false }) => (
         borderColor: '#C5D9F5',
         boxShadow: '0 6px 18px rgba(11, 94, 215, 0.08)',
         transform: 'translateY(-1px)',
-        '& .brand-logo-img': {
-          filter: 'grayscale(0)',
-          opacity: 1,
-        },
       },
       '&:focus-within': {
         outline: `2px solid ${colors.primaryBlue}`,
@@ -70,12 +66,6 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, compact = false }) => (
             height: 'auto',
             objectFit: 'contain',
             display: 'block',
-            filter: 'grayscale(1)',
-            opacity: 0.78,
-            transition: 'filter 0.22s ease, opacity 0.22s ease',
-            '@media (prefers-reduced-motion: reduce)': {
-              transition: 'none',
-            },
           }}
         />
       </Box>

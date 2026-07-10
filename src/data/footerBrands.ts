@@ -12,5 +12,5 @@ function toFooterBrand(brand: ServiceBrand): BrandWeService {
   return { name: brand.name, logo: brand.logo };
 }
 
-/** Appliance brands shown in the global footer marquee — sourced from centralized catalog. */
+/** Footer / homepage marquee brands — colored logo assets from the appliance catalog. */
 export const BRANDS_WE_SERVICE_FOOTER: BrandWeService[] = getFooterMarqueeBrands().map(toFooterBrand);

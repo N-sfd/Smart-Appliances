@@ -54,7 +54,8 @@ code {
 .brand-marquee-track {
   display: flex;
   width: max-content;
-  animation: brandMarqueeScroll 38s linear infinite;
+  animation: brandMarqueeScroll 32s linear infinite;
+  will-change: transform;
   contain: layout style paint;
 }
 
@@ -69,6 +70,7 @@ code {
     width: 100%;
     justify-content: center;
     gap: 2rem;
+    will-change: auto;
   }
 }
 

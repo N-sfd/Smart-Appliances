@@ -292,9 +292,32 @@ export function getContactUrlForCategory(contactServiceId: string): string {
   return `/contact?service=${encodeURIComponent(contactServiceId)}`;
 }
 
-/** Footer marquee — appliance brands with logos first, then text-only Miele. */
+/** Preferred homepage / footer marquee order (logos first). */
+const HOMEPAGE_MARQUEE_ORDER = [
+  'samsung',
+  'lg',
+  'whirlpool',
+  'ge-appliances',
+  'maytag',
+  'frigidaire',
+  'bosch',
+  'kitchenaid',
+  'electrolux',
+  'amana',
+  'kenmore',
+  'miele',
+] as const;
+
+/** Footer / homepage marquee — appliance brands with colored logos, preferred order. */
 export function getFooterMarqueeBrands(): ServiceBrand[] {
-  return getBrandsForCategory('appliances');
+  const byId = new Map(getBrandsForCategory('appliances').map((brand) => [brand.id, brand]));
+  const ordered = HOMEPAGE_MARQUEE_ORDER.map((id) => byId.get(id)).filter(
+    (brand): brand is ServiceBrand => Boolean(brand),
+  );
+  // Prefer logo assets so the strip reads as colored icons, not text pills.
+  const withLogos = ordered.filter((brand) => Boolean(brand.logo));
+  const textOnly = ordered.filter((brand) => !brand.logo);
+  return [...withLogos, ...textOnly];
 }
 
 export function parseBrandCategoryParam(raw: string | null): BrandCategoryId | 'all' {
