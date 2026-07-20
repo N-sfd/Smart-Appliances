@@ -4,12 +4,12 @@ export const LOGO_BRAND_HEIGHT = 645;
 export const LOGO_BRAND_ASPECT = LOGO_BRAND_WIDTH / LOGO_BRAND_HEIGHT;
 
 /** Header logo display sizes (width derived from height × aspect ratio) */
-export const LOGO_HEADER_HEIGHT = { xs: 88, sm: 96, md: 108, lg: 116 } as const;
+export const LOGO_HEADER_HEIGHT = { xs: 70, sm: 76, md: 84, lg: 90 } as const;
 export const LOGO_HEADER_WIDTH = {
-  xs: Math.round(88 * LOGO_BRAND_ASPECT),
-  sm: Math.round(96 * LOGO_BRAND_ASPECT),
-  md: Math.round(108 * LOGO_BRAND_ASPECT),
-  lg: Math.round(116 * LOGO_BRAND_ASPECT),
+  xs: Math.round(70 * LOGO_BRAND_ASPECT),
+  sm: Math.round(76 * LOGO_BRAND_ASPECT),
+  md: Math.round(84 * LOGO_BRAND_ASPECT),
+  lg: Math.round(90 * LOGO_BRAND_ASPECT),
 } as const;
 
 /** Typical brand logo slot in marquees (width × height) */

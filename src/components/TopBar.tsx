@@ -15,8 +15,9 @@ import {
   Collapse,
   Avatar,
   Tooltip,
+  Typography,
 } from '@mui/material';
-import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
+import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon, ArrowForward as ArrowForwardIcon, VerifiedOutlined as VerifiedOutlinedIcon } from '@mui/icons-material';
 import { colors, fonts, primaryButtonSx } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
@@ -201,144 +202,345 @@ const TopBar: React.FC = () => {
         <Toolbar
           sx={{
             justifyContent: 'space-between',
-            minHeight: { xs: '112px !important', md: '128px !important' },
-            py: { xs: 1, md: 1.25 },
+            alignItems: 'center',
+            minHeight: { xs: '84px !important', md: '96px !important' },
+            py: { xs: 0.75, md: 0.75 },
             pl: { xs: 1.5, sm: 2, md: 2.5, lg: 3 },
             pr: { xs: 2, lg: 3 },
-            gap: 0.5,
+            gap: { xs: 1, md: 1.5 },
             overflow: 'visible',
           }}
         >
-          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: { xs: 2, md: 2.5, lg: 2.5 } }}>
+          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: { xs: 1, md: 2, lg: 2.5 } }}>
             <BrandLogo variant="header" onClick={() => { navigate('/'); setDrawerOpen(false); }} />
           </Box>
 
+          {/* Desktop: announcement + nav/actions column (starts after logo) */}
           <Box
             sx={{
               display: 'none',
               '@media (min-width:1024px)': { display: 'flex' },
-              gap: 1.25,
-              '@media (min-width:1280px)': { gap: 2 },
-              '@media (min-width:1536px)': { gap: 3.25, ml: 2 },
-              alignItems: 'center',
+              flexDirection: 'column',
+              alignItems: 'stretch',
+              justifyContent: 'center',
               flexGrow: 1,
-              justifyContent: 'flex-start',
-              ml: 0.25,
+              minWidth: 0,
+              gap: 0.35,
             }}
           >
-            {navLinks.map((link) => {
-              const active = isActive(link);
+            <Box
+              component="aside"
+              aria-label="Service highlights"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                alignSelf: 'flex-start',
+                gap: 0.6,
+                minHeight: 26,
+                maxHeight: 28,
+                px: 1.25,
+                py: 0.25,
+                borderRadius: '999px',
+                backgroundColor: colors.lightBlueBg,
+                border: `1px solid ${colors.border}`,
+                maxWidth: '100%',
+                overflow: 'hidden',
+              }}
+            >
+              <VerifiedOutlinedIcon
+                sx={{ fontSize: '0.9rem', color: colors.primaryBlue, flexShrink: 0 }}
+                aria-hidden
+              />
+              <Typography
+                component="span"
+                sx={{
+                  fontFamily: fonts.body,
+                  fontWeight: 600,
+                  fontSize: { md: '0.75rem', lg: '0.8rem' },
+                  lineHeight: 1.2,
+                  color: colors.primaryBlue,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                Clear scheduling • Request tracking • Service updates
+              </Typography>
+            </Box>
 
-              if (link.key === 'services') {
-                return (
-                  <Box
-                    key={link.key}
-                    ref={servicesMenuRef}
-                    sx={{ position: 'relative' }}
-                    onMouseEnter={openServicesMenu}
-                    onMouseLeave={closeServicesMenu}
-                  >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1,
+                minWidth: 0,
+                width: '100%',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1.25,
+                  '@media (min-width:1280px)': { gap: 2 },
+                  '@media (min-width:1536px)': { gap: 3.25 },
+                  alignItems: 'center',
+                  flexGrow: 1,
+                  justifyContent: 'flex-start',
+                  minWidth: 0,
+                  overflow: 'hidden',
+                }}
+              >
+                {navLinks.map((link) => {
+                  const active = isActive(link);
+
+                  if (link.key === 'services') {
+                    return (
+                      <Box
+                        key={link.key}
+                        ref={servicesMenuRef}
+                        sx={{ position: 'relative', flexShrink: 0 }}
+                        onMouseEnter={openServicesMenu}
+                        onMouseLeave={closeServicesMenu}
+                      >
+                        <Button
+                          onClick={toggleServicesMenu}
+                          disableRipple
+                          aria-expanded={servicesMenuOpen}
+                          aria-haspopup="menu"
+                          endIcon={
+                            <KeyboardArrowDown
+                              sx={{
+                                fontSize: '1.1rem !important',
+                                transform: servicesMenuOpen ? 'rotate(180deg)' : 'none',
+                                transition: 'transform 0.2s ease',
+                              }}
+                            />
+                          }
+                          sx={navButtonSx(active)}
+                        >
+                          {link.label}
+                        </Button>
+
+                        {servicesMenuOpen && (
+                          <Box
+                            onMouseEnter={openServicesMenu}
+                            onMouseLeave={closeServicesMenu}
+                            sx={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              pt: 0.75,
+                              zIndex: 1200,
+                            }}
+                          >
+                            <Box
+                              className="services-nav-dropdown"
+                              role="menu"
+                              aria-label="Services menu"
+                            >
+                              <Box className="services-nav-dropdown-grid" role="none">
+                                {serviceNavItems.map((item) => {
+                                  const itemActive = isServiceNavItemActive(
+                                    item,
+                                    location.pathname,
+                                    location.search,
+                                  );
+                                  const isEmergency = item.id === 'emergency-service';
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      role="menuitem"
+                                      className={[
+                                        'services-nav-dropdown-card',
+                                        itemActive ? 'is-active' : '',
+                                        isEmergency ? 'is-emergency' : '',
+                                      ].filter(Boolean).join(' ')}
+                                      onClick={() => goToService(item)}
+                                    >
+                                      <span className="services-nav-dropdown-card-thumb">
+                                        <ServiceMenuIllustration variant={item.illustration} title={item.label} />
+                                      </span>
+                                      <span className="services-nav-dropdown-card-text">
+                                        <span className="services-nav-dropdown-card-title">{item.label}</span>
+                                        <span className="services-nav-dropdown-card-desc">{item.description}</span>
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </Box>
+                              <button
+                                type="button"
+                                className="services-nav-dropdown-viewall"
+                                onClick={() => { navigate('/services'); setServicesMenuOpen(false); }}
+                              >
+                                View All Services
+                                <ArrowForwardIcon sx={{ fontSize: '1rem !important' }} />
+                              </button>
+                            </Box>
+                          </Box>
+                        )}
+                      </Box>
+                    );
+                  }
+
+                  return (
                     <Button
-                      onClick={toggleServicesMenu}
+                      key={link.key}
+                      onClick={() => handleNavClick(link)}
                       disableRipple
-                      aria-expanded={servicesMenuOpen}
-                      aria-haspopup="menu"
-                      endIcon={
-                        <KeyboardArrowDown
-                          sx={{
-                            fontSize: '1.1rem !important',
-                            transform: servicesMenuOpen ? 'rotate(180deg)' : 'none',
-                            transition: 'transform 0.2s ease',
-                          }}
-                        />
-                      }
-                      sx={navButtonSx(active)}
+                      sx={{ ...navButtonSx(active), flexShrink: 0 }}
                     >
                       {link.label}
                     </Button>
+                  );
+                })}
+              </Box>
 
-                    {servicesMenuOpen && (
-                      <Box
-                        onMouseEnter={openServicesMenu}
-                        onMouseLeave={closeServicesMenu}
-                        sx={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: 0,
-                          pt: 0.75,
-                          zIndex: 1200,
-                        }}
-                      >
-                        <Box
-                          className="services-nav-dropdown"
-                          role="menu"
-                          aria-label="Services menu"
-                        >
-                          <Box className="services-nav-dropdown-grid" role="none">
-                            {serviceNavItems.map((item) => {
-                              const itemActive = isServiceNavItemActive(
-                                item,
-                                location.pathname,
-                                location.search,
-                              );
-                              const isEmergency = item.id === 'emergency-service';
-                              return (
-                                <button
-                                  key={item.id}
-                                  type="button"
-                                  role="menuitem"
-                                  className={[
-                                    'services-nav-dropdown-card',
-                                    itemActive ? 'is-active' : '',
-                                    isEmergency ? 'is-emergency' : '',
-                                  ].filter(Boolean).join(' ')}
-                                  onClick={() => goToService(item)}
-                                >
-                                  <span className="services-nav-dropdown-card-thumb">
-                                    <ServiceMenuIllustration variant={item.illustration} title={item.label} />
-                                  </span>
-                                  <span className="services-nav-dropdown-card-text">
-                                    <span className="services-nav-dropdown-card-title">{item.label}</span>
-                                    <span className="services-nav-dropdown-card-desc">{item.description}</span>
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </Box>
-                          <button
-                            type="button"
-                            className="services-nav-dropdown-viewall"
-                            onClick={() => { navigate('/services'); setServicesMenuOpen(false); }}
-                          >
-                            View All Services
-                            <ArrowForwardIcon sx={{ fontSize: '1rem !important' }} />
-                          </button>
-                        </Box>
-                      </Box>
-                    )}
-                  </Box>
-                );
-              }
-
-              return (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  flexShrink: 0,
+                }}
+              >
                 <Button
-                  key={link.key}
-                  onClick={() => handleNavClick(link)}
-                  disableRipple
-                  sx={navButtonSx(active)}
+                  component="a"
+                  href="tel:+12405760397"
+                  startIcon={<Phone sx={{ fontSize: '1rem !important' }} />}
+                  sx={{
+                    display: 'none',
+                    '@media (min-width:1280px)': { display: 'inline-flex' },
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: 40,
+                    minHeight: 40,
+                    color: colors.navy,
+                    fontFamily: fonts.body,
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    lineHeight: 1,
+                    textTransform: 'none',
+                    backgroundColor: '#EEF4FF',
+                    border: `2px solid #C5DCFA`,
+                    borderRadius: '50px',
+                    px: { xs: 2, lg: 1.5 },
+                    py: 0,
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.3s ease-in-out',
+                    '& .MuiButton-startIcon': {
+                      marginRight: '6px',
+                      marginLeft: 0,
+                      display: 'inherit',
+                    },
+                    '&:hover': {
+                      backgroundColor: colors.lightBlueBg,
+                      borderColor: colors.primaryBlue,
+                      color: colors.primaryBlue,
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 18px rgba(26, 115, 232, 0.18)',
+                    },
+                  }}
                 >
-                  {link.label}
+                  +1 (240) 576-0397
                 </Button>
-              );
-            })}
+
+                <IconButton
+                  component="a"
+                  href="tel:+12405760397"
+                  aria-label="Call +1 (240) 576-0397"
+                  sx={{
+                    display: 'inline-flex',
+                    '@media (min-width:1280px)': { display: 'none' },
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 40,
+                    height: 40,
+                    color: colors.navy,
+                    backgroundColor: '#EEF4FF',
+                    border: `2px solid #C5DCFA`,
+                    borderRadius: '50px',
+                    transition: 'all 0.3s ease-in-out',
+                    '&:hover': {
+                      backgroundColor: colors.lightBlueBg,
+                      borderColor: colors.primaryBlue,
+                      color: colors.primaryBlue,
+                      transform: 'translateY(-2px)',
+                    },
+                  }}
+                >
+                  <Phone sx={{ fontSize: '1.15rem' }} />
+                </IconButton>
+
+                {!user ? (
+                  <>
+                    <Button
+                      onClick={() => { setAuthModalView('login'); setAuthModalOpen(true); }}
+                      sx={{
+                        height: 40,
+                        color: colors.navy,
+                        fontFamily: fonts.body,
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        textTransform: 'none',
+                        border: `1.5px solid ${colors.border}`,
+                        borderRadius: '50px',
+                        px: { xs: 2, lg: 1.5 },
+                        whiteSpace: 'nowrap',
+                        '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg },
+                      }}
+                    >
+                      Log in
+                    </Button>
+                    <Button
+                      onClick={() => { setAuthModalView('signup'); setAuthModalOpen(true); }}
+                      sx={{
+                        height: 40,
+                        backgroundColor: colors.primaryBlue,
+                        color: '#fff',
+                        fontFamily: fonts.body,
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
+                        textTransform: 'none',
+                        borderRadius: '50px',
+                        px: { xs: 2.25, lg: 1.75 },
+                        whiteSpace: 'nowrap',
+                        '&:hover': { backgroundColor: colors.navy },
+                      }}
+                    >
+                      Sign up
+                    </Button>
+                  </>
+                ) : (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Tooltip title={profile?.full_name ?? user.email ?? 'Account'}>
+                      <Avatar
+                        onClick={() => navigate('/my-bookings')}
+                        sx={{ width: 36, height: 36, backgroundColor: colors.primaryBlue, fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', '&:hover': { backgroundColor: colors.navy } }}
+                      >
+                        {(profile?.full_name ?? user.email ?? '?').charAt(0).toUpperCase()}
+                      </Avatar>
+                    </Tooltip>
+                    <Tooltip title="Sign out">
+                      <IconButton onClick={() => signOut()} size="small" sx={{ color: colors.mutedText, '&:hover': { color: '#EF4444' } }}>
+                        <LogoutIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                )}
+              </Box>
+            </Box>
           </Box>
 
+          {/* Mobile / tablet actions (below 1024px) */}
           <Box
             sx={{
               display: 'flex',
+              '@media (min-width:1024px)': { display: 'none' },
               alignItems: 'center',
               gap: { xs: 0.75, sm: 1 },
-              '@media (min-width:1024px)': { gap: 0.5 },
               flexShrink: 0,
             }}
           >
@@ -349,8 +551,6 @@ const TopBar: React.FC = () => {
               sx={{
                 display: 'none',
                 '@media (min-width:600px)': { display: 'inline-flex' },
-                '@media (min-width:1024px)': { display: 'none' },
-                '@media (min-width:1280px)': { display: 'inline-flex' },
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: 44,
@@ -364,7 +564,7 @@ const TopBar: React.FC = () => {
                 backgroundColor: '#EEF4FF',
                 border: `2px solid #C5DCFA`,
                 borderRadius: '50px',
-                px: { xs: 2, lg: 1.5 },
+                px: 2,
                 py: 0,
                 whiteSpace: 'nowrap',
                 transition: 'all 0.3s ease-in-out',
@@ -392,8 +592,6 @@ const TopBar: React.FC = () => {
               sx={{
                 display: 'inline-flex',
                 '@media (min-width:600px)': { display: 'none' },
-                '@media (min-width:1024px)': { display: 'inline-flex' },
-                '@media (min-width:1280px)': { display: 'none' },
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: 44,
@@ -414,7 +612,6 @@ const TopBar: React.FC = () => {
               <Phone sx={{ fontSize: '1.15rem' }} />
             </IconButton>
 
-            {/* Auth buttons or user avatar — desktop */}
             {!user ? (
               <>
                 <Button
@@ -429,7 +626,7 @@ const TopBar: React.FC = () => {
                     textTransform: 'none',
                     border: `1.5px solid ${colors.border}`,
                     borderRadius: '50px',
-                    px: { xs: 2, lg: 1.5 },
+                    px: 2,
                     whiteSpace: 'nowrap',
                     '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg },
                   }}
@@ -448,7 +645,7 @@ const TopBar: React.FC = () => {
                     fontSize: '0.85rem',
                     textTransform: 'none',
                     borderRadius: '50px',
-                    px: { xs: 2.25, lg: 1.75 },
+                    px: 2.25,
                     whiteSpace: 'nowrap',
                     '&:hover': { backgroundColor: colors.navy },
                   }}
@@ -478,7 +675,6 @@ const TopBar: React.FC = () => {
               onClick={() => setDrawerOpen(true)}
               sx={{
                 display: 'inline-flex',
-                '@media (min-width:1024px)': { display: 'none' },
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: 44,
@@ -499,6 +695,44 @@ const TopBar: React.FC = () => {
             </IconButton>
           </Box>
         </Toolbar>
+
+        {/* Mobile mini announcement — short line below header row */}
+        <Box
+          component="aside"
+          aria-label="Service availability"
+          sx={{
+            display: 'flex',
+            '@media (min-width:1024px)': { display: 'none' },
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0.5,
+            px: 1.5,
+            py: 0.55,
+            borderTop: `1px solid ${colors.border}`,
+            backgroundColor: colors.lightBlueBg,
+            minHeight: 28,
+            overflow: 'hidden',
+          }}
+        >
+          <Typography
+            component="p"
+            sx={{
+              m: 0,
+              fontFamily: fonts.body,
+              fontWeight: 600,
+              fontSize: '0.72rem',
+              lineHeight: 1.25,
+              color: colors.primaryBlue,
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: '100%',
+            }}
+          >
+            Check ZIP availability · Call +1 (240) 576-0397
+          </Typography>
+        </Box>
       </AppBar>
 
       <Drawer

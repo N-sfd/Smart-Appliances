@@ -134,7 +134,10 @@ function AppRoutes() {
       <Box
         component="main"
         sx={{
-          paddingTop: showPublicChrome ? { xs: '112px', md: '128px' } : 0,
+          paddingTop: showPublicChrome ? { xs: '116px', md: '116px' } : 0,
+          '@media (min-width:1024px)': {
+            paddingTop: showPublicChrome ? '104px' : 0,
+          },
           display: 'flex',
           flexDirection: 'column',
           minHeight: showPublicChrome ? '100vh' : undefined,

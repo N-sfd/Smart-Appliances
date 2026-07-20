@@ -207,7 +207,7 @@ const MembershipPage: React.FC = () => {
           pt: sectionPy,
           pb: sectionPy,
           backgroundColor: colors.sectionBg,
-          scrollMarginTop: { xs: '128px', md: '152px' },
+          scrollMarginTop: { xs: '124px', md: '124px', lg: '116px' },
         }}
       >
         <Container maxWidth="lg">
