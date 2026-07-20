@@ -17,7 +17,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon, ArrowForward as ArrowForwardIcon, VerifiedOutlined as VerifiedOutlinedIcon } from '@mui/icons-material';
+import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon, ArrowForward as ArrowForwardIcon, CheckCircleOutline as CheckCircleOutlineIcon } from '@mui/icons-material';
 import { colors, fonts, primaryButtonSx } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
@@ -203,91 +203,115 @@ const TopBar: React.FC = () => {
           sx={{
             justifyContent: 'space-between',
             alignItems: 'center',
-            minHeight: { xs: '84px !important', md: '96px !important' },
-            py: { xs: 0.75, md: 0.75 },
+            minHeight: { xs: '84px !important', md: '100px !important' },
+            py: { xs: 0.75, md: 0.35 },
             pl: { xs: 1.5, sm: 2, md: 2.5, lg: 3 },
             pr: { xs: 2, lg: 3 },
-            gap: { xs: 1, md: 1.5 },
-            overflow: 'visible',
+            gap: 0.5,
+            overflow: 'hidden',
+            '@media (min-width:1024px)': { overflow: 'visible' },
           }}
         >
-          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: { xs: 1, md: 2, lg: 2.5 } }}>
+          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: { xs: 1.5, md: 1.75, lg: 2 } }}>
             <BrandLogo variant="header" onClick={() => { navigate('/'); setDrawerOpen(false); }} />
           </Box>
 
-          {/* Desktop: announcement + nav/actions column (starts after logo) */}
+          {/* Desktop: nav area (pill + links) then CTAs — pill centers over menu only */}
           <Box
             sx={{
               display: 'none',
               '@media (min-width:1024px)': { display: 'flex' },
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'center',
+              alignItems: 'center',
               flexGrow: 1,
               minWidth: 0,
-              gap: 0.35,
+              ml: 0.25,
+              gap: 1,
+              overflow: 'hidden',
             }}
           >
             <Box
-              component="aside"
-              aria-label="Service highlights"
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                alignSelf: 'flex-start',
-                gap: 0.6,
-                minHeight: 26,
-                maxHeight: 28,
-                px: 1.25,
-                py: 0.25,
-                borderRadius: '999px',
-                backgroundColor: colors.lightBlueBg,
-                border: `1px solid ${colors.border}`,
-                maxWidth: '100%',
-                overflow: 'hidden',
-              }}
-            >
-              <VerifiedOutlinedIcon
-                sx={{ fontSize: '0.9rem', color: colors.primaryBlue, flexShrink: 0 }}
-                aria-hidden
-              />
-              <Typography
-                component="span"
-                sx={{
-                  fontFamily: fonts.body,
-                  fontWeight: 600,
-                  fontSize: { md: '0.75rem', lg: '0.8rem' },
-                  lineHeight: 1.2,
-                  color: colors.primaryBlue,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                Clear scheduling • Request tracking • Service updates
-              </Typography>
-            </Box>
-
-            <Box
               sx={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 1,
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                justifyContent: 'center',
+                flexGrow: 1,
                 minWidth: 0,
-                width: '100%',
+                gap: 0.15,
+                overflow: 'hidden',
               }}
             >
               <Box
                 sx={{
+                  display: 'none',
+                  '@media (min-width:1150px)': {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    width: '100%',
+                  },
+                }}
+              >
+                <Box
+                  component="aside"
+                  aria-label="Service highlights"
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '24px',
+                    height: 28,
+                    py: 0.75,
+                    px: '40px',
+                    maxWidth: '100%',
+                    borderRadius: '999px',
+                    backgroundColor: colors.lightBlueBg,
+                    border: '1px solid #D0E3FF',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {['Clear scheduling', 'Request tracking', 'Service updates'].map((label) => (
+                    <Box
+                      key={label}
+                      component="span"
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.5,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <CheckCircleOutlineIcon
+                        sx={{ fontSize: '0.9rem', color: colors.primaryBlue, flexShrink: 0 }}
+                        aria-hidden
+                      />
+                      <Typography
+                        component="span"
+                        sx={{
+                          fontFamily: fonts.body,
+                          fontWeight: 600,
+                          fontSize: '0.78rem',
+                          lineHeight: 1,
+                          color: colors.primaryBlue,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
                   display: 'flex',
-                  gap: 1.25,
-                  '@media (min-width:1280px)': { gap: 2 },
-                  '@media (min-width:1536px)': { gap: 3.25 },
+                  gap: 1,
+                  '@media (min-width:1280px)': { gap: 1.5 },
+                  '@media (min-width:1536px)': { gap: 2.5 },
                   alignItems: 'center',
-                  flexGrow: 1,
-                  justifyContent: 'flex-start',
                   minWidth: 0,
+                  flexWrap: 'nowrap',
                   overflow: 'hidden',
                 }}
               >
@@ -390,20 +414,23 @@ const TopBar: React.FC = () => {
                       key={link.key}
                       onClick={() => handleNavClick(link)}
                       disableRipple
-                      sx={{ ...navButtonSx(active), flexShrink: 0 }}
+                      sx={navButtonSx(active)}
                     >
                       {link.label}
                     </Button>
                   );
                 })}
               </Box>
+            </Box>
 
+              {/* Phone / auth aligned on the nav row */}
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 0.5,
+                  gap: 0.75,
                   flexShrink: 0,
+                  pl: 1,
                 }}
               >
                 <Button
@@ -424,9 +451,9 @@ const TopBar: React.FC = () => {
                     lineHeight: 1,
                     textTransform: 'none',
                     backgroundColor: '#EEF4FF',
-                    border: `2px solid #C5DCFA`,
+                    border: '2px solid #C5DCFA',
                     borderRadius: '50px',
-                    px: { xs: 2, lg: 1.5 },
+                    px: 1.5,
                     py: 0,
                     whiteSpace: 'nowrap',
                     transition: 'all 0.3s ease-in-out',
@@ -460,7 +487,7 @@ const TopBar: React.FC = () => {
                     height: 40,
                     color: colors.navy,
                     backgroundColor: '#EEF4FF',
-                    border: `2px solid #C5DCFA`,
+                    border: '2px solid #C5DCFA',
                     borderRadius: '50px',
                     transition: 'all 0.3s ease-in-out',
                     '&:hover': {
@@ -487,9 +514,13 @@ const TopBar: React.FC = () => {
                         textTransform: 'none',
                         border: `1.5px solid ${colors.border}`,
                         borderRadius: '50px',
-                        px: { xs: 2, lg: 1.5 },
+                        px: 1.5,
                         whiteSpace: 'nowrap',
-                        '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg },
+                        '&:hover': {
+                          borderColor: colors.primaryBlue,
+                          color: colors.primaryBlue,
+                          backgroundColor: colors.lightBlueBg,
+                        },
                       }}
                     >
                       Log in
@@ -505,7 +536,7 @@ const TopBar: React.FC = () => {
                         fontSize: '0.85rem',
                         textTransform: 'none',
                         borderRadius: '50px',
-                        px: { xs: 2.25, lg: 1.75 },
+                        px: 1.75,
                         whiteSpace: 'nowrap',
                         '&:hover': { backgroundColor: colors.navy },
                       }}
@@ -518,23 +549,35 @@ const TopBar: React.FC = () => {
                     <Tooltip title={profile?.full_name ?? user.email ?? 'Account'}>
                       <Avatar
                         onClick={() => navigate('/my-bookings')}
-                        sx={{ width: 36, height: 36, backgroundColor: colors.primaryBlue, fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', '&:hover': { backgroundColor: colors.navy } }}
+                        sx={{
+                          width: 36,
+                          height: 36,
+                          backgroundColor: colors.primaryBlue,
+                          fontFamily: fonts.body,
+                          fontWeight: 700,
+                          fontSize: '0.85rem',
+                          cursor: 'pointer',
+                          '&:hover': { backgroundColor: colors.navy },
+                        }}
                       >
                         {(profile?.full_name ?? user.email ?? '?').charAt(0).toUpperCase()}
                       </Avatar>
                     </Tooltip>
                     <Tooltip title="Sign out">
-                      <IconButton onClick={() => signOut()} size="small" sx={{ color: colors.mutedText, '&:hover': { color: '#EF4444' } }}>
+                      <IconButton
+                        onClick={() => signOut()}
+                        size="small"
+                        sx={{ color: colors.mutedText, '&:hover': { color: '#EF4444' } }}
+                      >
                         <LogoutIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   </Box>
                 )}
               </Box>
-            </Box>
           </Box>
 
-          {/* Mobile / tablet actions (below 1024px) */}
+          {/* Mobile / tablet actions only — desktop CTAs live in the nav row above */}
           <Box
             sx={{
               display: 'flex',
@@ -562,7 +605,7 @@ const TopBar: React.FC = () => {
                 lineHeight: 1,
                 textTransform: 'none',
                 backgroundColor: '#EEF4FF',
-                border: `2px solid #C5DCFA`,
+                border: '2px solid #C5DCFA',
                 borderRadius: '50px',
                 px: 2,
                 py: 0,
@@ -598,7 +641,7 @@ const TopBar: React.FC = () => {
                 height: 44,
                 color: colors.navy,
                 backgroundColor: '#EEF4FF',
-                border: `2px solid #C5DCFA`,
+                border: '2px solid #C5DCFA',
                 borderRadius: '50px',
                 transition: 'all 0.3s ease-in-out',
                 '&:hover': {
@@ -611,65 +654,6 @@ const TopBar: React.FC = () => {
             >
               <Phone sx={{ fontSize: '1.15rem' }} />
             </IconButton>
-
-            {!user ? (
-              <>
-                <Button
-                  onClick={() => { setAuthModalView('login'); setAuthModalOpen(true); }}
-                  sx={{
-                    display: { xs: 'none', md: 'inline-flex' },
-                    height: 44,
-                    color: colors.navy,
-                    fontFamily: fonts.body,
-                    fontWeight: 600,
-                    fontSize: '0.85rem',
-                    textTransform: 'none',
-                    border: `1.5px solid ${colors.border}`,
-                    borderRadius: '50px',
-                    px: 2,
-                    whiteSpace: 'nowrap',
-                    '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg },
-                  }}
-                >
-                  Log in
-                </Button>
-                <Button
-                  onClick={() => { setAuthModalView('signup'); setAuthModalOpen(true); }}
-                  sx={{
-                    display: { xs: 'none', md: 'inline-flex' },
-                    height: 44,
-                    backgroundColor: colors.primaryBlue,
-                    color: '#fff',
-                    fontFamily: fonts.body,
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    textTransform: 'none',
-                    borderRadius: '50px',
-                    px: 2.25,
-                    whiteSpace: 'nowrap',
-                    '&:hover': { backgroundColor: colors.navy },
-                  }}
-                >
-                  Sign up
-                </Button>
-              </>
-            ) : (
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
-                <Tooltip title={profile?.full_name ?? user.email ?? 'Account'}>
-                  <Avatar
-                    onClick={() => navigate('/my-bookings')}
-                    sx={{ width: 36, height: 36, backgroundColor: colors.primaryBlue, fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', '&:hover': { backgroundColor: colors.navy } }}
-                  >
-                    {(profile?.full_name ?? user.email ?? '?').charAt(0).toUpperCase()}
-                  </Avatar>
-                </Tooltip>
-                <Tooltip title="Sign out">
-                  <IconButton onClick={() => signOut()} size="small" sx={{ color: colors.mutedText, '&:hover': { color: '#EF4444' } }}>
-                    <LogoutIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            )}
 
             <IconButton
               onClick={() => setDrawerOpen(true)}
@@ -696,7 +680,7 @@ const TopBar: React.FC = () => {
           </Box>
         </Toolbar>
 
-        {/* Mobile mini announcement — short line below header row */}
+        {/* Mobile-only compact line — not shown above the logo on desktop */}
         <Box
           component="aside"
           aria-label="Service availability"
@@ -705,12 +689,11 @@ const TopBar: React.FC = () => {
             '@media (min-width:1024px)': { display: 'none' },
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 0.5,
+            gap: 0.75,
+            height: 28,
             px: 1.5,
-            py: 0.55,
-            borderTop: `1px solid ${colors.border}`,
             backgroundColor: colors.lightBlueBg,
-            minHeight: 28,
+            borderTop: `1px solid ${colors.border}`,
             overflow: 'hidden',
           }}
         >
@@ -721,12 +704,12 @@ const TopBar: React.FC = () => {
               fontFamily: fonts.body,
               fontWeight: 600,
               fontSize: '0.72rem',
-              lineHeight: 1.25,
+              lineHeight: 1,
               color: colors.primaryBlue,
-              textAlign: 'center',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              textAlign: 'center',
               maxWidth: '100%',
             }}
           >
