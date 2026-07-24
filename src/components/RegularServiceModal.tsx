@@ -221,7 +221,7 @@ const RegularServiceModal: React.FC<RegularServiceModalProps> = ({
   };
 
   const fieldSx = {
-    '& .MuiOutlinedInput-root': { borderRadius: '8px' },
+    '& .MuiOutlinedInput-root': { borderRadius: '14px' },
   };
 
   return (

@@ -178,7 +178,7 @@ const PricingPage: React.FC = () => {
   const estZipValidation = validateZipCode(estZip);
 
   const fieldSx = {
-    '& .MuiOutlinedInput-root': { backgroundColor: '#FFFFFF', borderRadius: '12px' },
+    '& .MuiOutlinedInput-root': { backgroundColor: '#FFFFFF', borderRadius: '14px' },
     '& .MuiOutlinedInput-input': { paddingTop: '13px', paddingBottom: '13px' },
     '& .MuiSelect-select': { paddingTop: '13px !important', paddingBottom: '13px !important' },
   };

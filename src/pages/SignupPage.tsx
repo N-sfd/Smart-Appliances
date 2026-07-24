@@ -44,7 +44,7 @@ const SignupPage: React.FC = () => {
   };
 
   const fieldSx = {
-    '& .MuiOutlinedInput-root': { borderRadius: '12px', fontFamily: fonts.body },
+    '& .MuiOutlinedInput-root': { borderRadius: '14px', fontFamily: fonts.body },
   };
 
   if (success) {

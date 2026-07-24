@@ -59,6 +59,8 @@ export default function ExpertImage({
           component="img"
           src={src ?? undefined}
           alt={alt}
+          loading="lazy"
+          decoding="async"
           onError={() => setErrored(true)}
           sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />

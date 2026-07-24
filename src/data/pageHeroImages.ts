@@ -12,7 +12,7 @@ export interface PageHeroPhoto {
  */
 export const PAGE_HERO_PHOTOS = {
   about: {
-    src: '/images/experts/smart-appliances-team.png',
+    src: '/images/experts/smart-appliances-team.webp',
     alt: 'Smart Appliances home service team ready to help local homeowners',
     objectPosition: 'center 22%',
     aspectRatio: '4 / 3',

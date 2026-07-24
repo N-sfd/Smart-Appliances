@@ -734,7 +734,7 @@ const GarageDoorRepairPage: React.FC = () => {
                 width: '100%',
                 height: { xs: 240, md: 320 },
                 objectFit: 'cover',
-                borderRadius: '20px',
+                borderRadius: '16px',
                 display: { xs: 'none', md: 'block' },
               }}
             />

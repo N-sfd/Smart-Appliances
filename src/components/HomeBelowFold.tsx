@@ -377,7 +377,7 @@ const HomeBelowFold: React.FC = () => {
               id="service-detail-panel"
               sx={{
                 mt: 4,
-                borderRadius: '24px',
+                borderRadius: '16px',
                 border: '1px solid #D0E3FF',
                 overflow: 'hidden',
                 boxShadow: '0 20px 60px rgba(10,37,64,0.10)',
@@ -439,9 +439,9 @@ const HomeBelowFold: React.FC = () => {
                         backgroundColor: '#1A73E8',
                         color: '#FFFFFF',
                         fontFamily: fonts.body,
-                        fontWeight: 700,
+                        fontWeight: 600,
                         textTransform: 'none',
-                        borderRadius: '10px',
+                        borderRadius: radii.xl,
                         px: 3.5,
                         py: 1.3,
                         '&:hover': { backgroundColor: '#0B3D91' },
@@ -458,9 +458,9 @@ const HomeBelowFold: React.FC = () => {
                           borderColor: '#EF4444',
                           color: '#EF4444',
                           fontFamily: fonts.body,
-                          fontWeight: 700,
+                          fontWeight: 600,
                           textTransform: 'none',
-                          borderRadius: '10px',
+                          borderRadius: radii.xl,
                           px: 3,
                           py: 1.3,
                           '&:hover': { backgroundColor: '#FFF5F5', borderColor: '#EA580C', color: '#EA580C' },
@@ -642,7 +642,7 @@ const HomeBelowFold: React.FC = () => {
                     '&:hover': { backgroundColor: '#7C3AED' },
                   }}
                 >
-                  Schedule Service
+                  Book Same-Day Service
                 </Button>
               </Box>
             </Card>
@@ -1085,15 +1085,15 @@ const HomeBelowFold: React.FC = () => {
                 backgroundColor: colors.primaryBlue,
                 color: '#fff',
                 fontFamily: fonts.body,
-                fontWeight: 700,
+                fontWeight: 600,
                 textTransform: 'none',
-                borderRadius: '12px',
+                borderRadius: radii.xl,
                 px: 4,
                 py: 1.25,
                 '&:hover': { backgroundColor: colors.navy },
               }}
             >
-              Schedule Service
+              Book Your Service
             </Button>
           </Box>
         </Container>
@@ -1566,9 +1566,9 @@ const HomeBelowFold: React.FC = () => {
                       backgroundColor: '#16A34A',
                       color: '#fff',
                       fontFamily: fonts.body,
-                      fontWeight: 700,
+                      fontWeight: 600,
                       textTransform: 'none',
-                      borderRadius: '9px',
+                      borderRadius: radii.xl,
                       px: 2.5,
                       py: 0.9,
                       fontSize: '0.88rem',
@@ -1955,7 +1955,7 @@ const HomeBelowFold: React.FC = () => {
         >
           <EventAvailableIcon sx={{ fontSize: 17, color: '#fff' }} />
           <Typography sx={{ fontFamily: fonts.body, fontWeight: 700, fontSize: '0.85rem', color: '#fff' }}>
-            Book Now
+            Schedule Service
           </Typography>
         </Box>
       </Box>

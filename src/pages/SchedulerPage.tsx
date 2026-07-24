@@ -1141,6 +1141,8 @@ const SchedulerPage: React.FC = () => {
           component="img"
           src={panelInfo.image}
           alt={panelInfo.title}
+          loading="lazy"
+          decoding="async"
           sx={{
             width: '100%',
             height: 200,

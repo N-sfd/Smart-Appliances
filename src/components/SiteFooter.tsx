@@ -202,7 +202,7 @@ const SiteFooter: React.FC = () => {
           maxWidth: 1200,
           mx: 'auto',
           px: { xs: 2, sm: 3 },
-          pt: { xs: 4, md: 5 },
+          pt: { xs: 3, md: 4 },
           pb: { xs: 2, md: 2.5 },
         }}
       >
@@ -216,7 +216,7 @@ const SiteFooter: React.FC = () => {
               lg: '1.05fr 1.4fr 1fr 1fr 1.35fr',
             },
             columnGap: { xs: 0, sm: 4, lg: 5 },
-            rowGap: { xs: 3.5, sm: 4 },
+            rowGap: { xs: 2.5, sm: 3 },
             alignItems: 'start',
           }}
         >
@@ -375,7 +375,7 @@ const SiteFooter: React.FC = () => {
         <Box
           sx={{
             borderTop: `1px solid ${colors.border}`,
-            mt: { xs: 4, md: 5 },
+            mt: { xs: 3, md: 3.5 },
             pt: 2,
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },

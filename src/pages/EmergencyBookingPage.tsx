@@ -350,7 +350,7 @@ const EmergencyBookingPage: React.FC = () => {
         minHeight: '100vh',
         backgroundColor: PAGE_BG,
         backgroundImage:
-          'linear-gradient(180deg, rgba(245,247,251,0.30) 0%, rgba(245,247,251,0.55) 100%), url(/images/services/emergency-bg.png)',
+          'linear-gradient(180deg, rgba(245,247,251,0.30) 0%, rgba(245,247,251,0.55) 100%), url(/images/services/emergency-bg.webp)',
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
         backgroundRepeat: 'no-repeat',
@@ -514,8 +514,8 @@ const EmergencyBookingPage: React.FC = () => {
                 {(() => {
                   const info = getServiceImage(serviceTypeId, categoryId);
                   return (
-                    <Box sx={{ mb: 3, borderRadius: '14px', border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
-                      <Box component="img" src={info.image} alt={info.title} sx={{ width: '100%', height: 150, objectFit: 'cover', display: 'block' }} />
+                    <Box sx={{ mb: 3, borderRadius: '16px', border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
+                      <Box component="img" src={info.image} alt={info.title} loading="lazy" decoding="async" sx={{ width: '100%', height: 150, objectFit: 'cover', display: 'block' }} />
                       <Box sx={{ p: '12px 16px', backgroundColor: PAGE_BG }}>
                         <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: NAVY, lineHeight: 1.2 }}>{info.title}</Typography>
                         <Typography sx={{ fontSize: '0.85rem', color: MUTED, mt: '2px', lineHeight: 1.5 }}>{info.desc}</Typography>
@@ -640,7 +640,7 @@ const EmergencyBookingPage: React.FC = () => {
                     onClick={() => navigate('/services')}
                     variant="outlined"
                     fullWidth
-                    sx={{ borderColor: NAVY, color: NAVY, textTransform: 'none', borderRadius: '10px', px: 3, py: 1.35, fontWeight: 700, maxWidth: { sm: 220 } }}
+                    sx={{ borderColor: NAVY, color: NAVY, textTransform: 'none', borderRadius: '14px', px: 3, py: 1.35, fontWeight: 600, maxWidth: { sm: 220 } }}
                   >
                     Back to Services
                   </Button>
@@ -651,10 +651,10 @@ const EmergencyBookingPage: React.FC = () => {
                     sx={{
                       backgroundColor: RED,
                       color: '#FFFFFF',
-                      fontWeight: 700,
+                      fontWeight: 600,
                       px: 3,
                       py: 1.35,
-                      borderRadius: '10px',
+                      borderRadius: '14px',
                       textTransform: 'none',
                       maxWidth: { sm: 320 },
                       '&:hover': { backgroundColor: RED_DARK },
@@ -756,7 +756,7 @@ const EmergencyBookingPage: React.FC = () => {
                     onClick={() => setStep(1)}
                     variant="outlined"
                     fullWidth
-                    sx={{ borderColor: NAVY, color: NAVY, textTransform: 'none', borderRadius: '10px', px: 3, py: 1.35, fontWeight: 700, maxWidth: { sm: 200 } }}
+                    sx={{ borderColor: NAVY, color: NAVY, textTransform: 'none', borderRadius: '14px', px: 3, py: 1.35, fontWeight: 600, maxWidth: { sm: 200 } }}
                   >
                     Back
                   </Button>
@@ -769,10 +769,10 @@ const EmergencyBookingPage: React.FC = () => {
                     sx={{
                       backgroundColor: RED,
                       color: '#FFFFFF',
-                      fontWeight: 700,
+                      fontWeight: 600,
                       px: 3,
                       py: 1.35,
-                      borderRadius: '10px',
+                      borderRadius: '14px',
                       textTransform: 'none',
                       maxWidth: { sm: 320 },
                       '&:hover': { backgroundColor: RED_DARK },

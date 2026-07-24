@@ -32,7 +32,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /** Shared card treatment so the business-hours card, form card, and map read as one family. */
 const CARD_RADIUS = '20px';
 const CARD_SHADOW = '0 4px 20px rgba(11,61,145,0.06)';
-const FIELD_RADIUS = '12px';
+const FIELD_RADIUS = '14px';
 
 const fieldSx = {
   '& .MuiOutlinedInput-root': {
@@ -505,13 +505,13 @@ const GetInTouchSection: React.FC<GetInTouchSectionProps> = ({
                       FormHelperTextProps={{ id: 'contact-message-helper' }}
                       fullWidth
                       multiline
-                      minRows={6}
+                      minRows={4}
                       variant="outlined"
                       sx={{
                         ...fieldSx,
                         '& .MuiInputBase-inputMultiline': {
                           resize: 'vertical',
-                          minHeight: { xs: 150, sm: 165, md: 180 },
+                          minHeight: { xs: 100, sm: 110, md: 120 },
                           boxSizing: 'border-box',
                         },
                       }}

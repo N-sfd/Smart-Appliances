@@ -85,6 +85,10 @@ const ServiceGridCard: React.FC<ServiceGridCardProps> = ({ title, subtitle, imag
             color: '#0B3D91',
             mb: 0.35,
             lineHeight: 1.3,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
           }}
         >
           {title}
@@ -95,6 +99,10 @@ const ServiceGridCard: React.FC<ServiceGridCardProps> = ({ title, subtitle, imag
             fontSize: '0.78rem',
             color: '#64748B',
             lineHeight: 1.45,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
           }}
         >
           {subtitle}

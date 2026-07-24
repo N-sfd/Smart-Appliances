@@ -1,11 +1,11 @@
 /** Unique professional technician portraits, one per expert (face-centered for circular avatars). */
 export const EXPERT_IMAGE_BY_SLUG: Record<string, string> = {
-  'smart-appliances-team': '/images/experts/smart-appliances-team.png',
-  'hvac-repair-specialist': '/images/experts/hvac-comfort-expert.png',
-  'appliance-repair-specialist': '/images/experts/appliance-care-expert.png',
-  'plumbing-repair-specialist': '/images/experts/plumbing-service-expert.png',
-  'electrical-service-specialist': '/images/experts/electrical-smart-home-expert.png',
-  'garage-door-specialist': '/images/experts/garage-door-expert.png',
+  'smart-appliances-team': '/images/experts/smart-appliances-team.webp',
+  'hvac-repair-specialist': '/images/experts/hvac-comfort-expert.webp',
+  'appliance-repair-specialist': '/images/experts/appliance-care-expert.webp',
+  'plumbing-repair-specialist': '/images/experts/plumbing-service-expert.webp',
+  'electrical-service-specialist': '/images/experts/electrical-smart-home-expert.webp',
+  'garage-door-specialist': '/images/experts/garage-door-expert.webp',
 };
 
 /** Fine-tune circular crop so faces stay centered. Portraits are head-and-shoulders framed. */
@@ -19,12 +19,12 @@ export const EXPERT_AVATAR_OBJECT_POSITION: Record<string, string> = {
 };
 
 export const GALLERY_CATEGORY_IMAGES: Record<string, string> = {
-  'Appliance Care': '/images/services/washer-repair.jpg',
-  'HVAC Services': '/images/services/hvac-service.jpg',
-  Plumbing: '/images/services/plumbing-service.jpg',
-  Electrical: '/images/services/electrical/hero.jpg',
+  'Appliance Care': '/images/services/washer-repair.webp',
+  'HVAC Services': '/images/services/hvac-service.webp',
+  Plumbing: '/images/services/plumbing-service.webp',
+  Electrical: '/images/services/electrical/hero.webp',
   'Smart Home': '/images/services/smart-home/smart-home-hero.webp',
-  'Garage Door': '/images/services/garage-door/hero.jpg',
+  'Garage Door': '/images/services/garage-door/hero.webp',
 };
 
 /** Old placeholder icon avatars (team.svg, hvac-specialist.svg, etc.) — never use these, but real
@@ -61,7 +61,7 @@ export function getExpertImageUrl(slug: string, ...candidates: (string | null | 
     if (isBlockedAvatarPath(candidate)) continue;
     return candidate;
   }
-  return EXPERT_IMAGE_BY_SLUG[slug] ?? '/images/experts/smart-appliances-team.png';
+  return EXPERT_IMAGE_BY_SLUG[slug] ?? '/images/experts/smart-appliances-team.webp';
 }
 
 export function getExpertAvatarObjectPosition(slug: string): string {

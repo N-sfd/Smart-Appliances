@@ -101,7 +101,7 @@ export const CATEGORY_SERVICE_DETAILS: Record<string, CategoryServiceDetail> = {
     title: 'Garbage Disposal Installation',
     description: 'Install or replace garbage disposals with proper plumbing connections.',
     chips: ['New install', 'Replacement', 'Drain connection'],
-    image: '/images/services/appliances/garbage-disposal-install.png',
+    image: '/images/services/appliances/garbage-disposal-install.webp',
     scheduleId: 'garbage-disposal-repair',
   },
   'sump-pump-service': {

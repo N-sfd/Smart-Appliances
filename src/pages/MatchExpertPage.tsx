@@ -255,7 +255,7 @@ const MatchExpertPage: React.FC = () => {
   };
 
   const fieldSx = {
-    '& .MuiOutlinedInput-root': { backgroundColor: '#FFFFFF', borderRadius: '12px' },
+    '& .MuiOutlinedInput-root': { backgroundColor: '#FFFFFF', borderRadius: '14px' },
   };
 
   // ── Intro ──────────────────────────────────────────────────────────────
@@ -264,7 +264,7 @@ const MatchExpertPage: React.FC = () => {
       <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
         <Box
           sx={{
-            py: { xs: 8, md: 11 },
+            py: { xs: 6, md: 9 },
             textAlign: 'center',
             px: 2,
             background: 'linear-gradient(135deg, #071B41 0%, #0B2D6B 55%, #0D3A82 100%)',

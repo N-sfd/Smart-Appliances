@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Box, Typography, Container, Chip } from '@mui/material';
+import { Box, Typography, Container, Chip, Button } from '@mui/material';
 import { colors, fonts } from '../theme';
 import { useSeo } from '../hooks/useSeo';
 import { RESOURCE_CATEGORIES, ResourceCategoryId } from '../data/resourceCategories';
@@ -8,8 +8,11 @@ import VideoCard from '../components/resources/VideoCard';
 import VideosComingSoonPanel from '../components/resources/VideosComingSoonPanel';
 import ResourceBreadcrumbs from '../components/resources/ResourceBreadcrumbs';
 
+const PAGE_SIZE = 6;
+
 export default function ResourceVideosPage() {
   const [category, setCategory] = useState<ResourceCategoryId | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useSeo({
     title: 'Helpful Home Service Videos | Smart Appliances',
@@ -29,7 +32,13 @@ export default function ResourceVideosPage() {
     [enabledVideos],
   );
 
-  const visibleVideos = category ? enabledVideos.filter((v) => v.category === category) : enabledVideos;
+  const filteredVideos = category ? enabledVideos.filter((v) => v.category === category) : enabledVideos;
+  const visibleVideos = filteredVideos.slice(0, visibleCount);
+
+  const handleSelectCategory = (id: ResourceCategoryId | null) => {
+    setCategory(id);
+    setVisibleCount(PAGE_SIZE);
+  };
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
@@ -58,7 +67,7 @@ export default function ResourceVideosPage() {
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 4 }}>
                 <Chip
                   label="All"
-                  onClick={() => setCategory(null)}
+                  onClick={() => handleSelectCategory(null)}
                   sx={{
                     fontFamily: fonts.body,
                     fontWeight: !category ? 700 : 500,
@@ -74,7 +83,7 @@ export default function ResourceVideosPage() {
                     <Chip
                       key={c.id}
                       label={c.label}
-                      onClick={() => setCategory(isActive ? null : c.id)}
+                      onClick={() => handleSelectCategory(isActive ? null : c.id)}
                       sx={{
                         fontFamily: fonts.body,
                         fontWeight: isActive ? 700 : 500,
@@ -94,6 +103,17 @@ export default function ResourceVideosPage() {
                 <VideoCard key={video.id} video={video} />
               ))}
             </Box>
+            {visibleCount < filteredVideos.length && (
+              <Box sx={{ textAlign: 'center', mt: 4 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  sx={{ borderColor: colors.border, color: colors.navy, fontFamily: fonts.body, fontWeight: 700, textTransform: 'none', borderRadius: '12px', px: 3.5, '&:hover': { borderColor: colors.primaryBlue, color: colors.primaryBlue, backgroundColor: colors.lightBlueBg } }}
+                >
+                  Load More Videos
+                </Button>
+              </Box>
+            )}
           </>
         )}
       </Container>

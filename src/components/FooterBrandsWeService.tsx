@@ -13,7 +13,7 @@ const FooterBrandsWeService: React.FC = () => (
     sx={{
       backgroundColor: '#F6F9FC',
       borderTop: `1px solid ${colors.border}`,
-      py: { xs: 5, md: 7 },
+      py: { xs: 3.5, md: 5 },
     }}
   >
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, sm: 3 } }}>

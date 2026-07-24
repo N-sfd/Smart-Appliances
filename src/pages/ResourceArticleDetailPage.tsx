@@ -83,7 +83,7 @@ export default function ResourceArticleDetailPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
-      <Container maxWidth={false} sx={{ maxWidth: '1240px', mx: 'auto', px: { xs: 2, sm: 3, md: 5 }, py: { xs: 3, md: 5 } }}>
+      <Container maxWidth={false} sx={{ maxWidth: '1200px', mx: 'auto', px: { xs: 2, sm: 3, md: 5 }, py: { xs: 3, md: 5 } }}>
         <Box sx={{ mb: 2.5 }}>
           <ResourceBreadcrumbs
             items={[

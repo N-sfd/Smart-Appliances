@@ -38,7 +38,7 @@ const LoginPage: React.FC = () => {
 
   const fieldSx = {
     '& .MuiOutlinedInput-root': {
-      borderRadius: '12px',
+      borderRadius: '14px',
       fontFamily: fonts.body,
     },
   };

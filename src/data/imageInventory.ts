@@ -13,9 +13,9 @@ export const usedImageGroups: Record<string, string[]> = {
   membership: ['HeroIllustration variant="membership" (vector, no file)'],
   pricing: ['HeroIllustration variant="pricing" (vector, no file)'],
   about: [
-    'public/images/services/hero-technician.jpg (Our Mission photo)',
+    'public/images/services/hero-technician.webp (Our Mission photo)',
     'HeroIllustration variant="about" (hero, vector, no file)',
   ],
   contact: ['HeroIllustration variant="contact" (hero, vector, no file)'],
-  experts: ['public/images/experts/*.png (unique portrait per expert, no shared faces)'],
+  experts: ['public/images/experts/*.webp (unique portrait per expert, no shared faces)'],
 };

@@ -15,13 +15,17 @@ import {
   Collapse,
   Avatar,
   Tooltip,
-  Typography,
 } from '@mui/material';
-import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon, ArrowForward as ArrowForwardIcon, CheckCircleOutline as CheckCircleOutlineIcon } from '@mui/icons-material';
+import { Phone, Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp, Logout as LogoutIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
 import { colors, fonts, primaryButtonSx } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
 import { BrandLogo } from './Logo';
+import AnnouncementBanner, {
+  AnnouncementItem,
+  desktopAnnouncementItems,
+  mobileAnnouncementItems,
+} from './AnnouncementBanner';
 import ServiceMenuIllustration from './illustrations/ServiceMenuIllustration';
 import {
   serviceNavItems,
@@ -153,6 +157,15 @@ const TopBar: React.FC = () => {
     setDrawerOpen(false);
   };
 
+  const handleAnnouncementActivate = (item: AnnouncementItem) => {
+    if (!item.path) return;
+    if (item.path === '/service-areas') {
+      scrollToSection('service-areas');
+      return;
+    }
+    navigate(item.path);
+  };
+
   const goToService = (item: ServiceNavItem) => {
     navigate(serviceNavPath(item));
     setServicesMenuOpen(false);
@@ -251,56 +264,11 @@ const TopBar: React.FC = () => {
                   },
                 }}
               >
-                <Box
-                  component="aside"
-                  aria-label="Service highlights"
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '24px',
-                    height: 28,
-                    py: 0.75,
-                    px: '40px',
-                    maxWidth: '100%',
-                    borderRadius: '999px',
-                    backgroundColor: colors.lightBlueBg,
-                    border: '1px solid #D0E3FF',
-                    overflow: 'hidden',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  {['Clear scheduling', 'Request tracking', 'Service updates'].map((label) => (
-                    <Box
-                      key={label}
-                      component="span"
-                      sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <CheckCircleOutlineIcon
-                        sx={{ fontSize: '0.9rem', color: colors.primaryBlue, flexShrink: 0 }}
-                        aria-hidden
-                      />
-                      <Typography
-                        component="span"
-                        sx={{
-                          fontFamily: fonts.body,
-                          fontWeight: 600,
-                          fontSize: '0.78rem',
-                          lineHeight: 1,
-                          color: colors.primaryBlue,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {label}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
+                <AnnouncementBanner
+                  items={desktopAnnouncementItems}
+                  variant="desktop"
+                  onActivate={handleAnnouncementActivate}
+                />
               </Box>
 
               <Box
@@ -682,39 +650,22 @@ const TopBar: React.FC = () => {
 
         {/* Mobile-only compact line — not shown above the logo on desktop */}
         <Box
-          component="aside"
-          aria-label="Service availability"
           sx={{
             display: 'flex',
             '@media (min-width:1024px)': { display: 'none' },
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 0.75,
-            height: 28,
             px: 1.5,
             backgroundColor: colors.lightBlueBg,
             borderTop: `1px solid ${colors.border}`,
             overflow: 'hidden',
           }}
         >
-          <Typography
-            component="p"
-            sx={{
-              m: 0,
-              fontFamily: fonts.body,
-              fontWeight: 600,
-              fontSize: '0.72rem',
-              lineHeight: 1,
-              color: colors.primaryBlue,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              textAlign: 'center',
-              maxWidth: '100%',
-            }}
-          >
-            Check ZIP availability · Call +1 (240) 576-0397
-          </Typography>
+          <AnnouncementBanner
+            items={mobileAnnouncementItems}
+            variant="mobile"
+            onActivate={handleAnnouncementActivate}
+          />
         </Box>
       </AppBar>
 

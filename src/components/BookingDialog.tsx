@@ -521,7 +521,7 @@ const BookingDialog: React.FC<BookingDialogProps> = ({
                 component="img"
                 src={imagePreviewUrl}
                 alt="Upload preview"
-                sx={{ width: '100%', maxWidth: '240px', borderRadius: '12px', border: '1px solid #D9D9D9' }}
+                sx={{ width: '100%', maxWidth: '240px', borderRadius: '16px', border: '1px solid #D9D9D9' }}
               />
             </Box>
           )}

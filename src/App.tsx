@@ -1,5 +1,5 @@
-import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, CircularProgress } from '@mui/material';
 import { theme } from './theme';
@@ -62,6 +62,19 @@ const PageFallback = () => (
     <CircularProgress />
   </Box>
 );
+
+/** Banner / deep-link target — lands on the homepage service-areas section. */
+const ServiceAreasRedirect: React.FC = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate('/', { replace: true });
+    const timer = window.setTimeout(() => {
+      document.getElementById('service-areas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [navigate]);
+  return <PageFallback />;
+};
 
 /** Minimal shell for admin pages — no top nav, full-height sidebar layout */
 const AdminShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -134,7 +147,7 @@ function AppRoutes() {
       <Box
         component="main"
         sx={{
-          paddingTop: showPublicChrome ? { xs: '112px', md: '100px' } : 0,
+          paddingTop: showPublicChrome ? { xs: '118px', md: '100px' } : 0,
           display: 'flex',
           flexDirection: 'column',
           minHeight: showPublicChrome ? '100vh' : undefined,
@@ -163,6 +176,7 @@ function AppRoutes() {
             <Route path="/match-expert" element={<MatchExpertPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/service-areas" element={<ServiceAreasRedirect />} />
             <Route path="/book/regular" element={<RegularBookingPage />} />
             <Route path="/book/emergency" element={<Navigate to="/emergency-service" replace />} />
             <Route path="/emergency-service" element={<EmergencyBookingPage />} />

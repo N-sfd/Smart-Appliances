@@ -151,9 +151,9 @@ const ServiceDetailPage: React.FC = () => {
                   background: '#1A73E8',
                   color: '#FFFFFF',
                   fontFamily: font,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   textTransform: 'none',
-                  borderRadius: '10px',
+                  borderRadius: '14px',
                   px: 4,
                   py: 1.4,
                   '&:hover': { background: '#0B3D91' },
@@ -166,7 +166,9 @@ const ServiceDetailPage: React.FC = () => {
               component="img"
               src={image}
               alt={title}
-              sx={{ width: '100%', height: { xs: 240, md: 320 }, objectFit: 'cover', borderRadius: '20px' }}
+              loading="lazy"
+              decoding="async"
+              sx={{ width: '100%', height: { xs: 240, md: 320 }, objectFit: 'cover', borderRadius: '16px' }}
             />
           </Box>
         </Container>

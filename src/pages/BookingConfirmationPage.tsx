@@ -193,8 +193,8 @@ const BookingConfirmationPage: React.FC = () => {
               fullWidth
               sx={{
                 backgroundColor: colors.primaryBlue, color: '#fff',
-                fontFamily: fonts.body, fontWeight: 700, textTransform: 'none',
-                borderRadius: '12px', py: 1.4, fontSize: '0.95rem',
+                fontFamily: fonts.body, fontWeight: 600, textTransform: 'none',
+                borderRadius: '14px', py: 1.4, fontSize: '0.95rem',
                 '&:hover': { backgroundColor: colors.navy },
               }}
             >
@@ -208,7 +208,7 @@ const BookingConfirmationPage: React.FC = () => {
               sx={{
                 borderColor: colors.border, color: colors.darkText,
                 fontFamily: fonts.body, fontWeight: 600, textTransform: 'none',
-                borderRadius: '12px', py: 1.3,
+                borderRadius: '14px', py: 1.3,
                 '&:hover': { borderColor: colors.navy },
               }}
             >

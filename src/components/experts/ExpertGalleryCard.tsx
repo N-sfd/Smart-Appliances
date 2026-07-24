@@ -55,6 +55,8 @@ export default function ExpertGalleryCard({ category }: Props) {
             component="img"
             src={imageSrc}
             alt={`${category} service by Smart Appliances`}
+            loading="lazy"
+            decoding="async"
             onError={() => setErrored(true)}
             sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />

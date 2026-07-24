@@ -358,9 +358,9 @@ const ConfirmationPage: React.FC = () => {
               color: '#FFFFFF',
               textTransform: 'none',
               fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-              fontWeight: 700,
+              fontWeight: 600,
               px: 4,
-              borderRadius: '10px',
+              borderRadius: '14px',
               '&:hover': { backgroundColor: '#0B3D91' },
             }}
           >
@@ -375,9 +375,9 @@ const ConfirmationPage: React.FC = () => {
               color: '#0B3D91',
               textTransform: 'none',
               fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-              fontWeight: 700,
+              fontWeight: 600,
               px: 4,
-              borderRadius: '10px',
+              borderRadius: '14px',
               '&:hover': { backgroundColor: '#0B3D91', color: '#FFFFFF' },
             }}
           >

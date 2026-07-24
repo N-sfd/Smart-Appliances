@@ -133,7 +133,7 @@ const ServicesPage: React.FC = () => {
       <Box
         sx={{
           position: 'relative',
-          py: { xs: 8, md: 10 },
+          py: { xs: 7, md: 9 },
           textAlign: 'center',
           px: 2,
           overflow: 'hidden',
@@ -426,10 +426,10 @@ const ServicesPage: React.FC = () => {
                       backgroundColor: '#1A73E8',
                       color: '#FFFFFF',
                       fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: '0.9rem',
                       textTransform: 'none',
-                      borderRadius: '12px',
+                      borderRadius: '14px',
                       boxShadow: 'none',
                       '&:hover': {
                         backgroundColor: '#0B3D91',
@@ -450,7 +450,7 @@ const ServicesPage: React.FC = () => {
       <Box
         sx={{
           backgroundColor: '#0B3D91',
-          py: { xs: 8, md: 10 },
+          py: { xs: 7, md: 9 },
           textAlign: 'center',
           px: 2,
         }}

@@ -208,7 +208,7 @@ const EmergencyServiceModal: React.FC<EmergencyServiceModalProps> = ({
     }
   };
 
-  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
+  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '14px' } };
 
   return (
     <Dialog

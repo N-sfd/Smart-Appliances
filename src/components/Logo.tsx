@@ -62,7 +62,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       <Box sx={wrapperSx} {...interactiveProps}>
         <Box
           component="img"
-          src="/images/logo-full.png"
+          src="/images/logo-full.webp"
           alt="Smart Appliances"
           sx={{
             display: 'block',

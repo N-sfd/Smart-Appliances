@@ -79,10 +79,10 @@ const ContactPage: React.FC = () => {
                 backgroundColor: '#1A73E8',
                 color: '#FFFFFF',
                 fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                fontWeight: 700,
+                fontWeight: 600,
                 px: 4,
                 py: 1.5,
-                borderRadius: '10px',
+                borderRadius: '14px',
                 textTransform: 'none',
                 '&:hover': { backgroundColor: '#0B3D91' },
               }}

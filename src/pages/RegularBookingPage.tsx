@@ -106,7 +106,7 @@ const continueButtonSx = {
   backgroundColor: colors.primaryBlue,
   color: colors.white,
   fontFamily: fonts.body,
-  fontWeight: 700,
+  fontWeight: 600,
   fontSize: '15px',
   textTransform: 'none' as const,
   px: 4,
@@ -423,8 +423,8 @@ const RegularBookingPage: React.FC = () => {
                 {(() => {
                   const info = getServiceImage(serviceTypeId, categoryId);
                   return (
-                    <Box sx={{ mb: 3, borderRadius: '20px', border: '1px solid #E4E7EB', overflow: 'hidden', boxShadow: '0 12px 30px rgba(10,37,64,0.08)', transition: 'all 0.3s ease' }}>
-                      <Box component="img" src={info.image} alt={info.title} sx={{ width: '100%', height: 200, objectFit: 'cover', display: 'block', transition: 'opacity 0.3s ease' }} />
+                    <Box sx={{ mb: 3, borderRadius: '16px', border: '1px solid #E4E7EB', overflow: 'hidden', boxShadow: '0 12px 30px rgba(10,37,64,0.08)', transition: 'all 0.3s ease' }}>
+                      <Box component="img" src={info.image} alt={info.title} loading="lazy" decoding="async" sx={{ width: '100%', height: 200, objectFit: 'cover', display: 'block', transition: 'opacity 0.3s ease' }} />
                       <Box sx={{ p: '16px 18px', backgroundColor: '#FFFFFF' }}>
                         <Typography sx={{ fontSize: '20px', fontWeight: 700, color: '#0B3D91', lineHeight: 1.2 }}>{info.title}</Typography>
                         <Typography sx={{ fontSize: '14px', color: '#64748B', mt: '4px', lineHeight: 1.5 }}>{info.desc}</Typography>

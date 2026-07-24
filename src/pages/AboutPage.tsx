@@ -147,7 +147,7 @@ const AboutPage: React.FC = () => {
       />
 
       {/* ── Our Mission ── */}
-      <Box sx={{ py: { xs: 8, md: 10 }, backgroundColor: '#FFFFFF' }}>
+      <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#FFFFFF' }}>
         <Container maxWidth="lg">
           <Box
             sx={{
@@ -190,7 +190,7 @@ const AboutPage: React.FC = () => {
             {/* Right: team photo + 2x2 stat cards */}
             <Box>
               <StableImage
-                src="/images/services/hero-technician.jpg"
+                src="/images/services/hero-technician.webp"
                 alt="Smart Appliances technician preparing for a home service appointment"
                 intrinsicWidth={ABOUT_MISSION_IMAGE_WIDTH}
                 intrinsicHeight={ABOUT_MISSION_IMAGE_HEIGHT}
@@ -244,7 +244,7 @@ const AboutPage: React.FC = () => {
       </Box>
 
       {/* ── What We Offer ── */}
-      <Box sx={{ py: { xs: 8, md: 10 }, backgroundColor: '#F5F7F9' }}>
+      <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#F5F7F9' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
@@ -304,7 +304,7 @@ const AboutPage: React.FC = () => {
       </Box>
 
       {/* ── Why Customers Trust Us ── */}
-      <Box sx={{ py: { xs: 8, md: 10 }, backgroundColor: '#FFFFFF' }}>
+      <Box sx={{ py: { xs: 7, md: 9 }, backgroundColor: '#FFFFFF' }}>
         <Container maxWidth="lg">
           <Typography
             variant="h2"
@@ -372,7 +372,7 @@ const AboutPage: React.FC = () => {
       </Box>
 
       {/* ── CTA Banner ── */}
-      <Box sx={{ backgroundColor: '#0B3D91', py: { xs: 8, md: 10 }, textAlign: 'center', px: 2 }}>
+      <Box sx={{ backgroundColor: '#0B3D91', py: { xs: 7, md: 9 }, textAlign: 'center', px: 2 }}>
         <Container maxWidth="md">
           <Typography
             variant="h2"
@@ -393,10 +393,10 @@ const AboutPage: React.FC = () => {
                 backgroundColor: '#1A73E8',
                 color: '#FFFFFF',
                 fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                fontWeight: 700,
+                fontWeight: 600,
                 px: 4,
                 py: 1.75,
-                borderRadius: '12px',
+                borderRadius: '14px',
                 textTransform: 'none',
                 fontSize: '1rem',
                 '&:hover': { backgroundColor: '#FFFFFF', color: '#0B3D91' },
@@ -411,10 +411,10 @@ const AboutPage: React.FC = () => {
                 borderColor: '#EF4444',
                 color: '#EF4444',
                 fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-                fontWeight: 700,
+                fontWeight: 600,
                 px: 4,
                 py: 1.75,
-                borderRadius: '12px',
+                borderRadius: '14px',
                 textTransform: 'none',
                 fontSize: '1rem',
                 '&:hover': { backgroundColor: 'rgba(249,115,22,0.1)', borderColor: '#FB923C', color: '#FB923C' },
