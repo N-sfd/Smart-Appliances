@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { Box, Typography, TextField, Button, IconButton, Tooltip } from '@mui/material';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import YouTubeIcon from '@mui/icons-material/YouTube';
-import InstagramIcon from '@mui/icons-material/Instagram';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { colors, fonts } from '../theme';
 
@@ -66,23 +63,19 @@ const bottomBarLinks: FooterLink[] = [
 ];
 
 const socialLinks: SocialLink[] = [
-  { label: 'Facebook', ariaLabel: 'Visit Smart Appliances on Facebook', href: '#', icon: <FacebookIcon sx={{ fontSize: 18 }} />, color: '#1877F2' },
   {
-    label: 'X',
-    ariaLabel: 'Visit Smart Appliances on X',
-    href: '#',
-    icon: <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '0.85rem', lineHeight: 1, color: 'inherit' }}>X</Typography>,
-    color: '#000000',
+    label: 'Google Business',
+    ariaLabel: 'View Smart Appliances on Google Maps',
+    href: 'https://www.google.com/maps/search/?api=1&query=1101+Opal+Ct+Hagerstown+MD+21740',
+    icon: <StorefrontIcon sx={{ fontSize: 18 }} />,
+    color: '#4285F4',
   },
-  { label: 'YouTube', ariaLabel: 'Visit Smart Appliances on YouTube', href: '#', icon: <YouTubeIcon sx={{ fontSize: 18 }} />, color: '#FF0000' },
-  { label: 'Google Business', ariaLabel: 'View Smart Appliances Google Business Profile', href: '#', icon: <StorefrontIcon sx={{ fontSize: 18 }} />, color: '#4285F4' },
   {
-    label: 'Instagram',
-    ariaLabel: 'Visit Smart Appliances on Instagram',
-    href: '#',
-    icon: <InstagramIcon sx={{ fontSize: 18 }} />,
-    color: '#D62976',
-    hoverGradient: 'linear-gradient(45deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)',
+    label: 'Email',
+    ariaLabel: 'Email Smart Appliances',
+    href: 'mailto:service@smartappliances.co',
+    icon: <Typography sx={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: '0.85rem', lineHeight: 1, color: 'inherit' }}>@</Typography>,
+    color: '#1A73E8',
   },
 ];
 
@@ -97,17 +90,17 @@ const FOOTER_HEADING = {
   letterSpacing: '-0.01em',
   lineHeight: 1.3,
   m: 0,
-  mb: '12px',
+  mb: '8px',
 } as const;
 
 const footerLinkSx = {
   fontFamily: fonts.body,
   color: FOOTER_LINK_COLOR,
-  fontSize: '0.875rem',
-  lineHeight: 1.45,
+  fontSize: '0.8125rem',
+  lineHeight: 1.4,
   textDecoration: 'none',
   display: 'block',
-  mb: '7px',
+  mb: '5px',
   transition: 'color 0.2s',
   '&:hover': { color: colors.primaryBlue },
 } as const;
@@ -202,8 +195,8 @@ const SiteFooter: React.FC = () => {
           maxWidth: 1200,
           mx: 'auto',
           px: { xs: 2, sm: 3 },
-          pt: { xs: 3, md: 4 },
-          pb: { xs: 2, md: 2.5 },
+          pt: { xs: 2.5, md: 3 },
+          pb: { xs: 1.5, md: 2 },
         }}
       >
         <Box
@@ -215,8 +208,8 @@ const SiteFooter: React.FC = () => {
               md: 'repeat(3, minmax(0, 1fr))',
               lg: '1.05fr 1.4fr 1fr 1fr 1.35fr',
             },
-            columnGap: { xs: 0, sm: 4, lg: 5 },
-            rowGap: { xs: 2.5, sm: 3 },
+            columnGap: { xs: 0, sm: 3.5, lg: 4 },
+            rowGap: { xs: 2, sm: 2.5 },
             alignItems: 'start',
           }}
         >

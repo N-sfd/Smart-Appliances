@@ -12,6 +12,7 @@ import { getCategoryFallbackImage } from '../data/serviceCategoryFallbacks';
 import { getCategoryHeroFallback } from '../data/categoryHeroFallbacks';
 import { APPLIANCE_DEFAULT_IMAGE } from '../data/applianceHub';
 import ServiceTypeChips from './brands/ServiceTypeChips';
+import OptimizedServiceImage from './shared/OptimizedServiceImage';
 import type { IconChipItem } from '../data/serviceCategoryPages';
 
 /** categoryId -> the slug used by categoryHeroFallbacks (only smart-home's differ). */
@@ -474,19 +475,14 @@ const ServiceCategoryBookingSection: React.FC<ServiceCategoryBookingSectionProps
               mb: 0,
             }}
           >
-            <Box
-              component="img"
+            <OptimizedServiceImage
               src={displayService.image}
               alt={displayService.title}
-              loading="lazy"
-              width={480}
-              height={360}
+              variant="section"
+              borderRadius="16px"
               sx={{
-                width: '100%',
                 height: { xs: 240, sm: 300, md: 360 },
-                objectFit: 'cover',
-                borderRadius: '16px',
-                display: 'block',
+                aspectRatio: 'auto',
                 boxShadow: '0 12px 40px rgba(10,37,64,0.12)',
               }}
             />

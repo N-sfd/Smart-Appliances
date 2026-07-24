@@ -29,7 +29,11 @@ const ContactPage: React.FC = () => {
                 (240) 576-0397
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: '#FFFFFF' }}>
+            <Box
+              component="a"
+              href="mailto:service@smartappliances.co"
+              sx={{ display: 'flex', alignItems: 'center', gap: 0.75, textDecoration: 'none', color: '#FFFFFF', '&:hover': { color: '#4FC3F7' } }}
+            >
               <EmailIcon sx={{ fontSize: 17, color: '#4FC3F7' }} />
               <Typography sx={{ fontFamily: "'Inter', 'DM Sans', Arial, sans-serif", fontSize: '0.85rem', fontWeight: 600 }}>
                 service@smartappliances.co
@@ -74,7 +78,7 @@ const ContactPage: React.FC = () => {
             </Typography>
             <Button
               variant="contained"
-              onClick={() => navigate('/book/regular')}
+              onClick={() => navigate('/scheduler')}
               sx={{
                 backgroundColor: '#1A73E8',
                 color: '#FFFFFF',
@@ -87,7 +91,7 @@ const ContactPage: React.FC = () => {
                 '&:hover': { backgroundColor: '#0B3D91' },
               }}
             >
-              Book Regular Service
+              Schedule Service
             </Button>
           </Box>
         </Container>

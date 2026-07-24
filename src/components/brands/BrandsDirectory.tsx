@@ -294,6 +294,7 @@ const BrandsDirectory: React.FC = () => {
           <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 3.5 } }}>
             <Button
               onClick={() => setVisibleCount(filteredBrands.length)}
+              aria-expanded={false}
               variant="outlined"
               sx={{
                 borderColor: colors.primaryBlue,
@@ -311,6 +312,31 @@ const BrandsDirectory: React.FC = () => {
               }}
             >
               View More Brands
+            </Button>
+          </Box>
+        )}
+        {!hasMoreBrands && filteredBrands.length > INITIAL_VISIBLE_COUNT && (
+          <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 3.5 } }}>
+            <Button
+              onClick={() => setVisibleCount(INITIAL_VISIBLE_COUNT)}
+              aria-expanded={true}
+              variant="outlined"
+              sx={{
+                borderColor: colors.primaryBlue,
+                color: colors.primaryBlue,
+                fontFamily: fonts.body,
+                fontWeight: 700,
+                textTransform: 'none',
+                borderRadius: '12px',
+                px: 3,
+                '&:hover': {
+                  borderColor: colors.navy,
+                  color: colors.navy,
+                  backgroundColor: colors.lightBlueBg,
+                },
+              }}
+            >
+              Show Fewer Brands
             </Button>
           </Box>
         )}

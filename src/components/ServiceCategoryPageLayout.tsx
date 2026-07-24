@@ -16,6 +16,7 @@ import { colors, fonts } from '../theme';
 import ServiceCategoryBookingSection from './ServiceCategoryBookingSection';
 import BrandsWeService from './brands/BrandsWeService';
 import GetInTouchSection from './contact/GetInTouchSection';
+import RelatedServicesSection from './RelatedServicesSection';
 import type { ServiceCategoryPageConfig } from '../data/serviceCategoryPages';
 import { SERVICE_SLUG_TO_SCHEDULER } from '../data/schedulerPrefill';
 import { SERVICE_SLUG_TO_CONTACT_CATEGORY } from '../data/contact-info';
@@ -108,11 +109,20 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
       navigate('/emergency-service');
       return;
     }
-    if (config.slug === 'smart-home') {
-      navigate('/contact');
+    navigate('/contact');
+  };
+
+  const handleBottomPrimary = () => {
+    handlePrimaryCta();
+  };
+
+  const handleBottomSecondary = () => {
+    const label = config.bottomCta.secondaryLabel?.toLowerCase() ?? '';
+    if (label.includes('emergency')) {
+      navigate('/emergency-service');
       return;
     }
-    navigate('/emergency-service');
+    navigate('/contact');
   };
 
   const renderHero = () => {
@@ -131,8 +141,10 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
           <Box
             component="img"
             src={config.hero.image}
-            alt=""
+            alt={config.hero.imageAlt ?? config.hero.title}
             loading="eager"
+            decoding="sync"
+            fetchPriority="high"
             onError={handleHeroError}
             sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
@@ -512,8 +524,6 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
         serviceCardVariant={config.serviceCardVariant}
       />
 
-      {config.brandsCategory && <BrandsWeService category={config.brandsCategory} />}
-
       <Box sx={{ py: { xs: 6, md: 8 }, backgroundColor: colors.sectionBg, borderTop: '1px solid #EEF0F3' }}>
         <Container maxWidth="md">
           <Typography
@@ -667,6 +677,8 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
         </Box>
       )}
 
+      {config.brandsCategory && <BrandsWeService category={config.brandsCategory} />}
+
       <Box
         sx={{
           position: 'relative',
@@ -792,6 +804,8 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
         </Box>
       </Box>
 
+      <RelatedServicesSection currentSlug={config.slug} />
+
       <Box sx={{ pt: { xs: 5, md: 6 }, pb: { xs: 7, md: 9 }, backgroundColor: colors.navy, textAlign: 'center' }}>
         <Container maxWidth="sm">
           <Typography
@@ -806,9 +820,51 @@ const ServiceCategoryPageLayout: React.FC<ServiceCategoryPageLayoutProps> = ({ c
           >
             {config.bottomCta.title}
           </Typography>
-          <Typography sx={{ fontFamily: fonts.body, color: 'rgba(255,255,255,0.88)', fontSize: '1.05rem', lineHeight: 1.6 }}>
+          <Typography sx={{ fontFamily: fonts.body, color: 'rgba(255,255,255,0.88)', fontSize: '1.05rem', lineHeight: 1.6, mb: 3.5 }}>
             {config.bottomCta.subtitle}
           </Typography>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={handleBottomPrimary}
+              sx={{
+                background: '#FFFFFF',
+                color: colors.navy,
+                fontFamily: fonts.body,
+                fontWeight: 700,
+                textTransform: 'none',
+                borderRadius: '999px',
+                px: 4,
+                py: 1.5,
+                ...ctaLiftHover,
+                '&:hover': { background: '#E8F1FF', transform: 'translateY(-2px)' },
+              }}
+            >
+              {config.bottomCta.primaryLabel}
+            </Button>
+            {config.bottomCta.secondaryLabel && (
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={handleBottomSecondary}
+                sx={{
+                  borderColor: 'rgba(255,255,255,0.6)',
+                  color: '#FFFFFF',
+                  fontFamily: fonts.body,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  borderRadius: '999px',
+                  px: 3.5,
+                  py: 1.5,
+                  ...ctaLiftHover,
+                  '&:hover': { borderColor: '#FFFFFF', backgroundColor: 'rgba(255,255,255,0.08)', transform: 'translateY(-2px)' },
+                }}
+              >
+                {config.bottomCta.secondaryLabel}
+              </Button>
+            )}
+          </Box>
         </Container>
       </Box>
 

@@ -40,17 +40,17 @@ const fieldSx = {
     fontFamily: fonts.body,
   },
   '& .MuiOutlinedInput-input': {
-    fontSize: '0.9rem',
+    fontSize: '0.9375rem',
     paddingTop: '14px',
     paddingBottom: '14px',
   },
   '& .MuiSelect-select': {
-    fontSize: '0.9rem',
+    fontSize: '0.9375rem',
     paddingTop: '14px !important',
     paddingBottom: '14px !important',
   },
   '& .MuiInputLabel-root': {
-    fontSize: '0.85rem',
+    fontSize: '0.8125rem',
   },
   '& .MuiFormHelperText-root': {
     fontSize: '0.72rem',
@@ -215,7 +215,7 @@ const GetInTouchSection: React.FC<GetInTouchSectionProps> = ({
             {...linkProps}
             sx={{
               fontFamily: fonts.body,
-              fontSize: '0.95rem',
+              fontSize: '0.9375rem',
               fontWeight: 600,
               color: colors.navy,
               lineHeight: 1.3,
@@ -228,7 +228,7 @@ const GetInTouchSection: React.FC<GetInTouchSectionProps> = ({
             {label}
           </Typography>
         ) : (
-          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.95rem', fontWeight: 600, color: colors.navy, lineHeight: 1.3 }}>
+          <Typography sx={{ fontFamily: fonts.body, fontSize: '0.9375rem', fontWeight: 600, color: colors.navy, lineHeight: 1.3 }}>
             {label}
           </Typography>
         )}
@@ -311,18 +311,18 @@ const GetInTouchSection: React.FC<GetInTouchSectionProps> = ({
                 borderRadius: CARD_RADIUS,
                 border: '1px solid #E4E7EB',
                 boxShadow: CARD_SHADOW,
-                p: '20px',
+                p: '16px',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: '15px' }}>
-                <AccessTimeIcon sx={{ color: '#1A73E8', fontSize: 19 }} />
-                <Typography sx={{ fontFamily: fonts.heading, color: colors.navy, fontWeight: 600, fontSize: '0.95rem' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: '12px' }}>
+                <AccessTimeIcon sx={{ color: '#1A73E8', fontSize: 18 }} />
+                <Typography sx={{ fontFamily: fonts.heading, color: colors.navy, fontWeight: 600, fontSize: '0.9rem' }}>
                   Business Hours
                 </Typography>
               </Box>
               {BUSINESS_HOURS.map((row) => (
-                <Box key={row.day} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, mb: '9px', '&:last-of-type': { mb: 0 } }}>
-                  <Typography sx={{ fontFamily: fonts.body, color: colors.darkText, fontSize: '0.85rem' }}>
+                <Box key={row.day} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, mb: '8px', '&:last-of-type': { mb: 0 } }}>
+                  <Typography sx={{ fontFamily: fonts.body, color: colors.darkText, fontSize: '0.8125rem' }}>
                     {row.day}
                   </Typography>
                   <Typography
@@ -330,7 +330,7 @@ const GetInTouchSection: React.FC<GetInTouchSectionProps> = ({
                       fontFamily: fonts.body,
                       color: row.isEmergency ? '#D97706' : colors.navy,
                       fontWeight: 600,
-                      fontSize: '0.85rem',
+                      fontSize: '0.8125rem',
                       textAlign: 'right',
                     }}
                   >
@@ -505,13 +505,13 @@ const GetInTouchSection: React.FC<GetInTouchSectionProps> = ({
                       FormHelperTextProps={{ id: 'contact-message-helper' }}
                       fullWidth
                       multiline
-                      minRows={4}
+                      minRows={5}
                       variant="outlined"
                       sx={{
                         ...fieldSx,
                         '& .MuiInputBase-inputMultiline': {
                           resize: 'vertical',
-                          minHeight: { xs: 100, sm: 110, md: 120 },
+                          minHeight: { xs: 150, sm: 170, md: 185 },
                           boxSizing: 'border-box',
                         },
                       }}

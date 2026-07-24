@@ -470,7 +470,7 @@ const Home: React.FC = () => {
               >
                 <VerifiedIcon sx={{ color: '#7FDBFF', fontSize: 14 }} />
                 <Typography sx={{ fontFamily: fonts.body, fontSize: '0.76rem', fontWeight: 700, color: '#FFFFFF' }}>
-                  Trusted Local Appliance Service
+                  Trusted Local Home Service
                 </Typography>
               </Box>
 
@@ -487,8 +487,8 @@ const Home: React.FC = () => {
                   letterSpacing: '-0.4px',
                 }}
               >
-                Fast, Certified Appliance Repair —{' '}
-                <Box component="span" sx={{ color: '#4FC3F7' }}>Same‑Day Availability</Box>
+                Home repair, maintenance, and installation{' '}
+                <Box component="span" sx={{ color: '#4FC3F7' }}>made easy.</Box>
               </Typography>
 
               {/* Subtext */}
@@ -499,10 +499,10 @@ const Home: React.FC = () => {
                   color: 'rgba(255,255,255,0.75)',
                   lineHeight: 1.6,
                   mb: 2.5,
-                  maxWidth: '440px',
+                  maxWidth: '460px',
                 }}
               >
-                Book trusted technicians for appliance repair, installation, HVAC, plumbing, and urgent service needs.
+                Book appliance repair, HVAC, plumbing, electrical, smart-home, handyman, TV mounting, and more with clear scheduling and request tracking.
               </Typography>
 
               {/* CTAs */}
@@ -512,34 +512,20 @@ const Home: React.FC = () => {
                   onClick={() => navigate('/scheduler')}
                   sx={{ ...primaryButtonSx, ...heroCtaButtonSx }}
                 >
-                  Book Service
+                  Schedule Service
                 </Button>
                 <Button
                   variant="outlined"
-                  onClick={() => navigate('/emergency-service')}
+                  onClick={() => {
+                    const el = document.getElementById('service-areas');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    else navigate('/service-areas');
+                  }}
                   sx={{ ...secondaryButtonSx, ...heroCtaButtonSx }}
                 >
-                  Emergency Service
+                  Check ZIP Availability
                 </Button>
               </Box>
-
-              {/* Not sure which service? */}
-              <Button
-                variant="text"
-                onClick={() => navigate('/match-expert')}
-                sx={{
-                  fontFamily: fonts.body,
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
-                  textTransform: 'none',
-                  color: '#4FC3F7',
-                  px: 0,
-                  mb: 2.5,
-                  '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' },
-                }}
-              >
-                Not sure what you need? Match Me With an Expert →
-              </Button>
 
               {/* Trust row */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 0.5 }}>

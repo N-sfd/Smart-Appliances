@@ -1709,6 +1709,7 @@ const HomeBelowFold: React.FC = () => {
                 <Button
                   variant="text"
                   onClick={() => setShowAllAreas(true)}
+                  aria-expanded={false}
                   sx={{
                     alignSelf: 'flex-start',
                     mt: 1.5,
@@ -1722,6 +1723,26 @@ const HomeBelowFold: React.FC = () => {
                   }}
                 >
                   View All Service Areas →
+                </Button>
+              )}
+              {showAllAreas && serviceAreaNeighborhoods.length > INITIAL_AREA_COUNT && (
+                <Button
+                  variant="text"
+                  onClick={() => setShowAllAreas(false)}
+                  aria-expanded={true}
+                  sx={{
+                    alignSelf: 'flex-start',
+                    mt: 1.5,
+                    fontFamily: fonts.body,
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    textTransform: 'none',
+                    color: '#1A73E8',
+                    px: 0,
+                    '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' },
+                  }}
+                >
+                  Show Fewer Service Areas
                 </Button>
               )}
             </Box>

@@ -172,8 +172,12 @@ const TopBar: React.FC = () => {
     setDrawerOpen(false);
   };
 
+  // Not a real toggle: a mouse click is always preceded by a `mouseenter` on the
+  // wrapping Box, which already opened the menu via `openServicesMenu`. Toggling off
+  // current state here would immediately re-close what the hover just opened, so a
+  // click always (re)opens — closing happens via mouseleave, outside click, or Escape.
   const toggleServicesMenu = () => {
-    setServicesMenuOpen((open) => !open);
+    openServicesMenu();
   };
 
   const navButtonSx = (active: boolean) => ({
@@ -233,7 +237,7 @@ const TopBar: React.FC = () => {
           <Box
             sx={{
               display: 'none',
-              '@media (min-width:1024px)': { display: 'flex' },
+              '@media (min-width:1024px)': { display: 'flex', overflow: 'visible' },
               alignItems: 'center',
               flexGrow: 1,
               minWidth: 0,
@@ -252,6 +256,7 @@ const TopBar: React.FC = () => {
                 minWidth: 0,
                 gap: 0.15,
                 overflow: 'hidden',
+                '@media (min-width:1024px)': { overflow: 'visible' },
               }}
             >
               <Box
@@ -281,6 +286,7 @@ const TopBar: React.FC = () => {
                   minWidth: 0,
                   flexWrap: 'nowrap',
                   overflow: 'hidden',
+                  '@media (min-width:1024px)': { overflow: 'visible' },
                 }}
               >
                 {navLinks.map((link) => {

@@ -9,17 +9,17 @@ export interface AnnouncementItem {
 }
 
 export const desktopAnnouncementItems: AnnouncementItem[] = [
-  { id: 'zip', text: '✓ Check ZIP availability', path: '/service-areas' },
-  { id: 'book', text: '✓ Book service online', path: '/scheduler' },
-  { id: 'track', text: '✓ Track your request', path: '/track-request' },
-  { id: 'areas', text: '✓ Serving MD, VA, WV, PA, DE & DC', path: '/service-areas' },
-  { id: 'expert', text: '✓ Match with an expert', path: '/contact' },
+  { id: 'zip', text: 'Check ZIP availability', path: '/service-areas' },
+  { id: 'book', text: 'Book service online', path: '/scheduler' },
+  { id: 'track', text: 'Track your request', path: '/track-request' },
+  { id: 'areas', text: 'Serving MD, VA, WV, PA, DE & DC', path: '/service-areas' },
+  { id: 'expert', text: 'Match with an expert', path: '/contact' },
 ];
 
 export const mobileAnnouncementItems: AnnouncementItem[] = [
-  { id: 'zip-m', text: '✓ Check ZIP availability', path: '/service-areas' },
-  { id: 'book-m', text: '✓ Book service online', path: '/scheduler' },
-  { id: 'track-m', text: '✓ Track your request', path: '/track-request' },
+  { id: 'zip-m', text: 'Check ZIP availability', path: '/service-areas' },
+  { id: 'book-m', text: 'Book service online', path: '/scheduler' },
+  { id: 'track-m', text: 'Track your request', path: '/track-request' },
 ];
 
 function usePrefersReducedMotion(): boolean {
